@@ -92,6 +92,8 @@ class Date(object):
             return Date._advance(self, -period.length, period.units)
         elif isinstance(period, int):
             return Date._advance(self, -period, TimeUnits.Days)
+        elif isinstance(period, Date):
+            return self.__serialNumber__ - period.serialNumber
         else:
             period = Period(period)
             return Date._advance(self, -period.length, period.units)

@@ -25,10 +25,3 @@ class MetaSettings(type):
 
 class Settings(object):
     __metaclass__ = MetaSettings
-
-
-if __name__ == '__main__':
-
-    print(Settings.evaluationDate)
-    Settings.evaluationDate = Date(2015, 1, 1)
-    print(Settings.evaluationDate)

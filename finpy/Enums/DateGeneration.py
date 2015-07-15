@@ -10,5 +10,6 @@ from enum import unique
 
 @unique
 class DateGeneration(IntEnum):
-    Backward = 0
-    Forward = 1
+    Zero = 0
+    Backward = 1
+    Forward = 2

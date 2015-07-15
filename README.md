@@ -10,9 +10,6 @@
 
 ``
 pip install -r requirements/python2.txt
-``
-
-``
 python setpy.py install
 ``
 

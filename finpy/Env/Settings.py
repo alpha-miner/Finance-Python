@@ -7,6 +7,7 @@ Created on 2015-7-15
 
 from finpy.DateUtilities import Date
 
+
 class MetaSettings(type):
 
     _evaluationDate = Date.todaysDate()
@@ -21,6 +22,13 @@ class MetaSettings(type):
 
     evaluationDate = property(_getEvaluationDate, _setEvaluationDate)
 
+
 class Settings(object):
     __metaclass__ = MetaSettings
 
+
+if __name__ == '__main__':
+
+    print(Settings.evaluationDate)
+    Settings.evaluationDate = Date(2015, 1, 1)
+    print(Settings.evaluationDate)

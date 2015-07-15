@@ -10,5 +10,5 @@ from enum import unique
 
 @unique
 class DateGeneration(IntEnum):
-    Backward = CAL.DateGeneration.Backward
-    Forward = CAL.DateGeneration.Forward
+    Backward = 0
+    Forward = 1

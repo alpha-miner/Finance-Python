@@ -1,6 +1,3 @@
-# finpy
--------------
-
 ## finpy
 -------------
 
@@ -9,7 +6,7 @@
 ## 安装
 -------------
 
-根据使用的python版本不同，例如Python2，
+根据使用的python版本不同，例如Python2:
 
 ~~~
 pip install -r requirements/python2.txt

@@ -24,6 +24,8 @@ def test():
     suite.addTests(tests)
     tests = unittest.TestLoader().loadTestsFromTestCase(Risk.TestAccumulators)
     suite.addTests(tests)
+    tests = unittest.TestLoader().loadTestsFromTestCase(Risk.TestPerformancers)
+    suite.addTests(tests)
 
     res = unittest.TextTestRunner(verbosity=3).run(suite)
     if len(res.errors) >= 1 or len(res.failures) >= 1:

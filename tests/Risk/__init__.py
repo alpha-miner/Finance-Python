@@ -6,3 +6,4 @@ Created on 2015-7-17
 """
 
 from Risk.testAccumulators import TestAccumulators
+from Risk.testPerformancers import TestPerformancers

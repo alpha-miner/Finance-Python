@@ -7,4 +7,3 @@ Created on 2015-7-15
 
 __all__ = ['Settings']
 
-from finpy.Env.Settings import Settings

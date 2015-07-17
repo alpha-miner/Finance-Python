@@ -8,6 +8,8 @@ Created on 2015-7-13
 def test():
 
     import DateUtilities
+    import Env
+    import Risk
     import unittest
 
     suite = unittest.TestSuite()
@@ -17,6 +19,10 @@ def test():
     tests = unittest.TestLoader().loadTestsFromTestCase(DateUtilities.TestDate)
     suite.addTests(tests)
     tests = unittest.TestLoader().loadTestsFromTestCase(DateUtilities.TestPeriod)
+    suite.addTests(tests)
+    tests = unittest.TestLoader().loadTestsFromTestCase(Env.TestSettings)
+    suite.addTests(tests)
+    tests = unittest.TestLoader().loadTestsFromTestCase(Risk.TestAccumulators)
     suite.addTests(tests)
 
     res = unittest.TextTestRunner(verbosity=3).run(suite)

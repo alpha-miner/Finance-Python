@@ -220,7 +220,7 @@ class Schedule(object):
             self._isRegular[1] = (self._dates[1] == self._dates[0])
             self._dates[1] = self._dates[0]
             self._dates = self._dates[1:]
-            self._isRegular= self._isRegular[1:]
+            self._isRegular = self._isRegular[1:]
 
         assert len(self._dates) >= 1, "degenerate single date ({0}) schedule\n" \
                                       "seed date: {1}\n" \

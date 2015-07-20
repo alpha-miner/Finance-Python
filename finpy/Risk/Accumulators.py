@@ -54,6 +54,8 @@ class MovingAverager(ValueHolder):
     def result(self):
         if self._isFull:
             return self._runningSum / self._window
+        else:
+            return self._runningSum / len(self._con)
 
 
 class MovingVariancer(ValueHolder):
@@ -76,6 +78,13 @@ class MovingVariancer(ValueHolder):
                 return tmp / self._window
             else:
                 return tmp / (self._window - 1)
+        elif len(self._con) >= 2:
+            tmp = self._runningSumSquare - self._runningSum * self._runningSum / len(self._con)
+            if self._isPop:
+                return tmp / len(self._con)
+            else:
+                return tmp / (len(self._con) - 1)
+
 
 
 class MovingCorrelation(ValueHolder):
@@ -107,8 +116,13 @@ class MovingCorrelation(ValueHolder):
             nominator = n * self._runningSumCrossSquare - self._runningSumLeft * self._runningSumRight
             denominator = (n * self._runningSumSquareLeft - self._runningSumLeft * self._runningSumLeft) \
                          *(n * self._runningSumSquareRight - self._runningSumRight * self._runningSumRight)
-
             denominator = math.sqrt(denominator)
-
+            return nominator / denominator
+        elif len(self._con) >= 2:
+            n = len(self._con)
+            nominator = n * self._runningSumCrossSquare - self._runningSumLeft * self._runningSumRight
+            denominator = (n * self._runningSumSquareLeft - self._runningSumLeft * self._runningSumLeft) \
+                         *(n * self._runningSumSquareRight - self._runningSumRight * self._runningSumRight)
+            denominator = math.sqrt(denominator)
             return nominator / denominator
 

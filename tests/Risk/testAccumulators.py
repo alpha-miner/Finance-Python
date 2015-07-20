@@ -6,8 +6,11 @@ Created on 2015-7-16
 """
 
 import unittest
+import csv
+import os
 from finpy.Risk import MovingAverager
 from finpy.Risk import MovingVariancer
+from finpy.Risk import MovingCorrelation
 
 
 class TestAccumulators(unittest.TestCase):
@@ -86,5 +89,29 @@ class TestAccumulators(unittest.TestCase):
                 self.assertAlmostEqual(calculated, expected, 15, "at index {0:d}\n"
                                                                  "Var expected:   {1:f}\n"
                                                                  "Var calculated: {2:f}".format(i, expected, calculated))
+
+    def testMovingCorrelation(self):
+        dirName = os.path.dirname(os.path.abspath(__file__))
+        filePath = os.path.join(dirName, 'data/correlation.csv')
+
+        window = 120
+        total = 2500
+        mv = MovingCorrelation(window)
+
+        with open(filePath, 'r') as fileHandler:
+            reader = csv.reader(fileHandler)
+
+            for i, row in enumerate(reader):
+                if i == 0:
+                    continue
+                mv.push((float(row[0]), float(row[1])))
+                if i >= window:
+                    expected = float(row[2])
+                    calculated = mv.result()
+                    self.assertAlmostEqual(calculated, expected, 8, "at index {0:d}\n"
+                                                                    "Correlation expected:   {1:f}\n"
+                                                                    "Correlation calculated: {2:f}".format(i, expected, calculated))
+
+
 
 

@@ -5,6 +5,8 @@ Created on 2015-7-16
 @author: cheng.li
 """
 
+import math
+
 
 class ValueHolder(object):
 
@@ -21,7 +23,11 @@ class ValueHolder(object):
 
     def _dumpOneValue(self, value):
 
-        popout = 0.0
+        if not hasattr(value, '__iter__'):
+            popout = 0.0
+        else:
+            popout = [0.0] * len(value)
+
         if self._isFull == 1:
             # use list as circular queue
             popout = self._con[self._start]
@@ -70,4 +76,39 @@ class MovingVariancer(ValueHolder):
                 return tmp / self._window
             else:
                 return tmp / (self._window - 1)
+
+
+class MovingCorrelation(ValueHolder):
+
+    def __init__(self, window):
+        super(MovingCorrelation, self).__init__(window)
+        self._runningSumLeft = 0.0
+        self._runningSumRight = 0.0
+        self._runningSumSquareLeft = 0.0
+        self._runningSumSquareRight = 0.0
+        self._runningSumCrossSquare = 0.0
+
+    def push(self, value):
+        popout = self._dumpOneValue(value)
+        headLeft = popout[0]
+        headRight = popout[1]
+
+        # updating cached values
+        self._runningSumLeft = self._runningSumLeft - headLeft + value[0]
+        self._runningSumRight = self._runningSumRight - headRight + value[1]
+        self._runningSumSquareLeft = self._runningSumSquareLeft - headLeft * headLeft + value[0] * value[0]
+        self._runningSumSquareRight = self._runningSumSquareRight - headRight * headRight + value[1] * value[1]
+        self._runningSumCrossSquare = self._runningSumCrossSquare - headLeft * headRight + value[0] * value[1]
+
+    def result(self):
+
+        if self._isFull:
+            n = self._window
+            nominator = n * self._runningSumCrossSquare - self._runningSumLeft * self._runningSumRight
+            denominator = (n * self._runningSumSquareLeft - self._runningSumLeft * self._runningSumLeft) \
+                         *(n * self._runningSumSquareRight - self._runningSumRight * self._runningSumRight)
+
+            denominator = math.sqrt(denominator)
+
+            return nominator / denominator
 

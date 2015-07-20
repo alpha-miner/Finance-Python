@@ -40,7 +40,7 @@ setup(
     author_email=AUTHOR_EMAIL,
     license="commercial",
     url=URL,
-    packages=['finpy.api', 'finpy.DateUtilities', 'finpy.Enums'],
+    packages=['finpy.api', 'finpy.DateUtilities', 'finpy.Enums', 'finpy.Env', 'finpy.Risk'],
     py_modules=['finpy.__init__'],
     classifiers=[
         "Development Status :: 3 - Alpha",
@@ -48,7 +48,7 @@ setup(
         "Intended Audience :: Developers",
         "License :: OSI Approved :: BSD License",
         "Operating System :: OS Independent",
-        "Programming Language :: Python 2.7",
+        "Programming Language :: Python 2.7/3.4",
         "Framework :: none",
     ],
     cmdclass={"test": test},

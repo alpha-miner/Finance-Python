@@ -44,7 +44,7 @@ class TestAccumulators(unittest.TestCase):
         total = 2500
 
         # Test moving population variance
-        mv = MovingVariancer(window)
+        mv = MovingVariancer(window, True)
         runningSum = 0.0
         runningSumSquare = 0.0
         con = []

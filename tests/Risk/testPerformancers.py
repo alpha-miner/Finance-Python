@@ -9,6 +9,8 @@ import csv
 import unittest
 import os
 from finpy.Risk.Performancers import MovingSharp
+from finpy.Risk.Performancers import MovingAlphaBeta
+
 
 class TestPerformancers(unittest.TestCase):
 
@@ -19,7 +21,6 @@ class TestPerformancers(unittest.TestCase):
 
         with open(filePath, 'r') as fileHandler:
             reader = csv.reader(fileHandler)
-
             mv = MovingSharp(20)
 
             for i, row in enumerate(reader):
@@ -33,3 +34,26 @@ class TestPerformancers(unittest.TestCase):
                                                                     "Sharp expected:   {1:f}\n"
                                                                     "Sharp calculated: {2:f}".format(i, expected, calculated))
 
+    def testMovingAlphaBeta(self):
+        dirName = os.path.dirname(os.path.abspath(__file__))
+        filePath = os.path.join(dirName, 'data/alphabeta.csv')
+
+        window = 120
+
+        with open(filePath, 'r') as fileHandler:
+            reader = csv.reader(fileHandler)
+            mv = MovingAlphaBeta(window)
+            for i, row in enumerate(reader):
+                if i == 0:
+                    continue
+                mv.push(float(row[0]), float(row[1]), float(row[2]))
+                if i >= window:
+                    calculatedAlpha, calculatedBeta = mv.result()
+                    expectedBeta = float(row[8])
+                    self.assertAlmostEqual(calculatedBeta, expectedBeta, 8, "at index {0:d}\n"
+                                                                            "Beta expected:   {1:f}\n"
+                                                                            "Beta calculated: {2:f}".format(i, expectedBeta, calculatedBeta))
+                    expectedAlpha = float(row[9])
+                    self.assertAlmostEqual(calculatedAlpha, expectedAlpha, 8, "at index {0:d}\n"
+                                                                              "Alpha expected:   {1:f}\n"
+                                                                              "Alpha calculated: {2:f}".format(i, expectedAlpha, calculatedAlpha))

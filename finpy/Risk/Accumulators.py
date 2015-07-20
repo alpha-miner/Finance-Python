@@ -58,7 +58,7 @@ class MovingAverager(ValueHolder):
 
 class MovingVariancer(ValueHolder):
 
-    def __init__(self, window, isPopulation = True):
+    def __init__(self, window, isPopulation=False):
         super(MovingVariancer, self).__init__(window)
         self._runningSum = 0.0
         self._runningSumSquare = 0.0

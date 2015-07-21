@@ -8,6 +8,7 @@
 
 ~~~
 enum34 (python2)
+numpy
 ~~~
 
 ## °²×°

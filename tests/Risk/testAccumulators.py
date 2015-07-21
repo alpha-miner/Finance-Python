@@ -11,6 +11,7 @@ import os
 from finpy.Risk import MovingAverager
 from finpy.Risk import MovingVariancer
 from finpy.Risk import MovingCorrelation
+from finpy.Risk import MovingCorrelationMatrix
 
 
 class TestAccumulators(unittest.TestCase):
@@ -111,6 +112,9 @@ class TestAccumulators(unittest.TestCase):
                     self.assertAlmostEqual(calculated, expected, 8, "at index {0:d}\n"
                                                                     "Correlation expected:   {1:f}\n"
                                                                     "Correlation calculated: {2:f}".format(i, expected, calculated))
+
+    def testMovingCorrelationMatrx(self):
+        pass
 
 
 

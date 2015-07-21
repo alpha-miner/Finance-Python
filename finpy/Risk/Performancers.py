@@ -86,16 +86,6 @@ class MovingDrawDown(object):
         return self._runningCum - self._currentMax, self._runningIndex - self._highIndex, self._highIndex
 
 
-if __name__ == "__main__":
-    mv = MovingDrawDown(5)
-
-    value = [-0.01, -0.05, -0.02, 0.03, 0.04, 0.03, -0.01, 0.005, -0.02, -0.04, 0.2]
-
-    for v in value:
-        mv.push(v)
-        print(mv.result())
-
-
 
 
 

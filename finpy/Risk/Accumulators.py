@@ -6,6 +6,7 @@ Created on 2015-7-16
 """
 
 import math
+import numpy as np
 
 
 class ValueHolder(object):
@@ -98,7 +99,7 @@ class MovingVariancer(ValueHolder):
                 return tmp / (len(self._con) - 1)
 
 
-
+# Calculator for one pair of series
 class MovingCorrelation(ValueHolder):
 
     def __init__(self, window):
@@ -127,14 +128,30 @@ class MovingCorrelation(ValueHolder):
             n = self._window
             nominator = n * self._runningSumCrossSquare - self._runningSumLeft * self._runningSumRight
             denominator = (n * self._runningSumSquareLeft - self._runningSumLeft * self._runningSumLeft) \
-                         *(n * self._runningSumSquareRight - self._runningSumRight * self._runningSumRight)
+                          *(n * self._runningSumSquareRight - self._runningSumRight * self._runningSumRight)
             denominator = math.sqrt(denominator)
             return nominator / denominator
         elif len(self._con) >= 2:
             n = len(self._con)
             nominator = n * self._runningSumCrossSquare - self._runningSumLeft * self._runningSumRight
             denominator = (n * self._runningSumSquareLeft - self._runningSumLeft * self._runningSumLeft) \
-                         *(n * self._runningSumSquareRight - self._runningSumRight * self._runningSumRight)
+                          *(n * self._runningSumSquareRight - self._runningSumRight * self._runningSumRight)
             denominator = math.sqrt(denominator)
             return nominator / denominator
+
+
+class MovingCorrelationMatrix(ValueHolder):
+
+    def __init__(self, window):
+        super(MovingCorrelationMatrix, self).__init__(window)
+
+    def push(self, values):
+        _ = self._dumpOneValue(values)
+
+    def result(self):
+        return np.corrcoef(self._con)
+
+
+
+
 

@@ -33,10 +33,34 @@ class Calendar(object):
     def endOfMonth(self, d):
         return self.adjustDate(Date.endOfMonth(d), BizDayConventions.Preceding)
 
+    def bizDaysBetween(self, fromDate, toDate, includeFirst=True, includeLast=False):
+        wd = 0
+        if fromDate != toDate:
+            if fromDate < toDate:
+                d = fromDate
+                while d < toDate:
+                    if self.isBizDay(d):
+                        wd += 1
+                    d += 1
+                if self.isBizDay(toDate):
+                    wd += 1
+            elif fromDate > toDate:
+                d = toDate
+                while d > fromDate:
+                    if self.isBizDay(d):
+                        wd += 1
+                    d -= 1
+                if self.isBizDay(fromDate):
+                    wd += 1
+            if self.isBizDay(fromDate) and not includeFirst:
+                wd -= 1
+            if self.isBizDay(toDate) and not includeLast:
+                wd -= 1
+        return wd
+
     def adjustDate(self, d, c = BizDayConventions.Following):
         if c == BizDayConventions.Unadjusted:
             return d
-
         d1 = d
 
         if c == BizDayConventions.Following or c == BizDayConventions.ModifiedFollowing or \

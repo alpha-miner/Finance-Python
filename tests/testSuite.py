@@ -24,6 +24,8 @@ def test():
     suite.addTests(tests)
     tests = unittest.TestLoader().loadTestsFromTestCase(Risk.TestAccumulators)
     suite.addTests(tests)
+    tests = unittest.TestLoader().loadTestsFromTestCase(Risk.TestNormalizers)
+    suite.addTests(tests)
     tests = unittest.TestLoader().loadTestsFromTestCase(Risk.TestPerformancers)
     suite.addTests(tests)
 

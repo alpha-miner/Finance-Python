@@ -8,7 +8,6 @@
 
 ~~~
 enum34 (python2)
-pandas
 ~~~
 
 ## °²×°

@@ -10,6 +10,7 @@ import unittest
 import os
 from finpy.Risk.Performancers import MovingSharp
 from finpy.Risk.Performancers import MovingAlphaBeta
+from finpy.Risk.Performancers import MovingDrawDown
 
 
 class TestPerformancers(unittest.TestCase):
@@ -57,3 +58,60 @@ class TestPerformancers(unittest.TestCase):
                     self.assertAlmostEqual(calculatedAlpha, expectedAlpha, 8, "at index {0:d}\n"
                                                                               "Alpha expected:   {1:f}\n"
                                                                               "Alpha calculated: {2:f}".format(i, expectedAlpha, calculatedAlpha))
+
+    def testMovingDrawdownIncreasing(self):
+        dirName = os.path.dirname(os.path.abspath(__file__))
+        filePath = os.path.join(dirName, 'data/drawdown_increasing.csv')
+
+        window = 20
+
+        with open(filePath, 'r') as fileHandler:
+            reader = csv.reader(fileHandler)
+            mv = MovingDrawDown(window)
+            for i, row in enumerate(reader):
+                if i == 0:
+                    continue
+                mv.push(float(row[1]))
+                expectedDrawdown = float(row[2])
+                calculatedDrawdown = mv.result()[0]
+                self.assertAlmostEqual(calculatedDrawdown, expectedDrawdown, 10, "at index {0:d}\n"
+                                                                                 "Drawdown expected:   {1:f}\n"
+                                                                                 "Drawdown calculated: {2:f}".format(i, expectedDrawdown, calculatedDrawdown))
+
+    def testMovingDrawdownDecreasing(self):
+        dirName = os.path.dirname(os.path.abspath(__file__))
+        filePath = os.path.join(dirName, 'data/drawdown_decreasing.csv')
+
+        window = 20
+
+        with open(filePath, 'r') as fileHandler:
+            reader = csv.reader(fileHandler)
+            mv = MovingDrawDown(window)
+            for i, row in enumerate(reader):
+                if i == 0:
+                    continue
+                mv.push(float(row[1]))
+                expectedDrawdown = float(row[2])
+                calculatedDrawdown = mv.result()[0]
+                self.assertAlmostEqual(calculatedDrawdown, expectedDrawdown, 10, "at index {0:d}\n"
+                                                                                 "Drawdown expected:   {1:f}\n"
+                                                                                 "Drawdown calculated: {2:f}".format(i, expectedDrawdown, calculatedDrawdown))
+
+    def testMovingDrawdownRandom(self):
+        dirName = os.path.dirname(os.path.abspath(__file__))
+        filePath = os.path.join(dirName, 'data/drawdown_random.csv')
+
+        window = 20
+
+        with open(filePath, 'r') as fileHandler:
+            reader = csv.reader(fileHandler)
+            mv = MovingDrawDown(window)
+            for i, row in enumerate(reader):
+                if i == 0:
+                    continue
+                mv.push(float(row[1]))
+                expectedDrawdown = float(row[4])
+                calculatedDrawdown = mv.result()[0]
+                self.assertAlmostEqual(calculatedDrawdown, expectedDrawdown, 7, "at index {0:d}\n"
+                                                                                 "Drawdown expected:   {1:f}\n"
+                                                                                 "Drawdown calculated: {2:f}".format(i, expectedDrawdown, calculatedDrawdown))

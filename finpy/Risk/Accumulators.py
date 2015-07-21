@@ -41,6 +41,18 @@ class ValueHolder(object):
         return popout
 
 
+class MovingMaxer(ValueHolder):
+
+    def __init__(self, window):
+        super(MovingMaxer, self).__init__(window)
+
+    def push(self, value):
+        _ = self._dumpOneValue(value)
+
+    def result(self):
+        return max(self._con)
+
+
 class MovingAverager(ValueHolder):
 
     def __init__(self, window):

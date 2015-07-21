@@ -5,7 +5,7 @@ Created on 2015-7-17
 @author: cheng.li
 """
 
-from finpy.Risk.Accumulators import ValueHolder
+from finpy.Risk.Accumulators import MovingMaxer
 from finpy.Risk.Accumulators import MovingAverager
 from finpy.Risk.Accumulators import MovingVariancer
 from finpy.Risk.Accumulators import MovingCorrelation
@@ -58,72 +58,32 @@ class MovingAlphaBeta(object):
             return alpha, beta
 
 
-class MovingDrawDown(ValueHolder):
+class MovingDrawDown(object):
 
     def __init__(self, window):
-        super(MovingDrawDown, self).__init__(window)
+        self._maxer = MovingMaxer(window+1)
+        self._maxer.push(0.0)
+        self._runningCum = 0.0
         self._highIndex = 0
-        self._secondHighIndex = 0
-        self._runningIndex = -1
-        self._highCumReturn = 0.0
-        self._secondHighCumReturn = 0.0
-        self._runningCumReturn = 0.0
-        self._rollDown = 0.0
+        self._runningIndex = 0
 
     def push(self, value):
         '''
         :param value: expected to be exponential annualized return
         :return:
         '''
-        popout = self._dumpOneValue(value)
         self._runningIndex += 1
-        self._runningCumReturn += value
-
-        # when high == second high == current
-        if self._highIndex == self._secondHighIndex and self._secondHighIndex == self._runningIndex:
-            if value >= 0.0:
-                self._highIndex += 1
-                self._highCumReturn += value
-                self._secondHighIndex += 1
-                self._secondHighCumReturn += value
-        # when only second high == current
-        elif self._secondHighIndex == (self._runningIndex - 1):
-            if value > 0.0:
-                self._secondHighIndex += 1
-                self._secondHighCumReturn += value
-
-        self._rollDown += popout
-
-        # check should high or second high start to roll down
-        if self._runningIndex >= ((0 if self._highIndex < 0 else self._highIndex) + self._window):
-            self._highCumReturn = self._rollDown
-            self._highIndex += 1
-            if self._runningIndex >= ((0 if self._secondHighIndex < 0 else self._secondHighIndex) + self._window):
-                self._secondHighCumReturn = self._rollDown
-                self._secondHighIndex += 1
-
-        # check whether running sum replace highs
-        if self._runningCumReturn >= self._secondHighCumReturn:
-            self._secondHighIndex = self._runningIndex
-            self._secondHighCumReturn = self._runningCumReturn
-            if self._runningCumReturn >= self._highCumReturn:
-                self._highIndex = self._runningIndex
-                self._highCumReturn = self._runningCumReturn
-
-        # check whether highs changes
-        if self._highCumReturn < self._secondHighCumReturn:
-            self._highIndex = self._secondHighIndex
-            self._highCumReturn = self._secondHighCumReturn
-
-        # if high == second high != running
-        # make second high == running
-        if self._highIndex == self._secondHighIndex and self._highIndex != self._runningIndex:
-            self._secondHighIndex = self._runningIndex
-            self._secondHighCumReturn = self._runningCumReturn
+        self._runningCum += value
+        self._maxer.push(self._runningCum)
+        self._currentMax = self._maxer.result()
+        if self._runningCum >= self._currentMax:
+            self._highIndex = self._runningIndex
 
     def result(self):
-        return self._runningCumReturn - self._highCumReturn, self._runningIndex - self._highIndex, \
-               self._highIndex, self._secondHighIndex, self._runningIndex
+        '''
+        :return: (draw down, duration, high index)
+        '''
+        return self._runningCum - self._currentMax, self._runningIndex - self._highIndex, self._highIndex
 
 
 if __name__ == "__main__":

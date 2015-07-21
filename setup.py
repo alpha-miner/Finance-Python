@@ -8,7 +8,7 @@ from finpy import __version__
 
 PACKAGE = "finpy"
 NAME = "finpy"
-DESCRIPTION = "finpy 0.1.0"
+DESCRIPTION = "finpy 0.2.0"
 AUTHOR = "cheng li"
 AUTHOR_EMAIL = "cheng.li@datayes.com"
 URL = "www.datayes.com"

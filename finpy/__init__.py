@@ -7,7 +7,7 @@ Created on 2015-7-9
 
 __all__ = ['__version__', 'api', 'DateUtilities', 'Enums']
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 
 import finpy.api as api
 import finpy.DateUtilities as DateUtilities

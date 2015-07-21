@@ -28,5 +28,5 @@ class TestTimeseries(unittest.TestCase):
                                               .format(dates[-1], lastDate))
 
         for date, value in zip(dates, values):
-            self.assertEqual(ts[date], value, "Expected value at day {0} is not equal expected {1:f}"
+            self.assertEqual(ts[date], value, "Expected value at day {0} is not equal to expected {1:f}"
                                               .format(date, value))

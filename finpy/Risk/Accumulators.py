@@ -149,7 +149,8 @@ class MovingCorrelationMatrix(ValueHolder):
         _ = self._dumpOneValue(values)
 
     def result(self):
-        return np.corrcoef(self._con)
+        if len(self._con) >= 2:
+            return np.corrcoef(np.matrix(self._con).T)
 
 
 

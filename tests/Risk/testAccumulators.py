@@ -113,8 +113,50 @@ class TestAccumulators(unittest.TestCase):
                                                                     "Correlation expected:   {1:f}\n"
                                                                     "Correlation calculated: {2:f}".format(i, expected, calculated))
 
-    def testMovingCorrelationMatrx(self):
-        pass
+    def testMovingCorrelationMatrix(self):
+
+        first100Sample = [[1.00000000, -0.02300376, -0.05491407, -0.12810836, -0.16975843],
+                         [-0.02300376, 1.00000000, -0.15040039, 0.07712015, 0.05539850],
+                         [-0.05491407, -0.15040039, 1.00000000, -0.03660999, 0.20378756],
+                         [-0.12810836, 0.07712015, -0.03660999, 1.00000000, 0.08112261],
+                         [-0.16975843, 0.05539850, 0.20378756, 0.08112261, 1.00000000]]
+
+        last100Sample = [[1.000000000, 0.105645822, -0.084754465, 0.033285925, -0.064632300],
+                        [0.105645822, 1.000000000, -0.025033153, 0.094747896, 0.000483146],
+                        [-0.084754465, -0.025033153, 1.000000000, -0.010053933, -0.131093043],
+                        [0.033285925, 0.094747896, -0.010053933, 1.000000000, -0.043928037],
+                        [-0.064632300, 0.000483146, -0.131093043, -0.043928037, 1.000000000]]
+
+
+        dirName = os.path.dirname(os.path.abspath(__file__))
+        filePath = os.path.join(dirName, 'data/correlationmatrix.csv')
+
+        window = 100
+
+        mv = MovingCorrelationMatrix(window)
+
+        with open(filePath, 'r') as fileHandler:
+            reader = csv.reader(fileHandler)
+
+            reader = csv.reader(fileHandler)
+
+            for i, row in enumerate(reader):
+                row = [float(value) for value in row]
+                mv.push(row)
+                if (i+1) == window:
+                    calculated = mv.result()
+                    for k, row in enumerate(first100Sample):
+                        for j, corr in enumerate(row):
+                            self.assertAlmostEqual(calculated[k][j], corr, 8, "First 100 sample correlation matrix different at ({0:d}, {1:d})\n"
+                                                                               "Expected: {2:f}\n"
+                                                                               "Calculated: {3:f}".format(k, j, corr, calculated[k][j]))
+                if (i+1) == 1000:
+                    calculated = mv.result()
+                    for k, row in enumerate(last100Sample):
+                        for j, corr in enumerate(row):
+                            self.assertAlmostEqual(calculated[k][j], corr, 8, "Last 100 sample correlation matrix different at ({0:d}, {1:d})\n"
+                                                                               "Expected: {2:f}\n"
+                                                                               "Calculated: {3:f}".format(k, j, corr, calculated[k][j]))
 
 
 

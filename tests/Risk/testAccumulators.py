@@ -9,6 +9,9 @@ import unittest
 import csv
 import os
 from finpy.Risk import MovingAverager
+from finpy.Risk import MovingSum
+from finpy.Risk import MovingCountedPositive
+from finpy.Risk import MovingCountedNegative
 from finpy.Risk import MovingVariancer
 from finpy.Risk import MovingCorrelation
 from finpy.Risk import MovingCorrelationMatrix
@@ -37,8 +40,85 @@ class TestAccumulators(unittest.TestCase):
                 expected = runningSum / window
                 calculated = mv.result()
                 self.assertAlmostEqual(calculated, expected, 15, "at index {0:d}\n"
+                                                                 "Average expected:   {1:f}\n"
+                                                                 "Average calculated: {2:f}".format(i, expected, calculated))
+
+    def testMovingSum(self):
+        window = 120
+        total = 2500
+
+        mv = MovingSum(window)
+        runningSum = 0.0
+        con = []
+        for i in range(total):
+            value = float(i)
+            con.append(value)
+            mv.push(value)
+            runningSum += value
+
+            if i >= window:
+                runningSum -= con[0]
+                con = con[1:]
+
+            if i >= window - 1:
+                expected = runningSum
+                calculated = mv.result()
+                self.assertAlmostEqual(calculated, expected, 15, "at index {0:d}\n"
                                                                  "Sum expected:   {1:f}\n"
                                                                  "Sum calculated: {2:f}".format(i, expected, calculated))
+
+    def testMovingCountedPositive(self):
+        window = 120
+        total = 2500
+
+        values = [1.0 if i % 2 else -1.0 for i in range(total)]
+        mv = MovingCountedPositive(window)
+        runningCount = 0
+        con = []
+        for i, value in enumerate(values):
+            if i % 2:
+                runningCount += 1
+            con.append(i)
+            mv.push(value)
+
+            if i >= window:
+                if con[0] % 2:
+                    runningCount -= 1
+                con = con[1:]
+
+            if i >= window - 1:
+                expected = runningCount
+                calculated = mv.result()
+                self.assertAlmostEqual(calculated, expected, 15, "at index {0:d}\n"
+                                                                 "Counted positive expected:   {1:f}\n"
+                                                                 "Counted positive calculated: {2:f}".format(i, expected, calculated))
+
+
+    def testMovingCountedNegative(self):
+        window = 120
+        total = 2500
+
+        values = [1.0 if i % 2 else -1.0 for i in range(total)]
+        mv = MovingCountedNegative(window)
+        runningCount = 0
+        con = []
+        for i, value in enumerate(values):
+            if not i % 2:
+                runningCount += 1
+            con.append(i)
+            mv.push(value)
+
+            if i >= window:
+                if not con[0] % 2:
+                    runningCount -= 1
+                con = con[1:]
+
+            if i >= window - 1:
+                expected = runningCount
+                calculated = mv.result()
+                self.assertAlmostEqual(calculated, expected, 15, "at index {0:d}\n"
+                                                                 "Counted negative expected:   {1:f}\n"
+                                                                 "Counted negative calculated: {2:f}".format(i, expected, calculated))
 
     def testMovingVariancer(self):
         window = 120

@@ -22,6 +22,10 @@ class ValueHolder(object):
     def isFull(self):
         return self._isFull
 
+    @property
+    def size(self):
+        return len(self._con)
+
     def _dumpOneValue(self, value):
 
         if not hasattr(value, '__iter__'):
@@ -52,6 +56,20 @@ class MovingMaxer(ValueHolder):
 
     def result(self):
         return max(self._con)
+
+
+class MovingSum(ValueHolder):
+
+    def __init__(self, window):
+        super(MovingSum, self).__init__(window)
+        self._runningSum = 0.0
+
+    def push(self, value):
+        popout = self._dumpOneValue(value)
+        self._runningSum = self._runningSum - popout + value
+
+    def result(self):
+        return self._runningSum
 
 
 class MovingAverager(ValueHolder):
@@ -97,6 +115,41 @@ class MovingVariancer(ValueHolder):
                 return tmp / len(self._con)
             else:
                 return tmp / (len(self._con) - 1)
+
+class MovingCountedPositive(ValueHolder):
+
+    def __init__(self, window):
+        super(MovingCountedPositive, self).__init__(window)
+        self._counts = 0
+
+    def push(self, value):
+        popout = self._dumpOneValue(value)
+
+        if value > 0:
+            self._counts += 1
+        if popout > 0:
+            self._counts -= 1
+
+    def result(self):
+        return self._counts
+
+
+class MovingCountedNegative(ValueHolder):
+
+    def __init__(self, window):
+        super(MovingCountedNegative, self).__init__(window)
+        self._counts = 0
+
+    def push(self, value):
+        popout = self._dumpOneValue(value)
+
+        if value < 0:
+            self._counts += 1
+        if popout < 0:
+            self._counts -= 1
+
+    def result(self):
+        return self._counts
 
 
 # Calculator for one pair of series

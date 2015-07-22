@@ -5,6 +5,7 @@ Created on 2015-7-17
 @author: cheng.li
 """
 
+from finpy.Risk.Accumulators import ValueHolder
 from finpy.Risk.Accumulators import MovingMaxer
 from finpy.Risk.Accumulators import MovingAverager
 from finpy.Risk.Accumulators import MovingVariancer
@@ -84,6 +85,41 @@ class MovingDrawDown(object):
         :return: (draw down, duration, high index)
         '''
         return self._runningCum - self._currentMax, self._runningIndex - self._highIndex, self._highIndex
+
+
+class MovingAverageDrawdown(object):
+
+    def __init__(self, window):
+        self._drawdownCalculator = MovingDrawDown(window)
+        self._drawdownMean = MovingAverager(window)
+        self._durationMean = MovingAverager(window)
+
+    def push(self, value):
+        self._drawdownCalculator.push(value)
+        drawdown, duration = self._drawdownCalculator.result()
+        self._drawdownMean.push(drawdown)
+        self._durationMean.push(duration)
+
+    def result(self):
+        return self._durationMean.result(), self._durationMean.result()
+
+
+class MovingMaxDrawdown(ValueHolder):
+
+    def __init__(self, window):
+        super(MovingMaxDrawdown, self).__init__(window)
+        self._drawdownCalculator = MovingDrawDown(window)
+
+    def push(self, value):
+        self._drawdownCalculator.push(value)
+        drawdown, duration = self._drawdownCalculator.result()
+        self._dumpOneValue((drawdown, duration))
+
+    def result(self):
+        sortedValue = sorted(range(self.size), key=lambda x: self._con[x][0])
+        return self._con[sortedValue[-1]]
+
+
 
 
 

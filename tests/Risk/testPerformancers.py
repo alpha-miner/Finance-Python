@@ -11,6 +11,8 @@ import os
 from finpy.Risk.Performancers import MovingSharp
 from finpy.Risk.Performancers import MovingAlphaBeta
 from finpy.Risk.Performancers import MovingDrawDown
+from finpy.Risk.Performancers import MovingAverageDrawdown
+from finpy.Risk.Performancers import MovingMaxDrawdown
 
 
 class TestPerformancers(unittest.TestCase):
@@ -113,5 +115,12 @@ class TestPerformancers(unittest.TestCase):
                 expectedDrawdown = float(row[4])
                 calculatedDrawdown = mv.result()[0]
                 self.assertAlmostEqual(calculatedDrawdown, expectedDrawdown, 7, "at index {0:d}\n"
-                                                                                 "Drawdown expected:   {1:f}\n"
-                                                                                 "Drawdown calculated: {2:f}".format(i, expectedDrawdown, calculatedDrawdown))
+                                                                                "Drawdown expected:   {1:f}\n"
+                                                                                "Drawdown calculated: {2:f}".format(i, expectedDrawdown, calculatedDrawdown))
+
+    def testMovingAverageDrawdownRandom(self):
+        pass
+
+    def testMovingMaxDrawdwonRandom(self):
+        pass
+

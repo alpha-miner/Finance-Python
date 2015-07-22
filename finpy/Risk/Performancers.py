@@ -30,7 +30,7 @@ class MovingSharp(object):
         self._var.push(value - benchmark)
 
     def result(self):
-        if len(self._mean.size) >= 2:
+        if self._mean.size >= 2:
             return self._mean.result() / math.sqrt(self._var.result())
 
 
@@ -66,7 +66,7 @@ class MovingAlphaBeta(object):
         self._correlationHolder.push((pReturn - rf, mReturn - rf))
 
     def result(self):
-        if len(self._pReturnMean.size) >= 2:
+        if self._pReturnMean.size >= 2:
             corr = self._correlationHolder.result()
             pStd = math.sqrt(self._pReturnVar.result())
             mStd = math.sqrt(self._mReturnVar.result())

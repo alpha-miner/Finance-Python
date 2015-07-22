@@ -9,6 +9,7 @@ from finpy.Risk.Accumulators import ValueHolder
 from finpy.Risk.Accumulators import MovingMaxer
 from finpy.Risk.Accumulators import MovingAverager
 from finpy.Risk.Accumulators import MovingVariancer
+from finpy.Risk.Accumulators import MovingNegativeVariancer
 from finpy.Risk.Accumulators import MovingCorrelation
 import math
 
@@ -26,11 +27,26 @@ class MovingSharp(object):
         @benchmark: annualized benchmark treasury bond yield
         '''
         self._mean.push(value - benchmark)
-        self._var.push(value)
+        self._var.push(value - benchmark)
 
     def result(self):
-        if len(self._mean._con) >= 2:
+        if len(self._mean.size) >= 2:
             return self._mean.result() / math.sqrt(self._var.result())
+
+
+class MovingSortino(object):
+
+    def __init__(self, window):
+        self._mean = MovingAverager(window)
+        self._negativeVar = MovingNegativeVariancer(window)
+
+    def push(self, value, benchmark=0.0):
+        self._mean.push(value - benchmark)
+        self._negativeVar.push(value - benchmark)
+
+    def result(self):
+        if self._mean.size >= 2:
+            return self._mean.result() / math.sqrt(self._negativeVar.result())
 
 
 class MovingAlphaBeta(object):
@@ -50,7 +66,7 @@ class MovingAlphaBeta(object):
         self._correlationHolder.push((pReturn - rf, mReturn - rf))
 
     def result(self):
-        if len(self._pReturnMean._con) >= 2:
+        if len(self._pReturnMean.size) >= 2:
             corr = self._correlationHolder.result()
             pStd = math.sqrt(self._pReturnVar.result())
             mStd = math.sqrt(self._mReturnVar.result())

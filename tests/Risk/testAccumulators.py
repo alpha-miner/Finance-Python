@@ -15,6 +15,7 @@ from finpy.Risk import MovingSum
 from finpy.Risk import MovingCountedPositive
 from finpy.Risk import MovingCountedNegative
 from finpy.Risk import MovingVariancer
+from finpy.Risk import MovingNegativeVariancer
 from finpy.Risk import MovingCorrelation
 from finpy.Risk import MovingCorrelationMatrix
 
@@ -215,6 +216,26 @@ class TestAccumulators(unittest.TestCase):
                 self.assertAlmostEqual(calculated, expected, 15, "at index {0:d}\n"
                                                                  "Var expected:   {1:f}\n"
                                                                  "Var calculated: {2:f}".format(i, expected, calculated))
+
+    def testMovingNegativeVariancer(self):
+        dirName = os.path.dirname(os.path.abspath(__file__))
+        filePath = os.path.join(dirName, 'data/negativevariance.csv')
+
+        window = 20
+        mv = MovingNegativeVariancer(window)
+
+        with open(filePath, 'r') as fileHandler:
+            reader = csv.reader(fileHandler)
+            for i, row in enumerate(reader):
+                if i == 0:
+                    continue
+                mv.push(float(row[1]))
+                if i >= window:
+                    expected = float(row[6])
+                    calculated = mv.result()
+                    self.assertAlmostEqual(calculated, expected, 7, "at index {0:d}\n"
+                                                                    "Negative variance expected:   {1:f}\n"
+                                                                    "Negative variance calculated: {2:f}".format(i, expected, calculated))
 
     def testMovingCorrelation(self):
         dirName = os.path.dirname(os.path.abspath(__file__))

@@ -174,6 +174,39 @@ class MovingVariancer(ValueHolder):
                 return tmp / (len(self._con) - 1)
 
 
+class MovingNegativeVariancer(ValueHolder):
+
+    def __init__(self, window, isPopulation=False):
+        super(MovingNegativeVariancer, self).__init__(window)
+        self._runningNegativeSum = 0.0
+        self._runningNegativeSumSquare = 0.0
+        self._runningNegativeCount = 0
+        self._isPop = isPopulation
+
+    def push(self, value):
+        popout = self._dumpOneValue(value)
+        if value < 0:
+            self._runningNegativeSum = self._runningNegativeSum + value
+            self._runningNegativeSumSquare = self._runningNegativeSumSquare + value * value
+            self._runningNegativeCount += 1
+        if popout < 0:
+            self._runningNegativeSum = self._runningNegativeSum - popout
+            self._runningNegativeSumSquare = self._runningNegativeSumSquare - popout * popout
+            self._runningNegativeCount -= 1
+
+    def result(self):
+        if self._isPop:
+            if self._runningNegativeCount >= 1:
+                length = self._runningNegativeCount
+                tmp = self._runningNegativeSumSquare - self._runningNegativeSum * self._runningNegativeSum / length
+                return tmp / length
+        else:
+            if self._runningNegativeCount >= 2:
+                length = self._runningNegativeCount
+                tmp = self._runningNegativeSumSquare - self._runningNegativeSum * self._runningNegativeSum / length
+                return tmp / (length - 1)
+
+
 class MovingCountedPositive(ValueHolder):
 
     def __init__(self, window):

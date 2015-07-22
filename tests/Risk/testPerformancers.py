@@ -9,6 +9,7 @@ import csv
 import unittest
 import os
 from finpy.Risk.Performancers import MovingSharp
+from finpy.Risk.Performancers import MovingSortino
 from finpy.Risk.Performancers import MovingAlphaBeta
 from finpy.Risk.Performancers import MovingDrawDown
 from finpy.Risk.Performancers import MovingAverageDrawdown
@@ -18,7 +19,6 @@ from finpy.Risk.Performancers import MovingMaxDrawdown
 class TestPerformancers(unittest.TestCase):
 
     def testMovingSharp(self):
-
         dirName = os.path.dirname(os.path.abspath(__file__))
         filePath = os.path.join(dirName, 'data/sharp.csv')
 
@@ -33,9 +33,29 @@ class TestPerformancers(unittest.TestCase):
                 if i >= 20:
                     calculated = mv.result()
                     expected = float(row[6])
-                    self.assertAlmostEqual(calculated, expected, 8, "at index {0:d}\n"
+                    self.assertAlmostEqual(calculated, expected, 7, "at index {0:d}\n"
                                                                     "Sharp expected:   {1:f}\n"
                                                                     "Sharp calculated: {2:f}".format(i, expected, calculated))
+
+    def testMovingSortino(self):
+        dirName = os.path.dirname(os.path.abspath(__file__))
+        filePath = os.path.join(dirName, 'data/sortino.csv')
+
+        window = 20
+
+        with open(filePath, 'r') as fileHandler:
+            reader = csv.reader(fileHandler)
+            mv = MovingSortino(window)
+            for i, row in enumerate(reader):
+                if i == 0:
+                    continue
+                mv.push(float(row[2]), float(row[3]))
+                if i >= window:
+                    calculated = mv.result()
+                    expected = float(row[10])
+                    self.assertAlmostEqual(calculated, expected, 7, "at index {0:d}\n"
+                                                                    "Sortino expected:   {1:f}\n"
+                                                                    "Sortino calculated: {2:f}".format(i, expected, calculated))
 
     def testMovingAlphaBeta(self):
         dirName = os.path.dirname(os.path.abspath(__file__))

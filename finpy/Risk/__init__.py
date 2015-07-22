@@ -6,7 +6,7 @@ Created on 2015-7-16
 """
 
 __all__ = ["MovingAverager", "MovingSum", "MovingCountedPositive", "MovingCountedNegative",
-           "MovingCorrelation", "MovingCorrelationMatrix",
+           "MovingCorrelation", "MovingCorrelationMatrix", "MovingMaxer", "MovingMinumer",
            "MovingVariancer", "MovingAlphaBeta", "MovingDrawDown", "MovingAverageDrawdown", "MovingMaxDrawdown",
            "MovingSharp", "Timeseries"]
 
@@ -18,6 +18,7 @@ from finpy.Risk.Accumulators import MovingVariancer
 from finpy.Risk.Accumulators import MovingCorrelation
 from finpy.Risk.Accumulators import MovingCorrelationMatrix
 from finpy.Risk.Accumulators import MovingMaxer
+from finpy.Risk.Accumulators import MovingMinumer
 from finpy.Risk.Performancers import MovingAlphaBeta
 from finpy.Risk.Performancers import MovingDrawDown
 from finpy.Risk.Performancers import MovingAverageDrawdown

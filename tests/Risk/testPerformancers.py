@@ -119,8 +119,40 @@ class TestPerformancers(unittest.TestCase):
                                                                                 "Drawdown calculated: {2:f}".format(i, expectedDrawdown, calculatedDrawdown))
 
     def testMovingAverageDrawdownRandom(self):
-        pass
+        dirName = os.path.dirname(os.path.abspath(__file__))
+        filePath = os.path.join(dirName, 'data/averagedrawdown_random.csv')
+
+        window = 20
+
+        with open(filePath, 'r') as fileHandler:
+            reader = csv.reader(fileHandler)
+            mv = MovingAverageDrawdown(window)
+            for i, row in enumerate(reader):
+                if i == 0:
+                    continue
+                mv.push(float(row[1]))
+                expectedDrawdown = float(row[5])
+                calculatedDrawdown = mv.result()[0]
+                self.assertAlmostEqual(calculatedDrawdown, expectedDrawdown, 7, "at index {0:d}\n"
+                                                                                "Average drawdown expected:   {1:f}\n"
+                                                                                "Average drawdown calculated: {2:f}".format(i, expectedDrawdown, calculatedDrawdown))
 
     def testMovingMaxDrawdwonRandom(self):
-        pass
+        dirName = os.path.dirname(os.path.abspath(__file__))
+        filePath = os.path.join(dirName, 'data/maxdrawdown_random.csv')
+
+        window = 20
+
+        with open(filePath, 'r') as fileHandler:
+            reader = csv.reader(fileHandler)
+            mv = MovingMaxDrawdown(window)
+            for i, row in enumerate(reader):
+                if i == 0:
+                    continue
+                mv.push(float(row[1]))
+                expectedDrawdown = float(row[5])
+                calculatedDrawdown = mv.result()[0]
+                self.assertAlmostEqual(calculatedDrawdown, expectedDrawdown, 7, "at index {0:d}\n"
+                                                                                "Max drawdown expected:   {1:f}\n"
+                                                                                "Max drawdown calculated: {2:f}".format(i, expectedDrawdown, calculatedDrawdown))
 

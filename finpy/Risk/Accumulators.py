@@ -57,6 +57,17 @@ class MovingMaxer(ValueHolder):
     def result(self):
         return max(self._con)
 
+class MovingMinumer(ValueHolder):
+
+    def __init__(self, window):
+        super(MovingMinumer, self).__init__(window)
+
+    def push(self, value):
+        _ = self._dumpOneValue(value)
+
+    def result(self):
+        return min(self._con)
+
 
 class MovingSum(ValueHolder):
 

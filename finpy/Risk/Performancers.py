@@ -96,12 +96,12 @@ class MovingAverageDrawdown(object):
 
     def push(self, value):
         self._drawdownCalculator.push(value)
-        drawdown, duration = self._drawdownCalculator.result()
+        drawdown, duration, _ = self._drawdownCalculator.result()
         self._drawdownMean.push(drawdown)
         self._durationMean.push(duration)
 
     def result(self):
-        return self._durationMean.result(), self._durationMean.result()
+        return self._drawdownMean.result(), self._durationMean.result()
 
 
 class MovingMaxDrawdown(ValueHolder):
@@ -112,12 +112,12 @@ class MovingMaxDrawdown(ValueHolder):
 
     def push(self, value):
         self._drawdownCalculator.push(value)
-        drawdown, duration = self._drawdownCalculator.result()
+        drawdown, duration, _ = self._drawdownCalculator.result()
         self._dumpOneValue((drawdown, duration))
 
     def result(self):
         sortedValue = sorted(range(self.size), key=lambda x: self._con[x][0])
-        return self._con[sortedValue[-1]]
+        return self._con[sortedValue[0]]
 
 
 

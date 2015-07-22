@@ -9,6 +9,8 @@ import unittest
 import csv
 import os
 from finpy.Risk import MovingAverager
+from finpy.Risk import MovingPositiveAverager
+from finpy.Risk import MovingNegativeAverager
 from finpy.Risk import MovingSum
 from finpy.Risk import MovingCountedPositive
 from finpy.Risk import MovingCountedNegative
@@ -42,6 +44,49 @@ class TestAccumulators(unittest.TestCase):
                 self.assertAlmostEqual(calculated, expected, 15, "at index {0:d}\n"
                                                                  "Average expected:   {1:f}\n"
                                                                  "Average calculated: {2:f}".format(i, expected, calculated))
+
+    def testMovingPositiveAverager(self):
+        dirName = os.path.dirname(os.path.abspath(__file__))
+        filePath = os.path.join(dirName, 'data/averagepostiveandnegative_random.csv')
+
+        window = 20
+        mv = MovingPositiveAverager(window)
+
+        with open(filePath, 'r') as fileHandler:
+            reader = csv.reader(fileHandler)
+
+            for i, row in enumerate(reader):
+                if i == 0:
+                    continue
+                mv.push(float(row[1]))
+                if i >= window:
+                    expected = float(row[6])
+                    calculated = mv.result()
+                    self.assertAlmostEqual(calculated, expected, 8, "at index {0:d}\n"
+                                                                    "Positive average expected:   {1:f}\n"
+                                                                    "positive average calculated: {2:f}".format(i, expected, calculated))
+
+
+    def testMovingNegativeAverager(self):
+        dirName = os.path.dirname(os.path.abspath(__file__))
+        filePath = os.path.join(dirName, 'data/averagepostiveandnegative_random.csv')
+
+        window = 20
+        mv = MovingNegativeAverager(window)
+
+        with open(filePath, 'r') as fileHandler:
+            reader = csv.reader(fileHandler)
+
+            for i, row in enumerate(reader):
+                if i == 0:
+                    continue
+                mv.push(float(row[1]))
+                if i >= window:
+                    expected = float(row[7])
+                    calculated = mv.result()
+                    self.assertAlmostEqual(calculated, expected, 8, "at index {0:d}\n"
+                                                                    "Positive average expected:   {1:f}\n"
+                                                                    "positive average calculated: {2:f}".format(i, expected, calculated))
 
     def testMovingSum(self):
         window = 120
@@ -176,7 +221,6 @@ class TestAccumulators(unittest.TestCase):
         filePath = os.path.join(dirName, 'data/correlation.csv')
 
         window = 120
-        total = 2500
         mv = MovingCorrelation(window)
 
         with open(filePath, 'r') as fileHandler:

@@ -99,6 +99,52 @@ class MovingAverager(ValueHolder):
         else:
             return self._runningSum / len(self._con)
 
+class MovingPositiveAverager(ValueHolder):
+
+    def __init__(self, window):
+        super(MovingPositiveAverager, self).__init__(window)
+        self._runningPositiveSum = 0.0
+        self._runningPositiveCount = 0
+
+    def push(self, value):
+        popout = self._dumpOneValue(value)
+        if value > 0.0:
+            self._runningPositiveCount += 1
+            self._runningPositiveSum += value
+
+        if popout > 0.0:
+            self._runningPositiveCount -= 1
+            self._runningPositiveSum -= popout
+
+    def result(self):
+        if self._runningPositiveCount == 0:
+            return 0.0
+        else:
+            return self._runningPositiveSum / self._runningPositiveCount
+
+class MovingNegativeAverager(ValueHolder):
+
+    def __init__(self, window):
+        super(MovingNegativeAverager, self).__init__(window)
+        self._runningNegativeSum = 0.0
+        self._runningNegativeCount = 0
+
+    def push(self, value):
+        popout = self._dumpOneValue(value)
+        if value < 0.0:
+            self._runningNegativeCount += 1
+            self._runningNegativeSum += value
+
+        if popout < 0.0:
+            self._runningNegativeCount -= 1
+            self._runningNegativeSum -= popout
+
+    def result(self):
+        if self._runningNegativeCount == 0:
+            return 0.0
+        else:
+            return self._runningNegativeSum / self._runningNegativeCount
+
 
 class MovingVariancer(ValueHolder):
 
@@ -126,6 +172,7 @@ class MovingVariancer(ValueHolder):
                 return tmp / len(self._con)
             else:
                 return tmp / (len(self._con) - 1)
+
 
 class MovingCountedPositive(ValueHolder):
 

@@ -65,6 +65,10 @@ class CumulativeNormalDistribution(object):
             return -self._gaussian(z) / z * sumRes
         return result
 
+    def derivative(self, x):
+        xn = (x - self._average) / self._sigma
+        return self._gaussian(xn) / self._sigma
+
 
 class InverseCumulativeNormal(object):
 

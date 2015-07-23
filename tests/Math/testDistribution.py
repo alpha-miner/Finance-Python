@@ -63,6 +63,17 @@ class TestDistribution(unittest.TestCase):
 
         for i, (expected, calculated) in enumerate(zip(x, temp)):
             self.assertAlmostEqual(expected, calculated, 7, "at index {0:d}\n"
-                                                             "Expected gaussian:  {1:f}\n"
-                                                             "Calculated Gaussian: {2:f}".format(i, expected, calculated))
+                                                            "Expected gaussian:  {1:f}\n"
+                                                            "Calculated Gaussian: {2:f}".format(i, expected, calculated))
 
+        temp = [cum.derivative(v) for v in x]
+        for i, (expected, calculated) in enumerate(zip(y, temp)):
+            self.assertAlmostEqual(expected, calculated, 15, "at index {0:d}\n"
+                                                             "Expected:  {1:f}\n"
+                                                             "Calculated: {2:f}".format(i, expected, calculated))
+
+        temp = [normal.derivative(v) for v in x]
+        for i, (expected, calculated) in enumerate(zip(yd, temp)):
+            self.assertAlmostEqual(expected, calculated, 15, "at index {0:d}\n"
+                                                             "Expected:  {1:f}\n"
+                                                             "Calculated: {2:f}".format(i, expected, calculated))

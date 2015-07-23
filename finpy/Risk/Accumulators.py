@@ -57,6 +57,7 @@ class MovingMaxer(ValueHolder):
     def result(self):
         return max(self._con)
 
+
 class MovingMinumer(ValueHolder):
 
     def __init__(self, window):

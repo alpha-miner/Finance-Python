@@ -10,6 +10,7 @@ def test():
     import DateUtilities
     import Env
     import Risk
+    import PricingEngines
     import unittest
 
     suite = unittest.TestSuite()
@@ -21,6 +22,8 @@ def test():
     tests = unittest.TestLoader().loadTestsFromTestCase(DateUtilities.TestPeriod)
     suite.addTests(tests)
     tests = unittest.TestLoader().loadTestsFromTestCase(Env.TestSettings)
+    suite.addTests(tests)
+    tests = unittest.TestLoader().loadTestsFromTestCase(PricingEngines.TestBlackFormula)
     suite.addTests(tests)
     tests = unittest.TestLoader().loadTestsFromTestCase(Risk.TestAccumulators)
     suite.addTests(tests)

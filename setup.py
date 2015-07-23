@@ -40,7 +40,8 @@ setup(
     author_email=AUTHOR_EMAIL,
     license="commercial",
     url=URL,
-    packages=['finpy.api', 'finpy.DateUtilities', 'finpy.Enums', 'finpy.Env', 'finpy.Risk'],
+    packages=['finpy.api', 'finpy.DateUtilities', 'finpy.Enums', 'finpy.Env', 'finpy.Math',
+              'finpy.Math.Distributions', 'finpy.PricingEngines', 'finpy.Risk'],
     py_modules=['finpy.__init__'],
     classifiers=[
         "Development Status :: 3 - Alpha",

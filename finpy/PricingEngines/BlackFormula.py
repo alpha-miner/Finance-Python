@@ -14,12 +14,25 @@ from scipy.optimize import newton
 _dist = CumulativeNormalDistribution()
 
 
+def _checkParameters(strike, forward, displacement):
+    strike = float(strike)
+    forward = float(forward)
+    displacement = float(displacement)
+    assert displacement >= 0, "displacement ({0:f}) must be non-negative".format(displacement)
+    assert strike + displacement >= 0, "strike + displacement ({0:f}) must be non-negative".format(strike + displacement)
+    assert forward + displacement >= 0, "forward + displacement ({0:f}) must be non-negative".format(forward + displacement)
+    return strike, forward, displacement
+
+
 def blackFormula(optionType,
                  strike,
                  forward,
                  stdev,
                  discount=1.0,
                  displacement=0.0):
+
+    strike, forward, displacement = _checkParameters(strike, forward, displacement)
+
     if stdev == 0.0:
         return max((forward - strike) * optionType, 0.0) * discount
 
@@ -99,23 +112,8 @@ def blackFormulaImpliedStdDev(optionType,
                                                       blackPrice,
                                                       discount,
                                                       displacement)
-
     assert stdAppr >= 0.0, "stdDev ({0:f})) must be non-negative".format(stdAppr)
-
     return newton(func, stdAppr, tol=1e-10)
-
-if __name__ == '__main__':
-
-    import time
-    price = blackFormula(OptionType.Put, 1.0, 1.0, 0.3)
-
-    start = time.time()
-
-    for i in range(10000):
-        res = blackFormula(OptionType.Put, 1.0, 1.0, 0.3)
-        res = blackFormulaImpliedStdDev(OptionType.Put, 1.0, 1.0, price)
-
-    print(time.time() - start)
 
 
 

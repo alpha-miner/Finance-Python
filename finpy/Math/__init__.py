@@ -8,4 +8,4 @@ Created on 2015-7-23
 __all__ = ['errorFunction', 'Distributions']
 
 from finpy.Math.ErrorFunction import errorFunction
-import Distributions
+from finpy.Math import Distributions

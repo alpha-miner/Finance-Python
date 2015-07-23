@@ -9,6 +9,7 @@ def test():
 
     import DateUtilities
     import Env
+    import Math
     import Risk
     import PricingEngines
     import unittest
@@ -22,6 +23,8 @@ def test():
     tests = unittest.TestLoader().loadTestsFromTestCase(DateUtilities.TestPeriod)
     suite.addTests(tests)
     tests = unittest.TestLoader().loadTestsFromTestCase(Env.TestSettings)
+    suite.addTests(tests)
+    tests = unittest.TestLoader().loadTestsFromTestCase(Math.TestDistribution)
     suite.addTests(tests)
     tests = unittest.TestLoader().loadTestsFromTestCase(PricingEngines.TestBlackFormula)
     suite.addTests(tests)

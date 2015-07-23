@@ -4,3 +4,7 @@ Created on 2015-7-23
 
 @author: cheng.li
 """
+
+__all__ = ["TestDistribution"]
+
+from Math.testDistribution import TestDistribution

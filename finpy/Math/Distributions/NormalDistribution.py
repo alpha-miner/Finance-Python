@@ -48,7 +48,7 @@ class CumulativeNormalDistribution(object):
             zsqr = z * z
             i = 1.0
             g = 1.0
-            a = 0.0
+            a = 2.70e308
             while True:
                 lasta = a
                 x = (4.0 * i - 3.0) / zsqr
@@ -157,5 +157,5 @@ if __name__ == "__main__":
     for i in range(10000):
         _ = norm.ppf(sample)
 
-    print(norm.ppf(sample))
+    #_ = norm.ppf([sample]*100000)
     print(time.time() - start)

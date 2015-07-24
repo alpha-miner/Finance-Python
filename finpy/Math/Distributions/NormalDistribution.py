@@ -10,7 +10,7 @@ from finpy.Math.MathConstants import _M_SQRT_2
 from finpy.Math.MathConstants import _M_SQRT2
 from finpy.Math.MathConstants import _M_SQRTPI
 from finpy.Math.MathConstants import _M_1_SQRTPI
-from finpy.Math.MathConstants import _QL_EPLSON
+from finpy.Math.MathConstants import _QL_EPSILON
 from finpy.Math.ErrorFunction import errorFunction
 
 
@@ -60,7 +60,7 @@ class CumulativeNormalDistribution(object):
                 if a < 0.0:
                     a = -a
 
-                if lasta <= a or a < abs(sumRes * _QL_EPLSON):
+                if lasta <= a or a < abs(sumRes * _QL_EPSILON):
                     break
             return -self._gaussian(z) / z * sumRes
         return result

@@ -172,7 +172,7 @@ def bachelierFormulaImpliedVol(optionType,
     nu = max(-1.0 + _QL_EPSILON, min(nu, 1.0 - _QL_EPSILON))
     eta = 1.0 if (abs(nu) < SQRT_QL_EPSILON) else (nu / math.atanh(nu))
 
-    heta = HCalculator(eta)
+    heta = HCalculator.calculate(eta)
     impliedBpvol = math.sqrt(_M_PI / (2 * tte)) * straddlePremium * heta
     return impliedBpvol
 
@@ -202,7 +202,7 @@ class HCalculator(object):
     _B9 = 1.174240599306013e+1
 
     @classmethod
-    def __call__(cls, eta):
+    def calculate(cls, eta):
         num = cls._A0 + eta * (cls._A1 + eta * (cls._A2 + eta * (cls._A3 + eta
               * (cls._A4 + eta * (cls._A5 + eta * (cls._A6 + eta * cls._A7))))))
 
@@ -210,10 +210,6 @@ class HCalculator(object):
               * (cls._B5 + eta * (cls._B6 + eta * (cls._B7 + eta * (cls._B8 + eta * cls._B9))))))))
 
         return math.sqrt(eta) * (num / den)
-
-
-if __name__ == "__main__":
-    pass
 
 
 

@@ -6,13 +6,99 @@ Created on 2015-7-13
 """
 
 import unittest
+import datetime as dt
 from finpy.DateUtilities import Date
 
 
 class TestDate(unittest.TestCase):
 
-    def testConsistency(self):
+    def testBasicFunctions(self):
+        year = 2015
+        month = 7
+        day = 24
+        strRepr = "{0}-{1:02d}-{2:02d}".format(year, month, day)
 
+        testDate = Date(year, month, day)
+        self.assertEqual(str(testDate), strRepr, "date str representation:\n"
+                                                      "expected:   {0:s}\n"
+                                                      "calculated: {1:s}".format(strRepr, str(testDate)))
+
+        self.assertEqual(testDate.year(), year, "date year:\n"
+                                                "expected:   {0:d}\n"
+                                                "calculated: {1:d}".format(year, testDate.year()))
+
+        self.assertEqual(testDate.month(), month, "date month:\n"
+                                                  "expected:   {0:d}\n"
+                                                  "calculated: {1:d}".format(month, testDate.month()))
+
+        self.assertEqual(testDate.dayOfMonth(), day, "date day:\n"
+                                                     "expected:   {0:d}\n"
+                                                     "calculated: {1:d}".format(day, testDate.dayOfMonth()))
+
+        self.assertEqual(testDate.dayOfYear(), testDate - Date(2015, 1, 1) + 1, "date day:\n"
+                                                                                "expected:   {0:d}\n"
+                                                                                "calculated: {1:d}"
+                                                                                .format(testDate - Date(2015, 1, 1) + 1, testDate.dayOfYear()))
+        self.assertEqual(testDate.weekday(), 6, "date weekday:\n"
+                                                "expected:   {0:d}\n"
+                                                "calculated: {1:d}".format(5, testDate.weekday()))
+
+        self.assertEqual(testDate.toDateTime(), dt.date(year, month, day), "date datetime representation\n"
+                                                                           "expected:   {0}\n"
+                                                                           "calculated: {1}".format(dt.datetime(year, month, day), testDate.toDateTime()))
+
+        serialNumber = testDate.serialNumber
+        serialDate = Date(serialNumber=serialNumber)
+
+        self.assertEqual(serialDate, testDate, "date excel serial number representation\n"
+                                               "expected:   {0:d}"
+                                               "calculated: {1:d}".format(serialDate.serialNumber, testDate.serialNumber))
+
+        # test comparisons
+        previousDate = testDate - 1
+        self.assertTrue(previousDate < testDate, "{0} is not earlier than {1}".format(previousDate, testDate))
+        self.assertFalse(previousDate >= testDate, "{0} should not be later than or equal to {1}".format(previousDate, testDate))
+        self.assertTrue((previousDate + 1) == testDate, "{0} plus one day should be equal to {1}".format(previousDate, testDate))
+
+        # check static members
+        self.assertEqual(Date.minDate(), Date(1901, 1, 1), "min date is wrong")
+        self.assertEqual(Date.maxDate(), Date(2199, 12, 31), "max date is wrong")
+        self.assertEqual(Date.endOfMonth(testDate), Date(year, month, 31), "end of month is wrong")
+        self.assertTrue(Date.isEndOfMonth(Date(year, month, 31)), "{0} should be the end of month")
+        self.assertEqual(Date.nextWeekday(testDate, testDate.weekday()), testDate, "{0}'s next same week day should be {1}"
+                                                                                   .format(testDate, testDate))
+        self.assertEqual(Date.todaysDate().toDateTime(), dt.date.today(), "today's date\n"
+                                                                          "expected:   {0}\n"
+                                                                          "calculated: {1}".format(dt.date.today(), Date.todaysDate()))
+
+        # to add more here ...
+
+        # check plus/sub
+        threeMonthsBefore = testDate - "3M"
+        expectedDate = Date(year, month - 3, day)
+        self.assertEqual(threeMonthsBefore, expectedDate, "date - 3m period\n"
+                                                          "expected:   {0}\n"
+                                                          "calculated: {1}".format(expectedDate, threeMonthsBefore))
+
+        threeMonthsAfter = testDate + "3m"
+        expectedDate = Date(year, month + 3, day)
+        self.assertEqual(threeMonthsAfter, expectedDate, "date + 3m period\n"
+                                                         "expected:   {0}\n"
+                                                         "calculated: {1}".format(expectedDate, threeMonthsAfter))
+
+        oneYearAndTwoMonthsBefore = testDate - "14m"
+        expectedDate = Date(year - 1, month - 2, day)
+        self.assertEqual(oneYearAndTwoMonthsBefore, expectedDate, "date - 14m period\n"
+                                                                  "expected:   {0}\n"
+                                                                  "calculated: {1}".format(expectedDate, threeMonthsBefore))
+
+        oneYearAndTwoMonthsBefore = testDate + "14m"
+        expectedDate = Date(year + 1, month + 2, day)
+        self.assertEqual(oneYearAndTwoMonthsBefore, expectedDate, "date + 14m period\n"
+                                                                  "expected:   {0}\n"
+                                                                  "calculated: {1}".format(expectedDate, threeMonthsBefore))
+
+    def testConsistency(self):
         minDate = Date.minDate().serialNumber + 1
         maxDate = Date.maxDate().serialNumber
 
@@ -111,7 +197,6 @@ class TestDate(unittest.TestCase):
                               " year:          {3:d}".format(input_date, d.dayOfMonth(), d.month(),  d.year()))
 
     def testParseDates(self):
-
         input_date = "2006-01-15"
         d = Date.strptime(input_date, "%Y-%m-%d")
         flag = d == Date(2006, 1, 15)

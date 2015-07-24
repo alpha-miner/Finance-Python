@@ -5,7 +5,7 @@ Created on 2015-7-17
 @author: cheng.li
 """
 
-from finpy.Risk.Accumulators import ValueHolder
+from finpy.Risk.Accumulators import StatefulValueHolder
 from finpy.Risk.Accumulators import MovingMaxer
 from finpy.Risk.Accumulators import MovingAverager
 from finpy.Risk.Accumulators import MovingVariancer
@@ -14,37 +14,42 @@ from finpy.Risk.Accumulators import MovingCorrelation
 import math
 
 
-class MovingSharp(object):
+class MovingSharp(StatefulValueHolder):
 
-    def __init__(self, window):
-        self._mean = MovingAverager(window)
-        self._var = MovingVariancer(window, False)
-        self._window = window
+    def __init__(self, window, pNames=['ret', 'riskFree']):
+        super(MovingSharp, self).__init__(window, pNames)
+        self._mean = MovingAverager(window, pNames='x')
+        self._var = MovingVariancer(window, pNames='x', isPopulation=False)
 
-    def push(self, value, benchmark=0.0):
+    def push(self, **kwargs):
         '''
         @value: annualized return value
         @benchmark: annualized benchmark treasury bond yield
         '''
-        self._mean.push(value - benchmark)
-        self._var.push(value - benchmark)
+        value = kwargs[self._pNames[0]]
+        benchmark = kwargs[self._pNames[1]]
+        self._mean.push(x=value - benchmark)
+        self._var.push(x=value - benchmark)
 
     def result(self):
-        if self._mean.size >= 2:
+        if self._var.size >= 2:
             return self._mean.result() / math.sqrt(self._var.result())
         else:
             raise RuntimeError("Container has less than 2 samples")
 
 
-class MovingSortino(object):
+class MovingSortino(StatefulValueHolder):
 
-    def __init__(self, window):
-        self._mean = MovingAverager(window)
-        self._negativeVar = MovingNegativeVariancer(window)
+    def __init__(self, window, pNames=['ret', 'riskFree']):
+        super(MovingSortino, self).__init__(window, pNames)
+        self._mean = MovingAverager(window, pNames='x')
+        self._negativeVar = MovingNegativeVariancer(window, pNames='x')
 
-    def push(self, value, benchmark=0.0):
-        self._mean.push(value - benchmark)
-        self._negativeVar.push(value - benchmark)
+    def push(self, **kwargs):
+        value = kwargs[self._pNames[0]]
+        benchmark = kwargs[self._pNames[1]]
+        self._mean.push(x=value - benchmark)
+        self._negativeVar.push(x=value - benchmark)
 
     def result(self):
         if self._mean.size >= 2:
@@ -53,21 +58,25 @@ class MovingSortino(object):
             raise RuntimeError("Container has less than 2 samples")
 
 
-class MovingAlphaBeta(object):
+class MovingAlphaBeta(StatefulValueHolder):
 
-    def __init__(self, window):
-        self._pReturnMean = MovingAverager(window)
-        self._mReturnMean = MovingAverager(window)
-        self._pReturnVar = MovingVariancer(window)
-        self._mReturnVar = MovingVariancer(window)
-        self._correlationHolder = MovingCorrelation(window)
+    def __init__(self, window, pNames=['pRet', 'mRet', 'riskFree']):
+        super(MovingAlphaBeta, self).__init__(window, pNames)
+        self._pReturnMean = MovingAverager(window, pNames='x')
+        self._mReturnMean = MovingAverager(window, pNames='y')
+        self._pReturnVar = MovingVariancer(window, pNames='x')
+        self._mReturnVar = MovingVariancer(window, pNames='y')
+        self._correlationHolder = MovingCorrelation(window, pNames=['x', 'y'])
 
-    def push(self, pReturn, mReturn, rf=0.0):
-        self._pReturnMean.push(pReturn - rf)
-        self._mReturnMean.push(mReturn - rf)
-        self._pReturnVar.push(pReturn - rf)
-        self._mReturnVar.push(mReturn - rf)
-        self._correlationHolder.push((pReturn - rf, mReturn - rf))
+    def push(self, **kwargs):
+        pReturn = kwargs[self._pNames[0]]
+        mReturn = kwargs[self._pNames[1]]
+        rf = kwargs[self._pNames[2]]
+        self._pReturnMean.push(x=pReturn - rf)
+        self._mReturnMean.push(y=mReturn - rf)
+        self._pReturnVar.push(x=pReturn - rf)
+        self._mReturnVar.push(y=mReturn - rf)
+        self._correlationHolder.push(x=pReturn - rf, y=mReturn - rf)
 
     def result(self):
         if self._pReturnMean.size >= 2:
@@ -81,23 +90,25 @@ class MovingAlphaBeta(object):
             raise RuntimeError("Container has less than 2 samples")
 
 
-class MovingDrawDown(object):
+class MovingDrawDown(StatefulValueHolder):
 
-    def __init__(self, window):
-        self._maxer = MovingMaxer(window+1)
-        self._maxer.push(0.0)
+    def __init__(self, window, pNames='ret'):
+        super(MovingDrawDown, self).__init__(window, pNames)
+        self._maxer = MovingMaxer(window+1, pNames='x')
+        self._maxer.push(x=0.0)
         self._runningCum = 0.0
         self._highIndex = 0
         self._runningIndex = 0
 
-    def push(self, value):
+    def push(self, **kwargs):
         '''
         :param value: expected to be exponential annualized return
         :return:
         '''
+        value = kwargs[self._pNames]
         self._runningIndex += 1
         self._runningCum += value
-        self._maxer.push(self._runningCum)
+        self._maxer.push(x=self._runningCum)
         self._currentMax = self._maxer.result()
         if self._runningCum >= self._currentMax:
             self._highIndex = self._runningIndex
@@ -109,31 +120,34 @@ class MovingDrawDown(object):
         return self._runningCum - self._currentMax, self._runningIndex - self._highIndex, self._highIndex
 
 
-class MovingAverageDrawdown(object):
+class MovingAverageDrawdown(StatefulValueHolder):
 
-    def __init__(self, window):
-        self._drawdownCalculator = MovingDrawDown(window)
-        self._drawdownMean = MovingAverager(window)
-        self._durationMean = MovingAverager(window)
+    def __init__(self, window, pNames='ret'):
+        super(MovingAverageDrawdown, self).__init__(window, pNames)
+        self._drawdownCalculator = MovingDrawDown(window, pNames='x')
+        self._drawdownMean = MovingAverager(window, pNames='x')
+        self._durationMean = MovingAverager(window, pNames='x')
 
-    def push(self, value):
-        self._drawdownCalculator.push(value)
+    def push(self, **kwargs):
+        value = kwargs[self._pNames]
+        self._drawdownCalculator.push(x=value)
         drawdown, duration, _ = self._drawdownCalculator.result()
-        self._drawdownMean.push(drawdown)
-        self._durationMean.push(duration)
+        self._drawdownMean.push(x=drawdown)
+        self._durationMean.push(x=duration)
 
     def result(self):
         return self._drawdownMean.result(), self._durationMean.result()
 
 
-class MovingMaxDrawdown(ValueHolder):
+class MovingMaxDrawdown(StatefulValueHolder):
 
-    def __init__(self, window):
-        super(MovingMaxDrawdown, self).__init__(window)
-        self._drawdownCalculator = MovingDrawDown(window)
+    def __init__(self, window, pNames=['ret']):
+        super(MovingMaxDrawdown, self).__init__(window, pNames)
+        self._drawdownCalculator = MovingDrawDown(window, 'x')
 
-    def push(self, value):
-        self._drawdownCalculator.push(value)
+    def push(self, **kwargs):
+        value = kwargs[self._pNames]
+        self._drawdownCalculator.push(x=value)
         drawdown, duration, _ = self._drawdownCalculator.result()
         self._dumpOneValue((drawdown, duration))
 

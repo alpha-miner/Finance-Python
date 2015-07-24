@@ -27,13 +27,13 @@ class TestAccumulators(unittest.TestCase):
         window = 120
         total = 2500
 
-        mv = MovingAverager(window)
+        mv = MovingAverager(window, pNames='z')
         runningSum = 0.0
         con = []
         for i in range(total):
             value = float(i)
             con.append(value)
-            mv.push(value)
+            mv.push(z=value)
             runningSum += value
             if i >= window:
                 runningSum -= con[0]
@@ -51,7 +51,7 @@ class TestAccumulators(unittest.TestCase):
         filePath = os.path.join(dirName, 'data/averagepostiveandnegative_random.csv')
 
         window = 20
-        mv = MovingPositiveAverager(window)
+        mv = MovingPositiveAverager(window, pNames='z')
 
         with open(filePath, 'r') as fileHandler:
             reader = csv.reader(fileHandler)
@@ -59,7 +59,7 @@ class TestAccumulators(unittest.TestCase):
             for i, row in enumerate(reader):
                 if i == 0:
                     continue
-                mv.push(float(row[1]))
+                mv.push(z=float(row[1]))
                 if i >= window:
                     expected = float(row[6])
                     calculated = mv.result()
@@ -73,7 +73,7 @@ class TestAccumulators(unittest.TestCase):
         filePath = os.path.join(dirName, 'data/averagepostiveandnegative_random.csv')
 
         window = 20
-        mv = MovingNegativeAverager(window)
+        mv = MovingNegativeAverager(window, pNames='z')
 
         with open(filePath, 'r') as fileHandler:
             reader = csv.reader(fileHandler)
@@ -81,7 +81,7 @@ class TestAccumulators(unittest.TestCase):
             for i, row in enumerate(reader):
                 if i == 0:
                     continue
-                mv.push(float(row[1]))
+                mv.push(z=float(row[1]))
                 if i >= window:
                     expected = float(row[7])
                     calculated = mv.result()
@@ -93,13 +93,13 @@ class TestAccumulators(unittest.TestCase):
         window = 120
         total = 2500
 
-        mv = MovingSum(window)
+        mv = MovingSum(window, pNames=['z'])
         runningSum = 0.0
         con = []
         for i in range(total):
             value = float(i)
             con.append(value)
-            mv.push(value)
+            mv.push(z=value)
             runningSum += value
 
             if i >= window:
@@ -118,14 +118,14 @@ class TestAccumulators(unittest.TestCase):
         total = 2500
 
         values = [1.0 if i % 2 else -1.0 for i in range(total)]
-        mv = MovingCountedPositive(window)
+        mv = MovingCountedPositive(window, pNames='z')
         runningCount = 0
         con = []
         for i, value in enumerate(values):
             if i % 2:
                 runningCount += 1
             con.append(i)
-            mv.push(value)
+            mv.push(z=value)
 
             if i >= window:
                 if con[0] % 2:
@@ -145,14 +145,14 @@ class TestAccumulators(unittest.TestCase):
         total = 2500
 
         values = [1.0 if i % 2 else -1.0 for i in range(total)]
-        mv = MovingCountedNegative(window)
+        mv = MovingCountedNegative(window, pNames='z')
         runningCount = 0
         con = []
         for i, value in enumerate(values):
             if not i % 2:
                 runningCount += 1
             con.append(i)
-            mv.push(value)
+            mv.push(z=value)
 
             if i >= window:
                 if not con[0] % 2:
@@ -171,14 +171,14 @@ class TestAccumulators(unittest.TestCase):
         total = 2500
 
         # Test moving population variance
-        mv = MovingVariancer(window, True)
+        mv = MovingVariancer(window, pNames='z', isPopulation=True)
         runningSum = 0.0
         runningSumSquare = 0.0
         con = []
         for i in range(total):
             value = float(i)
             con.append(value)
-            mv.push(value)
+            mv.push(z=value)
             runningSum += value
             runningSumSquare += value * value
             if i >= window:
@@ -194,14 +194,14 @@ class TestAccumulators(unittest.TestCase):
                                                                  "Var calculated: {2:f}".format(i, expected, calculated))
 
         # Test moving sample variance
-        mv = MovingVariancer(window, False)
+        mv = MovingVariancer(window, pNames='z', isPopulation=False)
         runningSum = 0.0
         runningSumSquare = 0.0
         con = []
         for i in range(total):
             value = float(i)
             con.append(value)
-            mv.push(value)
+            mv.push(z=value)
             runningSum += value
             runningSumSquare += value * value
             if i >= window:
@@ -222,14 +222,14 @@ class TestAccumulators(unittest.TestCase):
         filePath = os.path.join(dirName, 'data/negativevariance.csv')
 
         window = 20
-        mv = MovingNegativeVariancer(window)
+        mv = MovingNegativeVariancer(window,pNames='z')
 
         with open(filePath, 'r') as fileHandler:
             reader = csv.reader(fileHandler)
             for i, row in enumerate(reader):
                 if i == 0:
                     continue
-                mv.push(float(row[1]))
+                mv.push(z=float(row[1]))
                 if i >= window:
                     expected = float(row[6])
                     calculated = mv.result()
@@ -242,7 +242,7 @@ class TestAccumulators(unittest.TestCase):
         filePath = os.path.join(dirName, 'data/correlation.csv')
 
         window = 120
-        mv = MovingCorrelation(window)
+        mv = MovingCorrelation(window, pNames=['z', 't'])
 
         with open(filePath, 'r') as fileHandler:
             reader = csv.reader(fileHandler)
@@ -250,7 +250,7 @@ class TestAccumulators(unittest.TestCase):
             for i, row in enumerate(reader):
                 if i == 0:
                     continue
-                mv.push((float(row[0]), float(row[1])))
+                mv.push(z=float(row[0]), t=float(row[1]))
                 if i >= window:
                     expected = float(row[2])
                     calculated = mv.result()
@@ -278,7 +278,7 @@ class TestAccumulators(unittest.TestCase):
 
         window = 100
 
-        mv = MovingCorrelationMatrix(window)
+        mv = MovingCorrelationMatrix(window, pNames='samples')
 
         with open(filePath, 'r') as fileHandler:
             reader = csv.reader(fileHandler)
@@ -287,7 +287,7 @@ class TestAccumulators(unittest.TestCase):
 
             for i, row in enumerate(reader):
                 row = [float(value) for value in row]
-                mv.push(row)
+                mv.push(samples=row)
                 if (i+1) == window:
                     calculated = mv.result()
                     for k, row in enumerate(first100Sample):

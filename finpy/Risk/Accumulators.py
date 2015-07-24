@@ -7,27 +7,53 @@ Created on 2015-7-16
 
 import math
 import numpy as np
+from abc import ABCMeta
+from abc import abstractmethod
 
 
-class ValueHolder(object):
+class Accumulator(object):
 
-    def __init__(self, window):
+    __metaclass__ = ABCMeta
+
+    @abstractmethod
+    def push(self, **kwargs):
+        raise NotImplementedError("push method is not implemented for Accumulator class")
+
+    @abstractmethod
+    def result(self):
+        raise NotImplementedError("result method is not implemented for Accumulator class")
+
+
+class StatelessValueHolder(Accumulator):
+    pass
+
+
+class StatefulValueHolder(Accumulator):
+
+    def __init__(self, window, pNames):
         assert window > 0, "window length should be greater than 0"
         self._window = window
         self._con = []
         self._isFull = 0
         self._start = 0
+        if hasattr(pNames, '__iter__') and len(pNames) >= 2:
+            self._pNames = pNames
+        elif hasattr(pNames, '__iter__') and len(pNames) == 1:
+            self._pNames = pNames[0]
+        elif hasattr(pNames, '__iter__'):
+            raise RuntimeError("parameters' name list should not be empty")
+        else:
+            self._pNames = pNames
 
     @property
     def isFull(self):
-        return self._isFull
+        return self._isFull == 1
 
     @property
     def size(self):
         return len(self._con)
 
     def _dumpOneValue(self, value):
-
         if not hasattr(value, '__iter__'):
             popout = 0.0
         else:
@@ -46,37 +72,38 @@ class ValueHolder(object):
         return popout
 
 
-class MovingMaxer(ValueHolder):
+class MovingMaxer(StatefulValueHolder):
 
-    def __init__(self, window):
-        super(MovingMaxer, self).__init__(window)
+    def __init__(self, window, pNames='x'):
+        super(MovingMaxer, self).__init__(window, pNames)
 
-    def push(self, value):
-        _ = self._dumpOneValue(value)
+    def push(self, **kwargs):
+        _ = self._dumpOneValue(kwargs[self._pNames])
 
     def result(self):
         return max(self._con)
 
 
-class MovingMinumer(ValueHolder):
+class MovingMinumer(StatefulValueHolder):
 
-    def __init__(self, window):
-        super(MovingMinumer, self).__init__(window)
+    def __init__(self, window, pNames='x'):
+        super(MovingMinumer, self).__init__(window, pNames)
 
-    def push(self, value):
-        _ = self._dumpOneValue(value)
+    def push(self, **kwargs):
+        _ = self._dumpOneValue(kwargs[self._pNames])
 
     def result(self):
         return min(self._con)
 
 
-class MovingSum(ValueHolder):
+class MovingSum(StatefulValueHolder):
 
-    def __init__(self, window):
-        super(MovingSum, self).__init__(window)
+    def __init__(self, window, pNames='x'):
+        super(MovingSum, self).__init__(window, pNames)
         self._runningSum = 0.0
 
-    def push(self, value):
+    def push(self, **kwargs):
+        value = kwargs[self._pNames]
         popout = self._dumpOneValue(value)
         self._runningSum = self._runningSum - popout + value
 
@@ -84,13 +111,14 @@ class MovingSum(ValueHolder):
         return self._runningSum
 
 
-class MovingAverager(ValueHolder):
+class MovingAverager(StatefulValueHolder):
 
-    def __init__(self, window):
-        super(MovingAverager, self).__init__(window)
+    def __init__(self, window, pNames='x'):
+        super(MovingAverager, self).__init__(window, pNames)
         self._runningSum = 0.0
 
-    def push(self, value):
+    def push(self, **kwargs):
+        value = kwargs[self._pNames]
         popout = self._dumpOneValue(value)
         self._runningSum = self._runningSum - popout + value
 
@@ -98,16 +126,18 @@ class MovingAverager(ValueHolder):
         if self._isFull:
             return self._runningSum / self._window
         else:
-            return self._runningSum / len(self._con)
+            return self._runningSum / self.size
 
-class MovingPositiveAverager(ValueHolder):
 
-    def __init__(self, window):
-        super(MovingPositiveAverager, self).__init__(window)
+class MovingPositiveAverager(StatefulValueHolder):
+
+    def __init__(self, window, pNames='x'):
+        super(MovingPositiveAverager, self).__init__(window, pNames)
         self._runningPositiveSum = 0.0
         self._runningPositiveCount = 0
 
-    def push(self, value):
+    def push(self, **kwargs):
+        value = kwargs[self._pNames]
         popout = self._dumpOneValue(value)
         if value > 0.0:
             self._runningPositiveCount += 1
@@ -123,14 +153,16 @@ class MovingPositiveAverager(ValueHolder):
         else:
             return self._runningPositiveSum / self._runningPositiveCount
 
-class MovingNegativeAverager(ValueHolder):
 
-    def __init__(self, window):
-        super(MovingNegativeAverager, self).__init__(window)
+class MovingNegativeAverager(StatefulValueHolder):
+
+    def __init__(self, window, pNames='x'):
+        super(MovingNegativeAverager, self).__init__(window, pNames)
         self._runningNegativeSum = 0.0
         self._runningNegativeCount = 0
 
-    def push(self, value):
+    def push(self, **kwargs):
+        value = kwargs[self._pNames]
         popout = self._dumpOneValue(value)
         if value < 0.0:
             self._runningNegativeCount += 1
@@ -147,15 +179,16 @@ class MovingNegativeAverager(ValueHolder):
             return self._runningNegativeSum / self._runningNegativeCount
 
 
-class MovingVariancer(ValueHolder):
+class MovingVariancer(StatefulValueHolder):
 
-    def __init__(self, window, isPopulation=False):
-        super(MovingVariancer, self).__init__(window)
+    def __init__(self, window, pNames='x', isPopulation=False):
+        super(MovingVariancer, self).__init__(window, pNames)
         self._runningSum = 0.0
         self._runningSumSquare = 0.0
         self._isPop = isPopulation
 
-    def push(self, value):
+    def push(self, **kwargs):
+        value = kwargs[self._pNames]
         popout = self._dumpOneValue(value)
         self._runningSum = self._runningSum - popout + value
         self._runningSumSquare = self._runningSumSquare - popout * popout + value * value
@@ -167,34 +200,35 @@ class MovingVariancer(ValueHolder):
                 return tmp / self._window
             else:
                 return tmp / (self._window - 1)
-        elif len(self._con) >= 2:
-            tmp = self._runningSumSquare - self._runningSum * self._runningSum / len(self._con)
+        elif self.size >= 2:
+            tmp = self._runningSumSquare - self._runningSum * self._runningSum / self.size
             if self._isPop:
-                return tmp / len(self._con)
+                return tmp / self.size
             else:
-                return tmp / (len(self._con) - 1)
+                return tmp / (self.size - 1)
         else:
             raise RuntimeError("Container has less than 2 samples")
 
 
-class MovingNegativeVariancer(ValueHolder):
+class MovingNegativeVariancer(StatefulValueHolder):
 
-    def __init__(self, window, isPopulation=False):
-        super(MovingNegativeVariancer, self).__init__(window)
+    def __init__(self, window, pNames='x', isPopulation=False):
+        super(MovingNegativeVariancer, self).__init__(window, pNames)
         self._runningNegativeSum = 0.0
         self._runningNegativeSumSquare = 0.0
         self._runningNegativeCount = 0
         self._isPop = isPopulation
 
-    def push(self, value):
+    def push(self, **kwargs):
+        value = kwargs[self._pNames]
         popout = self._dumpOneValue(value)
         if value < 0:
-            self._runningNegativeSum = self._runningNegativeSum + value
-            self._runningNegativeSumSquare = self._runningNegativeSumSquare + value * value
+            self._runningNegativeSum += value
+            self._runningNegativeSumSquare += value * value
             self._runningNegativeCount += 1
         if popout < 0:
-            self._runningNegativeSum = self._runningNegativeSum - popout
-            self._runningNegativeSumSquare = self._runningNegativeSumSquare - popout * popout
+            self._runningNegativeSum -= popout
+            self._runningNegativeSumSquare -= popout * popout
             self._runningNegativeCount -= 1
 
     def result(self):
@@ -203,22 +237,25 @@ class MovingNegativeVariancer(ValueHolder):
                 length = self._runningNegativeCount
                 tmp = self._runningNegativeSumSquare - self._runningNegativeSum * self._runningNegativeSum / length
                 return tmp / length
+            else:
+                raise RuntimeError("Negative population variance container has less than 1 samples")
         else:
             if self._runningNegativeCount >= 2:
                 length = self._runningNegativeCount
                 tmp = self._runningNegativeSumSquare - self._runningNegativeSum * self._runningNegativeSum / length
                 return tmp / (length - 1)
             else:
-                raise RuntimeError("Container has less than 2 samples")
+                raise RuntimeError("Negative sample variance container has less than 2 samples")
 
 
-class MovingCountedPositive(ValueHolder):
+class MovingCountedPositive(StatefulValueHolder):
 
-    def __init__(self, window):
-        super(MovingCountedPositive, self).__init__(window)
+    def __init__(self, window, pNames='x'):
+        super(MovingCountedPositive, self).__init__(window, pNames)
         self._counts = 0
 
-    def push(self, value):
+    def push(self, **kwargs):
+        value = kwargs[self._pNames]
         popout = self._dumpOneValue(value)
 
         if value > 0:
@@ -230,13 +267,14 @@ class MovingCountedPositive(ValueHolder):
         return self._counts
 
 
-class MovingCountedNegative(ValueHolder):
+class MovingCountedNegative(StatefulValueHolder):
 
-    def __init__(self, window):
-        super(MovingCountedNegative, self).__init__(window)
+    def __init__(self, window, pNames='x'):
+        super(MovingCountedNegative, self).__init__(window, pNames)
         self._counts = 0
 
-    def push(self, value):
+    def push(self, **kwargs):
+        value = kwargs[self._pNames]
         popout = self._dumpOneValue(value)
 
         if value < 0:
@@ -249,17 +287,18 @@ class MovingCountedNegative(ValueHolder):
 
 
 # Calculator for one pair of series
-class MovingCorrelation(ValueHolder):
+class MovingCorrelation(StatefulValueHolder):
 
-    def __init__(self, window):
-        super(MovingCorrelation, self).__init__(window)
+    def __init__(self, window, pNames=['x', 'y']):
+        super(MovingCorrelation, self).__init__(window, pNames)
         self._runningSumLeft = 0.0
         self._runningSumRight = 0.0
         self._runningSumSquareLeft = 0.0
         self._runningSumSquareRight = 0.0
         self._runningSumCrossSquare = 0.0
 
-    def push(self, value):
+    def push(self, **kwargs):
+        value = [kwargs[self._pNames[0]], kwargs[self._pNames[1]]]
         popout = self._dumpOneValue(value)
         headLeft = popout[0]
         headRight = popout[1]
@@ -280,8 +319,8 @@ class MovingCorrelation(ValueHolder):
                           *(n * self._runningSumSquareRight - self._runningSumRight * self._runningSumRight)
             denominator = math.sqrt(denominator)
             return nominator / denominator
-        elif len(self._con) >= 2:
-            n = len(self._con)
+        elif self.size >= 2:
+            n = self.size
             nominator = n * self._runningSumCrossSquare - self._runningSumLeft * self._runningSumRight
             denominator = (n * self._runningSumSquareLeft - self._runningSumLeft * self._runningSumLeft) \
                           *(n * self._runningSumSquareRight - self._runningSumRight * self._runningSumRight)
@@ -291,12 +330,13 @@ class MovingCorrelation(ValueHolder):
             raise RuntimeError("Container has less than 2 samples")
 
 
-class MovingCorrelationMatrix(ValueHolder):
+class MovingCorrelationMatrix(StatefulValueHolder):
 
-    def __init__(self, window):
-        super(MovingCorrelationMatrix, self).__init__(window)
+    def __init__(self, window, pNames='values'):
+        super(MovingCorrelationMatrix, self).__init__(window, pNames)
 
-    def push(self, values):
+    def push(self, **kwargs):
+        values = kwargs[self._pNames]
         _ = self._dumpOneValue(values)
 
     def result(self):

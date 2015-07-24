@@ -17,4 +17,3 @@ class Strategy(object):
     @abstractmethod
     def calculateSignals(self):
         raise NotImplementedError()
-

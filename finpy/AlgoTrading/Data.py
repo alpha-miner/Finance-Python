@@ -29,7 +29,7 @@ class DataHandler(object):
         raise NotImplementedError()
 
     @abstractmethod
-    def getLatestBarDatetiem(self, symbol):
+    def getLatestBarDatetime(self, symbol):
         raise NotImplementedError()
 
     @abstractmethod
@@ -73,7 +73,7 @@ class HistoricalCSVDataHandler(DataHandler):
         else:
             return barsList[-N:]
 
-    def getLatestBarDatetiem(self, symbol):
+    def getLatestBarDatetime(self, symbol):
         try:
             barsList = self.latestSymbolData[symbol]
         except KeyError:

@@ -41,6 +41,7 @@ setup(
     license="commercial",
     url=URL,
     packages=['finpy.api',
+              'finpy.AlgoTrading',
               'finpy.DateUtilities',
               'finpy.Enums',
               'finpy.Env',

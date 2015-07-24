@@ -14,6 +14,7 @@ AUTHOR_EMAIL = "cheng.li@datayes.com"
 URL = "www.datayes.com"
 VERSION = __version__
 
+
 class test(Command):
     description = "test the distribution prior to install"
 

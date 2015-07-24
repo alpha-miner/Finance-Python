@@ -56,11 +56,11 @@ class FillEvent(Event):
 
         # calculate commission
         if commission is None:
-            self.commission = self.calculateIbCommission()
+            self.commission = self._calculateIbCommission()
         else:
             self.commission = commission
 
-    def calculateIbCommission(self):
+    def _calculateIbCommission(self):
         if self.quantity <= 500:
             fullCost = max(1.3, 0.013 * self.quantity)
         else:

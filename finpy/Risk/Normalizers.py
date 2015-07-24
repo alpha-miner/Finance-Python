@@ -5,7 +5,6 @@ Created on 2015-7-21
 @author: cheng.li
 """
 
-from finpy.DateUtilities.Date import Date
 from finpy.Enums.NormalizingType import NormalizingType
 from finpy.DateUtilities.Calendar import Calendar
 

@@ -141,25 +141,3 @@ class InverseCumulativeNormal(object):
     def __call__(self, x):
         return self._average + self._sigma * self._standard_value(x)
 
-
-if __name__ == "__main__":
-
-    iv = InverseCumulativeNormal()
-
-    import time
-    from scipy.stats import norm
-    sample = 0.3
-    start = time.time()
-
-    for i in range(10000):
-        _ = iv(sample)
-
-    print(iv(sample))
-    print(time.time() - start)
-
-    start = time.time()
-    for i in range(10000):
-        _ = norm.ppf(sample)
-
-    #_ = norm.ppf([sample]*100000)
-    print(time.time() - start)

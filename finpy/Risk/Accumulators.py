@@ -173,6 +173,8 @@ class MovingVariancer(ValueHolder):
                 return tmp / len(self._con)
             else:
                 return tmp / (len(self._con) - 1)
+        else:
+            raise RuntimeError("Container has less than 2 samples")
 
 
 class MovingNegativeVariancer(ValueHolder):
@@ -206,6 +208,8 @@ class MovingNegativeVariancer(ValueHolder):
                 length = self._runningNegativeCount
                 tmp = self._runningNegativeSumSquare - self._runningNegativeSum * self._runningNegativeSum / length
                 return tmp / (length - 1)
+            else:
+                raise RuntimeError("Container has less than 2 samples")
 
 
 class MovingCountedPositive(ValueHolder):
@@ -283,6 +287,8 @@ class MovingCorrelation(ValueHolder):
                           *(n * self._runningSumSquareRight - self._runningSumRight * self._runningSumRight)
             denominator = math.sqrt(denominator)
             return nominator / denominator
+        else:
+            raise RuntimeError("Container has less than 2 samples")
 
 
 class MovingCorrelationMatrix(ValueHolder):
@@ -296,6 +302,8 @@ class MovingCorrelationMatrix(ValueHolder):
     def result(self):
         if len(self._con) >= 2:
             return np.corrcoef(np.matrix(self._con).T)
+        else:
+            raise RuntimeError("Container has less than 2 samples")
 
 
 

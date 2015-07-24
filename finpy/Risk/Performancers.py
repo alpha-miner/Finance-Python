@@ -32,6 +32,8 @@ class MovingSharp(object):
     def result(self):
         if self._mean.size >= 2:
             return self._mean.result() / math.sqrt(self._var.result())
+        else:
+            raise RuntimeError("Container has less than 2 samples")
 
 
 class MovingSortino(object):
@@ -47,6 +49,8 @@ class MovingSortino(object):
     def result(self):
         if self._mean.size >= 2:
             return self._mean.result() / math.sqrt(self._negativeVar.result())
+        else:
+            raise RuntimeError("Container has less than 2 samples")
 
 
 class MovingAlphaBeta(object):
@@ -73,6 +77,8 @@ class MovingAlphaBeta(object):
             beta = corr * pStd / mStd
             alpha = self._pReturnMean.result() - beta * self._mReturnMean.result()
             return alpha, beta
+        else:
+            raise RuntimeError("Container has less than 2 samples")
 
 
 class MovingDrawDown(object):

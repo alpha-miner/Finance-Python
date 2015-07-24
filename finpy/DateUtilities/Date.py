@@ -56,6 +56,9 @@ class Date(object):
         w = self.__serialNumber__ % 7
         return Weekdays(7 if w == 0 else w)
 
+    def toDateTime(self):
+        return dt.datetime(self.year(), self.month(), self.dayOfMonth())
+
     @property
     def serialNumber(self):
         return self.__serialNumber__
@@ -115,11 +118,11 @@ class Date(object):
 
     @staticmethod
     def minDate():
-        return Date(1901,1,1)
+        return Date(1901, 1, 1)
 
     @staticmethod
     def maxDate():
-        return Date(2199,12,31)
+        return Date(2199, 12, 31)
 
     @staticmethod
     def endOfMonth(date):

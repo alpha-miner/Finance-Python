@@ -53,4 +53,4 @@ class TestBlackFormula(unittest.TestCase):
             callPrem = bachelierFormula(OptionType.Put, strike, forward, bpvol * math.sqrt(tte), math.exp(-r*tte))
             impliedBpVol = bachelierFormulaImpliedVol(OptionType.Put, strike, forward, tte, callPrem, math.exp(-r*tte))
             self.assertAlmostEqual(impliedBpVol, bpvol, 12)
-            
+

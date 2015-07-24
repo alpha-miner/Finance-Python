@@ -1,9 +1,9 @@
 ## finpy
 -------------
 
-��pythonʵ�ֵĽ��ڼ���⣬�ο�quantlib
+纯python实现的金融计算库，参考quantlib
 
-## ����
+## 依赖
 -------------
 
 ~~~
@@ -12,24 +12,25 @@ numpy
 scipy
 ~~~
 
-## ��װ
+## 安装
 -------------
 
-����ʹ�õ�python�汾��ͬ������Python2:
+根据使用的python版本不同，例如Python2:
 
 ~~~
 pip install -r requirements/python2.txt
 python setpy.py install
 ~~~
 
-## �汾��ʷ
+## 版本历史
 -------------
 
 ### 0.2.0
 
-ʵ���˲��Եķ�������ָ����㡣
+1. 实现了策略的风险收益指标计算；
+2. 一些简单的期权计算公式。
 
 ### 0.1.0
 
-������������غ�����ʵ�֡�
+基本的日期相关函数的实现。
 

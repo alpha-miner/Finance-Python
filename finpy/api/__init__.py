@@ -5,8 +5,12 @@ Created on 2015-7-13
 @author: cheng.li
 """
 
-__all__ = ["datesList", "bizDatesList", "holDatesList", "advanceDate",
-           "adjustDateByCalendar", "advanceDateByCalendar"]
+__all__ = ["datesList",
+           "bizDatesList",
+           "holDatesList",
+           "advanceDate",
+           "adjustDateByCalendar",
+           "advanceDateByCalendar"]
 
 from finpy.api.DateUtilites import datesList
 from finpy.api.DateUtilites import bizDatesList

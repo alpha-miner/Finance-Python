@@ -5,8 +5,13 @@ Created on 2015-7-9
 @author: cheng.li
 """
 
-__all__ = ['BizDayConventions', 'DateGeneration', 'Months', 'NormalizingType', 'OptionType',
-           'TimeUnits', 'Weekdays']
+__all__ = ['BizDayConventions',
+           'DateGeneration',
+           'Months',
+           'NormalizingType',
+           'OptionType',
+           'TimeUnits',
+           'Weekdays']
 
 from finpy.Enums.BizDayConventions import BizDayConventions
 from finpy.Enums.DateGeneration import DateGeneration

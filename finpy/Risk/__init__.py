@@ -5,11 +5,25 @@ Created on 2015-7-16
 @author: cheng.li
 """
 
-__all__ = ["MovingAverager", "MovingPositiveAverager", "MovingNegativeAverager", "MovingSum",
-           "MovingCountedPositive", "MovingCountedNegative", "MovingNegativeVariancer",
-           "MovingCorrelation", "MovingCorrelationMatrix", "MovingMaxer", "MovingMinumer",
-           "MovingVariancer", "MovingAlphaBeta", "MovingDrawDown", "MovingAverageDrawdown", "MovingMaxDrawdown",
-           "MovingSharp", "MovingSortino", "Timeseries"]
+__all__ = ["MovingAverager",
+           "MovingPositiveAverager",
+           "MovingNegativeAverager",
+           "MovingSum",
+           "MovingCountedPositive",
+           "MovingCountedNegative",
+           "MovingNegativeVariancer",
+           "MovingCorrelation",
+           "MovingCorrelationMatrix",
+           "MovingMaxer",
+           "MovingMinumer",
+           "MovingVariancer",
+           "MovingAlphaBeta",
+           "MovingDrawDown",
+           "MovingAverageDrawdown",
+           "MovingMaxDrawdown",
+           "MovingSharp",
+           "MovingSortino",
+           "Timeseries"]
 
 from finpy.Risk.Accumulators import MovingAverager
 from finpy.Risk.Accumulators import MovingPositiveAverager

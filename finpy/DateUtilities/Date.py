@@ -6,6 +6,7 @@ Created on 2015-7-9
 """
 
 import datetime as dt
+import math
 from finpy.Enums.TimeUnits import TimeUnits
 from finpy.DateUtilities.Period import Period
 from finpy.Enums.Weekdays import Weekdays
@@ -57,7 +58,7 @@ class Date(object):
         return Weekdays(7 if w == 0 else w)
 
     def toDateTime(self):
-        return dt.datetime(self.year(), self.month(), self.dayOfMonth())
+        return dt.date(self.year(), self.month(), self.dayOfMonth())
 
     @property
     def serialNumber(self):
@@ -134,7 +135,7 @@ class Date(object):
     def isEndOfMonth(date):
         m = date.month()
         y = date.year()
-        return date.dayOfMonth() ==  Date._monthLength(m, Date.isLeap(y))
+        return date.dayOfMonth() == Date._monthLength(m, Date.isLeap(y))
 
     @staticmethod
     def nextWeekday(date, dayOfWeek):
@@ -200,7 +201,7 @@ class Date(object):
             d = date.dayOfMonth()
             m = date.month() + n
             y = date.year()
-            addedYear = int(m / 12)
+            addedYear = math.floor(m / 12)
             monthLeft = m % 12
             if monthLeft == 0:
                 monthLeft = 12
@@ -209,7 +210,7 @@ class Date(object):
 
             assert 1900 < y < 2200, 'year {0:d} is out of bound. It must be in [1901, 2199]'.format(y)
 
-            return Date(y,monthLeft,d)
+            return Date(y, monthLeft, d)
         elif units == TimeUnits.Years:
             d = date.dayOfMonth()
             m = date.month()

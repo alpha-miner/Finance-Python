@@ -6,6 +6,7 @@ Created on 2015-7-9
 """
 
 import re
+import math
 from finpy.Enums.TimeUnits import TimeUnits
 
 _unitPattern = re.compile('[BbDdMmWwYy]{1}')
@@ -22,7 +23,7 @@ class Period(object):
 
     def __init__(self, *args):
 
-        if isinstance(args[0],str):
+        if isinstance(args[0], str):
             perStr = args[0]
             unitsPos = _unitPattern.search(perStr)
             numPos = _numberPattern.search(perStr)
@@ -193,7 +194,7 @@ class Period(object):
 
         if self.units == TimeUnits.Days:
             if n >= 7:
-                m = n/7
+                m = math.floor(n/7)
                 out += str(m) + "W"
                 n %= 7
             if n != 0 or m == 0:
@@ -204,7 +205,7 @@ class Period(object):
             return out + str(n) + "W"
         elif self.units == TimeUnits.Months:
             if n >= 12:
-                m = n/12
+                m = math.floor(n/12)
                 out += str(m) + "Y"
                 n %= 12
             if n != 0 or m == 0:

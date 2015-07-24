@@ -23,6 +23,97 @@ class Accumulator(object):
     def result(self):
         raise NotImplementedError("result method is not implemented for Accumulator class")
 
+    def __add__(self, right):
+        return AddedValueHolder(self, right)
+
+    def __sub__(self, right):
+        return MinusedValueHolder(self, right)
+
+    def __mul__(self, right):
+        return MultipliedValueHolder(self, right)
+
+    def __div__(self, right):
+        return DividedValueHolder(self, right)
+
+    def __truediv__(self, right):
+        return self.__div__(right)
+
+    def __rshift__(self, right):
+        return CompoundedValueHolder(self, right)
+
+
+class CombinedValueHolder(Accumulator):
+
+    def __init__(self, left, right):
+        assert left._returnSize == right._returnSize
+        self._returnSize = left._returnSize
+        self._left = left
+        self._right = right
+
+    def push(self, **kwargs):
+        self._left.push(**kwargs)
+        self._right.push(**kwargs)
+
+
+class AddedValueHolder(CombinedValueHolder):
+
+    def __init__(self, left, right):
+        super(AddedValueHolder, self).__init__(left, right)
+
+    def result(self):
+        return self._left.result() + self._right.result()
+
+
+class MinusedValueHolder(CombinedValueHolder):
+
+    def __init__(self, left, right):
+        super(MinusedValueHolder, self).__init__(left, right)
+
+    def result(self):
+        return self._left.result() - self._right.result()
+
+
+class MultipliedValueHolder(CombinedValueHolder):
+
+    def __init__(self, left, right):
+        super(MultipliedValueHolder, self).__init__(left, right)
+
+    def result(self):
+        return self._left.result() * self._right.result()
+
+
+class DividedValueHolder(CombinedValueHolder):
+
+    def __init__(self, left, right):
+        super(DividedValueHolder, self).__init__(left, right)
+
+    def result(self):
+        return self._left.result() / self._right.result()
+
+
+class CompoundedValueHolder(Accumulator):
+
+    def __init__(self, left, right):
+        self._returnSize = right._returnSize
+        self._left = left
+        self._right = right
+
+        if hasattr(self._right._pNames, '__iter__'):
+            assert left._returnSize == len(self._right._pNames)
+        else:
+            assert left._returnSize == 1
+
+    def push(self, **kwargs):
+        self._left.push(**kwargs)
+        values = self._left.result()
+        if hasattr(values, '__iter__'):
+            parameters = dict((name, value) for name, value in zip(self._right._pNames, values))
+        else:
+            parameters = {self._right._pNames:values}
+        self._right.push(**parameters)
+
+    def result(self):
+        return self._right.result()
 
 class StatelessValueHolder(Accumulator):
     pass
@@ -32,6 +123,7 @@ class StatefulValueHolder(Accumulator):
 
     def __init__(self, window, pNames):
         assert window > 0, "window length should be greater than 0"
+        self._returnSize = 1
         self._window = window
         self._con = []
         self._isFull = 0
@@ -289,7 +381,7 @@ class MovingCountedNegative(StatefulValueHolder):
 # Calculator for one pair of series
 class MovingCorrelation(StatefulValueHolder):
 
-    def __init__(self, window, pNames=['x', 'y']):
+    def __init__(self, window, pNames=('x', 'y')):
         super(MovingCorrelation, self).__init__(window, pNames)
         self._runningSumLeft = 0.0
         self._runningSumRight = 0.0
@@ -345,6 +437,14 @@ class MovingCorrelationMatrix(StatefulValueHolder):
         else:
             raise RuntimeError("Container has less than 2 samples")
 
+
+if __name__ == '__main__':
+
+    addedHolder = MovingAverager(20, 'x') >> MovingAverager(20) >> MovingMinumer(20)
+
+    for i in range(100):
+        addedHolder.push(x=float(i))
+        print(addedHolder.result())
 
 
 

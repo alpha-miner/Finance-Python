@@ -16,7 +16,7 @@ import math
 
 class MovingSharp(StatefulValueHolder):
 
-    def __init__(self, window, pNames=['ret', 'riskFree']):
+    def __init__(self, window, pNames=('ret', 'riskFree')):
         super(MovingSharp, self).__init__(window, pNames)
         self._mean = MovingAverager(window, pNames='x')
         self._var = MovingVariancer(window, pNames='x', isPopulation=False)
@@ -40,7 +40,7 @@ class MovingSharp(StatefulValueHolder):
 
 class MovingSortino(StatefulValueHolder):
 
-    def __init__(self, window, pNames=['ret', 'riskFree']):
+    def __init__(self, window, pNames=('ret', 'riskFree')):
         super(MovingSortino, self).__init__(window, pNames)
         self._mean = MovingAverager(window, pNames='x')
         self._negativeVar = MovingNegativeVariancer(window, pNames='x')
@@ -60,7 +60,8 @@ class MovingSortino(StatefulValueHolder):
 
 class MovingAlphaBeta(StatefulValueHolder):
 
-    def __init__(self, window, pNames=['pRet', 'mRet', 'riskFree']):
+    def __init__(self, window, pNames=('pRet', 'mRet', 'riskFree')):
+        self._returnSize = 2
         super(MovingAlphaBeta, self).__init__(window, pNames)
         self._pReturnMean = MovingAverager(window, pNames='x')
         self._mReturnMean = MovingAverager(window, pNames='y')
@@ -94,6 +95,7 @@ class MovingDrawDown(StatefulValueHolder):
 
     def __init__(self, window, pNames='ret'):
         super(MovingDrawDown, self).__init__(window, pNames)
+        self._returnSize = 3
         self._maxer = MovingMaxer(window+1, pNames='x')
         self._maxer.push(x=0.0)
         self._runningCum = 0.0
@@ -124,6 +126,7 @@ class MovingAverageDrawdown(StatefulValueHolder):
 
     def __init__(self, window, pNames='ret'):
         super(MovingAverageDrawdown, self).__init__(window, pNames)
+        self._returnSize = 2
         self._drawdownCalculator = MovingDrawDown(window, pNames='x')
         self._drawdownMean = MovingAverager(window, pNames='x')
         self._durationMean = MovingAverager(window, pNames='x')
@@ -141,8 +144,9 @@ class MovingAverageDrawdown(StatefulValueHolder):
 
 class MovingMaxDrawdown(StatefulValueHolder):
 
-    def __init__(self, window, pNames=['ret']):
+    def __init__(self, window, pNames='ret'):
         super(MovingMaxDrawdown, self).__init__(window, pNames)
+        self._returnSize = 2
         self._drawdownCalculator = MovingDrawDown(window, 'x')
 
     def push(self, **kwargs):

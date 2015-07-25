@@ -312,6 +312,8 @@ class MovingVariancer(StatefulValueHolder):
         self._runningSum = 0.0
         self._runningSumSquare = 0.0
         self._isPop = isPopulation
+        if not self._isPop:
+            assert window >= 2, "sampling variance can't be calculated with window size < 2"
 
     def push(self, **kwargs):
         value = kwargs[self._pNames]
@@ -320,20 +322,16 @@ class MovingVariancer(StatefulValueHolder):
         self._runningSumSquare = self._runningSumSquare - popout * popout + value * value
 
     def result(self):
-        if self._isFull:
-            tmp = self._runningSumSquare - self._runningSum * self._runningSum / self._window
-            if self._isPop:
-                return tmp / self._window
-            else:
-                return tmp / (self._window - 1)
-        elif self.size >= 2:
-            tmp = self._runningSumSquare - self._runningSum * self._runningSum / self.size
-            if self._isPop:
-                return tmp / self.size
-            else:
-                return tmp / (self.size - 1)
+        length = self.size
+        tmp = self._runningSumSquare - self._runningSum * self._runningSum / length
+
+        if self._isPop:
+            return tmp / length
         else:
-            raise RuntimeError("Container has less than 2 samples")
+            if length >= 2:
+                return tmp / (length - 1)
+            else:
+                raise RuntimeError("Container has too few samples: {0:d}".format(self.size))
 
 
 class MovingNegativeVariancer(StatefulValueHolder):

@@ -201,7 +201,7 @@ class Date(object):
             d = date.dayOfMonth()
             m = date.month() + n
             y = date.year()
-            addedYear = math.floor(m / 12)
+            addedYear = int(math.floor(m / 12))
             monthLeft = m % 12
             if monthLeft == 0:
                 monthLeft = 12
@@ -218,7 +218,7 @@ class Date(object):
 
             assert 1900 < y < 2200, 'year {0:d} is out of bound. It must be in [1901, 2199]'.format(y)
 
-            return Date(y,m,d)
+            return Date(y, m, d)
 
     @staticmethod
     def westernStyle(day, month, year):

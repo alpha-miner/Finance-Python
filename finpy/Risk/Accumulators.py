@@ -24,16 +24,24 @@ class Accumulator(object):
         raise NotImplementedError("result method is not implemented for Accumulator class")
 
     def __add__(self, right):
-        return AddedValueHolder(self, right)
+        if isinstance(right, Accumulator):
+            return AddedValueHolder(self, right)
+        return AddedValueHolder(self, Identity(right))
 
     def __sub__(self, right):
-        return MinusedValueHolder(self, right)
+        if isinstance(right, Accumulator):
+            return MinusedValueHolder(self, right)
+        return MinusedValueHolder(self, Identity(right))
 
     def __mul__(self, right):
-        return MultipliedValueHolder(self, right)
+        if isinstance(right, Accumulator):
+            return MultipliedValueHolder(self, right)
+        return MultipliedValueHolder(self, Identity(right))
 
     def __div__(self, right):
-        return DividedValueHolder(self, right)
+        if isinstance(right, Accumulator):
+            return DividedValueHolder(self, right)
+        return DividedValueHolder(self, Identity(right))
 
     def __truediv__(self, right):
         return self.__div__(right)
@@ -115,8 +123,20 @@ class CompoundedValueHolder(Accumulator):
     def result(self):
         return self._right.result()
 
+
 class StatelessValueHolder(Accumulator):
     pass
+
+
+class Identity(StatelessValueHolder):
+    def __init__(self, value):
+        self._value = value
+
+    def push(self, **kwargs):
+        pass
+
+    def result(self):
+        return self._value
 
 
 class StatefulValueHolder(Accumulator):
@@ -162,6 +182,20 @@ class StatefulValueHolder(Accumulator):
         else:
             self._con.append(value)
         return popout
+
+
+class Shift(StatefulValueHolder):
+
+    def __init__(self, valueHolder, N=0):
+        super(Shift, self).__init__(N, valueHolder)
+        self._valueHolder = valueHolder
+
+    def push(self, **kwargs):
+        self._valueHolder.push(**kwargs)
+        self._popout = self._dumpOneValue(self._valueHolder.result())
+
+    def result(self):
+        return self._popout
 
 
 class MovingMaxer(StatefulValueHolder):
@@ -441,11 +475,11 @@ class MovingCorrelationMatrix(StatefulValueHolder):
 if __name__ == '__main__':
 
     addedHolder = MovingAverager(20, 'x') >> MovingAverager(20) >> MovingMinumer(20)
+    shifted = Shift(addedHolder, 2)
 
     for i in range(100):
         addedHolder.push(x=float(i))
-        print(addedHolder.result())
-
-
+        shifted.push(x=float(i))
+        print(addedHolder.result(), shifted.result())
 
 

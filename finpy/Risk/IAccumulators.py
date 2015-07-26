@@ -8,9 +8,20 @@ Created on 2015-7-26
 from abc import ABCMeta
 from abc import abstractmethod
 
+
 class Accumulator(object):
 
     __metaclass__ = ABCMeta
+
+    def __init__(self, pNames):
+        if hasattr(pNames, '__iter__') and len(pNames) >= 2:
+            self._pNames = pNames
+        elif hasattr(pNames, '__iter__') and len(pNames) == 1:
+            self._pNames = pNames[0]
+        elif hasattr(pNames, '__iter__'):
+            raise RuntimeError("parameters' name list should not be empty")
+        else:
+            self._pNames = pNames
 
     @abstractmethod
     def push(self, **kwargs):

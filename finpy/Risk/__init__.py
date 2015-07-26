@@ -25,6 +25,11 @@ __all__ = ["MovingAverage",
            "MovingSortino",
            "Timeseries"]
 
+from finpy.Risk.StatelessAccumulators import Max
+from finpy.Risk.StatelessAccumulators import Minum
+from finpy.Risk.StatelessAccumulators import Sum
+from finpy.Risk.StatelessAccumulators import Average
+
 from finpy.Risk.StatefulAccumulators import MovingAverage
 from finpy.Risk.StatefulAccumulators import MovingPositiveAverage
 from finpy.Risk.StatefulAccumulators import MovingNegativeAverage
@@ -37,6 +42,7 @@ from finpy.Risk.StatefulAccumulators import MovingCorrelation
 from finpy.Risk.StatefulAccumulators import MovingCorrelationMatrix
 from finpy.Risk.StatefulAccumulators import MovingMax
 from finpy.Risk.StatefulAccumulators import MovingMinum
+
 from finpy.Risk.Performancers import MovingAlphaBeta
 from finpy.Risk.Performancers import MovingDrawDown
 from finpy.Risk.Performancers import MovingAverageDrawdown

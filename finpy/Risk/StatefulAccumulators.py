@@ -13,20 +13,13 @@ from finpy.Risk.IAccumulators import Accumulator
 class StatefulValueHolder(Accumulator):
 
     def __init__(self, window, pNames):
+        super(StatefulValueHolder, self).__init__(pNames)
         assert window > 0, "window length should be greater than 0"
         self._returnSize = 1
         self._window = window
         self._con = []
         self._isFull = 0
         self._start = 0
-        if hasattr(pNames, '__iter__') and len(pNames) >= 2:
-            self._pNames = pNames
-        elif hasattr(pNames, '__iter__') and len(pNames) == 1:
-            self._pNames = pNames[0]
-        elif hasattr(pNames, '__iter__'):
-            raise RuntimeError("parameters' name list should not be empty")
-        else:
-            self._pNames = pNames
 
     @property
     def isFull(self):
@@ -55,15 +48,15 @@ class StatefulValueHolder(Accumulator):
         return popout
 
 
-class Shift(StatefulValueHolder):
+class Shift(Accumulator):
 
     def __init__(self, valueHolder, N=1):
-        super(Shift, self).__init__(N, valueHolder)
+        self._historyContainer = StatefulValueHolder(N, pNames=valueHolder._pNames)
         self._valueHolder = valueHolder
 
     def push(self, **kwargs):
         self._valueHolder.push(**kwargs)
-        self._popout = self._dumpOneValue(self._valueHolder.result())
+        self._popout = self._historyContainer._dumpOneValue(self._valueHolder.result())
 
     def result(self):
         return self._popout

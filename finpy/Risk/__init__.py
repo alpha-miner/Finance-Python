@@ -5,18 +5,18 @@ Created on 2015-7-16
 @author: cheng.li
 """
 
-__all__ = ["MovingAverager",
-           "MovingPositiveAverager",
-           "MovingNegativeAverager",
+__all__ = ["MovingAverage",
+           "MovingPositiveAverage",
+           "MovingNegativeAverage",
            "MovingSum",
            "MovingCountedPositive",
            "MovingCountedNegative",
-           "MovingNegativeVariancer",
+           "MovingNegativeVariance",
            "MovingCorrelation",
            "MovingCorrelationMatrix",
-           "MovingMaxer",
-           "MovingMinumer",
-           "MovingVariancer",
+           "MovingMax",
+           "MovingMinum",
+           "MovingVariance",
            "MovingAlphaBeta",
            "MovingDrawDown",
            "MovingAverageDrawdown",
@@ -25,18 +25,18 @@ __all__ = ["MovingAverager",
            "MovingSortino",
            "Timeseries"]
 
-from finpy.Risk.StatefulAccumulators import MovingAverager
-from finpy.Risk.StatefulAccumulators import MovingPositiveAverager
-from finpy.Risk.StatefulAccumulators import MovingNegativeAverager
+from finpy.Risk.StatefulAccumulators import MovingAverage
+from finpy.Risk.StatefulAccumulators import MovingPositiveAverage
+from finpy.Risk.StatefulAccumulators import MovingNegativeAverage
 from finpy.Risk.StatefulAccumulators import MovingSum
 from finpy.Risk.StatefulAccumulators import MovingCountedPositive
 from finpy.Risk.StatefulAccumulators import MovingCountedNegative
-from finpy.Risk.StatefulAccumulators import MovingVariancer
-from finpy.Risk.StatefulAccumulators import MovingNegativeVariancer
+from finpy.Risk.StatefulAccumulators import MovingVariance
+from finpy.Risk.StatefulAccumulators import MovingNegativeVariance
 from finpy.Risk.StatefulAccumulators import MovingCorrelation
 from finpy.Risk.StatefulAccumulators import MovingCorrelationMatrix
-from finpy.Risk.StatefulAccumulators import MovingMaxer
-from finpy.Risk.StatefulAccumulators import MovingMinumer
+from finpy.Risk.StatefulAccumulators import MovingMax
+from finpy.Risk.StatefulAccumulators import MovingMinum
 from finpy.Risk.Performancers import MovingAlphaBeta
 from finpy.Risk.Performancers import MovingDrawDown
 from finpy.Risk.Performancers import MovingAverageDrawdown

@@ -68,14 +68,14 @@ class Shift(StatefulValueHolder):
     def result(self):
         return self._popout
 
-    def shift(self):
+    def shift(self, N=1):
         return Shift(self, N)
 
 
-class MovingMaxer(StatefulValueHolder):
+class MovingMax(StatefulValueHolder):
 
     def __init__(self, window, pNames='x'):
-        super(MovingMaxer, self).__init__(window, pNames)
+        super(MovingMax, self).__init__(window, pNames)
 
     def push(self, **kwargs):
         _ = self._dumpOneValue(kwargs[self._pNames])
@@ -84,10 +84,10 @@ class MovingMaxer(StatefulValueHolder):
         return max(self._con)
 
 
-class MovingMinumer(StatefulValueHolder):
+class MovingMinum(StatefulValueHolder):
 
     def __init__(self, window, pNames='x'):
-        super(MovingMinumer, self).__init__(window, pNames)
+        super(MovingMinum, self).__init__(window, pNames)
 
     def push(self, **kwargs):
         _ = self._dumpOneValue(kwargs[self._pNames])
@@ -111,10 +111,10 @@ class MovingSum(StatefulValueHolder):
         return self._runningSum
 
 
-class MovingAverager(StatefulValueHolder):
+class MovingAverage(StatefulValueHolder):
 
     def __init__(self, window, pNames='x'):
-        super(MovingAverager, self).__init__(window, pNames)
+        super(MovingAverage, self).__init__(window, pNames)
         self._runningSum = 0.0
 
     def push(self, **kwargs):
@@ -129,10 +129,10 @@ class MovingAverager(StatefulValueHolder):
             return self._runningSum / self.size
 
 
-class MovingPositiveAverager(StatefulValueHolder):
+class MovingPositiveAverage(StatefulValueHolder):
 
     def __init__(self, window, pNames='x'):
-        super(MovingPositiveAverager, self).__init__(window, pNames)
+        super(MovingPositiveAverage, self).__init__(window, pNames)
         self._runningPositiveSum = 0.0
         self._runningPositiveCount = 0
 
@@ -154,10 +154,10 @@ class MovingPositiveAverager(StatefulValueHolder):
             return self._runningPositiveSum / self._runningPositiveCount
 
 
-class MovingNegativeAverager(StatefulValueHolder):
+class MovingNegativeAverage(StatefulValueHolder):
 
     def __init__(self, window, pNames='x'):
-        super(MovingNegativeAverager, self).__init__(window, pNames)
+        super(MovingNegativeAverage, self).__init__(window, pNames)
         self._runningNegativeSum = 0.0
         self._runningNegativeCount = 0
 
@@ -179,10 +179,10 @@ class MovingNegativeAverager(StatefulValueHolder):
             return self._runningNegativeSum / self._runningNegativeCount
 
 
-class MovingVariancer(StatefulValueHolder):
+class MovingVariance(StatefulValueHolder):
 
     def __init__(self, window, pNames='x', isPopulation=False):
-        super(MovingVariancer, self).__init__(window, pNames)
+        super(MovingVariance, self).__init__(window, pNames)
         self._runningSum = 0.0
         self._runningSumSquare = 0.0
         self._isPop = isPopulation
@@ -208,10 +208,10 @@ class MovingVariancer(StatefulValueHolder):
                 raise RuntimeError("Container has too few samples: {0:d}".format(self.size))
 
 
-class MovingNegativeVariancer(StatefulValueHolder):
+class MovingNegativeVariance(StatefulValueHolder):
 
     def __init__(self, window, pNames='x', isPopulation=False):
-        super(MovingNegativeVariancer, self).__init__(window, pNames)
+        super(MovingNegativeVariance, self).__init__(window, pNames)
         self._runningNegativeSum = 0.0
         self._runningNegativeSumSquare = 0.0
         self._runningNegativeCount = 0
@@ -343,15 +343,5 @@ class MovingCorrelationMatrix(StatefulValueHolder):
         else:
             raise RuntimeError("Container has less than 2 samples")
 
-
-if __name__ == '__main__':
-
-    addedHolder = MovingAverager(20, 'x') >> MovingAverager(20) >> MovingMinumer(20)
-    shifted = Shift(addedHolder, 2)
-
-    for i in range(100):
-        addedHolder.push(x=float(i))
-        shifted.push(x=float(i))
-        print(addedHolder.result(), shifted.result())
 
 

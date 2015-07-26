@@ -8,26 +8,26 @@ Created on 2015-7-16
 import unittest
 import csv
 import os
-from finpy.Risk import MovingAverager
-from finpy.Risk import MovingPositiveAverager
-from finpy.Risk import MovingNegativeAverager
+from finpy.Risk import MovingAverage
+from finpy.Risk import MovingPositiveAverage
+from finpy.Risk import MovingNegativeAverage
 from finpy.Risk import MovingSum
 from finpy.Risk import MovingCountedPositive
 from finpy.Risk import MovingCountedNegative
-from finpy.Risk import MovingVariancer
-from finpy.Risk import MovingNegativeVariancer
+from finpy.Risk import MovingVariance
+from finpy.Risk import MovingNegativeVariance
 from finpy.Risk import MovingCorrelation
 from finpy.Risk import MovingCorrelationMatrix
 
 
-class TestAccumulators(unittest.TestCase):
+class TestStatefulAccumulators(unittest.TestCase):
 
     def testMovingAverager(self):
 
         window = 120
         total = 2500
 
-        mv = MovingAverager(window, pNames='z')
+        mv = MovingAverage(window, pNames='z')
         runningSum = 0.0
         con = []
         for i in range(total):
@@ -51,7 +51,7 @@ class TestAccumulators(unittest.TestCase):
         filePath = os.path.join(dirName, 'data/averagepostiveandnegative_random.csv')
 
         window = 20
-        mv = MovingPositiveAverager(window, pNames='z')
+        mv = MovingPositiveAverage(window, pNames='z')
 
         with open(filePath, 'r') as fileHandler:
             reader = csv.reader(fileHandler)
@@ -73,7 +73,7 @@ class TestAccumulators(unittest.TestCase):
         filePath = os.path.join(dirName, 'data/averagepostiveandnegative_random.csv')
 
         window = 20
-        mv = MovingNegativeAverager(window, pNames='z')
+        mv = MovingNegativeAverage(window, pNames='z')
 
         with open(filePath, 'r') as fileHandler:
             reader = csv.reader(fileHandler)
@@ -171,7 +171,7 @@ class TestAccumulators(unittest.TestCase):
         total = 2500
 
         # Test moving population variance
-        mv = MovingVariancer(window, pNames='z', isPopulation=True)
+        mv = MovingVariance(window, pNames='z', isPopulation=True)
         runningSum = 0.0
         runningSumSquare = 0.0
         con = []
@@ -194,7 +194,7 @@ class TestAccumulators(unittest.TestCase):
                                                                  "Var calculated: {2:f}".format(i, expected, calculated))
 
         # Test moving sample variance
-        mv = MovingVariancer(window, pNames='z', isPopulation=False)
+        mv = MovingVariance(window, pNames='z', isPopulation=False)
         runningSum = 0.0
         runningSumSquare = 0.0
         con = []
@@ -222,7 +222,7 @@ class TestAccumulators(unittest.TestCase):
         filePath = os.path.join(dirName, 'data/negativevariance.csv')
 
         window = 20
-        mv = MovingNegativeVariancer(window,pNames='z')
+        mv = MovingNegativeVariance(window,pNames='z')
 
         with open(filePath, 'r') as fileHandler:
             reader = csv.reader(fileHandler)

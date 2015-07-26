@@ -6,10 +6,10 @@ Created on 2015-7-17
 """
 
 from finpy.Risk.StatefulAccumulators import StatefulValueHolder
-from finpy.Risk.StatefulAccumulators import MovingMaxer
-from finpy.Risk.StatefulAccumulators import MovingAverager
-from finpy.Risk.StatefulAccumulators import MovingVariancer
-from finpy.Risk.StatefulAccumulators import MovingNegativeVariancer
+from finpy.Risk.StatefulAccumulators import MovingMax
+from finpy.Risk.StatefulAccumulators import MovingAverage
+from finpy.Risk.StatefulAccumulators import MovingVariance
+from finpy.Risk.StatefulAccumulators import MovingNegativeVariance
 from finpy.Risk.StatefulAccumulators import MovingCorrelation
 import math
 
@@ -18,8 +18,8 @@ class MovingSharp(StatefulValueHolder):
 
     def __init__(self, window, pNames=('ret', 'riskFree')):
         super(MovingSharp, self).__init__(window, pNames)
-        self._mean = MovingAverager(window, pNames='x')
-        self._var = MovingVariancer(window, pNames='x', isPopulation=False)
+        self._mean = MovingAverage(window, pNames='x')
+        self._var = MovingVariance(window, pNames='x', isPopulation=False)
 
     def push(self, **kwargs):
         '''
@@ -42,8 +42,8 @@ class MovingSortino(StatefulValueHolder):
 
     def __init__(self, window, pNames=('ret', 'riskFree')):
         super(MovingSortino, self).__init__(window, pNames)
-        self._mean = MovingAverager(window, pNames='x')
-        self._negativeVar = MovingNegativeVariancer(window, pNames='x')
+        self._mean = MovingAverage(window, pNames='x')
+        self._negativeVar = MovingNegativeVariance(window, pNames='x')
 
     def push(self, **kwargs):
         value = kwargs[self._pNames[0]]
@@ -63,10 +63,10 @@ class MovingAlphaBeta(StatefulValueHolder):
     def __init__(self, window, pNames=('pRet', 'mRet', 'riskFree')):
         self._returnSize = 2
         super(MovingAlphaBeta, self).__init__(window, pNames)
-        self._pReturnMean = MovingAverager(window, pNames='x')
-        self._mReturnMean = MovingAverager(window, pNames='y')
-        self._pReturnVar = MovingVariancer(window, pNames='x')
-        self._mReturnVar = MovingVariancer(window, pNames='y')
+        self._pReturnMean = MovingAverage(window, pNames='x')
+        self._mReturnMean = MovingAverage(window, pNames='y')
+        self._pReturnVar = MovingVariance(window, pNames='x')
+        self._mReturnVar = MovingVariance(window, pNames='y')
         self._correlationHolder = MovingCorrelation(window, pNames=['x', 'y'])
 
     def push(self, **kwargs):
@@ -96,7 +96,7 @@ class MovingDrawDown(StatefulValueHolder):
     def __init__(self, window, pNames='ret'):
         super(MovingDrawDown, self).__init__(window, pNames)
         self._returnSize = 3
-        self._maxer = MovingMaxer(window+1, pNames='x')
+        self._maxer = MovingMax(window+1, pNames='x')
         self._maxer.push(x=0.0)
         self._runningCum = 0.0
         self._highIndex = 0
@@ -128,8 +128,8 @@ class MovingAverageDrawdown(StatefulValueHolder):
         super(MovingAverageDrawdown, self).__init__(window, pNames)
         self._returnSize = 2
         self._drawdownCalculator = MovingDrawDown(window, pNames='x')
-        self._drawdownMean = MovingAverager(window, pNames='x')
-        self._durationMean = MovingAverager(window, pNames='x')
+        self._drawdownMean = MovingAverage(window, pNames='x')
+        self._durationMean = MovingAverage(window, pNames='x')
 
     def push(self, **kwargs):
         value = kwargs[self._pNames]

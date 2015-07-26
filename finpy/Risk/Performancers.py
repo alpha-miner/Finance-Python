@@ -5,12 +5,12 @@ Created on 2015-7-17
 @author: cheng.li
 """
 
-from finpy.Risk.Accumulators import StatefulValueHolder
-from finpy.Risk.Accumulators import MovingMaxer
-from finpy.Risk.Accumulators import MovingAverager
-from finpy.Risk.Accumulators import MovingVariancer
-from finpy.Risk.Accumulators import MovingNegativeVariancer
-from finpy.Risk.Accumulators import MovingCorrelation
+from finpy.Risk.StatefulAccumulators import StatefulValueHolder
+from finpy.Risk.StatefulAccumulators import MovingMaxer
+from finpy.Risk.StatefulAccumulators import MovingAverager
+from finpy.Risk.StatefulAccumulators import MovingVariancer
+from finpy.Risk.StatefulAccumulators import MovingNegativeVariancer
+from finpy.Risk.StatefulAccumulators import MovingCorrelation
 import math
 
 

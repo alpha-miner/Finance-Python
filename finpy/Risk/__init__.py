@@ -25,18 +25,18 @@ __all__ = ["MovingAverager",
            "MovingSortino",
            "Timeseries"]
 
-from finpy.Risk.Accumulators import MovingAverager
-from finpy.Risk.Accumulators import MovingPositiveAverager
-from finpy.Risk.Accumulators import MovingNegativeAverager
-from finpy.Risk.Accumulators import MovingSum
-from finpy.Risk.Accumulators import MovingCountedPositive
-from finpy.Risk.Accumulators import MovingCountedNegative
-from finpy.Risk.Accumulators import MovingVariancer
-from finpy.Risk.Accumulators import MovingNegativeVariancer
-from finpy.Risk.Accumulators import MovingCorrelation
-from finpy.Risk.Accumulators import MovingCorrelationMatrix
-from finpy.Risk.Accumulators import MovingMaxer
-from finpy.Risk.Accumulators import MovingMinumer
+from finpy.Risk.StatefulAccumulators import MovingAverager
+from finpy.Risk.StatefulAccumulators import MovingPositiveAverager
+from finpy.Risk.StatefulAccumulators import MovingNegativeAverager
+from finpy.Risk.StatefulAccumulators import MovingSum
+from finpy.Risk.StatefulAccumulators import MovingCountedPositive
+from finpy.Risk.StatefulAccumulators import MovingCountedNegative
+from finpy.Risk.StatefulAccumulators import MovingVariancer
+from finpy.Risk.StatefulAccumulators import MovingNegativeVariancer
+from finpy.Risk.StatefulAccumulators import MovingCorrelation
+from finpy.Risk.StatefulAccumulators import MovingCorrelationMatrix
+from finpy.Risk.StatefulAccumulators import MovingMaxer
+from finpy.Risk.StatefulAccumulators import MovingMinumer
 from finpy.Risk.Performancers import MovingAlphaBeta
 from finpy.Risk.Performancers import MovingDrawDown
 from finpy.Risk.Performancers import MovingAverageDrawdown

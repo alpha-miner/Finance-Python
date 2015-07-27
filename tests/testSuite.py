@@ -28,6 +28,8 @@ def test():
     suite.addTests(tests)
     tests = unittest.TestLoader().loadTestsFromTestCase(PricingEngines.TestBlackFormula)
     suite.addTests(tests)
+    tests = unittest.TestLoader().loadTestsFromTestCase(Risk.TestAccumulatorsArithmetic)
+    suite.addTests(tests)
     tests = unittest.TestLoader().loadTestsFromTestCase(Risk.TestStatefulAccumulators)
     suite.addTests(tests)
     tests = unittest.TestLoader().loadTestsFromTestCase(Risk.TestNormalizers)

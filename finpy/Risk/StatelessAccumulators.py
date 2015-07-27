@@ -12,6 +12,7 @@ class Max(Accumulator):
     def __init__(self, pNames='x'):
         super(Max, self).__init__(pNames)
         self._currentMax = None
+        self._returnSize = 1
 
     def push(self, **kwargs):
         value = kwargs[self._pNames]
@@ -29,6 +30,7 @@ class Minum(Accumulator):
     def __init__(self, pNames='x'):
         super(Minum, self).__init__(pNames)
         self._currentMin = None
+        self._returnSize = 1
 
     def push(self, **kwargs):
         value = kwargs[self._pNames]
@@ -46,6 +48,7 @@ class Sum(Accumulator):
     def __init__(self, pNames='x'):
         super(Sum, self).__init__(pNames)
         self._currentSum = 0.0
+        self._returnSize = 1
 
     def push(self, **kwargs):
         value = kwargs[self._pNames]
@@ -60,6 +63,7 @@ class Average(Accumulator):
         super(Average, self).__init__(pNames)
         self._currentSum = 0.0
         self._currentCount = 0
+        self._returnSize = 1
 
     def push(self, **kwargs):
         value = kwargs[self._pNames]

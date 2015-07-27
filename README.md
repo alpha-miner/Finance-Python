@@ -1,4 +1,4 @@
-## finpy
+﻿## finpy
 -------------
 
 纯python实现的金融计算库，参考quantlib
@@ -10,6 +10,7 @@
 enum34 (python2)
 numpy
 scipy
+pandas
 ~~~
 
 ## 安装

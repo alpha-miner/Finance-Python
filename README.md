@@ -30,6 +30,13 @@ pip install -r requirements/python2.txt
 python setpy.py install
 ~~~
 
+对于python3：
+
+~~~
+pip install -r requirements/python3.txt
+python setpy.py install
+~~~
+
 可以直接运行测试：
 ~~~
 python setup.py test

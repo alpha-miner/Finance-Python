@@ -6,6 +6,7 @@ Created on 2015-7-16
 """
 
 import math
+import bisect
 import numpy as np
 from finpy.Risk.IAccumulators import Accumulator
 
@@ -17,6 +18,7 @@ class StatefulValueHolder(Accumulator):
         assert window > 0, "window length should be greater than 0"
         self._returnSize = 1
         self._window = window
+        self._dependency = window - 1
         self._con = []
         self._isFull = 0
         self._start = 0
@@ -64,29 +66,40 @@ class Shift(Accumulator):
     def shift(self, N=1):
         return Shift(self, N)
 
+class SortedValueHolder(StatefulValueHolder):
 
-class MovingMax(StatefulValueHolder):
+    def __init__(self, window, pNames='x'):
+        super(SortedValueHolder, self).__init__(window, pNames)
+        self._sortedArray = []
+
+    def push(self, **kwargs):
+        value = kwargs[self._pNames]
+        if self._isFull:
+            popout = self._dumpOneValue(kwargs[self._pNames])
+            delPos = bisect.bisect_left(self._sortedArray, popout)
+            del self._sortedArray[delPos]
+            bisect.insort_left(self._sortedArray, value)
+        else:
+            _ = self._dumpOneValue(kwargs[self._pNames])
+            bisect.insort_left(self._sortedArray, value)
+
+
+class MovingMax(SortedValueHolder):
 
     def __init__(self, window, pNames='x'):
         super(MovingMax, self).__init__(window, pNames)
 
-    def push(self, **kwargs):
-        _ = self._dumpOneValue(kwargs[self._pNames])
-
     def result(self):
-        return max(self._con)
+        return self._sortedArray[-1]
 
 
-class MovingMinum(StatefulValueHolder):
+class MovingMinum(SortedValueHolder):
 
     def __init__(self, window, pNames='x'):
         super(MovingMinum, self).__init__(window, pNames)
 
-    def push(self, **kwargs):
-        _ = self._dumpOneValue(kwargs[self._pNames])
-
     def result(self):
-        return min(self._con)
+        return self._sortedArray[0]
 
 
 class MovingSum(StatefulValueHolder):

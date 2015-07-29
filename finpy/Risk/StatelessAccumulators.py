@@ -7,8 +7,16 @@ Created on 2015-7-25
 
 from finpy.Risk.IAccumulators import Accumulator
 
+class StatelessAccumulator(Accumulator):
 
-class Max(Accumulator):
+    def __init__(self, pNames='x'):
+        super(StatelessAccumulator, self).__init__(pNames)
+        self._currentMax = None
+        self._returnSize = 1
+        self._dependency = 0
+
+
+class Max(StatelessAccumulator):
     def __init__(self, pNames='x'):
         super(Max, self).__init__(pNames)
         self._currentMax = None
@@ -26,7 +34,7 @@ class Max(Accumulator):
         return self._currentMax
 
 
-class Minum(Accumulator):
+class Minum(StatelessAccumulator):
     def __init__(self, pNames='x'):
         super(Minum, self).__init__(pNames)
         self._currentMin = None
@@ -44,7 +52,7 @@ class Minum(Accumulator):
         return self._currentMin
 
 
-class Sum(Accumulator):
+class Sum(StatelessAccumulator):
     def __init__(self, pNames='x'):
         super(Sum, self).__init__(pNames)
         self._currentSum = 0.0
@@ -58,7 +66,7 @@ class Sum(Accumulator):
         return self._currentSum
 
 
-class Average(Accumulator):
+class Average(StatelessAccumulator):
     def __init__(self, pNames='x'):
         super(Average, self).__init__(pNames)
         self._currentSum = 0.0

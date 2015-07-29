@@ -7,6 +7,7 @@ Created on 2015-7-26
 
 from abc import ABCMeta
 from abc import abstractmethod
+from copy import deepcopy
 
 
 class Accumulator(object):
@@ -63,8 +64,9 @@ class CombinedValueHolder(Accumulator):
     def __init__(self, left, right):
         assert left._returnSize == right._returnSize
         self._returnSize = left._returnSize
-        self._left = left
-        self._right = right
+        self._left = deepcopy(left)
+        self._right = deepcopy(right)
+        self._dependency = max(self._left._dependency, self._right._dependency)
 
     def push(self, **kwargs):
         self._left.push(**kwargs)
@@ -122,8 +124,9 @@ class CompoundedValueHolder(Accumulator):
 
     def __init__(self, left, right):
         self._returnSize = right._returnSize
-        self._left = left
-        self._right = right
+        self._left = deepcopy(left)
+        self._right = deepcopy(right)
+        self._dependency = self._left._dependency + self._right._dependency
 
         if hasattr(self._right._pNames, '__iter__'):
             assert left._returnSize == len(self._right._pNames)

@@ -43,6 +43,21 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
                                                              "expected:   {1:f}\n"
                                                              "calculated: {2:f}".format(i, expected, calculated))
 
+    def testRPlusOperator(self):
+        ma20 = MovingAverage(20, 'close')
+        plusRes = 5.0 + MovingAverage(20, 'close')
+        sampleClose = np.random.randn(10000)
+
+        for i, close in enumerate(sampleClose):
+            ma20.push(close=close)
+            plusRes.push(close=close)
+
+            expected = 5.0 + ma20.result()
+            calculated = plusRes.result()
+            self.assertAlmostEqual(calculated, expected, 12, "at index {0:d}\n"
+                                                             "expected:   {1:f}\n"
+                                                             "calculated: {2:f}".format(i, expected, calculated))
+
     def testSubOperator(self):
         ma5 = MovingAverage(5, 'close')
         sumTotal = Sum('open')
@@ -57,6 +72,21 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
             subRes.push(open=open, close=close)
 
             expected = ma5.result() - sumTotal.result()
+            calculated = subRes.result()
+            self.assertAlmostEqual(calculated, expected, 12, "at index {0:d}\n"
+                                                             "expected:   {1:f}\n"
+                                                             "calculated: {2:f}".format(i, expected, calculated))
+
+    def testRSubOperator(self):
+        ma20 = MovingAverage(20, 'close')
+        subRes = 5.0 - MovingAverage(20, 'close')
+        sampleClose = np.random.randn(10000)
+
+        for i, close in enumerate(sampleClose):
+            ma20.push(close=close)
+            subRes.push(close=close)
+
+            expected = 5.0 - ma20.result()
             calculated = subRes.result()
             self.assertAlmostEqual(calculated, expected, 12, "at index {0:d}\n"
                                                              "expected:   {1:f}\n"
@@ -82,6 +112,21 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
                                                                  "expected:   {1:f}\n"
                                                                  "calculated: {2:f}".format(i, expected, calculated))
 
+    def testRMultiplyOperator(self):
+        ma20 = MovingAverage(20, 'close')
+        mulRes = 5.0 * MovingAverage(20, 'close')
+        sampleClose = np.random.randn(10000)
+
+        for i, close in enumerate(sampleClose):
+            ma20.push(close=close)
+            mulRes.push(close=close)
+
+            expected = 5.0 * ma20.result()
+            calculated = mulRes.result()
+            self.assertAlmostEqual(calculated, expected, 12, "at index {0:d}\n"
+                                                             "expected:   {1:f}\n"
+                                                             "calculated: {2:f}".format(i, expected, calculated))
+
     def testDivOperator(self):
         mc5 = MovingCorrelation(5, ['open', 'close'])
         minum = Minimum('open')
@@ -101,6 +146,21 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
                 self.assertAlmostEqual(calculated, expected, 12, "at index {0:d}\n"
                                                                  "expected:   {1:f}\n"
                                                                  "calculated: {2:f}".format(i, expected, calculated))
+
+    def testRDivOperator(self):
+        ma20 = MovingAverage(20, 'close')
+        divRes = 5.0 / MovingAverage(20, 'close')
+        sampleClose = np.random.randn(10000)
+
+        for i, close in enumerate(sampleClose):
+            ma20.push(close=close)
+            divRes.push(close=close)
+
+            expected = 5.0 / ma20.result()
+            calculated = divRes.result()
+            self.assertAlmostEqual(calculated, expected, 12, "at index {0:d}\n"
+                                                             "expected:   {1:f}\n"
+                                                             "calculated: {2:f}".format(i, expected, calculated))
 
     def testMultipleOperators(self):
         ma20 = MovingAverage(20, 'close')

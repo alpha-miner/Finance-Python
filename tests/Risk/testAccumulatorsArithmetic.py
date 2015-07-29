@@ -13,7 +13,7 @@ from finpy.Risk.StatefulAccumulators import MovingMax
 from finpy.Risk.StatefulAccumulators import MovingCorrelation
 from finpy.Risk.StatelessAccumulators import Sum
 from finpy.Risk.StatelessAccumulators import Average
-from finpy.Risk.StatelessAccumulators import Minum
+from finpy.Risk.StatelessAccumulators import Minimum
 from finpy.Risk.StatelessAccumulators import Max
 
 
@@ -79,8 +79,8 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
 
     def testDivOperator(self):
         mc5 = MovingCorrelation(5, ['open', 'close'])
-        minum = Minum('open')
-        divRes = Minum('open') / MovingCorrelation(5, ['open', 'close'])
+        minum = Minimum('open')
+        divRes = Minimum('open') / MovingCorrelation(5, ['open', 'close'])
 
         sampleOpen = np.random.randn(10000)
         sampleClose = np.random.randn(10000)

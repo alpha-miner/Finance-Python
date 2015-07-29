@@ -93,10 +93,10 @@ class MovingMax(SortedValueHolder):
         return self._sortedArray[-1]
 
 
-class MovingMinum(SortedValueHolder):
+class MovingMinimum(SortedValueHolder):
 
     def __init__(self, window, pNames='x'):
-        super(MovingMinum, self).__init__(window, pNames)
+        super(MovingMinimum, self).__init__(window, pNames)
 
     def result(self):
         return self._sortedArray[0]

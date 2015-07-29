@@ -36,9 +36,9 @@ class Max(StatelessAccumulator):
         return self._currentMax
 
 
-class Minum(StatelessAccumulator):
+class Minimum(StatelessAccumulator):
     def __init__(self, pNames='x'):
-        super(Minum, self).__init__(pNames)
+        super(Minimum, self).__init__(pNames)
         self._currentMin = None
         self._returnSize = 1
 

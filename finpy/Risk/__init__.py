@@ -5,7 +5,13 @@ Created on 2015-7-16
 @author: cheng.li
 """
 
-__all__ = ["MovingAverage",
+__all__ = ["Max",
+           "Minimum",
+           "Sum",
+           "Average",
+           "Variance",
+           "Correlation",
+           "MovingAverage",
            "MovingPositiveAverage",
            "MovingNegativeAverage",
            "MovingSum",
@@ -15,7 +21,7 @@ __all__ = ["MovingAverage",
            "MovingCorrelation",
            "MovingCorrelationMatrix",
            "MovingMax",
-           "MovingMinum",
+           "MovingMinimum",
            "MovingVariance",
            "MovingAlphaBeta",
            "MovingDrawDown",
@@ -26,9 +32,11 @@ __all__ = ["MovingAverage",
            "Timeseries"]
 
 from finpy.Risk.StatelessAccumulators import Max
-from finpy.Risk.StatelessAccumulators import Minum
+from finpy.Risk.StatelessAccumulators import Minimum
 from finpy.Risk.StatelessAccumulators import Sum
 from finpy.Risk.StatelessAccumulators import Average
+from finpy.Risk.StatelessAccumulators import Variance
+from finpy.Risk.StatelessAccumulators import Correlation
 
 from finpy.Risk.StatefulAccumulators import MovingAverage
 from finpy.Risk.StatefulAccumulators import MovingPositiveAverage
@@ -41,7 +49,7 @@ from finpy.Risk.StatefulAccumulators import MovingNegativeVariance
 from finpy.Risk.StatefulAccumulators import MovingCorrelation
 from finpy.Risk.StatefulAccumulators import MovingCorrelationMatrix
 from finpy.Risk.StatefulAccumulators import MovingMax
-from finpy.Risk.StatefulAccumulators import MovingMinum
+from finpy.Risk.StatefulAccumulators import MovingMinimum
 
 from finpy.Risk.Performancers import MovingAlphaBeta
 from finpy.Risk.Performancers import MovingDrawDown

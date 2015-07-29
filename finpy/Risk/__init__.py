@@ -5,7 +5,11 @@ Created on 2015-7-16
 @author: cheng.li
 """
 
-__all__ = ["Max",
+__all__ = ["Exp",
+           "Log",
+           "Sqrt",
+           "Abs",
+           "Max",
            "Minimum",
            "Sum",
            "Average",
@@ -30,6 +34,11 @@ __all__ = ["Max",
            "MovingSharp",
            "MovingSortino",
            "Timeseries"]
+
+from finpy.Risk.IAccumulators import Exp
+from finpy.Risk.IAccumulators import Log
+from finpy.Risk.IAccumulators import Sqrt
+from finpy.Risk.IAccumulators import Abs
 
 from finpy.Risk.StatelessAccumulators import Max
 from finpy.Risk.StatelessAccumulators import Minimum

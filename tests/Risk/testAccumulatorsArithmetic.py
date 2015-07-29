@@ -6,7 +6,12 @@ Created on 2015-7-27
 """
 
 import unittest
+import math
 import numpy as np
+from finpy.Risk.IAccumulators import Exp
+from finpy.Risk.IAccumulators import Log
+from finpy.Risk.IAccumulators import Sqrt
+from finpy.Risk.IAccumulators import Abs
 from finpy.Risk.StatefulAccumulators import MovingAverage
 from finpy.Risk.StatefulAccumulators import MovingVariance
 from finpy.Risk.StatefulAccumulators import MovingMax
@@ -132,6 +137,70 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
 
             expected = maxer.result()
             calculated = max5ma.result()
+            self.assertAlmostEqual(calculated, expected, 12, "at index {0:d}\n"
+                                                             "expected:   {1:f}\n"
+                                                             "calculated: {2:f}".format(i, expected, calculated))
+
+    def testExpFunction(self):
+        ma5 = MovingAverage(5, 'close')
+        holde = Exp(ma5)
+
+        sample = np.random.randn(10000)
+
+        for i, close in enumerate(sample):
+            ma5.push(close=close)
+            holde.push(close=close)
+
+            expected = math.exp(ma5.result())
+            calculated = holde.result()
+            self.assertAlmostEqual(calculated, expected, 12, "at index {0:d}\n"
+                                                             "expected:   {1:f}\n"
+                                                             "calculated: {2:f}".format(i, expected, calculated))
+
+    def testLogFunction(self):
+        ma5 = MovingAverage(5, 'close')
+        holder = Log(ma5)
+
+        sample = np.exp(np.random.randn(10000))
+
+        for i, close in enumerate(sample):
+            ma5.push(close=close)
+            holder.push(close=close)
+
+            expected = math.log(ma5.result())
+            calculated = holder.result()
+            self.assertAlmostEqual(calculated, expected, 12, "at index {0:d}\n"
+                                                             "expected:   {1:f}\n"
+                                                             "calculated: {2:f}".format(i, expected, calculated))
+
+    def testSqrtFunction(self):
+        ma5 = MovingAverage(5, 'close')
+        holder = Sqrt(ma5)
+
+        sample = np.exp(np.random.randn(10000))
+
+        for i, close in enumerate(sample):
+            ma5.push(close=close)
+            holder.push(close=close)
+
+            expected = math.sqrt(ma5.result())
+            calculated = holder.result()
+            self.assertAlmostEqual(calculated, expected, 12, "at index {0:d}\n"
+                                                             "expected:   {1:f}\n"
+                                                             "calculated: {2:f}".format(i, expected, calculated))
+
+    def testAbsFunction(self):
+        ma5 = MovingAverage(5, 'close')
+        holder = Abs(ma5)
+
+        sample = np.random.randn(10000)
+
+        for i, close in enumerate(sample):
+            ma5.push(close=close)
+            holder.push(close=close)
+
+            expected = abs(ma5.result())
+            calculated = holder.result()
             self.assertAlmostEqual(calculated, expected, 12, "at index {0:d}\n"
                                                              "expected:   {1:f}\n"
                                                              "calculated: {2:f}".format(i, expected, calculated))

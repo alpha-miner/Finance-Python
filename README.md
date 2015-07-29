@@ -1,4 +1,4 @@
-﻿## finpy
+## finpy
 -------------
 
 纯python实现的金融计算库，目标是提供进行量化交易必要的工具，包括但不限于：定价分析工具、技术分析指标以及回测平台。其中部分实现参考了quantlib。
@@ -15,6 +15,13 @@ pandas
 
 ## 安装
 -------------
+
+首先将代码保存至本地：
+
+~~~
+git clone https://git.coding.net/wegamekinglc/finance-Python.git
+cd finance-Python
+~~~
 
 根据使用的python版本不同，例如Python2:
 

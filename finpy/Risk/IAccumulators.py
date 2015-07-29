@@ -141,6 +141,8 @@ class DividedValueHolder(CombinedValueHolder):
 class Identity(Accumulator):
     def __init__(self, value):
         self._value = value
+        self._returnSize = 1
+        self._dependency = 0
 
     def push(self, **kwargs):
         pass

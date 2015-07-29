@@ -96,11 +96,11 @@ class Variance(StatelessAccumulator):
     def push(self, **kwargs):
         value = kwargs[self._pNames]
         self._currentSum += value
-        self._currentCountSquare += value * value
+        self._currentSumSquare += value * value
         self._currentCount += 1
 
     def result(self):
-        tmp = self._runningSumSquare - self._runningSum * self._runningSum / self._currentCount
+        tmp = self._currentSumSquare - self._currentSum * self._currentSum / self._currentCount
 
         if self._isPop:
             return tmp / self._currentCount

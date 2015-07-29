@@ -8,6 +8,7 @@ Created on 2015-7-26
 from abc import ABCMeta
 from abc import abstractmethod
 from copy import deepcopy
+import math
 
 
 class Accumulator(object):
@@ -145,3 +146,36 @@ class CompoundedValueHolder(Accumulator):
     def result(self):
         return self._right.result()
 
+
+class BasicFunction(Accumulator):
+
+    def __init__(self, valueHolder, func):
+        self._returnSize = valueHolder._returnSize
+        self._valueHolder = deepcopy(valueHolder)
+        self._dependency = valueHolder._dependency
+        self._func = func
+
+    def push(self, **kwargs):
+        self._valueHolder.push(**kwargs)
+
+    def result(self):
+        origValue = self._valueHolder.result()
+
+        if hasattr(origValue, '__iter__'):
+            return tuple(self._func(v) for v in origValue)
+
+
+def Exp(valueHolder):
+    return BasicFunction(valueHolder, math.exp)
+
+
+def Log(valueHolder):
+    return BasicFunction(valueHolder, math.log)
+
+
+def Sqrt(valueHolder):
+    return BasicFunction(valueHolder, math.sqrt)
+
+
+def Abs(valueHolder):
+    return BasicFunction(valueHolder, abs)

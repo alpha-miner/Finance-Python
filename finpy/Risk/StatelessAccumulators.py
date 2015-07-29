@@ -141,4 +141,3 @@ class Correlation(StatelessAccumulator):
             return nominator / denominator
         else:
             raise RuntimeError("Container has less than 2 samples")
-

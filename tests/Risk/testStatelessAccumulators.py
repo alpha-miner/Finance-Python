@@ -57,7 +57,8 @@ class TestStatelessAccumulators(unittest.TestCase):
 
     def testVariance(self):
         samples = np.random.randn(1000)
-        mm = Variance(pNames='close', isPopulation=True) # np.var is population variance
+        # np.var is population variance
+        mm = Variance(pNames='close', isPopulation=True)
 
         for i, value in enumerate(samples):
             mm.push(close=value)

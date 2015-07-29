@@ -35,7 +35,7 @@ class StatefulValueHolder(Accumulator):
         if not hasattr(value, '__iter__'):
             popout = 0.0
         else:
-            popout = [0.0] * len(value)
+            popout = np.zeros(np.shape(value))
 
         if self._isFull == 1:
             # use list as circular queue
@@ -334,10 +334,11 @@ class MovingCorrelation(StatefulValueHolder):
             raise RuntimeError("Container has less than 2 samples")
 
 
-class MovingCorrelationMatrix(StatefulValueHolder):
+# Calculator for several series
+class MovingCorrelationMatrixVer2(StatefulValueHolder):
 
     def __init__(self, window, pNames='values'):
-        super(MovingCorrelationMatrix, self).__init__(window, pNames)
+        super(MovingCorrelationMatrixVer2, self).__init__(window, pNames)
 
     def push(self, **kwargs):
         values = kwargs[self._pNames]
@@ -350,4 +351,62 @@ class MovingCorrelationMatrix(StatefulValueHolder):
             raise RuntimeError("Container has less than 2 samples")
 
 
+# Calculator for several series
+class MovingCorrelationMatrix(StatefulValueHolder):
+
+    def __init__(self, window, pNames='values'):
+        super(MovingCorrelationMatrix, self).__init__(window, pNames)
+        self._isFirst = True
+        self._runningSum = None
+        self._runningSumSquare = None
+        self._runningSumCrossSquare = None
+
+    def push(self, **kwargs):
+        values = kwargs[self._pNames]
+        if self._isFirst:
+            self._runningSum = np.zeros((1, len(values)))
+            self._runningSumCrossSquare = np.zeros((len(values), len(values)))
+            self._isFirst = False
+        reshapeValues = np.array(values).reshape((1, len(values)))
+        popout = self._dumpOneValue(reshapeValues)
+        assert len(values) == self._runningSum.size, "size incompatiable"
+        self._runningSum += reshapeValues - popout
+        self._runningSumCrossSquare += reshapeValues * reshapeValues.T - popout * popout.T
+
+    def result(self):
+        if len(self._con) >= 2:
+            n = self.size
+            nominator = n * self._runningSumCrossSquare - self._runningSum * self._runningSum.T
+            denominator = n * np.diag(self._runningSumCrossSquare) - self._runningSum * self._runningSum
+            denominator = np.sqrt(denominator * denominator.T)
+            return nominator / denominator
+        else:
+            raise RuntimeError("Container has less than 2 samples")
+
+
+if __name__ == "__main__":
+
+    import time
+    import pandas as pd
+
+    data = pd.read_excel('d:/random.xlsx', header=None)
+    samples = data.values
+    samples = np.random.randn(10000, 50)
+
+    mc1 = MovingCorrelationMatrix(window=25)
+    mc2 = MovingCorrelationMatrixVer2(window=25)
+
+    start = time.time()
+    for i in range(np.size(samples, 0)):
+        mc1.push(values=samples[i, :])
+        if i >= 1:
+            mc1.result()
+    print(time.time() - start)
+
+    start = time.time()
+    for i in range(np.size(samples, 0)):
+        mc2.push(values=samples[i, :])
+        if i >= 1:
+            mc2.result()
+    print(time.time() - start)
 

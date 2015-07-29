@@ -43,23 +43,46 @@ class Accumulator(object):
             return AddedValueHolder(self, right)
         return AddedValueHolder(self, Identity(right))
 
+    def __radd__(self, left):
+        if isinstance(left, Accumulator):
+            return AddedValueHolder(self, left)
+        return AddedValueHolder(self, Identity(left))
+
     def __sub__(self, right):
         if isinstance(right, Accumulator):
             return MinusedValueHolder(self, right)
         return MinusedValueHolder(self, Identity(right))
+
+    def __rsub__(self, left):
+        if isinstance(left, Accumulator):
+            return MinusedValueHolder(left, self)
+        return MinusedValueHolder(Identity(left), self)
 
     def __mul__(self, right):
         if isinstance(right, Accumulator):
             return MultipliedValueHolder(self, right)
         return MultipliedValueHolder(self, Identity(right))
 
+    def __rmul__(self, left):
+        if isinstance(left, Accumulator):
+            return MultipliedValueHolder(self, left)
+        return MultipliedValueHolder(self, Identity(left))
+
     def __div__(self, right):
         if isinstance(right, Accumulator):
             return DividedValueHolder(self, right)
         return DividedValueHolder(self, Identity(right))
 
+    def __rdiv__(self, left):
+        if isinstance(left, Accumulator):
+            return DividedValueHolder(left, self)
+        return DividedValueHolder(Identity(left), self)
+
     def __truediv__(self, right):
         return self.__div__(right)
+
+    def __rtruediv__(self, left):
+        return self.__rdiv__(left)
 
     def __rshift__(self, right):
         return CompoundedValueHolder(self, right)

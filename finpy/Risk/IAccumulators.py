@@ -17,12 +17,17 @@ class Accumulator(object):
 
     def __init__(self, pNames):
         if hasattr(pNames, '__iter__') and len(pNames) >= 2:
+            for name in pNames:
+                assert isinstance(name, str), '{0} in pNames should be a plain string. But it is {1}'.format(name, type(name))
             self._pNames = pNames
         elif hasattr(pNames, '__iter__') and len(pNames) == 1:
+            for name in pNames:
+                assert isinstance(name, str), '{0} in pNames should be a plain string. But it is {1}'.format(name, type(name))
             self._pNames = pNames[0]
         elif hasattr(pNames, '__iter__'):
             raise RuntimeError("parameters' name list should not be empty")
         else:
+            assert isinstance(pNames, str), '{0} in pNames should be a plain string. But it is {1}'.format(pNames, type(pNames))
             self._pNames = pNames
 
     @abstractmethod
@@ -163,6 +168,8 @@ class BasicFunction(Accumulator):
 
         if hasattr(origValue, '__iter__'):
             return tuple(self._func(v) for v in origValue)
+        else:
+            return self._func(origValue)
 
 
 def Exp(valueHolder):

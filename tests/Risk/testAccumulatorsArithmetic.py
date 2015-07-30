@@ -8,6 +8,8 @@ Created on 2015-7-27
 import unittest
 import math
 import numpy as np
+from scipy.stats import linregress
+from collections import deque
 from finpy.Risk.IAccumulators import Exp
 from finpy.Risk.IAccumulators import Log
 from finpy.Risk.IAccumulators import Sqrt
@@ -20,6 +22,7 @@ from finpy.Risk.StatelessAccumulators import Sum
 from finpy.Risk.StatelessAccumulators import Average
 from finpy.Risk.StatelessAccumulators import Minimum
 from finpy.Risk.StatelessAccumulators import Max
+from finpy.Risk.Performancers import MovingAlphaBeta
 
 
 class TestAccumulatorsArithmetic(unittest.TestCase):
@@ -199,6 +202,27 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
                                                              "expected:   {1:f}\n"
                                                              "calculated: {2:f}".format(i, expected, calculated))
 
+    def testListedOperator(self):
+        ma20 = MovingAverage(20, 'close')
+        maxer = Max('open')
+        minimumer = Minimum('close')
+        listHolder = MovingAverage(20, 'close') ^ Max('open') ^ Minimum('close')
+        sampleOpen = np.random.randn(10000)
+        sampleClose = np.random.randn(10000)
+
+        for i, (open, close) in enumerate(zip(sampleOpen, sampleClose)):
+            ma20.push(close=close)
+            maxer.push(open=open)
+            minimumer.push(close=close)
+            listHolder.push(open=open, close=close)
+
+            expected = (ma20.result(), maxer.result(), minimumer.result())
+            calculated = listHolder.result()
+
+            for ev, cv in zip(expected, calculated):
+                self.assertAlmostEqual(ev, cv, 12, "at index {0:d}\n"
+                                                   "expected:   {1}\n"
+                                                   "calculated: {2}".format(i, expected, calculated) )
 
     def testCompoundedOperator(self):
         ma5 = MovingAverage(5, 'x')
@@ -224,6 +248,69 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
             self.assertAlmostEqual(calculated, expected, 12, "at index {0:d}\n"
                                                              "expected:   {1:f}\n"
                                                              "calculated: {2:f}".format(i, expected, calculated))
+
+    def testListedAndCompoundedOperator(self):
+        maClose = MovingAverage(20, 'close')
+        maOpen = MovingAverage(10, 'open')
+        maRf = MovingAverage(10, 'rf')
+        listHolder = MovingAverage(20, 'close') ^ MovingAverage(10, 'open') ^ MovingAverage(10, 'rf')
+        mc = MovingAlphaBeta(20, listHolder)
+
+        sampleOpen = np.random.randn(10000)
+        sampleClose = np.random.randn(10000)
+        sampleRf = np.random.randn(10000)
+
+        maCloseContainer = deque(maxlen=20)
+        maOpenContainer = deque(maxlen=20)
+
+        for i, (open, close, rf) in enumerate(zip(sampleOpen, sampleClose, sampleRf)):
+            maClose.push(close=close)
+            maOpen.push(open=open)
+            maRf.push(rf=rf)
+            mc.push(open=open, close=close, rf=rf)
+            maCloseContainer.append(maClose.result() - maRf.result())
+            maOpenContainer.append(maOpen.result() - maRf.result())
+
+            if i >= 2:
+                expected = linregress(maOpenContainer, maCloseContainer)
+                calculated = mc.result()
+
+                # check alpha
+                self.assertAlmostEqual(expected[1], calculated[0], 12, "at index {0:d}\n"
+                                                                       "expected alpha:   {1:f}\n"
+                                                                       "calculated alpha: {2:f}".format(i, expected[1], calculated[0]))
+
+                # check beta
+                self.assertAlmostEqual(expected[0], calculated[1], 12, "at index {0:d}\n"
+                                                                       "expected beta:   {1:f}\n"
+                                                                       "calculated beta: {2:f}".format(i, expected[0], calculated[1]))
+
+    def testGetItemOperator(self):
+        listHolder = MovingAverage(20, 'close') ^ Max('open') ^ Minimum('close')
+        listHolder1 = listHolder[1]
+        listHolder2 = listHolder[1:2]
+        maxer = Max('open')
+
+        sampleOpen = np.random.randn(10000)
+        sampleClose = np.random.randn(10000)
+
+        for i, (open, close) in enumerate(zip(sampleOpen, sampleClose)):
+            listHolder1.push(open=open, close=close)
+            listHolder2.push(open=open, close=close)
+            maxer.push(open=open)
+
+            expected = maxer.result()
+            calculated = listHolder1.result()
+            self.assertAlmostEqual(expected, calculated, 12, "at index {0:d}\n"
+                                                             "expected beta:   {1:f}\n"
+                                                             "calculated beta: {2:f}".format(i, expected, calculated))
+
+            calculated = listHolder2.result()[0]
+            self.assertAlmostEqual(expected, calculated, 12, "at index {0:d}\n"
+                                                             "expected beta:   {1:f}\n"
+                                                             "calculated beta: {2:f}".format(i, expected, calculated))
+
+
 
     def testExpFunction(self):
         ma5 = MovingAverage(5, 'close')

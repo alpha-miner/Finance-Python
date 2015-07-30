@@ -94,6 +94,11 @@ class Accumulator(object):
     def __rtruediv__(self, left):
         return self.__rdiv__(left)
 
+    def __xor__(self, right):
+        if isinstance(right, Accumulator):
+            return ListedValueHolder(self, right)
+        return ListedValueHolder(self, Identity(right))
+
     def __rshift__(self, right):
         if isinstance(right, Accumulator):
             return CompoundedValueHolder(self, right)
@@ -109,6 +114,9 @@ class Accumulator(object):
 
     def __neg__(self):
         return NegativeValueHolder(self)
+
+    def __getitem__(self, item):
+        return TruncatedValueHolder(self, item)
 
 
 class NegativeValueHolder(Accumulator):
@@ -127,6 +135,59 @@ class NegativeValueHolder(Accumulator):
             return tuple(-r for r in res)
         except TypeError:
             return -res
+
+
+class ListedValueHolder(Accumulator):
+    def __init__(self, left, right):
+        self._returnSize = left._returnSize + right._returnSize
+        self._left = deepcopy(left)
+        self._right = deepcopy(right)
+        self._dependency = max(self._left._dependency, self._right._dependency)
+
+    def push(self, **kwargs):
+        self._left.push(**kwargs)
+        self._right.push(**kwargs)
+
+    def result(self):
+        resLeft = self._left.result()
+        resRight = self._right.result()
+
+        if not hasattr(resLeft, '__iter__'):
+            resLeft = (resLeft,)
+        if not hasattr(resRight, '__iter__'):
+            resRight = (resRight,)
+
+        return tuple(resLeft) + tuple(resRight)
+
+
+class TruncatedValueHolder(Accumulator):
+    def __init__(self, valueHolder, item):
+        if valueHolder._returnSize == 1:
+            raise RuntimeError("scalar valued holder ({0}) can't be sliced".format(valueHolder))
+        if isinstance(item, slice):
+            self._start = item.start
+            self._stop = item.stop
+            length = item.stop - item.start
+            if length < 0:
+                length += valueHolder._returnSize
+            if length < 0:
+                raise RuntimeError('start {0:d} and end {0:d} are not compatible'.format(self._start, self._stop))
+            self._returnSize = length
+        else:
+            self._start = item
+            self._stop = None
+            self._returnSize = 1
+
+        self._valueHolder = valueHolder
+        self._dependency = self._valueHolder._dependency
+
+    def push(self, **kwargs):
+        self._valueHolder.push(**kwargs)
+
+    def result(self):
+        if self._stop is None:
+            return self._valueHolder.result()[self._start]
+        return self._valueHolder.result()[self._start:self._stop]
 
 
 class CombinedValueHolder(Accumulator):

@@ -1,10 +1,5 @@
-.. finpy documentation master file, created by
-   sphinx-quickstart on Mon Jul 27 12:36:19 2015.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
-Welcome to finpy's documentation!
-=================================
+﻿欢迎来到Finance-Python!
+##########################
 
 Contents:
 

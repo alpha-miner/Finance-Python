@@ -184,35 +184,49 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
                                                              "calculated: {2:f}".format(i, expected, calculated))
 
     def testCompoundedOperator(self):
-        ma5 = MovingAverage(5, 'close')
-        maxer = Max('x')
-        max5ma = MovingAverage(5, 'close') >> Max()
+        ma5 = MovingAverage(5, 'x')
+        maxer = Max('close')
+        max5ma = Max('close') >> MovingAverage(5)
+        max5ma2 = MovingAverage(5, Max('close'))
 
         sample = np.random.randn(10000)
 
         for i, close in enumerate(sample):
-            ma5.push(close=close)
-            maxer.push(x=ma5.result())
+            maxer.push(close=close)
+            ma5.push(x=maxer.result())
             max5ma.push(close=close)
+            max5ma2.push(close=close)
 
-            expected = maxer.result()
+            expected = ma5.result()
             calculated = max5ma.result()
+            self.assertAlmostEqual(calculated, expected, 12, "at index {0:d}\n"
+                                                             "expected:   {1:f}\n"
+                                                             "calculated: {2:f}".format(i, expected, calculated))
+
+            calculated = max5ma2.result()
             self.assertAlmostEqual(calculated, expected, 12, "at index {0:d}\n"
                                                              "expected:   {1:f}\n"
                                                              "calculated: {2:f}".format(i, expected, calculated))
 
     def testExpFunction(self):
         ma5 = MovingAverage(5, 'close')
-        holde = Exp(ma5)
+        holder = Exp(MovingAverage(5, 'close'))
+        holder2 = MovingAverage(5, 'close') >> Exp
 
         sample = np.random.randn(10000)
 
         for i, close in enumerate(sample):
             ma5.push(close=close)
-            holde.push(close=close)
+            holder.push(close=close)
+            holder2.push(close=close)
 
             expected = math.exp(ma5.result())
-            calculated = holde.result()
+            calculated = holder.result()
+            self.assertAlmostEqual(calculated, expected, 12, "at index {0:d}\n"
+                                                             "expected:   {1:f}\n"
+                                                             "calculated: {2:f}".format(i, expected, calculated))
+
+            calculated = holder2.result()
             self.assertAlmostEqual(calculated, expected, 12, "at index {0:d}\n"
                                                              "expected:   {1:f}\n"
                                                              "calculated: {2:f}".format(i, expected, calculated))

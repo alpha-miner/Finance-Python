@@ -25,7 +25,7 @@ class Max(StatelessAccumulator):
         self._returnSize = 1
 
     def push(self, **kwargs):
-        value = kwargs[self._pNames]
+        value = super(Max, self).push(**kwargs)
         if self._currentMax is None:
             self._currentMax = value
         else:
@@ -43,7 +43,7 @@ class Minimum(StatelessAccumulator):
         self._returnSize = 1
 
     def push(self, **kwargs):
-        value = kwargs[self._pNames]
+        value = super(Minimum, self).push(**kwargs)
         if self._currentMin is None:
             self._currentMin = value
         else:
@@ -61,7 +61,7 @@ class Sum(StatelessAccumulator):
         self._returnSize = 1
 
     def push(self, **kwargs):
-        value = kwargs[self._pNames]
+        value = super(Sum, self).push(**kwargs)
         self._currentSum += value
 
     def result(self):
@@ -76,7 +76,7 @@ class Average(StatelessAccumulator):
         self._returnSize = 1
 
     def push(self, **kwargs):
-        value = kwargs[self._pNames]
+        value = super(Average, self).push(**kwargs)
         self._currentSum += value
         self._currentCount += 1
 
@@ -94,7 +94,7 @@ class Variance(StatelessAccumulator):
         self._returnSize = 1
 
     def push(self, **kwargs):
-        value = kwargs[self._pNames]
+        value = super(Variance, self).push(**kwargs)
         self._currentSum += value
         self._currentSumSquare += value * value
         self._currentCount += 1
@@ -123,7 +123,7 @@ class Correlation(StatelessAccumulator):
         self._returnSize = 1
 
     def push(self, **kwargs):
-        value = [kwargs[self._pNames[0]], kwargs[self._pNames[1]]]
+        value = super(Correlation, self).push(**kwargs)
         self._runningSumLeft = self._runningSumLeft + value[0]
         self._runningSumRight = self._runningSumRight + value[1]
         self._runningSumSquareLeft = self._runningSumSquareLeft + value[0] * value[0]

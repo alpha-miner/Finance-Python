@@ -16,6 +16,10 @@ class Accumulator(object):
     __metaclass__ = ABCMeta
 
     def __init__(self, pNames):
+        if isinstance(pNames, Accumulator):
+            self._isValueHolderContained = True
+        else:
+            self._isValueHolderContained = False
         if hasattr(pNames, '__iter__') and len(pNames) >= 2:
             for name in pNames:
                 assert isinstance(name, str), '{0} in pNames should be a plain string. But it is {1}'.format(name, type(name))
@@ -27,12 +31,18 @@ class Accumulator(object):
         elif hasattr(pNames, '__iter__'):
             raise RuntimeError("parameters' name list should not be empty")
         else:
-            assert isinstance(pNames, str), '{0} in pNames should be a plain string. But it is {1}'.format(pNames, type(pNames))
+            assert isinstance(pNames, str) or isinstance(pNames, Accumulator), '{0} in pNames should be a plain string or an value holder. But it is {1}'.format(pNames, type(pNames))
             self._pNames = pNames
 
-    @abstractmethod
     def push(self, **kwargs):
-        raise NotImplementedError("push method is not implemented for Accumulator class")
+        if not self._isValueHolderContained:
+            if isinstance(self._pNames, str):
+                return kwargs[self._pNames]
+            elif hasattr(self._pNames, '__iter__'):
+                return tuple(kwargs[p] for p in self._pNames)
+        else:
+            self._pNames.push(**kwargs)
+            return self._pNames.result()
 
     @abstractmethod
     def result(self):
@@ -85,8 +95,17 @@ class Accumulator(object):
         return self.__rdiv__(left)
 
     def __rshift__(self, right):
-        return CompoundedValueHolder(self, right)
+        if isinstance(right, Accumulator):
+            return CompoundedValueHolder(self, right)
+        try:
+            return CompoundedValueHolder(self, right())
+        except:
+            pass
 
+        try:
+            return right(self)
+        except:
+            raise '{0} is not recogonized as a valid operator'.format(right)
 
 class CombinedValueHolder(Accumulator):
 
@@ -211,3 +230,19 @@ def Sqrt(valueHolder):
 
 def Abs(valueHolder):
     return BasicFunction(valueHolder, abs)
+
+
+def Acos(valueHolder):
+    return BasicFunction(valueHolder, math.acos)
+
+
+def Acosh(valueHolder):
+    return BasicFunction(valueHolder, math.acosh)
+
+
+def Asin(valueHolder):
+    return BasicFunction(valueHolder, math.asin)
+
+
+def Asinh(valueHolder):
+    return BasicFunction(valueHolder, math.sinh)

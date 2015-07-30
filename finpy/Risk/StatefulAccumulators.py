@@ -73,7 +73,7 @@ class SortedValueHolder(StatefulValueHolder):
         self._sortedArray = []
 
     def push(self, **kwargs):
-        value = kwargs[self._pNames]
+        value = super(SortedValueHolder, self).push(**kwargs)
         if self._isFull:
             popout = self._dumpOneValue(kwargs[self._pNames])
             delPos = bisect.bisect_left(self._sortedArray, popout)
@@ -109,7 +109,7 @@ class MovingSum(StatefulValueHolder):
         self._runningSum = 0.0
 
     def push(self, **kwargs):
-        value = kwargs[self._pNames]
+        value = super(MovingSum, self).push(**kwargs)
         popout = self._dumpOneValue(value)
         self._runningSum = self._runningSum - popout + value
 
@@ -124,7 +124,7 @@ class MovingAverage(StatefulValueHolder):
         self._runningSum = 0.0
 
     def push(self, **kwargs):
-        value = kwargs[self._pNames]
+        value = super(MovingAverage, self).push(**kwargs)
         popout = self._dumpOneValue(value)
         self._runningSum = self._runningSum - popout + value
 
@@ -143,7 +143,7 @@ class MovingPositiveAverage(StatefulValueHolder):
         self._runningPositiveCount = 0
 
     def push(self, **kwargs):
-        value = kwargs[self._pNames]
+        value = super(MovingPositiveAverage, self).push(**kwargs)
         popout = self._dumpOneValue(value)
         if value > 0.0:
             self._runningPositiveCount += 1
@@ -168,7 +168,7 @@ class MovingNegativeAverage(StatefulValueHolder):
         self._runningNegativeCount = 0
 
     def push(self, **kwargs):
-        value = kwargs[self._pNames]
+        value = super(MovingNegativeAverage, self).push(**kwargs)
         popout = self._dumpOneValue(value)
         if value < 0.0:
             self._runningNegativeCount += 1
@@ -196,7 +196,7 @@ class MovingVariance(StatefulValueHolder):
             assert window >= 2, "sampling variance can't be calculated with window size < 2"
 
     def push(self, **kwargs):
-        value = kwargs[self._pNames]
+        value = super(MovingVariance, self).push(**kwargs)
         popout = self._dumpOneValue(value)
         self._runningSum = self._runningSum - popout + value
         self._runningSumSquare = self._runningSumSquare - popout * popout + value * value
@@ -224,7 +224,7 @@ class MovingNegativeVariance(StatefulValueHolder):
         self._isPop = isPopulation
 
     def push(self, **kwargs):
-        value = kwargs[self._pNames]
+        value = super(MovingNegativeVariance, self).push(**kwargs)
         popout = self._dumpOneValue(value)
         if value < 0:
             self._runningNegativeSum += value
@@ -259,7 +259,7 @@ class MovingCountedPositive(StatefulValueHolder):
         self._counts = 0
 
     def push(self, **kwargs):
-        value = kwargs[self._pNames]
+        value = super(MovingCountedPositive, self).push(**kwargs)
         popout = self._dumpOneValue(value)
 
         if value > 0:
@@ -278,7 +278,7 @@ class MovingCountedNegative(StatefulValueHolder):
         self._counts = 0
 
     def push(self, **kwargs):
-        value = kwargs[self._pNames]
+        value = super(MovingCountedNegative, self).push(**kwargs)
         popout = self._dumpOneValue(value)
 
         if value < 0:
@@ -302,7 +302,7 @@ class MovingCorrelation(StatefulValueHolder):
         self._runningSumCrossSquare = 0.0
 
     def push(self, **kwargs):
-        value = [kwargs[self._pNames[0]], kwargs[self._pNames[1]]]
+        value = super(MovingCorrelation, self).push(**kwargs)
         popout = self._dumpOneValue(value)
         headLeft = popout[0]
         headRight = popout[1]
@@ -341,7 +341,7 @@ class MovingCorrelationMatrixVer2(StatefulValueHolder):
         super(MovingCorrelationMatrixVer2, self).__init__(window, pNames)
 
     def push(self, **kwargs):
-        values = kwargs[self._pNames]
+        values = super(MovingCorrelationMatrixVer2, self).push(**kwargs)
         _ = self._dumpOneValue(values)
 
     def result(self):
@@ -362,7 +362,7 @@ class MovingCorrelationMatrix(StatefulValueHolder):
         self._runningSumCrossSquare = None
 
     def push(self, **kwargs):
-        values = kwargs[self._pNames]
+        values = super(MovingCorrelationMatrix, self).push(**kwargs)
         if self._isFirst:
             self._runningSum = np.zeros((1, len(values)))
             self._runningSumCrossSquare = np.zeros((len(values), len(values)))

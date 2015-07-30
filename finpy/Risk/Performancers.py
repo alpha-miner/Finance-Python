@@ -26,10 +26,11 @@ class MovingSharp(StatefulValueHolder):
         @value: annualized return value
         @benchmark: annualized benchmark treasury bond yield
         '''
-        value = kwargs[self._pNames[0]]
-        benchmark = kwargs[self._pNames[1]]
-        self._mean.push(x=value - benchmark)
-        self._var.push(x=value - benchmark)
+        value = super(MovingSharp, self).push(**kwargs)
+        ret = value[0]
+        benchmark = value[1]
+        self._mean.push(x=ret - benchmark)
+        self._var.push(x=ret - benchmark)
 
     def result(self):
         if self._var.size >= 2:
@@ -46,10 +47,11 @@ class MovingSortino(StatefulValueHolder):
         self._negativeVar = MovingNegativeVariance(window, pNames='x')
 
     def push(self, **kwargs):
-        value = kwargs[self._pNames[0]]
-        benchmark = kwargs[self._pNames[1]]
-        self._mean.push(x=value - benchmark)
-        self._negativeVar.push(x=value - benchmark)
+        value = super(MovingSortino, self).push(**kwargs)
+        ret = value[0]
+        benchmark = value[1]
+        self._mean.push(x=ret - benchmark)
+        self._negativeVar.push(x=ret - benchmark)
 
     def result(self):
         if self._mean.size >= 2:
@@ -70,9 +72,10 @@ class MovingAlphaBeta(StatefulValueHolder):
         self._correlationHolder = MovingCorrelation(window, pNames=['x', 'y'])
 
     def push(self, **kwargs):
-        pReturn = kwargs[self._pNames[0]]
-        mReturn = kwargs[self._pNames[1]]
-        rf = kwargs[self._pNames[2]]
+        value = super(MovingAlphaBeta, self).push(**kwargs)
+        pReturn = value[0]
+        mReturn = value[1]
+        rf = value[2]
         self._pReturnMean.push(x=pReturn - rf)
         self._mReturnMean.push(y=mReturn - rf)
         self._pReturnVar.push(x=pReturn - rf)
@@ -107,7 +110,7 @@ class MovingDrawDown(StatefulValueHolder):
         :param value: expected to be exponential annualized return
         :return:
         '''
-        value = kwargs[self._pNames]
+        value = super(MovingDrawDown, self).push(**kwargs)
         self._runningIndex += 1
         self._runningCum += value
         self._maxer.push(x=self._runningCum)
@@ -132,7 +135,7 @@ class MovingAverageDrawdown(StatefulValueHolder):
         self._durationMean = MovingAverage(window, pNames='x')
 
     def push(self, **kwargs):
-        value = kwargs[self._pNames]
+        value = super(MovingAverageDrawdown, self).push(**kwargs)
         self._drawdownCalculator.push(x=value)
         drawdown, duration, _ = self._drawdownCalculator.result()
         self._drawdownMean.push(x=drawdown)
@@ -150,7 +153,7 @@ class MovingMaxDrawdown(StatefulValueHolder):
         self._drawdownCalculator = MovingDrawDown(window, 'x')
 
     def push(self, **kwargs):
-        value = kwargs[self._pNames]
+        value = super(MovingMaxDrawdown, self).push(**kwargs)
         self._drawdownCalculator.push(x=value)
         drawdown, duration, _ = self._drawdownCalculator.result()
         self._dumpOneValue((drawdown, duration))

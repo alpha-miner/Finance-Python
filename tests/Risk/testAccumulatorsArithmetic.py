@@ -183,6 +183,23 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
                                                              "expected:   {1:f}\n"
                                                              "calculated: {2:f}".format(i, expected, calculated))
 
+    def testNegativeOperator(self):
+        ma20 = MovingAverage(20, 'close')
+        negma20 = -ma20
+
+        sampleClose = np.random.randn(10000)
+
+        for i, close in enumerate(sampleClose):
+            ma20.push(close=close)
+            negma20.push(close=close)
+
+            expected = -ma20.result()
+            calculated = negma20.result()
+            self.assertAlmostEqual(calculated, expected, 12, "at index {0:d}\n"
+                                                             "expected:   {1:f}\n"
+                                                             "calculated: {2:f}".format(i, expected, calculated))
+
+
     def testCompoundedOperator(self):
         ma5 = MovingAverage(5, 'x')
         maxer = Max('close')

@@ -107,6 +107,28 @@ class Accumulator(object):
         except:
             raise '{0} is not recogonized as a valid operator'.format(right)
 
+    def __neg__(self):
+        return NegativeValueHolder(self)
+
+
+class NegativeValueHolder(Accumulator):
+
+    def __init__(self, valueHolder):
+        self._returnSize = valueHolder._returnSize
+        self._valueHolder = deepcopy(valueHolder)
+        self._dependency = valueHolder._dependency
+
+    def push(self, **kwargs):
+        self._valueHolder.push(**kwargs)
+
+    def result(self):
+        res = self._valueHolder.result()
+        try:
+            return tuple(-r for r in res)
+        except TypeError:
+            return -res
+
+
 class CombinedValueHolder(Accumulator):
 
     def __init__(self, left, right):

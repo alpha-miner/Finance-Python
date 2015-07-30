@@ -281,11 +281,13 @@ class CompoundedValueHolder(Accumulator):
 
 class BasicFunction(Accumulator):
 
-    def __init__(self, valueHolder, func):
+    def __init__(self, valueHolder, func, *args, **kwargs):
         self._returnSize = valueHolder._returnSize
         self._valueHolder = deepcopy(valueHolder)
         self._dependency = valueHolder._dependency
         self._func = func
+        self._args = args
+        self._kwargs = kwargs
 
     def push(self, **kwargs):
         self._valueHolder.push(**kwargs)
@@ -294,9 +296,9 @@ class BasicFunction(Accumulator):
         origValue = self._valueHolder.result()
 
         if hasattr(origValue, '__iter__'):
-            return tuple(self._func(v) for v in origValue)
+            return tuple(self._func(v, *self._args, **self._kwargs) for v in origValue)
         else:
-            return self._func(origValue)
+            return self._func(origValue, *self._args, **self._kwargs)
 
 
 def Exp(valueHolder):
@@ -309,6 +311,25 @@ def Log(valueHolder):
 
 def Sqrt(valueHolder):
     return BasicFunction(valueHolder, math.sqrt)
+
+
+# since the pow function is much slower than ** operator
+class Pow(Accumulator):
+    def __init__(self, valueHolder, n):
+        self._returnSize = valueHolder._returnSize
+        self._valueHolder = deepcopy(valueHolder)
+        self._dependency = valueHolder._dependency
+        self._n = n
+
+    def push(self, **kwargs):
+        self._valueHolder.push(**kwargs)
+
+    def result(self):
+        origValue = self._valueHolder.result()
+        if hasattr(origValue, '__iter__'):
+            return tuple(v ** self._n for v in origValue)
+        else:
+            return origValue ** self._n
 
 
 def Abs(valueHolder):

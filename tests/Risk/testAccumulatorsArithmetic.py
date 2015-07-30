@@ -14,6 +14,7 @@ from finpy.Risk.IAccumulators import Exp
 from finpy.Risk.IAccumulators import Log
 from finpy.Risk.IAccumulators import Sqrt
 from finpy.Risk.IAccumulators import Abs
+from finpy.Risk.IAccumulators import Pow
 from finpy.Risk.StatefulAccumulators import MovingAverage
 from finpy.Risk.StatefulAccumulators import MovingVariance
 from finpy.Risk.StatefulAccumulators import MovingMax
@@ -288,7 +289,7 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
     def testGetItemOperator(self):
         listHolder = MovingAverage(20, 'close') ^ Max('open') ^ Minimum('close')
         listHolder1 = listHolder[1]
-        listHolder2 = listHolder[1:2]
+        listHolder2 = listHolder[1:3]
         maxer = Max('open')
 
         sampleOpen = np.random.randn(10000)
@@ -309,8 +310,6 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
             self.assertAlmostEqual(expected, calculated, 12, "at index {0:d}\n"
                                                              "expected beta:   {1:f}\n"
                                                              "calculated beta: {2:f}".format(i, expected, calculated))
-
-
 
     def testExpFunction(self):
         ma5 = MovingAverage(5, 'close')
@@ -378,6 +377,21 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
             holder.push(close=close)
 
             expected = abs(ma5.result())
+            calculated = holder.result()
+            self.assertAlmostEqual(calculated, expected, 12, "at index {0:d}\n"
+                                                             "expected:   {1:f}\n"
+                                                             "calculated: {2:f}".format(i, expected, calculated))
+
+        ma5min = MovingAverage(5, 'close') >> Minimum
+        holder = Pow(ma5min, 3)
+
+        sample = np.random.randn(10000)
+
+        for i, close in enumerate(sample):
+            ma5min.push(close=close)
+            holder.push(close=close)
+
+            expected = math.pow(ma5min.result(), 3)
             calculated = holder.result()
             self.assertAlmostEqual(calculated, expected, 12, "at index {0:d}\n"
                                                              "expected:   {1:f}\n"

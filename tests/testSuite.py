@@ -5,15 +5,15 @@ Created on 2015-7-13
 @author: cheng.li
 """
 
+import DateUtilities
+import Env
+import Math
+import Risk
+import PricingEngines
+import unittest
+
+
 def test():
-
-    import DateUtilities
-    import Env
-    import Math
-    import Risk
-    import PricingEngines
-    import unittest
-
     suite = unittest.TestSuite()
 
     tests = unittest.TestLoader().loadTestsFromTestCase(DateUtilities.TestCalendar)

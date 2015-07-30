@@ -9,6 +9,11 @@ __all__ = ["Exp",
            "Log",
            "Sqrt",
            "Abs",
+           "Pow",
+           "Acos",
+           "Acosh",
+           "Asin",
+           "Asinh",
            "Max",
            "Minimum",
            "Sum",
@@ -39,6 +44,11 @@ from finpy.Risk.IAccumulators import Exp
 from finpy.Risk.IAccumulators import Log
 from finpy.Risk.IAccumulators import Sqrt
 from finpy.Risk.IAccumulators import Abs
+from finpy.Risk.IAccumulators import Pow
+from finpy.Risk.IAccumulators import Acos
+from finpy.Risk.IAccumulators import Acosh
+from finpy.Risk.IAccumulators import Asin
+from finpy.Risk.IAccumulators import Asinh
 
 from finpy.Risk.StatelessAccumulators import Max
 from finpy.Risk.StatelessAccumulators import Minimum

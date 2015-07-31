@@ -6,6 +6,7 @@ Created on 2015-7-24
 """
 
 import pandas as pd
+from copy import deepcopy
 from finpy.AlgoTrading.Event import OrderEvent
 
 
@@ -19,7 +20,7 @@ class Portfolio(object):
         self.initialCapital = initialCapital
 
         self.allPositions = self.constructAllPositions()
-        self.currentPosition = dict((k, v) for k, v in [(s, 0) for s in self.symbolList])
+        self.currentPosition = dict((s, 0) for s in self.symbolList)
 
         self.allHoldings = self.constructAllHoldings()
         self.currentHoldings = self.constructCurrentHoldings()
@@ -47,15 +48,11 @@ class Portfolio(object):
 
     def updateTimeindex(self, event):
         latestDatetime = self.bars.getLatestBarDatetime(self.symbolList[0])
-        dp = dict((k, v) for k, v in [(s, 0) for s in self.symbolList])
+        dp = deepcopy(self.currentPosition)
         dp['date'] = latestDatetime
-
-        for s in self.symbolList:
-            dp[s] = self.currentPosition[s]
-
         self.allPositions.append(dp)
 
-        dh = dict((k, v) for k, v in [(s, 0) for s in self.symbolList])
+        dh = dict((s, 0) for s in self.symbolList)
         dh['datetime'] = latestDatetime
         dh['cash'] = self.currentHoldings['cash']
         dh['commission'] = self.currentHoldings['commission']

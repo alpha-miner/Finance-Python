@@ -155,6 +155,11 @@ class Accumulator(object):
             return ListedValueHolder(self, right)
         return ListedValueHolder(self, Identity(right, 1))
 
+    def __rxor__(self, left):
+        if isinstance(left, Accumulator):
+            return ListedValueHolder(left, self)
+        return ListedValueHolder(Identity(left, 1), self)
+
     def __rshift__(self, right):
         if isinstance(right, Accumulator):
             return CompoundedValueHolder(self, right)

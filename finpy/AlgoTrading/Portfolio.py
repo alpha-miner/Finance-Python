@@ -5,6 +5,7 @@ Created on 2015-7-24
 @author: cheng.li
 """
 
+import pandas as pd
 from finpy.AlgoTrading.Event import OrderEvent
 
 
@@ -20,7 +21,7 @@ class Portfolio(object):
         self.allPositions = self.constructAllPositions()
         self.currentPosition = dict((k, v) for k, v in [(s, 0) for s in self.symbolList])
 
-        self.allHoldings = self.costructAllHoldings()
+        self.allHoldings = self.constructAllHoldings()
         self.currentHoldings = self.constructCurrentHoldings()
 
     def constructAllPositions(self):
@@ -121,4 +122,18 @@ class Portfolio(object):
         if event.type == 'SIGNAL':
             orderEvent = self.generateNaiveOrder(event)
             self.events.put(orderEvent)
+
+    def createEquityCurveDataframe(self):
+        curve = pd.DataFrame(self.allHoldings)
+        curve.set_index('datetime', inplace=True)
+        curve['return'] = curve['total'].pct_change()
+        curve['equity_curve'] = (1.0 + curve['return']).cumprod()
+        self.equityCurve = curve
+
+    def outputSummaryStats(self):
+        totalReturn = self.equityCurve['equity_curve'][-1]
+        returns = self.equityCurve['returns']
+        pnl = self.equityCurve['equity_curve']
+
+        #sharp_ratio = createSharpRatio(returns, perios=252 * 60 * 6.5)
 

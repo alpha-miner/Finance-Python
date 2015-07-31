@@ -37,7 +37,7 @@ class DataHandler(object):
         raise NotImplementedError()
 
     @abstractmethod
-    def getLatestBarValues(self, symbol, valType, N=1):
+    def getLatestBarsValues(self, symbol, valType, N=1):
         raise NotImplementedError()
 
     @abstractmethod
@@ -89,9 +89,9 @@ class HistoricalCSVDataHandler(DataHandler):
         else:
             return getattr(barsList[-1][1], valType)
 
-    def getLatestBarValues(self, symbol, valType, N=1):
+    def getLatestBarsValues(self, symbol, valType, N=1):
         try:
-            barsList = self.latestSymbolData[symbol]
+            barsList = self.getLatestBars(symbol, N)
         except KeyError:
             raise RuntimeError("the symbol {0:s} is not available in the historical data set".format(symbol))
         else:
@@ -115,7 +115,7 @@ class HistoricalCSVDataHandler(DataHandler):
     def _openConvertCSVFiles(self):
         combIndex = None
         for s in self.symbolList:
-            filePath = os.path.join(self.csvDir, "{0:s}".format(s))
+            filePath = os.path.join(self.csvDir, "{0:s}.csv".format(s))
             self.symbolData[s] = io.parsers.read_csv(filePath,
                                                      header=0,
                                                      index_col=0,

@@ -7,7 +7,6 @@ Created on 2015-7-23
 
 import unittest
 import math
-
 from finpy.Enums.OptionType import OptionType
 from finpy.PricingEngines.BlackFormula import bachelierFormula
 from finpy.PricingEngines.BlackFormula import bachelierFormulaImpliedVol

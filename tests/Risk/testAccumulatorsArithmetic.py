@@ -7,9 +7,9 @@ Created on 2015-7-27
 
 import unittest
 import math
+from collections import deque
 import numpy as np
 from scipy.stats import linregress
-from collections import deque
 from finpy.Risk.IAccumulators import Exp
 from finpy.Risk.IAccumulators import Log
 from finpy.Risk.IAccumulators import Sqrt

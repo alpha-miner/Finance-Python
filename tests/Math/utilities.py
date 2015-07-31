@@ -5,8 +5,8 @@ Created on 2015-7-23
 @author: cheng.li
 """
 
-import numpy as np
 import math
+import numpy as np
 
 def norm(values, h):
     values = np.square(values)

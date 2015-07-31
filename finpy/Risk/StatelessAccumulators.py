@@ -5,8 +5,8 @@ Created on 2015-7-25
 @author: cheng.li
 """
 
-from finpy.Risk.IAccumulators import Accumulator
 import math
+from finpy.Risk.IAccumulators import Accumulator
 
 
 class StatelessAccumulator(Accumulator):

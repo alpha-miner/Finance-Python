@@ -5,8 +5,8 @@ Created on 2015-7-23
 @author: cheng.li
 """
 
-from finpy.Math.MathConstants import _DBL_MIN
 import math
+from finpy.Math.MathConstants import _DBL_MIN
 
 tiny = 0.0
 one = 1.0

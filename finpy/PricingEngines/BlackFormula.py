@@ -5,12 +5,12 @@ Created on 2015-7-23
 @author: cheng.li
 """
 
+import math
+from scipy.optimize import newton
 from finpy.Enums.OptionType import OptionType
 from finpy.Math.Distributions.NormalDistribution import CumulativeNormalDistribution
 from finpy.Math.MathConstants import _M_PI
 from finpy.Math.MathConstants import _QL_EPSILON
-import math
-from scipy.optimize import newton
 
 _dist = CumulativeNormalDistribution()
 

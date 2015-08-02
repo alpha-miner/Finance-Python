@@ -460,7 +460,7 @@ def Sqrt(valueHolder):
     return BasicFunction(valueHolder, math.sqrt)
 
 
-# since the pow function is much slower than ** operator
+# due to the fact that pow function is much slower than ** operator
 class Pow(Accumulator):
     def __init__(self, valueHolder, n):
         self._returnSize = valueHolder._returnSize

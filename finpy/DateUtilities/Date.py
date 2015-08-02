@@ -186,10 +186,10 @@ class Date(object):
         assert len(dateStr) == 10 and dateStr[4] == '-' and dateStr[7] == '-', "invalid format"
         return Date(int(dateStr[0:4]), int(dateStr[5:7]), int(dateStr[8:10]))
 
-    @staticmethod
-    def strptime(dateStr, dateFormat = '%Y-%m-%d'):
+    @classmethod
+    def strptime(cls, dateStr, dateFormat = '%Y-%m-%d'):
         pydt = dt.datetime.strptime(dateStr, dateFormat)
-        return Date(pydt.year, pydt.month, pydt.day)
+        return cls(pydt.year, pydt.month, pydt.day)
 
     @staticmethod
     def _advance(date, n, units):
@@ -220,9 +220,9 @@ class Date(object):
 
             return Date(y, m, d)
 
-    @staticmethod
-    def westernStyle(day, month, year):
-        return Date(year, month, day)
+    @classmethod
+    def westernStyle(cls, day, month, year):
+        return cls(year, month, day)
 
 _YearIsLeap = [
             # 1900 is leap in agreement with Excel's bug

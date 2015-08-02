@@ -341,12 +341,12 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
                 calculated = mc.result()
 
                 # check alpha
-                self.assertAlmostEqual(expected[1], calculated[0], 12, "at index {0:d}\n"
+                self.assertAlmostEqual(expected[1], calculated[0], 10, "at index {0:d}\n"
                                                                        "expected alpha:   {1:f}\n"
                                                                        "calculated alpha: {2:f}".format(i, expected[1], calculated[0]))
 
                 # check beta
-                self.assertAlmostEqual(expected[0], calculated[1], 12, "at index {0:d}\n"
+                self.assertAlmostEqual(expected[0], calculated[1], 10, "at index {0:d}\n"
                                                                        "expected beta:   {1:f}\n"
                                                                        "calculated beta: {2:f}".format(i, expected[0], calculated[1]))
 

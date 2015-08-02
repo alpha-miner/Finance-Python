@@ -17,15 +17,15 @@ sigma = 2.0
 
 
 def gaussia(x):
-    normFact = sigma*math.sqrt(2.0 * _M_PI)
+    normFact = sigma * math.sqrt(2.0 * _M_PI)
     dx = x - average
-    return math.exp(-dx*dx/(2.0*sigma*sigma))/normFact
+    return math.exp(-dx*dx / (2.0 * sigma * sigma))/normFact
 
 
 def gaussianDerivative(x):
-    normFact = sigma*sigma*sigma*math.sqrt(2.0*_M_PI)
+    normFact = sigma * sigma*sigma * math.sqrt(2.0 * _M_PI)
     dx = x-average
-    return -dx*math.exp(-dx*dx/(2.0*sigma*sigma))/normFact
+    return -dx*math.exp(-dx*dx/(2.0 * sigma*sigma))/normFact
 
 
 class TestDistribution(unittest.TestCase):

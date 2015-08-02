@@ -187,7 +187,6 @@ class Period(object):
         return p2 < self
 
     def __str__(self):
-
         out = ""
         n = self.length
         m = 0

@@ -6,6 +6,7 @@ Created on 2015-7-13
 """
 
 import unittest
+import API
 import DateUtilities
 import Env
 import Math
@@ -16,6 +17,8 @@ import PricingEngines
 def test():
     suite = unittest.TestSuite()
 
+    tests = unittest.TestLoader().loadTestsFromTestCase(API.TestDateUtilities)
+    suite.addTests(tests)
     tests = unittest.TestLoader().loadTestsFromTestCase(DateUtilities.TestCalendar)
     suite.addTests(tests)
     tests = unittest.TestLoader().loadTestsFromTestCase(DateUtilities.TestDate)

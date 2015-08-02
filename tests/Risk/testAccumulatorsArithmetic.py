@@ -28,16 +28,18 @@ from finpy.Risk.Performancers import MovingAlphaBeta
 
 class TestAccumulatorsArithmetic(unittest.TestCase):
 
+    def setUp(self):
+        self.sampleOpen = np.random.randn(10000)
+        self.sampleClose = np.random.randn(10000)
+        self.sampleRf = np.random.randn(10000)
+
     def testPlusOperator(self):
         ma5 = MovingAverage(5, 'close')
         ma20 = MovingAverage(20, 'open')
         plusRes = ma5 + ma20
         concated = (ma5 ^ ma20) + 2.0
 
-        sampleOpen = np.random.randn(10000)
-        sampleClose = np.random.randn(10000)
-
-        for i, (open, close) in enumerate(zip(sampleOpen, sampleClose)):
+        for i, (open, close) in enumerate(zip(self.sampleOpen, self.sampleClose)):
             ma5.push(close=close)
             ma20.push(open=open)
             plusRes.push(open=open, close=close)
@@ -59,10 +61,9 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
         ma5 = MovingAverage(5, 'close')
         ma20 = MovingAverage(20, 'close')
         plusRes = 5.0 + MovingAverage(20, 'close')
-        sampleClose = np.random.randn(10000)
         concated = 2.0 + (ma5 ^ ma20)
 
-        for i, close in enumerate(sampleClose):
+        for i, close in enumerate(self.sampleClose):
             ma5.push(close=close)
             ma20.push(close=close)
             plusRes.push(close=close)
@@ -86,10 +87,7 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
         subRes = MovingAverage(5, 'close') - Sum('open')
         concated = (MovingAverage(5, 'close') ^ Sum('open')) - Sum('open')
 
-        sampleOpen = np.random.randn(10000)
-        sampleClose = np.random.randn(10000)
-
-        for i, (open, close) in enumerate(zip(sampleOpen, sampleClose)):
+        for i, (open, close) in enumerate(zip(self.sampleOpen, self.sampleClose)):
             ma5.push(close=close)
             sumTotal.push(open=open)
             subRes.push(open=open, close=close)
@@ -116,9 +114,7 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
         subRes = 5.0 - MovingAverage(20, 'close')
         concated = sumTotal - (ma20 ^ sumTotal)
 
-        sampleClose = np.random.randn(10000)
-
-        for i, close in enumerate(sampleClose):
+        for i, close in enumerate(self.sampleClose):
             ma20.push(close=close)
             sumTotal.push(close=close)
             subRes.push(close=close)
@@ -145,10 +141,7 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
         mulRes = MovingVariance(5, 'close') * Average('open')
         concated = (Average('open') ^ mv5) * Average('open')
 
-        sampleOpen = np.random.randn(10000)
-        sampleClose = np.random.randn(10000)
-
-        for i, (open, close) in enumerate(zip(sampleOpen, sampleClose)):
+        for i, (open, close) in enumerate(zip(self.sampleOpen, self.sampleClose)):
             mv5.push(close=close)
             average.push(open=open)
             mulRes.push(open=open, close=close)
@@ -175,10 +168,8 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
         average = Average('open')
         mulRes = 5.0 * MovingAverage(20, 'close')
         concated = 5.0 * (MovingAverage(20, 'close') ^ Average('open'))
-        sampleClose = np.random.randn(10000)
-        sampleOpen = np.random.randn(10000)
 
-        for i, (open, close) in enumerate(zip(sampleOpen, sampleClose)):
+        for i, (open, close) in enumerate(zip(self.sampleOpen, self.sampleClose)):
             average.push(open=open)
             ma20.push(close=close)
             mulRes.push(close=close)
@@ -205,10 +196,7 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
         divRes = Minimum('open') / MovingCorrelation(5, ['open', 'close'])
         concated = (Minimum('open') ^ MovingCorrelation(5, ['open', 'close'])) / MovingCorrelation(5, ['open', 'close'])
 
-        sampleOpen = np.random.randn(10000)
-        sampleClose = np.random.randn(10000)
-
-        for i, (open, close) in enumerate(zip(sampleOpen, sampleClose)):
+        for i, (open, close) in enumerate(zip(self.sampleOpen, self.sampleClose)):
             mc5.push(open=open, close=close)
             minum.push(open=open)
             divRes.push(open=open, close=close)
@@ -234,9 +222,8 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
         ma20 = MovingAverage(20, 'close')
         divRes = 5.0 / MovingAverage(20, 'close')
         concated = (5.0 ^ MovingAverage(20, 'close')) / MovingAverage(20, 'close')
-        sampleClose = np.random.randn(10000)
 
-        for i, close in enumerate(sampleClose):
+        for i, close in enumerate(self.sampleClose):
             ma20.push(close=close)
             divRes.push(close=close)
             concated.push(close=close)
@@ -262,10 +249,7 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
         mmax = MovingMax(50, 'open')
         res = (MovingAverage(20, 'close') - MovingAverage(120, 'close')) / MovingMax(50, 'open')
 
-        sampleOpen = np.random.randn(10000)
-        sampleClose = np.random.randn(10000)
-
-        for i, (open, close) in enumerate(zip(sampleOpen, sampleClose)):
+        for i, (open, close) in enumerate(zip(self.sampleOpen, self.sampleClose)):
             ma20.push(close=close)
             ma120.push(close=close)
             mmax.push(open=open)
@@ -281,9 +265,7 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
         ma20 = MovingAverage(20, 'close')
         negma20 = -ma20
 
-        sampleClose = np.random.randn(10000)
-
-        for i, close in enumerate(sampleClose):
+        for i, close in enumerate(self.sampleClose):
             ma20.push(close=close)
             negma20.push(close=close)
 
@@ -298,10 +280,8 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
         maxer = Max('open')
         minimumer = Minimum('close')
         listHolder = MovingAverage(20, 'close') ^ Max('open') ^ Minimum('close')
-        sampleOpen = np.random.randn(10000)
-        sampleClose = np.random.randn(10000)
 
-        for i, (open, close) in enumerate(zip(sampleOpen, sampleClose)):
+        for i, (open, close) in enumerate(zip(self.sampleOpen, self.sampleClose)):
             ma20.push(close=close)
             maxer.push(open=open)
             minimumer.push(close=close)
@@ -321,9 +301,7 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
         max5ma = Max('close') >> MovingAverage(5)
         max5ma2 = MovingAverage(5, Max('close'))
 
-        sample = np.random.randn(10000)
-
-        for i, close in enumerate(sample):
+        for i, close in enumerate(self.sampleClose):
             maxer.push(close=close)
             ma5.push(x=maxer.result())
             max5ma.push(close=close)
@@ -347,14 +325,10 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
         listHolder = MovingAverage(20, 'close') ^ MovingAverage(10, 'open') ^ MovingAverage(10, 'rf')
         mc = MovingAlphaBeta(20, listHolder)
 
-        sampleOpen = np.random.randn(10000)
-        sampleClose = np.random.randn(10000)
-        sampleRf = np.random.randn(10000)
-
         maCloseContainer = deque(maxlen=20)
         maOpenContainer = deque(maxlen=20)
 
-        for i, (open, close, rf) in enumerate(zip(sampleOpen, sampleClose, sampleRf)):
+        for i, (open, close, rf) in enumerate(zip(self.sampleOpen, self.sampleClose, self.sampleRf)):
             maClose.push(close=close)
             maOpen.push(open=open)
             maRf.push(rf=rf)
@@ -382,10 +356,7 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
         listHolder2 = listHolder[1:3]
         maxer = Max('open')
 
-        sampleOpen = np.random.randn(10000)
-        sampleClose = np.random.randn(10000)
-
-        for i, (open, close) in enumerate(zip(sampleOpen, sampleClose)):
+        for i, (open, close) in enumerate(zip(self.sampleOpen, self.sampleClose)):
             listHolder1.push(open=open, close=close)
             listHolder2.push(open=open, close=close)
             maxer.push(open=open)
@@ -406,9 +377,7 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
         holder = Exp(MovingAverage(5, 'close'))
         holder2 = MovingAverage(5, 'close') >> Exp
 
-        sample = np.random.randn(10000)
-
-        for i, close in enumerate(sample):
+        for i, close in enumerate(self.sampleClose):
             ma5.push(close=close)
             holder.push(close=close)
             holder2.push(close=close)
@@ -428,9 +397,9 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
         ma5 = MovingAverage(5, 'close')
         holder = Log(ma5)
 
-        sample = np.exp(np.random.randn(10000))
+        sampleClose = np.exp(self.sampleClose)
 
-        for i, close in enumerate(sample):
+        for i, close in enumerate(sampleClose):
             ma5.push(close=close)
             holder.push(close=close)
 
@@ -444,9 +413,9 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
         ma5 = MovingAverage(5, 'close')
         holder = Sqrt(ma5)
 
-        sample = np.exp(np.random.randn(10000))
+        sampleClose = np.square(self.sampleClose)
 
-        for i, close in enumerate(sample):
+        for i, close in enumerate(sampleClose):
             ma5.push(close=close)
             holder.push(close=close)
 
@@ -460,9 +429,7 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
         ma5 = MovingAverage(5, 'close')
         holder = Abs(ma5)
 
-        sample = np.random.randn(10000)
-
-        for i, close in enumerate(sample):
+        for i, close in enumerate(self.sampleClose):
             ma5.push(close=close)
             holder.push(close=close)
 
@@ -476,9 +443,7 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
         ma5min = MovingAverage(5, 'close') >> Minimum
         holder = Pow(ma5min, 3)
 
-        sample = np.random.randn(10000)
-
-        for i, close in enumerate(sample):
+        for i, close in enumerate(self.sampleClose):
             ma5min.push(close=close)
             holder.push(close=close)
 

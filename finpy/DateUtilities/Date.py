@@ -151,10 +151,10 @@ class Date(object):
         skip = nth - (1 if dayOfWeek >= first else 0)
         return Date(y, m, (1 + dayOfWeek + skip*7) - first)
 
-    @staticmethod
-    def todaysDate():
+    @classmethod
+    def todaysDate(cls):
         today = dt.date.today()
-        return Date(today.year, today.month, today.day)
+        return cls(today.year, today.month, today.day)
 
     @staticmethod
     def isLeap(year):
@@ -175,28 +175,30 @@ class Date(object):
         else:
             return _MonthOffset[month-1]
 
-    @staticmethod
-    def fromExcelSerialNumber(serialNumber):
-        d = Date(serialNumber=1)
-        d.__serialNumber__ = serialNumber
-        return d
+    @classmethod
+    def fromExcelSerialNumber(cls, serialNumber):
+        return cls(serialNumber=serialNumber)
 
-    @staticmethod
-    def parseISO(dateStr):
+    @classmethod
+    def fromDateTime(cls, dateTime):
+        return cls(dateTime.year, dateTime.month, dateTime.day)
+
+    @classmethod
+    def parseISO(cls, dateStr):
         assert len(dateStr) == 10 and dateStr[4] == '-' and dateStr[7] == '-', "invalid format"
-        return Date(int(dateStr[0:4]), int(dateStr[5:7]), int(dateStr[8:10]))
+        return cls(int(dateStr[0:4]), int(dateStr[5:7]), int(dateStr[8:10]))
 
     @classmethod
     def strptime(cls, dateStr, dateFormat = '%Y-%m-%d'):
         pydt = dt.datetime.strptime(dateStr, dateFormat)
         return cls(pydt.year, pydt.month, pydt.day)
 
-    @staticmethod
-    def _advance(date, n, units):
+    @classmethod
+    def _advance(cls, date, n, units):
         if units == TimeUnits.Days or units == TimeUnits.BDays:
-            return Date.fromExcelSerialNumber(date.__serialNumber__ + n)
+            return cls.fromExcelSerialNumber(date.__serialNumber__ + n)
         elif units == TimeUnits.Weeks:
-            return Date.fromExcelSerialNumber(date.__serialNumber__ + 7*n)
+            return cls.fromExcelSerialNumber(date.__serialNumber__ + 7*n)
         elif units == TimeUnits.Months:
             d = date.dayOfMonth()
             m = date.month() + n
@@ -210,7 +212,7 @@ class Date(object):
 
             assert 1900 < y < 2200, 'year {0:d} is out of bound. It must be in [1901, 2199]'.format(y)
 
-            return Date(y, monthLeft, d)
+            return cls(y, monthLeft, d)
         elif units == TimeUnits.Years:
             d = date.dayOfMonth()
             m = date.month()
@@ -218,7 +220,7 @@ class Date(object):
 
             assert 1900 < y < 2200, 'year {0:d} is out of bound. It must be in [1901, 2199]'.format(y)
 
-            return Date(y, m, d)
+            return cls(y, m, d)
 
     @classmethod
     def westernStyle(cls, day, month, year):

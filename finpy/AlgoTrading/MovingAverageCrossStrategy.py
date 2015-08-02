@@ -20,8 +20,8 @@ class MovingAverageCrossStrategy(Strategy):
     def __init__(self,
                  bars,
                  events,
-                 shortWindow=100,
-                 longWindow=400):
+                 shortWindow=10,
+                 longWindow=60):
         self.bars = bars
         self.symbolList = self.bars.symbolList
         self.events = events
@@ -41,11 +41,14 @@ class MovingAverageCrossStrategy(Strategy):
             short_sma = self.short_sma.result()
             long_sma = self.long_sma.result()
             symbol = s
+            currDt = self.bars.getLatestBarDatetime(s)
             if short_sma > long_sma and self.bought[s] == 'OUT':
+                print("{0}: BUY".format(currDt))
                 sigDir = 'LONG'
                 self.order(symbol, sigDir)
                 self.bought[s] = 'LONG'
             if short_sma < long_sma and self.bought[s] == "LONG":
+                print("{0}: SELL".format(currDt))
                 sigDir = 'EXIT'
                 self.order(symbol, sigDir)
                 self.bought[s] = 'OUT'

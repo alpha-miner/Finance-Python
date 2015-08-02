@@ -86,7 +86,7 @@ class Backtest(object):
 
     def _outputPerformance(self):
         self.portfolio.createEquityCurveDataframe()
-        print(self.portfolio.equityCurve.tail(10))
+        print(self.portfolio.equityCurve.tail(50))
 
         print("Signals: {0:d}".format(self.signals))
         print("Orders : {0:d}".format(self.orders))

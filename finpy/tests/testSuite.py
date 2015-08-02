@@ -5,6 +5,9 @@ Created on 2015-7-13
 @author: cheng.li
 """
 
+import sys
+sys.path.append("D:/dev/gitcafe/finpy")
+
 import unittest
 import API
 import DateUtilities

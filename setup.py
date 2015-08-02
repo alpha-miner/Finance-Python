@@ -41,7 +41,7 @@ setup(
     author_email=AUTHOR_EMAIL,
     license="commercial",
     url=URL,
-    packages=['finpy.api',
+    packages=['finpy.API',
               'finpy.AlgoTrading',
               'finpy.DateUtilities',
               'finpy.Enums',

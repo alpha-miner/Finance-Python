@@ -2,5 +2,11 @@ build/*
 *.pyc
 .idea/*
 doc/_build/*
+*.coverage
+*.html
+*.js
+*.png
+*.dat
+*.css
 
 

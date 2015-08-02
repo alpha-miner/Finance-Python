@@ -31,7 +31,6 @@ def blackFormula(optionType,
                  stdDev,
                  discount=1.0,
                  displacement=0.0):
-
     strike, forward, displacement = _checkParameters(strike, forward, displacement)
 
     if stdDev == 0.0:
@@ -57,7 +56,6 @@ def _blackFormulaImpliedStdDevApproximation(optionType,
                                             blackPrice,
                                             discount=1.0,
                                             displacement=0.0):
-
     forward += displacement
     strike += displacement
 
@@ -122,9 +120,8 @@ def bachelierFormula(optionType,
                      forward,
                      stdDev,
                      discount=1.0):
-
     strike = float(strike)
-    forwoard = float(forward)
+    forward = float(forward)
     stdDev = float(stdDev)
     discount = float(discount)
 

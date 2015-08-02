@@ -48,6 +48,10 @@ class Accumulator(object):
     def result(self):
         raise NotImplementedError("result method is not implemented for Accumulator class")
 
+    @property
+    def value(self):
+        return self.result()
+
     def __add__(self, right):
         if isinstance(right, Accumulator):
             if self._returnSize == right._returnSize:

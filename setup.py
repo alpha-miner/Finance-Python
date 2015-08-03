@@ -49,7 +49,8 @@ setup(
               'finpy.Math',
               'finpy.Math.Distributions',
               'finpy.PricingEngines',
-              'finpy.Risk'],
+              'finpy.Risk',
+              'finpy.tests'],
     py_modules=['finpy.__init__'],
     classifiers=[
         "Development Status :: 3 - Alpha",

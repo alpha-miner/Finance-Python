@@ -61,11 +61,6 @@ class Accumulator(object):
         return AddedValueHolder(self, Identity(right, self._returnSize))
 
     def __radd__(self, left):
-        if isinstance(left, Accumulator):
-            if self._returnSize == left._returnSize:
-                return AddedValueHolder(self, left)
-            elif self._returnSize == 1:
-                return AddedValueHolder(Identity(self, left._returnSize), left)
         return AddedValueHolder(self, Identity(left, self._returnSize))
 
     def __sub__(self, right):
@@ -77,11 +72,6 @@ class Accumulator(object):
         return MinusedValueHolder(self, Identity(right, self._returnSize))
 
     def __rsub__(self, left):
-        if isinstance(left, Accumulator):
-            if self._returnSize == left._returnSize:
-                return MinusedValueHolder(left, self)
-            elif self._returnSize == 1:
-                return MinusedValueHolder(left, Identity(self, left._returnSize))
         return MinusedValueHolder(Identity(left, self._returnSize), self)
 
     def __mul__(self, right):
@@ -93,11 +83,6 @@ class Accumulator(object):
         return MultipliedValueHolder(self, Identity(right, self._returnSize))
 
     def __rmul__(self, left):
-        if isinstance(left, Accumulator):
-            if self._returnSize == left._returnSize:
-                return MultipliedValueHolder(self, left)
-            elif self._returnSize == 1:
-                return MultipliedValueHolder(Identity(self, left._returnSize), left)
         return MultipliedValueHolder(self, Identity(left, self._returnSize))
 
     def __div__(self, right):
@@ -109,16 +94,13 @@ class Accumulator(object):
         return DividedValueHolder(self, Identity(right, self._returnSize))
 
     def __rdiv__(self, left):
-        if isinstance(left, Accumulator):
-            if self._returnSize == left._returnSize:
-                return DividedValueHolder(left, self)
-            elif self._returnSize == 1:
-                return DividedValueHolder(left, Identity(self, left._returnSize))
         return DividedValueHolder(Identity(left, self._returnSize), self)
 
+    # only work for python 3
     def __truediv__(self, right):
         return self.__div__(right)
 
+    # only work for python 3
     def __rtruediv__(self, left):
         return self.__rdiv__(left)
 
@@ -135,7 +117,7 @@ class Accumulator(object):
             if self._returnSize == right._returnSize:
                 return LtOperatorValueHolder(self, right)
             elif self._returnSize == 1:
-                LtOperatorValueHolder(Identity(self, right._returnSize), right)
+                return LtOperatorValueHolder(Identity(self, right._returnSize), right)
         return LtOperatorValueHolder(self, Identity(right, self._returnSize))
 
     def __ge__(self, right):

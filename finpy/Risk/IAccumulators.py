@@ -142,8 +142,6 @@ class Accumulator(object):
         return ListedValueHolder(self, Identity(right, 1))
 
     def __rxor__(self, left):
-        if isinstance(left, Accumulator):
-            return ListedValueHolder(left, self)
         return ListedValueHolder(Identity(left, 1), self)
 
     def __rshift__(self, right):
@@ -157,7 +155,7 @@ class Accumulator(object):
         try:
             return right(self)
         except:
-            raise '{0} is not recogonized as a valid operator'.format(right)
+            raise RuntimeError('{0} is not recogonized as a valid operator'.format(right))
 
     def __neg__(self):
         return NegativeValueHolder(self)
@@ -478,4 +476,4 @@ def Asin(valueHolder):
 
 
 def Asinh(valueHolder):
-    return BasicFunction(valueHolder, math.sinh)
+    return BasicFunction(valueHolder, math.asinh)

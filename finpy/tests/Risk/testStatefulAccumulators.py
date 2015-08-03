@@ -22,6 +22,9 @@ from finpy.Risk import MovingCorrelationMatrix
 
 class TestStatefulAccumulators(unittest.TestCase):
 
+    def testShiftValueHolder(self):
+        pass
+
     def testMovingAverager(self):
 
         window = 120

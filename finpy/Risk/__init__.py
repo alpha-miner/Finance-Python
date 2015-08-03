@@ -17,6 +17,7 @@ __all__ = ["Exp",
            "Max",
            "Minimum",
            "Sum",
+           "TruncatedValueHolder",
            "Average",
            "Variance",
            "Correlation",
@@ -40,6 +41,7 @@ __all__ = ["Exp",
            "MovingSortino",
            "Timeseries"]
 
+from finpy.Risk.IAccumulators import TruncatedValueHolder
 from finpy.Risk.IAccumulators import Exp
 from finpy.Risk.IAccumulators import Log
 from finpy.Risk.IAccumulators import Sqrt

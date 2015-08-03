@@ -30,6 +30,9 @@ class TestPerformancers(unittest.TestCase):
                 if i == 0:
                     continue
                 mv.push(ret=float(row[1]), riskFree=float(row[2]))
+                if i == 1:
+                    with self.assertRaises(RuntimeError):
+                        _ = mv.result()
                 if i >= 20:
                     calculated = mv.result()
                     expected = float(row[6])
@@ -50,6 +53,9 @@ class TestPerformancers(unittest.TestCase):
                 if i == 0:
                     continue
                 mv.push(ret=float(row[2]), riskFree=float(row[3]))
+                if i == 1:
+                    with self.assertRaises(RuntimeError):
+                        _ = mv.result()
                 if i >= window:
                     calculated = mv.result()
                     expected = float(row[10])
@@ -70,6 +76,9 @@ class TestPerformancers(unittest.TestCase):
                 if i == 0:
                     continue
                 mv.push(pRet=float(row[0]), mRet=float(row[1]), riskFree=float(row[2]))
+                if i == 1:
+                    with self.assertRaises(RuntimeError):
+                        _ = mv.result()
                 if i >= window:
                     calculatedAlpha, calculatedBeta = mv.result()
                     expectedBeta = float(row[8])

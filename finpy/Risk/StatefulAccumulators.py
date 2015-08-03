@@ -37,7 +37,7 @@ class StatefulValueHolder(Accumulator):
         else:
             popout = np.zeros(np.shape(value))
 
-        if self._isFull == 1:
+        if self.isFull:
             # use list as circular queue
             popout = self._con[self._start]
             self._con[self._start] = value
@@ -74,7 +74,7 @@ class SortedValueHolder(StatefulValueHolder):
 
     def push(self, **kwargs):
         value = super(SortedValueHolder, self).push(**kwargs)
-        if self._isFull:
+        if  self.isFull:
             popout = self._dumpOneValue(kwargs[self._pNames])
             delPos = bisect.bisect_left(self._sortedArray, popout)
             del self._sortedArray[delPos]
@@ -129,7 +129,7 @@ class MovingAverage(StatefulValueHolder):
         self._runningSum = self._runningSum - popout + value
 
     def result(self):
-        if self._isFull:
+        if self.isFull:
             return self._runningSum / self._window
         else:
             return self._runningSum / self.size
@@ -316,7 +316,7 @@ class MovingCorrelation(StatefulValueHolder):
 
     def result(self):
 
-        if self._isFull:
+        if self.isFull:
             n = self._window
             nominator = n * self._runningSumCrossSquare - self._runningSumLeft * self._runningSumRight
             denominator = (n * self._runningSumSquareLeft - self._runningSumLeft * self._runningSumLeft) \
@@ -383,30 +383,4 @@ class MovingCorrelationMatrix(StatefulValueHolder):
         else:
             raise RuntimeError("Container has less than 2 samples")
 
-
-if __name__ == "__main__":
-
-    import time
-    import pandas as pd
-
-    data = pd.read_excel('d:/random.xlsx', header=None)
-    samples = data.values
-    samples = np.random.randn(10000, 50)
-
-    mc1 = MovingCorrelationMatrix(window=25)
-    mc2 = MovingCorrelationMatrixVer2(window=25)
-
-    start = time.time()
-    for i in range(np.size(samples, 0)):
-        mc1.push(values=samples[i, :])
-        if i >= 1:
-            mc1.result()
-    print(time.time() - start)
-
-    start = time.time()
-    for i in range(np.size(samples, 0)):
-        mc2.push(values=samples[i, :])
-        if i >= 1:
-            mc2.result()
-    print(time.time() - start)
 

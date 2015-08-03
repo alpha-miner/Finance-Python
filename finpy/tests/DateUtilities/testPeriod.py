@@ -9,10 +9,143 @@ import unittest
 from finpy.DateUtilities import Period
 from finpy.Enums import TimeUnits
 
+
 class TestPeriod(unittest.TestCase):
 
-    def testYearsMonthsAlgebra(self):
+    def testBasicArithmic(self):
+        # test bad normalize
+        testPriod = Period(1, TimeUnits.Years)
+        testPriod._units = 10
+        with self.assertRaises(TypeError):
+            testPriod.normalize()
 
+        # test plus method
+        p1 = Period(0, TimeUnits.Days)
+        p2 = Period(10, TimeUnits.Months)
+        calculated = p1 + p2
+        self.assertEqual(p2, calculated, "added value {0} should be equal to {1}".format(calculated, p2))
+
+        p1 = Period(2, TimeUnits.Years)
+        p2 = Period(13, TimeUnits.Months)
+        calculated = p1 + p2
+        expected = Period(37, TimeUnits.Months)
+        self.assertEqual(expected, calculated, "added value {0} should be equal to {1}".format(calculated, expected))
+
+        p2 = Period(2, TimeUnits.Weeks)
+        with self.assertRaises(AssertionError):
+            _ = p1 + p2
+
+        p2 = Period(2, TimeUnits.BDays)
+        with self.assertRaises(AssertionError):
+            _ = p1 + p2
+
+        p2 = Period(2, TimeUnits.Days)
+        with self.assertRaises(AssertionError):
+            _ = p1 + p2
+
+        p2._units = 10
+        with self.assertRaises(TypeError):
+            _ = p1 + p2
+
+        p1 = Period(13, TimeUnits.Months)
+        p2 = Period(2, TimeUnits.Years)
+        calculated = p1 + p2
+        expected = Period(37, TimeUnits.Months)
+        self.assertEqual(expected, calculated, "added value {0} should be equal to {1}".format(calculated, expected))
+
+        p2 = Period(2, TimeUnits.Weeks)
+        with self.assertRaises(AssertionError):
+            _ = p1 + p2
+
+        p2 = Period(2, TimeUnits.BDays)
+        with self.assertRaises(AssertionError):
+            _ = p1 + p2
+
+        p2 = Period(2, TimeUnits.Days)
+        with self.assertRaises(AssertionError):
+            _ = p1 + p2
+
+        p2._units = 10
+        with self.assertRaises(TypeError):
+            _ = p1 + p2
+
+        p1 = Period(2, TimeUnits.Weeks)
+        p2 = Period(7, TimeUnits.Days)
+        calculated = p1 + p2
+        expected = Period(21, TimeUnits.Days)
+        self.assertEqual(expected, calculated, "added value {0} should be equal to {1}".format(calculated, expected))
+
+        p2 = Period(2, TimeUnits.Months)
+        with self.assertRaises(AssertionError):
+            _ = p1 + p2
+
+        p2 = Period(2, TimeUnits.BDays)
+        with self.assertRaises(AssertionError):
+            _ = p1 + p2
+
+        p2 = Period(2, TimeUnits.Years)
+        with self.assertRaises(AssertionError):
+            _ = p1 + p2
+
+        p2._units = 10
+        with self.assertRaises(TypeError):
+            _ = p1 + p2
+
+        p1 = Period(7, TimeUnits.Days)
+        p2 = Period(2, TimeUnits.Weeks)
+        calculated = p1 + p2
+        expected = Period(21, TimeUnits.Days)
+        self.assertEqual(expected, calculated, "added value {0} should be equal to {1}".format(calculated, expected))
+
+        p2 = Period(2, TimeUnits.Months)
+        with self.assertRaises(AssertionError):
+            _ = p1 + p2
+
+        p2 = Period(2, TimeUnits.BDays)
+        with self.assertRaises(AssertionError):
+            _ = p1 + p2
+
+        p2 = Period(2, TimeUnits.Years)
+        with self.assertRaises(AssertionError):
+            _ = p1 + p2
+
+        p2._units = 10
+        with self.assertRaises(TypeError):
+            _ = p1 + p2
+
+        p1 = Period(7, TimeUnits.BDays)
+
+        p2 = Period(2, TimeUnits.Months)
+        with self.assertRaises(AssertionError):
+            _ = p1 + p2
+
+        p2 = Period(2, TimeUnits.Days)
+        with self.assertRaises(AssertionError):
+            _ = p1 + p2
+
+        p2 = Period(2, TimeUnits.Weeks)
+        with self.assertRaises(AssertionError):
+            _ = p1 + p2
+
+        p2 = Period(2, TimeUnits.Years)
+        with self.assertRaises(AssertionError):
+            _ = p1 + p2
+
+        p2._units = 10
+        with self.assertRaises(TypeError):
+            _ = p1 + p2
+
+        # test negative operator
+        p1 = Period(-13, TimeUnits.Weeks)
+        p2 = -p1
+        self.assertEqual(p2, Period(13, TimeUnits.Weeks))
+
+        # test less operator
+        p1 = Period(0, TimeUnits.Days)
+        p2 = Period(-3, TimeUnits.BDays)
+        self.assertTrue(p2 < p1)
+
+    def testYearsMonthsAlgebra(self):
         oneYear = Period(1, TimeUnits.Years)
         sixMonths = Period(6, TimeUnits.Months)
         threeMonths = Period(3, TimeUnits.Months)
@@ -62,8 +195,21 @@ class TestPeriod(unittest.TestCase):
                               " is {0:d}"
                               " instead of {1:d}".format(twelveMonths.units, TimeUnits.Years))
 
-    def testWeeksDaysAlgebra(self):
+        thirtyDays = Period(30, TimeUnits.Days)
+        normalizedThirtyDays = thirtyDays.normalize()
+        flag = normalizedThirtyDays.units == TimeUnits.Days
+        self.assertTrue(flag, "normalization error: ThirtyDays.units"
+                              " is {0:d}"
+                              " instead of {1:d}".format(normalizedThirtyDays.units, TimeUnits.Days))
 
+        thirtyBDays = Period(30, TimeUnits.BDays)
+        normalizedThirtyBDays = thirtyBDays.normalize()
+        flag = normalizedThirtyBDays.units == TimeUnits.BDays
+        self.assertTrue(flag, "normalization error: ThirtyBDays.units"
+                              " is {0:d}"
+                              " instead of {1:d}".format(normalizedThirtyBDays.units, TimeUnits.BDays))
+
+    def testWeeksDaysAlgebra(self):
         twoWeeks = Period(2, TimeUnits.Weeks)
         oneWeek = Period(1, TimeUnits.Weeks)
         threeDays = Period(3, TimeUnits.Days)

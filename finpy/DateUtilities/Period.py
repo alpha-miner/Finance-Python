@@ -7,6 +7,7 @@ Created on 2015-7-9
 
 import re
 import math
+from copy import deepcopy
 from finpy.Enums.TimeUnits import TimeUnits
 
 _unitPattern = re.compile('[BbDdMmWwYy]{1}')
@@ -44,9 +45,11 @@ class Period(object):
         return self._units
 
     def normalize(self):
+        length = self.length
+        units = self.units
         if self.length != 0:
             if self.units == TimeUnits.BDays or self.units == TimeUnits.Weeks or self.units == TimeUnits.Years:
-                return self
+                return deepcopy(self)
             elif self.units == TimeUnits.Months:
                 if self.length % 12 == 0:
                     length = self.length // 12
@@ -58,7 +61,7 @@ class Period(object):
                     units = TimeUnits.Weeks
                 return Period(length, units)
             else:
-                raise RuntimeError("unknown time unit ({0:d})".format(self.units))
+                raise TypeError("unknown time unit ({0:d})".format(self.units))
 
     def __div__(self, n):
         assert n != 0, "cannot be divided by zero"
@@ -101,43 +104,43 @@ class Period(object):
                     res._units = TimeUnits.Months
                     res._length = res.length * 12 + p2.length
                 elif p2.units == TimeUnits.Weeks or p2.units == TimeUnits.Days or p2.units == TimeUnits.BDays:
-                    assert p2.length == 0, "impossible addition between {0:s} and {1:s}".format(self, p2)
+                    assert p2.length == 0, "impossible addition between {0} and {1}".format(self, p2)
                 else:
-                    raise RuntimeError("unknown time unit ({0:d})".format(p2.units))
+                    raise TypeError("unknown time unit ({0:d})".format(p2.units))
                 return res
             elif self.units == TimeUnits.Months:
                 if p2.units == TimeUnits.Years:
                     res._length += 12 * p2.length
                 elif p2.units == TimeUnits.Weeks or p2.units == TimeUnits.Days or p2.units == TimeUnits.BDays:
-                    assert p2.length == 0, "impossible addition between {0:s} and {1:s}".format(self, p2)
+                    assert p2.length == 0, "impossible addition between {0} and {1}".format(self, p2)
                 else:
-                    raise RuntimeError("unknown time unit ({0:d})".format(p2.units))
+                    raise TypeError("unknown time unit ({0:d})".format(p2.units))
                 return res
             elif self.units == TimeUnits.Weeks:
                 if p2.units == TimeUnits.Days:
                     res._units = TimeUnits.Days
                     res._length = res.length * 7 + p2.length
                 elif p2.units == TimeUnits.Years or p2.units == TimeUnits.Months or p2.units == TimeUnits.BDays:
-                    assert p2.length == 0, "impossible addition between {0:s} and {1:s}".format(self, p2)
+                    assert p2.length == 0, "impossible addition between {0} and {1}".format(self, p2)
                 else:
-                    raise RuntimeError("unknown time unit ({0:d})".format(p2.units))
+                    raise TypeError("unknown time unit ({0:d})".format(p2.units))
                 return res
             elif self.units == TimeUnits.Days:
                 if p2.units == TimeUnits.Weeks:
                     res._length += 7 * p2.length
                 elif p2.units == TimeUnits.Years or p2.units == TimeUnits.Months or p2.units == TimeUnits.BDays:
-                    assert p2.length == 0, "impossible addition between {0:s} and {1:s}".format(self, p2)
+                    assert p2.length == 0, "impossible addition between {0} and {1}".format(self, p2)
                 else:
-                    raise RuntimeError("unknown time unit ({0:d})".format(p2.units))
+                    raise TypeError("unknown time unit ({0:d})".format(p2.units))
                 return res
             elif self.units == TimeUnits.BDays:
                 if p2.units == TimeUnits.Years or p2.units == TimeUnits.Months or p2.units == TimeUnits.Weeks or p2.units == TimeUnits.Days:
-                    assert p2.length == 0, "impossible addition between {0:s} and {1:s}".format(self, p2)
+                    assert p2.length == 0, "impossible addition between {0} and {1}".format(self, p2)
                 else:
-                    raise RuntimeError("unknown time unit ({0:d})".format(p2.units))
+                    raise TypeError("unknown time unit ({0:d})".format(p2.units))
                 return res
             else:
-                raise RuntimeError("unknown time unit ({0:d})".format(self.units))
+                raise TypeError("unknown time unit ({0:d})".format(self.units))
 
     def __neg__(self):
         return Period(-self.length, self.units)

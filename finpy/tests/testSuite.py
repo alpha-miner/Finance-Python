@@ -34,6 +34,8 @@ def test():
     suite.addTests(tests)
     tests = unittest.TestLoader().loadTestsFromTestCase(Math.TestDistribution)
     suite.addTests(tests)
+    tests = unittest.TestLoader().loadTestsFromTestCase(Math.TestErrorFunction)
+    suite.addTests(tests)
     tests = unittest.TestLoader().loadTestsFromTestCase(PricingEngines.TestBlackFormula)
     suite.addTests(tests)
     tests = unittest.TestLoader().loadTestsFromTestCase(Risk.TestAccumulatorsArithmetic)

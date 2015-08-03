@@ -16,6 +16,29 @@ from finpy.PricingEngines.BlackFormula import blackFormulaImpliedStdDev
 
 class TestBlackFormula(unittest.TestCase):
 
+    def testBlackBasic(self):
+        strike = 1.0
+        forward = 1.2
+        stdDev = 0.2
+        discount = 0.95
+
+        expected = discount * (forward - strike)
+        calculated = blackFormula(OptionType.Call, strike, forward, 0.0, discount)
+        self.assertAlmostEqual(expected, calculated, 15)
+
+        expected = discount * forward
+        calculated = blackFormula(OptionType.Call, 0.0, forward, stdDev, discount)
+        self.assertAlmostEqual(expected, calculated, 15)
+
+    def testBachelierBasics(self):
+        strike = 1.0
+        forward = 1.2
+        discount = 0.95
+
+        expected = discount * (forward - strike)
+        calculated = bachelierFormula(OptionType.Call, strike, forward, 0.0, discount)
+        self.assertAlmostEqual(expected, calculated, 15)
+
     def testBlackImpliedVol(self):
         forward = 1.0
         bpvol = 0.25

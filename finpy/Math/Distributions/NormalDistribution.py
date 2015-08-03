@@ -48,7 +48,7 @@ class CumulativeNormalDistribution(object):
             zsqr = z * z
             i = 1.0
             g = 1.0
-            a = 2.70e308
+            a = 2.20e308
             while True:
                 lasta = a
                 x = (4.0 * i - 3.0) / zsqr
@@ -103,15 +103,15 @@ class InverseCumulativeNormal(object):
 
     _dist = CumulativeNormalDistribution()
 
-    def __init__(self, average=0.0, sigma=1.0, full_accuracy=False):
+    def __init__(self, average=0.0, sigma=1.0, fullAccuracy=False):
         self._average = average
         self._sigma = sigma
-        self._fullAcc = full_accuracy
+        self._fullAcc = fullAccuracy
 
     @classmethod
     def _tail_value(cls, x):
         if x <= 0.0 or x >= 1.0:
-            raise RuntimeError("InverseCumulativeNormal({0:x}) undefined: must be 0 < x < 1".format(x))
+            raise ArithmeticError("InverseCumulativeNormal({0:f}) undefined: must be 0 < x < 1".format(x))
 
         if x < cls._x_low:
             # Rational approximation for the lower region 0<x<u_low

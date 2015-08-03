@@ -16,7 +16,7 @@ average = 1.0
 sigma = 2.0
 
 
-def gaussia(x):
+def gaussian(x):
     normFact = sigma * math.sqrt(2.0 * _M_PI)
     dx = x - average
     return math.exp(-dx*dx / (2.0 * sigma * sigma))/normFact
@@ -40,6 +40,7 @@ class TestDistribution(unittest.TestCase):
         normal = NormalDistribution(average, sigma)
         cum = CumulativeNormalDistribution(average, sigma)
         invCum = InverseCumulativeNormal(average, sigma)
+        invCumAcc = InverseCumulativeNormal(average, sigma, fullAccuracy=True)
 
         numberOfStandardDeviation = 6
         xMin = average - numberOfStandardDeviation*sigma
@@ -49,7 +50,7 @@ class TestDistribution(unittest.TestCase):
         h = (xMax-xMin)/(N-1)
 
         x = [xMin + i * h for i in range(N)]
-        y = [gaussia(v) for v in x]
+        y = [gaussian(v) for v in x]
         yd = [gaussianDerivative(v) for v in x]
 
         temp = [normal(v) for v in x]
@@ -66,6 +67,14 @@ class TestDistribution(unittest.TestCase):
                                                             "Expected gaussian:  {1:f}\n"
                                                             "Calculated Gaussian: {2:f}".format(i, expected, calculated))
 
+        temp = [cum(v) for v in x]
+        temp = [invCumAcc(v) for v in temp]
+
+        for i, (expected, calculated) in enumerate(zip(x, temp)):
+            self.assertAlmostEqual(expected, calculated, 7, "at index {0:d}\n"
+                                                            "Expected gaussian:  {1:.9f}\n"
+                                                            "Calculated Gaussian: {2:.9f}".format(i, expected, calculated))
+
         temp = [cum.derivative(v) for v in x]
         for i, (expected, calculated) in enumerate(zip(y, temp)):
             self.assertAlmostEqual(expected, calculated, 15, "at index {0:d}\n"
@@ -77,3 +86,7 @@ class TestDistribution(unittest.TestCase):
             self.assertAlmostEqual(expected, calculated, 15, "at index {0:d}\n"
                                                              "Expected:  {1:f}\n"
                                                              "Calculated: {2:f}".format(i, expected, calculated))
+
+        # test exception raising
+        with self.assertRaises(ArithmeticError):
+            invCum(-0.5)

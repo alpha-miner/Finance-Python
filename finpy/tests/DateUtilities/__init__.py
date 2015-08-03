@@ -7,8 +7,10 @@ Created on 2015-7-13
 
 __all__ = ["TestCalendar",
            "TestDate",
-           "TestPeriod"]
+           "TestPeriod",
+           "TestSchedule"]
 
 from DateUtilities.testCalendar import TestCalendar
 from DateUtilities.testDate import TestDate
 from DateUtilities.testPeriod import TestPeriod
+from DateUtilities.testSchedule import TestSchedule

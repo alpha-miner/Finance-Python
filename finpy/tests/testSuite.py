@@ -28,6 +28,8 @@ def test():
     suite.addTests(tests)
     tests = unittest.TestLoader().loadTestsFromTestCase(DateUtilities.TestPeriod)
     suite.addTests(tests)
+    tests = unittest.TestLoader().loadTestsFromTestCase(DateUtilities.TestSchedule)
+    suite.addTests(tests)
     tests = unittest.TestLoader().loadTestsFromTestCase(Env.TestSettings)
     suite.addTests(tests)
     tests = unittest.TestLoader().loadTestsFromTestCase(Math.TestDistribution)

@@ -32,9 +32,11 @@ class test(Command):
         sys.path.insert(0, self.test_dir)
 
     def run(self):
-        subprocess.Popen("coverage run finpy/tests/testSuite.py", shell=True)
-        subprocess.Popen("coverage report", shell=True)
-        subprocess.Popen("coverage html", shell=True)
+        if sys.platform == 'win32':
+            command = "coverage run finpy/tests/testSuite.py& coverage report& coverage html"
+        else:
+            command = "coverage run finpy/tests/testSuite.py; coverage report; coverage html"
+        subprocess.Popen(command, shell=True)
 
 setup(
     name=NAME,

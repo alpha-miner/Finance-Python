@@ -39,6 +39,7 @@ python setpy.py install
 
 安装之前，可以直先接运行测试：
 ~~~
+pip install -r requirements/test.txt
 python setup.py test
 ~~~
 
@@ -53,4 +54,3 @@ python setup.py test
 ### 0.1.0
 
 基本的日期相关函数的实现。
-

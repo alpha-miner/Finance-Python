@@ -92,7 +92,7 @@ class Period(object):
         return self.__div__(n)
 
     def __add__(self, p2):
-        res = Period(self.length, self.units )
+        res = Period(self.length, self.units)
 
         if self.length == 0:
             return Period(p2.length, p2.units)
@@ -139,9 +139,6 @@ class Period(object):
                     assert p2.length == 0, "impossible addition between {0} and {1}".format(self, p2)
                 else:
                     raise TypeError("unknown time unit ({0:d})".format(p2.units))
-                return res
-            else:
-                raise TypeError("unknown time unit ({0:d})".format(self.units))
 
     def __neg__(self):
         return Period(-self.length, self.units)
@@ -161,13 +158,13 @@ class Period(object):
         if self.units == p2.units:
             return self.length < p2.length
         elif self.units == TimeUnits.Months and p2.units == TimeUnits.Years:
-            self.length < (p2.length * 12)
+            return self.length < (p2.length * 12)
         elif self.units == TimeUnits.Years and p2.units == TimeUnits.Months:
-            (self.length * 12) < p2.length
+            return (self.length * 12) < p2.length
         elif self.units == TimeUnits.Days and p2.units == TimeUnits.Weeks:
-            self.length < (p2.length * 7)
+            return self.length < (p2.length * 7)
         elif self.units == TimeUnits.Weeks and p2.units == TimeUnits.Days:
-            (self.length * 7) < p2.length
+            return (self.length * 7) < p2.length
 
         # inexact comparisons (handled by converting to days and using limits)
 
@@ -179,7 +176,7 @@ class Period(object):
         elif p1lim[0] >= p2lim[1]:
             return False
         else:
-            raise RuntimeError("undecidable comparison between {0:s} and {1:s}".format(self, p2))
+            raise RuntimeError("undecidable comparison between {0} and {1}".format(self, p2))
 
     def __eq__(self, p2):
         return not (self < p2 or p2 < self)
@@ -197,7 +194,7 @@ class Period(object):
 
         if self.units == TimeUnits.Days:
             if n >= 7:
-                m = math.floor(n/7)
+                m = int(math.floor(n/7))
                 out += str(m) + "W"
                 n %= 7
             if n != 0 or m == 0:
@@ -208,7 +205,7 @@ class Period(object):
             return out + str(n) + "W"
         elif self.units == TimeUnits.Months:
             if n >= 12:
-                m = math.floor(n/12)
+                m = int(math.floor(n/12))
                 out += str(m) + "Y"
                 n %= 12
             if n != 0 or m == 0:
@@ -219,13 +216,9 @@ class Period(object):
             return out + str(n) + "Y"
         elif self.units == TimeUnits.BDays:
             return out + str(n) + "B"
-        else:
-            raise RuntimeError("unknown time unit ({0:d})".format(self.units))
 
 # implementation detail
-
 def _daysMinMax(p):
-
     if p.units == TimeUnits.Days:
         return p.length, p.length
     elif p.units == TimeUnits.Weeks:
@@ -236,5 +229,3 @@ def _daysMinMax(p):
         return 365 * p.length, 366 * p.length
     elif p.units == TimeUnits.BDays:
         raise RuntimeError("Business days unit has not min max days")
-    else:
-        raise RuntimeError("unknown time unit ({0:d})".format(p.units))

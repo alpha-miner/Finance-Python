@@ -135,6 +135,9 @@ class TestPeriod(unittest.TestCase):
         with self.assertRaises(TypeError):
             _ = p1 + p2
 
+        p2 = Period(2, TimeUnits.BDays)
+        self.assertEqual(p1 + p2, Period('9B'))
+
         # test negative operator
         p1 = Period(-13, TimeUnits.Weeks)
         p2 = -p1
@@ -144,6 +147,67 @@ class TestPeriod(unittest.TestCase):
         p1 = Period(0, TimeUnits.Days)
         p2 = Period(-3, TimeUnits.BDays)
         self.assertTrue(p2 < p1)
+
+        # test sub operator
+        p1 = Period(0, TimeUnits.Days)
+        p2 = Period(-3, TimeUnits.BDays)
+        self.assertEqual(p1 - p2, Period('3b'))
+
+        # test string representation
+        p1 = Period(12, TimeUnits.Months)
+        self.assertEqual("1Y", p1.__str__())
+
+    def testComparingOperators(self):
+        p1 = Period(0, TimeUnits.Days)
+        p2 = Period(1, TimeUnits.Days)
+        self.assertTrue(p1 < p2)
+
+        p1 = Period(13, TimeUnits.Months)
+        p2 = Period(1, TimeUnits.Years)
+        self.assertTrue(not p1 < p2)
+
+        p1 = Period(1, TimeUnits.Years)
+        p2 = Period(13, TimeUnits.Months)
+        self.assertTrue(p1 < p2)
+
+        p1 = Period(13, TimeUnits.Days)
+        p2 = Period(2, TimeUnits.Weeks)
+        self.assertTrue(p1 < p2)
+
+        p1 = Period(2, TimeUnits.Weeks)
+        p2 = Period(13, TimeUnits.Days)
+        self.assertTrue(not p1 < p2)
+
+        p1 = Period(1, TimeUnits.Years)
+        p2 = Period(56, TimeUnits.Weeks)
+        self.assertTrue(p1 < p2)
+
+        p1 = Period(56, TimeUnits.Weeks)
+        p2 = Period(1, TimeUnits.Years)
+        self.assertTrue(not p1 < p2)
+
+        p1 = Period(21, TimeUnits.Weeks)
+        p2 = Period(5, TimeUnits.Months)
+
+        with self.assertRaises(RuntimeError):
+            _ = p1 < p2
+
+        p1 = Period(21, TimeUnits.BDays)
+        with self.assertRaises(RuntimeError):
+            _ = p1 < p2
+
+        # test not equal operator
+        p1 = Period(1, TimeUnits.Days)
+        p2 = Period(1, TimeUnits.Days)
+        self.assertTrue(not p1 != p2)
+
+        p2 = Period(1, TimeUnits.Years)
+        self.assertTrue(p1 != p2)
+
+        # test greater than operator
+        p1 = Period(1, TimeUnits.Days)
+        p2 = Period(2, TimeUnits.Days)
+        self.assertEqual(p1 < p2, not p1 > p2)
 
     def testYearsMonthsAlgebra(self):
         oneYear = Period(1, TimeUnits.Years)

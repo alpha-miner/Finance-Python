@@ -58,7 +58,7 @@ class Calendar(object):
                 wd -= 1
         return wd
 
-    def adjustDate(self, d, c = BizDayConventions.Following):
+    def adjustDate(self, d, c=BizDayConventions.Following):
         if c == BizDayConventions.Unadjusted:
             return d
         d1 = d

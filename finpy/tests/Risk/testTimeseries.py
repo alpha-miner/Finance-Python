@@ -20,6 +20,8 @@ class TestTimeseries(unittest.TestCase):
 
         ts = Timeseries(dates, values)
 
+        self.assertEqual(ts.size(), len(dates))
+
         firstDate = ts.firstDate()
         lastDate = ts.lastDate()
         self.assertEqual(dates[0], firstDate, "Expected first date {0} is not equal to ts's first date {1}"

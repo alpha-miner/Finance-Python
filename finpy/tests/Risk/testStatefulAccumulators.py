@@ -8,6 +8,11 @@ Created on 2015-7-16
 import unittest
 import csv
 import os
+import numpy as np
+from collections import deque
+from finpy.Risk import Shift
+from finpy.Risk import MovingMax
+from finpy.Risk import MovingMinimum
 from finpy.Risk import MovingAverage
 from finpy.Risk import MovingPositiveAverage
 from finpy.Risk import MovingNegativeAverage
@@ -23,10 +28,26 @@ from finpy.Risk import MovingCorrelationMatrix
 class TestStatefulAccumulators(unittest.TestCase):
 
     def testShiftValueHolder(self):
-        pass
+        ma = MovingAverage(10, 'close')
+
+        with self.assertRaises(AssertionError):
+            _ = Shift(ma, N=0)
+
+        test = Shift(ma, N=1)
+
+        test.push(close=2.0)
+        ma.push(close=2.0)
+        previous = ma.result()
+        test.push(close=5.0)
+        ma.push(close=5.0)
+
+        self.assertAlmostEqual(previous, test.result())
+
+        previous = ma.result()
+        test.push(close=10.0)
+        self.assertAlmostEqual(previous, test.result())
 
     def testMovingAverager(self):
-
         window = 120
         total = 2500
 
@@ -55,6 +76,7 @@ class TestStatefulAccumulators(unittest.TestCase):
 
         window = 20
         mv = MovingPositiveAverage(window, pNames='z')
+        self.assertAlmostEqual(mv.result(), 0.0, 15)
 
         with open(filePath, 'r') as fileHandler:
             reader = csv.reader(fileHandler)
@@ -77,6 +99,7 @@ class TestStatefulAccumulators(unittest.TestCase):
 
         window = 20
         mv = MovingNegativeAverage(window, pNames='z')
+        self.assertAlmostEqual(mv.result(), 0.0, 15)
 
         with open(filePath, 'r') as fileHandler:
             reader = csv.reader(fileHandler)
@@ -115,6 +138,43 @@ class TestStatefulAccumulators(unittest.TestCase):
                 self.assertAlmostEqual(calculated, expected, 15, "at index {0:d}\n"
                                                                  "Sum expected:   {1:f}\n"
                                                                  "Sum calculated: {2:f}".format(i, expected, calculated))
+
+    def testMovingMax(self):
+        window = 120
+
+        mv = MovingMax(window, pNames='z')
+        total = np.random.randn(2500)
+        con = deque(maxlen=window)
+        for i, value in enumerate(total):
+            value = float(value)
+            con.append(value)
+            mv.push(z=value)
+            runningMax = max(con)
+
+            expected = runningMax
+            calculated = mv.result()
+            self.assertAlmostEqual(calculated, expected, 15, "at index {0:d}\n"
+                                                             "Max expected:   {1:f}\n"
+                                                             "Max calculated: {2:f}".format(i, expected, calculated))
+
+    def testMovingMinimum(self):
+        window = 120
+
+        mv = MovingMinimum(window, pNames='z')
+        total = np.random.randn(2500)
+        con = deque(maxlen=window)
+        for i, value in enumerate(total):
+            value = float(value)
+            con.append(value)
+            mv.push(z=value)
+            runningMin = min(con)
+
+            expected = runningMin
+            calculated = mv.result()
+            self.assertAlmostEqual(calculated, expected, 15, "at index {0:d}\n"
+                                                             "Min expected:   {1:f}\n"
+                                                             "Min calculated: {2:f}".format(i, expected, calculated))
+
 
     def testMovingCountedPositive(self):
         window = 120
@@ -184,6 +244,7 @@ class TestStatefulAccumulators(unittest.TestCase):
             mv.push(z=value)
             runningSum += value
             runningSumSquare += value * value
+
             if i >= window:
                 runningSum -= con[0]
                 runningSumSquare -= con[0] * con[0]
@@ -207,6 +268,11 @@ class TestStatefulAccumulators(unittest.TestCase):
             mv.push(z=value)
             runningSum += value
             runningSumSquare += value * value
+
+            if i == 0:
+                with self.assertRaises(RuntimeError):
+                    mv.result()
+
             if i >= window:
                 runningSum -= con[0]
                 runningSumSquare -= con[0] * con[0]
@@ -225,7 +291,7 @@ class TestStatefulAccumulators(unittest.TestCase):
         filePath = os.path.join(dirName, 'data/negativevariance.csv')
 
         window = 20
-        mv = MovingNegativeVariance(window,pNames='z')
+        mv = MovingNegativeVariance(window, pNames='z')
 
         with open(filePath, 'r') as fileHandler:
             reader = csv.reader(fileHandler)
@@ -233,6 +299,11 @@ class TestStatefulAccumulators(unittest.TestCase):
                 if i == 0:
                     continue
                 mv.push(z=float(row[1]))
+
+                if mv._runningNegativeCount == 1:
+                    with self.assertRaises(RuntimeError):
+                        mv.result()
+
                 if i >= window:
                     expected = float(row[6])
                     calculated = mv.result()
@@ -254,6 +325,11 @@ class TestStatefulAccumulators(unittest.TestCase):
                 if i == 0:
                     continue
                 mv.push(z=float(row[0]), t=float(row[1]))
+
+                if i == 1:
+                    with self.assertRaises(RuntimeError):
+                        _ = mv.result()
+
                 if i >= window:
                     expected = float(row[2])
                     calculated = mv.result()
@@ -286,11 +362,12 @@ class TestStatefulAccumulators(unittest.TestCase):
         with open(filePath, 'r') as fileHandler:
             reader = csv.reader(fileHandler)
 
-            reader = csv.reader(fileHandler)
-
             for i, row in enumerate(reader):
                 row = [float(value) for value in row]
                 mv.push(samples=row)
+                if i == 0:
+                    with self.assertRaises(RuntimeError):
+                        _ = mv.result()
                 if (i+1) == window:
                     calculated = mv.result()
                     for k, row in enumerate(first100Sample):

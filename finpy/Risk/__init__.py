@@ -21,6 +21,7 @@ __all__ = ["Exp",
            "Average",
            "Variance",
            "Correlation",
+           "Shift",
            "MovingAverage",
            "MovingPositiveAverage",
            "MovingNegativeAverage",
@@ -59,6 +60,7 @@ from finpy.Risk.StatelessAccumulators import Average
 from finpy.Risk.StatelessAccumulators import Variance
 from finpy.Risk.StatelessAccumulators import Correlation
 
+from finpy.Risk.StatefulAccumulators import Shift
 from finpy.Risk.StatefulAccumulators import MovingAverage
 from finpy.Risk.StatefulAccumulators import MovingPositiveAverage
 from finpy.Risk.StatefulAccumulators import MovingNegativeAverage

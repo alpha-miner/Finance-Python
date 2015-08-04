@@ -8,6 +8,7 @@ Created on 2015-7-16
 import math
 import bisect
 import numpy as np
+from copy import deepcopy
 from finpy.Risk.IAccumulators import Accumulator
 
 
@@ -50,21 +51,23 @@ class StatefulValueHolder(Accumulator):
         return popout
 
 
-class Shift(Accumulator):
+class Shift(StatefulValueHolder):
 
     def __init__(self, valueHolder, N=1):
-        self._historyContainer = StatefulValueHolder(N, pNames=valueHolder._pNames)
-        self._valueHolder = valueHolder
+        super(Shift, self).__init__(N, valueHolder._pNames)
+        assert N >= 1, "shift value should always not be less than 1"
+        self._valueHolder = deepcopy(valueHolder)
+        self._pNames = valueHolder._pNames
+        self._dependency = valueHolder._dependency + N
+        self._returnSize = valueHolder._returnSize
 
     def push(self, **kwargs):
         self._valueHolder.push(**kwargs)
-        self._popout = self._historyContainer._dumpOneValue(self._valueHolder.result())
+        self._popout = super(Shift, self)._dumpOneValue(self._valueHolder.result())
 
     def result(self):
         return self._popout
 
-    def shift(self, N=1):
-        return Shift(self, N)
 
 class SortedValueHolder(StatefulValueHolder):
 
@@ -74,7 +77,7 @@ class SortedValueHolder(StatefulValueHolder):
 
     def push(self, **kwargs):
         value = super(SortedValueHolder, self).push(**kwargs)
-        if  self.isFull:
+        if self.isFull:
             popout = self._dumpOneValue(kwargs[self._pNames])
             delPos = bisect.bisect_left(self._sortedArray, popout)
             del self._sortedArray[delPos]
@@ -330,23 +333,6 @@ class MovingCorrelation(StatefulValueHolder):
                           *(n * self._runningSumSquareRight - self._runningSumRight * self._runningSumRight)
             denominator = math.sqrt(denominator)
             return nominator / denominator
-        else:
-            raise RuntimeError("Container has less than 2 samples")
-
-
-# Calculator for several series
-class MovingCorrelationMatrixVer2(StatefulValueHolder):
-
-    def __init__(self, window, pNames='values'):
-        super(MovingCorrelationMatrixVer2, self).__init__(window, pNames)
-
-    def push(self, **kwargs):
-        values = super(MovingCorrelationMatrixVer2, self).push(**kwargs)
-        _ = self._dumpOneValue(values)
-
-    def result(self):
-        if len(self._con) >= 2:
-            return np.corrcoef(np.matrix(self._con).T)
         else:
             raise RuntimeError("Container has less than 2 samples")
 

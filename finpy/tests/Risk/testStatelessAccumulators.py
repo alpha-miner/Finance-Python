@@ -59,21 +59,36 @@ class TestStatelessAccumulators(unittest.TestCase):
     def testVariance(self):
         # np.var is population variance
         mm = Variance(pNames='close', isPopulation=True)
+        mm2 = Variance(pNames='close',)
 
         for i, value in enumerate(self.samplesClose):
             mm.push(close=value)
+            mm2.push(close=value)
             expected = np.var(self.samplesClose[:i+1])
             calculated = mm.result()
+
+            if i == 0:
+                with self.assertRaises(RuntimeError):
+                    _ = mm2.result()
 
             self.assertAlmostEqual(expected, calculated, 10, "at index {0:d}\n"
                                                              "expected var:   {1:f}\n"
                                                              "calculated var: {2:f}".format(i, expected, calculated))
+
+            if i >= 1:
+                calculated = mm2.result() * i / (i + 1) # transform sample variance to population variance
+                self.assertAlmostEqual(expected, calculated, 10, "at index {0:d}\n"
+                                                                 "expected var:   {1:f}\n"
+                                                                 "calculated var: {2:f}".format(i, expected, calculated))
 
     def testCorrelation(self):
         mm = Correlation(pNames=['close', 'open'])
 
         for i, (openPrice, closePrice) in enumerate(zip(self.samplesOpen, self.samplesClose)):
             mm.push(open=openPrice, close=closePrice)
+            if i == 0:
+                with self.assertRaises(RuntimeError):
+                    _ = mm.result()
             if i >= 1:
                 expected = np.corrcoef(self.samplesOpen[:i+1], self.samplesClose[:i+1])[0,1]
                 calculated = mm.result()

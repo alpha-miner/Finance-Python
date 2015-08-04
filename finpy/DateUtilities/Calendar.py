@@ -46,10 +46,10 @@ class Calendar(object):
                     wd += 1
             elif fromDate > toDate:
                 d = toDate
-                while d > fromDate:
+                while d < fromDate:
                     if self.isBizDay(d):
                         wd += 1
-                    d -= 1
+                    d += 1
                 if self.isBizDay(fromDate):
                     wd += 1
             if self.isBizDay(fromDate) and not includeFirst:
@@ -92,7 +92,7 @@ class Calendar(object):
             raise RuntimeError("unknown business-day convention")
         return d1
 
-    def advanceDate(self, d, period, c = BizDayConventions.Following, endOfMonth = False):
+    def advanceDate(self, d, period, c=BizDayConventions.Following, endOfMonth = False):
 
         if isinstance(period, str):
             period = Period(period)
@@ -326,9 +326,6 @@ class ChinaIBImpl(object):
     def isBizDay(self, date):
         return self._sseImpl.isBizDay(date) or date in ChinaIBImpl._working_weekends
 
-    def isHoliday(self, d):
-        return not self.isBizDay(d)
-
     def isWeekEnd(self, weekDay):
         return weekDay == Weekdays.Saturday or weekDay == Weekdays.Sunday
 
@@ -340,9 +337,6 @@ class NullCalendar(object):
 
     def isBizDay(self, date):
         return True
-
-    def isHoliday(self, date):
-        return False
 
     def isWeekEnd(self, weekDay):
         return weekDay == Weekdays.Saturday or weekDay == Weekdays.Sunday
@@ -416,4 +410,5 @@ class TargetImpl(WestenImpl):
 _holDict = {'china.sse': ChinaSseImpl,
             'china.ib': ChinaIBImpl,
             'target': TargetImpl,
-            'null': NullCalendar}
+            'null': NullCalendar,
+            'nullcalendar': NullCalendar}

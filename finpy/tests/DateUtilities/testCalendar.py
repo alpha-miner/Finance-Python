@@ -10,6 +10,7 @@ from finpy.DateUtilities import Date
 from finpy.DateUtilities import Calendar
 from finpy.Enums import BizDayConventions
 from finpy.Enums import Months
+from finpy.Enums import Weekdays
 
 
 class TestCalendar(unittest.TestCase):
@@ -26,11 +27,24 @@ class TestCalendar(unittest.TestCase):
         cal = Calendar('China.SSE')
         self.assertTrue(cal.isEndOfMonth(testDate), "{0} is expected to be a end of month".format(testDate))
 
-        testDate = Date(2015,5,1)
+        testDate = Date(2015, 5, 1)
         cal = Calendar('China.SSE')
         endOfMonth = cal.endOfMonth(testDate)
         self.assertEqual(endOfMonth, Date(2015, 5, 29), "The month end of 2015/5 is expected to be {0}".format(Date(2015, 5, 29)))
 
+        bizDates1 = cal.bizDaysBetween(Date(2015, 1, 1), Date(2015, 12, 31), True, False)
+        bizDates2 = cal.bizDaysBetween(Date(2015, 12, 31), Date(2015, 1, 1), False, True)
+        self.assertEqual(bizDates1, bizDates2)
+
+    def testNullCalendar(self):
+        cal = Calendar("Null")
+
+        testDate = Date(2015, 1, 1)
+        self.assertTrue(cal.isBizDay(testDate))
+        self.assertTrue(not cal.isHoliday(testDate))
+        self.assertTrue(cal.isWeekEnd(Weekdays.Saturday))
+        self.assertTrue(cal.isWeekEnd(Weekdays.Sunday))
+        self.assertTrue(not cal.isWeekEnd(Weekdays.Friday))
 
     def testChinaSSE(self):
         # China Shhanghai Securities Exchange holiday list in the year 2014
@@ -85,6 +99,10 @@ class TestCalendar(unittest.TestCase):
         sseCal = Calendar('China.SSE')
         ibCal  = Calendar('China.IB')
 
+        bizDayConv = BizDayConventions.Unadjusted
+        self.assertEqual(sseCal.adjustDate(referenceDate, bizDayConv), referenceDate)
+        self.assertEqual(ibCal.adjustDate(referenceDate, bizDayConv), referenceDate)
+
         bizDayConv = BizDayConventions.Following
         self.assertEqual(sseCal.adjustDate(referenceDate, bizDayConv), Date(2005, Months.May, 9))
         self.assertEqual(ibCal.adjustDate(referenceDate, bizDayConv), Date(2005, Months.April, 30))
@@ -100,6 +118,12 @@ class TestCalendar(unittest.TestCase):
 
         bizDayConv = BizDayConventions.Following
 
+        # test null period
+        self.assertEqual(sseCal.advanceDate(referenceDate, '0b', bizDayConv), Date(2014, 2, 7))
+
+        # test negative period
+        self.assertEqual(sseCal.advanceDate(referenceDate, '-5b', bizDayConv), Date(2014, 1, 24))
+
         # The difference is caused by Feb 8 is SSE holiday but a working day for IB market
         self.assertEqual(sseCal.advanceDate(referenceDate, '2b', bizDayConv), Date(2014, 2, 10))
         self.assertEqual(sseCal.advanceDate(referenceDate, '2d', bizDayConv), Date(2014, 2, 7))
@@ -108,7 +132,7 @@ class TestCalendar(unittest.TestCase):
 
         bizDayConv = BizDayConventions.ModifiedFollowing
         # May 31, 2014 is a holiday
-        self.assertEqual(sseCal.advanceDate(referenceDate, '4m', bizDayConv), Date(2014, 5, 30))
+        self.assertEqual(sseCal.advanceDate(referenceDate, '4m', bizDayConv, True), Date(2014, 5, 30))
 
     def testDatesList(self):
 
@@ -147,3 +171,25 @@ class TestCalendar(unittest.TestCase):
             if ibCal.isBizDay(d):
                 self.assertTrue(d in ibWorkingDayList and d not in ibHolList)
             d += 1
+
+    def testCalendarWithDayConvention(self):
+        sseCal = Calendar('China.SSE')
+
+        referenceDate = Date(2015, 2, 14)
+        testDate = sseCal.adjustDate(referenceDate, BizDayConventions.HalfMonthModifiedFollowing)
+        self.assertEqual(testDate, Date(2015, 2, 13))
+
+        referenceDate = Date(2014, 2, 4)
+        testDate = sseCal.adjustDate(referenceDate, BizDayConventions.ModifiedPreceding)
+        self.assertEqual(testDate, Date(2014, 2, 7))
+
+        referenceDate = Date(2014, 2, 3)
+        testDate = sseCal.adjustDate(referenceDate, BizDayConventions.Nearest)
+        self.assertEqual(testDate, Date(2014, 2, 7))
+
+        referenceDate = Date(2014, 2, 2)
+        testDate = sseCal.adjustDate(referenceDate, BizDayConventions.Nearest)
+        self.assertEqual(testDate, Date(2014, 1, 30))
+
+        with self.assertRaises(RuntimeError):
+            _ = sseCal.adjustDate(referenceDate, -1)

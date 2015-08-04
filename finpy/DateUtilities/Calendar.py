@@ -226,9 +226,6 @@ class ChinaSseImpl(object):
             return False
         return True
 
-    def isHoliday(self, d):
-        return not self.isBizDay(d)
-
     def isWeekEnd(self, weekDay):
         return weekDay == Weekdays.Saturday or weekDay == Weekdays.Sunday
 

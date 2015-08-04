@@ -3,6 +3,8 @@
 from distutils.core import setup
 from distutils.cmd import Command
 import sys
+import subprocess
+
 
 from finpy import __version__
 
@@ -30,8 +32,9 @@ class test(Command):
         sys.path.insert(0, self.test_dir)
 
     def run(self):
-        module = __import__('testSuite', globals(), locals(), [''])
-        module.test()
+        subprocess.Popen("coverage run finpy/tests/testSuite.py", shell=True)
+        subprocess.Popen("coverage report", shell=True)
+        subprocess.Popen("coverage html", shell=True)
 
 setup(
     name=NAME,

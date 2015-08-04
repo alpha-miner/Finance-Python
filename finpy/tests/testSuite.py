@@ -18,6 +18,7 @@ import PricingEngines
 
 
 def test():
+    print('Python ' + sys.version)
     suite = unittest.TestSuite()
 
     tests = unittest.TestLoader().loadTestsFromTestCase(API.TestDateUtilities)

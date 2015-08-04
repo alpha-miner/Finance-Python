@@ -8,6 +8,8 @@ Created on 2015-7-13
 import unittest
 import datetime as dt
 from finpy.DateUtilities import Date
+from finpy.DateUtilities import Period
+from finpy.Enums import Weekdays
 
 
 class TestDate(unittest.TestCase):
@@ -17,11 +19,16 @@ class TestDate(unittest.TestCase):
         month = 7
         day = 24
         strRepr = "{0}-{1:02d}-{2:02d}".format(year, month, day)
+        innerRepr = "Date({0}, {1}, {2})".format(year, month, day)
 
         testDate = Date(year, month, day)
-        self.assertEqual(str(testDate), strRepr, "date str representation:\n"
-                                                      "expected:   {0:s}\n"
-                                                      "calculated: {1:s}".format(strRepr, str(testDate)))
+        self.assertEqual(str(testDate), strRepr, "date string:\n"
+                                                 "expected:   {0:s}\n"
+                                                 "calculated: {1:s}".format(strRepr, str(testDate)))
+
+        self.assertEqual(repr(testDate), innerRepr, "date representation:\n"
+                                                    "expected:   {0:s}\n"
+                                                    "calculated: {1:s}".format(innerRepr, repr(testDate)))
 
         self.assertEqual(testDate.year(), year, "date year:\n"
                                                 "expected:   {0:d}\n"
@@ -71,10 +78,30 @@ class TestDate(unittest.TestCase):
                                                                           "expected:   {0}\n"
                                                                           "calculated: {1}".format(dt.date.today(), Date.todaysDate()))
 
-        # to add more here ...
+        # nth-week day
+        with self.assertRaises(AssertionError):
+            _ = Date.nthWeekday(0, Weekdays.Friday, 1, 2015)
+
+        with self.assertRaises(AssertionError):
+            _ = Date.nthWeekday(6, Weekdays.Friday, 1, 2015)
+
+        self.assertEqual(Date.nthWeekday(3, Weekdays.Wednesday, 8, 2015), Date(2015, 8, 19))
 
         # check plus/sub
+
+        threeWeeksAfter = testDate + '3W'
+        expectedDate = testDate + 21
+        self.assertEqual(threeWeeksAfter, expectedDate, "date + 3w period\n"
+                                                        "expected:   {0}\n"
+                                                        "calculated: {1}".format(expectedDate, threeWeeksAfter))
+
         threeMonthsBefore = testDate - "3M"
+        expectedDate = Date(year, month - 3, day)
+        self.assertEqual(threeMonthsBefore, expectedDate, "date - 3m period\n"
+                                                          "expected:   {0}\n"
+                                                          "calculated: {1}".format(expectedDate, threeMonthsBefore))
+
+        threeMonthsBefore = testDate - Period("3M")
         expectedDate = Date(year, month - 3, day)
         self.assertEqual(threeMonthsBefore, expectedDate, "date - 3m period\n"
                                                           "expected:   {0}\n"
@@ -97,6 +124,12 @@ class TestDate(unittest.TestCase):
         self.assertEqual(oneYearAndTwoMonthsBefore, expectedDate, "date + 14m period\n"
                                                                   "expected:   {0}\n"
                                                                   "calculated: {1}".format(expectedDate, threeMonthsBefore))
+
+        fiveMonthsAfter = testDate + "5m"
+        expectedDate = Date(year, month + 5, day)
+        self.assertEqual(fiveMonthsAfter, expectedDate, "date + 5m period\n"
+                                                        "expected:   {0}\n"
+                                                        "calculated: {1}".format(expectedDate, fiveMonthsAfter))
 
     def testConsistency(self):
         minDate = Date.minDate().serialNumber + 1

@@ -49,8 +49,6 @@ class Date(object):
         leap = self.isLeap(self.year())
         while d <= self._monthOffset(m, leap):
             m -= 1
-        while d > self._monthOffset(m+1, leap):
-            m += 1
         return m
 
     def weekday(self):
@@ -363,7 +361,7 @@ _MonthLeapLength = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
 
 _MonthOffset = [0,  31,  59,  90, 120, 151,   # Jan - Jun
                 181, 212, 243, 273, 304, 334,   # Jun - Dec
-                365 ]
-_MonthLeapOffset = [ 0,  31,  60,  91, 121, 152,   # Jan - Jun
-                     182, 213, 244, 274, 305, 335,   # Jun - Dec
-                     366]
+                365]
+_MonthLeapOffset = [0,  31,  60,  91, 121, 152,   # Jan - Jun
+                    182, 213, 244, 274, 305, 335,   # Jun - Dec
+                    366]

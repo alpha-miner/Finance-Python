@@ -87,6 +87,7 @@ class Period(object):
 
         return res
 
+    # only work for python 3
     def __truediv__(self, n):
         return self.__div__(n)
 

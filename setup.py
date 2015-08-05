@@ -20,16 +20,17 @@ URL = "www.datayes.com"
 VERSION = __version__
 
 if os.name == "posix":
-  exePath = sys.path
-  for path in exePath:
-      if path.endswith('site-packages'):
-          packagePath = path
-          break
+    exePath = sys.path
+    for path in exePath:
+        if path.endswith('site-packages'):
+            packagePath = path
+            break
 else:
     packagePath = sysconfig.get_python_lib()
 
 files = glob.glob("finpy/tests/Risk/data/*.csv")
 datafiles = [(os.path.join(packagePath, "finpy/tests/Risk/data"), files)]
+
 
 class test(Command):
     description = "test the distribution prior to install"
@@ -60,7 +61,8 @@ setup(
     author_email=AUTHOR_EMAIL,
     license="commercial",
     url=URL,
-    packages=['finpy.API',
+    packages=[
+              'finpy.API',
               'finpy.AlgoTrading',
               'finpy.DateUtilities',
               'finpy.Enums',

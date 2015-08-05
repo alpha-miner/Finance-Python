@@ -37,7 +37,7 @@ pip install -r requirements/python3.txt
 python setpy.py install
 ~~~
 
-安装之前，可以直先接运行测试：
+安装之后，可以直先接运行测试：
 ~~~
 pip install -r requirements/test.txt
 python setup.py test

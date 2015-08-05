@@ -12,9 +12,9 @@ __all__ = ['TestAccumulatorsArithmetic',
            'TestPerformancers',
            'TestTimeseries']
 
-from Risk.testAccumulatorsArithmetic import TestAccumulatorsArithmetic
-from Risk.testStatefulAccumulators import TestStatefulAccumulators
-from Risk.testStatelessAccumulators import TestStatelessAccumulators
-from Risk.testNormalizers import TestNormalizers
-from Risk.testPerformancers import TestPerformancers
-from Risk.testTimeseries import TestTimeseries
+from finpy.tests.Risk.testAccumulatorsArithmetic import TestAccumulatorsArithmetic
+from finpy.tests.Risk.testStatefulAccumulators import TestStatefulAccumulators
+from finpy.tests.Risk.testStatelessAccumulators import TestStatelessAccumulators
+from finpy.tests.Risk.testNormalizers import TestNormalizers
+from finpy.tests.Risk.testPerformancers import TestPerformancers
+from finpy.tests.Risk.testTimeseries import TestTimeseries

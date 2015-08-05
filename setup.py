@@ -2,8 +2,11 @@
 
 from distutils.core import setup
 from distutils.cmd import Command
+from distutils import sysconfig
+import os
 import sys
 import subprocess
+import glob
 
 
 from finpy import __version__
@@ -16,6 +19,17 @@ AUTHOR_EMAIL = "cheng.li@datayes.com"
 URL = "www.datayes.com"
 VERSION = __version__
 
+if os.name == "posix":
+  exePath = sys.path
+  for path in exePath:
+      if path.endswith('site-packages'):
+          packagePath = path
+          break
+else:
+    packagePath = sysconfig.get_python_lib()
+
+files = glob.glob("finpy/tests/Risk/data/*.csv")
+datafiles = [(os.path.join(packagePath, "finpy/tests/Risk/data"), files)]
 
 class test(Command):
     description = "test the distribution prior to install"
@@ -55,8 +69,16 @@ setup(
               'finpy.Math.Distributions',
               'finpy.PricingEngines',
               'finpy.Risk',
-              'finpy.tests'],
-    py_modules=['finpy.__init__'],
+              'finpy.tests',
+              'finpy.tests.API',
+              'finpy.tests.DateUtilities',
+              'finpy.tests.Env',
+              'finpy.tests.Math',
+              'finpy.tests.Risk',
+              'finpy.tests.PricingEngines'
+              ],
+    py_modules=['finpy.__init__', 'finpy.tests.testSuite'],
+    data_files=datafiles,
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Environment :: PC test",

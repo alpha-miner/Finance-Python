@@ -10,7 +10,7 @@ __all__ = ["TestCalendar",
            "TestPeriod",
            "TestSchedule"]
 
-from DateUtilities.testCalendar import TestCalendar
-from DateUtilities.testDate import TestDate
-from DateUtilities.testPeriod import TestPeriod
-from DateUtilities.testSchedule import TestSchedule
+from finpy.tests.DateUtilities.testCalendar import TestCalendar
+from finpy.tests.DateUtilities.testDate import TestDate
+from finpy.tests.DateUtilities.testPeriod import TestPeriod
+from finpy.tests.DateUtilities.testSchedule import TestSchedule

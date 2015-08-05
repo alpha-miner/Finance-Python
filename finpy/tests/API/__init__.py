@@ -7,4 +7,4 @@ Created on 2015-7-13
 
 __all__ = ["TesDateUtilities"]
 
-from API.testDateUtilities import TestDateUtilities
+from finpy.tests.API.testDateUtilities import TestDateUtilities

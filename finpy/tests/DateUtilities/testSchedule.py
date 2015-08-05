@@ -17,7 +17,6 @@ from finpy.Enums import BizDayConventions
 class TestSchedule(unittest.TestCase):
 
     def checkDates(self, s, expected):
-
         if s.size() != len(expected):
             self.fail("expected {0:d} dates, found {1}".format(len(expected), s.size()))
 
@@ -25,8 +24,10 @@ class TestSchedule(unittest.TestCase):
             if s[i] != expected[i]:
                 self.fail("expected {0} at index found {1}".format(expected[i], s[i]))
 
-    def testDailySchedule(self):
+    def testScheduleInitialize(self):
+        pass
 
+    def testDailySchedule(self):
         # Jan 2 and Jan 3 are skipped as New Year holiday
         # Jan 7 is skipped as weekend
         # Jan 8 is adjusted to Jan 9 with following convention

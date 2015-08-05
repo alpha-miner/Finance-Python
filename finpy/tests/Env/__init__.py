@@ -7,4 +7,4 @@ Created on 2015-7-15
 
 __all__ = ["TestSettings"]
 
-from Env.testSettings import TestSettings
+from finpy.tests.Env.testSettings import TestSettings

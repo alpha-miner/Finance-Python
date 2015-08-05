@@ -6,15 +6,13 @@ Created on 2015-7-13
 """
 
 import sys
-sys.path.append("D:/dev/gitcafe/finpy")
-
 import unittest
-import API
-import DateUtilities
-import Env
-import Math
-import Risk
-import PricingEngines
+import finpy.tests.API as API
+import finpy.tests.DateUtilities as DateUtilities
+import finpy.tests.Env as Env
+import finpy.tests.Math as Math
+import finpy.tests.Risk as Risk
+import finpy.tests.PricingEngines as PricingEngines
 
 
 def test():
@@ -54,9 +52,9 @@ def test():
 
     res = unittest.TextTestRunner(verbosity=3).run(suite)
     if len(res.errors) >= 1 or len(res.failures) >= 1:
-        exit(-1)
+        sys.exit(-1)
     else:
-        exit(0)
+        sys.exit(0)
 
 if __name__ == "__main__":
     test()

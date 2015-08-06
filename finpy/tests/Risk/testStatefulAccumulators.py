@@ -287,6 +287,20 @@ class TestStatefulAccumulators(unittest.TestCase):
                                                                  "Var calculated: {2:f}".format(i, expected, calculated))
 
     def testMovingNegativeVariancer(self):
+        # test without enough negative value
+        mv = MovingNegativeVariance(20, pNames='z', isPopulation=True)
+        mv.push(z=20.)
+
+        with self.assertRaises(RuntimeError):
+            _ = mv.result()
+
+        mv = MovingNegativeVariance(20, pNames='z', isPopulation=False)
+        mv.push(z=20.)
+        mv.push(z=-20.)
+
+        with self.assertRaises(RuntimeError):
+            _ = mv.result()
+
         dirName = os.path.dirname(os.path.abspath(__file__))
         filePath = os.path.join(dirName, 'data/negativevariance.csv')
 

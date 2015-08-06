@@ -6,6 +6,7 @@ Created on 2015-7-13
 """
 
 import sys
+sys.path.append('D:\\dev\\gitcafe\\finpy')
 import unittest
 import finpy.tests.API as API
 import finpy.tests.DateUtilities as DateUtilities

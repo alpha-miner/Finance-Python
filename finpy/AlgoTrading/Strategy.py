@@ -10,7 +10,7 @@ from abc import ABCMeta
 from abc import abstractmethod
 import datetime as dt
 from finpy.AlgoTrading.Event import SignalEvent
-from finpy.Risk.IAccumulators import Accumulator
+from finpy.Math.Accumulators.IAccumulators import Accumulator
 
 class Strategy(object):
 

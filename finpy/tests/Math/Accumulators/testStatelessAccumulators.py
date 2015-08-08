@@ -7,11 +7,11 @@ Created on 2015-7-29
 
 import unittest
 import numpy as np
-from finpy.Risk.StatelessAccumulators import Max
-from finpy.Risk.StatelessAccumulators import Minimum
-from finpy.Risk.StatelessAccumulators import Sum
-from finpy.Risk.StatelessAccumulators import Variance
-from finpy.Risk.StatelessAccumulators import Correlation
+from finpy.Math.Accumulators.StatelessAccumulators import Max
+from finpy.Math.Accumulators.StatelessAccumulators import Minimum
+from finpy.Math.Accumulators.StatelessAccumulators import Sum
+from finpy.Math.Accumulators.StatelessAccumulators import Variance
+from finpy.Math.Accumulators.StatelessAccumulators import Correlation
 
 
 class TestStatelessAccumulators(unittest.TestCase):

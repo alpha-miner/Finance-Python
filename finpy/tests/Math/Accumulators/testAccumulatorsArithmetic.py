@@ -10,26 +10,26 @@ import math
 from collections import deque
 import numpy as np
 from scipy.stats import linregress
-from finpy.Risk.IAccumulators import Exp
-from finpy.Risk.IAccumulators import Log
-from finpy.Risk.IAccumulators import Sqrt
-from finpy.Risk.IAccumulators import Abs
-from finpy.Risk.IAccumulators import Pow
-from finpy.Risk.IAccumulators import Acos
-from finpy.Risk.IAccumulators import Acosh
-from finpy.Risk.IAccumulators import Asin
-from finpy.Risk.IAccumulators import Asinh
-from finpy.Risk.IAccumulators import TruncatedValueHolder
-from finpy.Risk.StatefulAccumulators import MovingAverage
-from finpy.Risk.StatefulAccumulators import MovingVariance
-from finpy.Risk.StatefulAccumulators import MovingMax
-from finpy.Risk.StatefulAccumulators import MovingCorrelation
-from finpy.Risk.StatelessAccumulators import Sum
-from finpy.Risk.StatelessAccumulators import Average
-from finpy.Risk.StatelessAccumulators import Minimum
-from finpy.Risk.StatelessAccumulators import Max
-from finpy.Risk.StatelessAccumulators import Correlation
-from finpy.Risk.Performancers import MovingAlphaBeta
+from finpy.Math.Accumulators.IAccumulators import Exp
+from finpy.Math.Accumulators.IAccumulators import Log
+from finpy.Math.Accumulators.IAccumulators import Sqrt
+from finpy.Math.Accumulators.IAccumulators import Abs
+from finpy.Math.Accumulators.IAccumulators import Pow
+from finpy.Math.Accumulators.IAccumulators import Acos
+from finpy.Math.Accumulators.IAccumulators import Acosh
+from finpy.Math.Accumulators.IAccumulators import Asin
+from finpy.Math.Accumulators.IAccumulators import Asinh
+from finpy.Math.Accumulators.IAccumulators import TruncatedValueHolder
+from finpy.Math.Accumulators.StatefulAccumulators import MovingAverage
+from finpy.Math.Accumulators.StatefulAccumulators import MovingVariance
+from finpy.Math.Accumulators.StatefulAccumulators import MovingMax
+from finpy.Math.Accumulators.StatefulAccumulators import MovingCorrelation
+from finpy.Math.Accumulators.StatelessAccumulators import Sum
+from finpy.Math.Accumulators.StatelessAccumulators import Average
+from finpy.Math.Accumulators.StatelessAccumulators import Minimum
+from finpy.Math.Accumulators.StatelessAccumulators import Max
+from finpy.Math.Accumulators.StatelessAccumulators import Correlation
+from finpy.Math.Accumulators.Performancers import MovingAlphaBeta
 
 
 class TestAccumulatorsArithmetic(unittest.TestCase):

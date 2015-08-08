@@ -6,12 +6,12 @@ Created on 2015-7-17
 """
 
 import math
-from finpy.Risk.StatefulAccumulators import StatefulValueHolder
-from finpy.Risk.StatefulAccumulators import MovingMax
-from finpy.Risk.StatefulAccumulators import MovingAverage
-from finpy.Risk.StatefulAccumulators import MovingVariance
-from finpy.Risk.StatefulAccumulators import MovingNegativeVariance
-from finpy.Risk.StatefulAccumulators import MovingCorrelation
+from finpy.Math.Accumulators.StatefulAccumulators import StatefulValueHolder
+from finpy.Math.Accumulators.StatefulAccumulators import MovingMax
+from finpy.Math.Accumulators.StatefulAccumulators import MovingAverage
+from finpy.Math.Accumulators.StatefulAccumulators import MovingVariance
+from finpy.Math.Accumulators.StatefulAccumulators import MovingNegativeVariance
+from finpy.Math.Accumulators.StatefulAccumulators import MovingCorrelation
 
 
 class MovingSharp(StatefulValueHolder):

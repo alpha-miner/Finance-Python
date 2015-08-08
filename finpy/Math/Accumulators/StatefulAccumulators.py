@@ -9,7 +9,7 @@ import math
 import bisect
 import numpy as np
 from copy import deepcopy
-from finpy.Risk.IAccumulators import Accumulator
+from finpy.Math.Accumulators.IAccumulators import Accumulator
 
 
 class StatefulValueHolder(Accumulator):

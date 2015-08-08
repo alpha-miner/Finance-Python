@@ -6,7 +6,7 @@ Created on 2015-7-25
 """
 
 import math
-from finpy.Risk.IAccumulators import Accumulator
+from finpy.Math.Accumulators.IAccumulators import Accumulator
 
 
 class StatelessAccumulator(Accumulator):

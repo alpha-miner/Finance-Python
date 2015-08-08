@@ -12,7 +12,6 @@ import finpy.tests.API as API
 import finpy.tests.DateUtilities as DateUtilities
 import finpy.tests.Env as Env
 import finpy.tests.Math as Math
-import finpy.tests.Risk as Risk
 import finpy.tests.PricingEngines as PricingEngines
 
 
@@ -32,23 +31,23 @@ def test():
     suite.addTests(tests)
     tests = unittest.TestLoader().loadTestsFromTestCase(Env.TestSettings)
     suite.addTests(tests)
-    tests = unittest.TestLoader().loadTestsFromTestCase(Math.TestDistribution)
+    tests = unittest.TestLoader().loadTestsFromTestCase(Math.Distributions.TestDistribution)
     suite.addTests(tests)
     tests = unittest.TestLoader().loadTestsFromTestCase(Math.TestErrorFunction)
     suite.addTests(tests)
     tests = unittest.TestLoader().loadTestsFromTestCase(PricingEngines.TestBlackFormula)
     suite.addTests(tests)
-    tests = unittest.TestLoader().loadTestsFromTestCase(Risk.TestAccumulatorsArithmetic)
+    tests = unittest.TestLoader().loadTestsFromTestCase(Math.Accumulators.TestAccumulatorsArithmetic)
     suite.addTests(tests)
-    tests = unittest.TestLoader().loadTestsFromTestCase(Risk.TestStatefulAccumulators)
+    tests = unittest.TestLoader().loadTestsFromTestCase(Math.Accumulators.TestStatefulAccumulators)
     suite.addTests(tests)
-    tests = unittest.TestLoader().loadTestsFromTestCase(Risk.TestStatelessAccumulators)
+    tests = unittest.TestLoader().loadTestsFromTestCase(Math.Accumulators.TestStatelessAccumulators)
     suite.addTests(tests)
-    tests = unittest.TestLoader().loadTestsFromTestCase(Risk.TestNormalizers)
+    tests = unittest.TestLoader().loadTestsFromTestCase(Math.Timeseries.TestNormalizers)
     suite.addTests(tests)
-    tests = unittest.TestLoader().loadTestsFromTestCase(Risk.TestPerformancers)
+    tests = unittest.TestLoader().loadTestsFromTestCase(Math.Accumulators.TestPerformancers)
     suite.addTests(tests)
-    tests = unittest.TestLoader().loadTestsFromTestCase(Risk.TestTimeseries)
+    tests = unittest.TestLoader().loadTestsFromTestCase(Math.Timeseries.TestTimeseries)
     suite.addTests(tests)
 
     res = unittest.TextTestRunner(verbosity=3).run(suite)

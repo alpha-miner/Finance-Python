@@ -8,12 +8,12 @@ Created on 2015-7-16
 import csv
 import unittest
 import os
-from finpy.Risk.Performancers import MovingSharp
-from finpy.Risk.Performancers import MovingSortino
-from finpy.Risk.Performancers import MovingAlphaBeta
-from finpy.Risk.Performancers import MovingDrawDown
-from finpy.Risk.Performancers import MovingAverageDrawdown
-from finpy.Risk.Performancers import MovingMaxDrawdown
+from finpy.Math.Accumulators.Performancers import MovingSharp
+from finpy.Math.Accumulators.Performancers import MovingSortino
+from finpy.Math.Accumulators.Performancers import MovingAlphaBeta
+from finpy.Math.Accumulators.Performancers import MovingDrawDown
+from finpy.Math.Accumulators.Performancers import MovingAverageDrawdown
+from finpy.Math.Accumulators.Performancers import MovingMaxDrawdown
 
 
 class TestPerformancers(unittest.TestCase):

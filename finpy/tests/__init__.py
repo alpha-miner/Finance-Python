@@ -12,4 +12,4 @@ from finpy.tests import DateUtilities
 from finpy.tests import Env
 from finpy.tests import Math
 from finpy.tests import PricingEngines
-from finpy.tests import Risk
+from finpy.tests import Analysis

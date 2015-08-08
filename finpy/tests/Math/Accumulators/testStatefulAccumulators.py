@@ -10,19 +10,19 @@ import csv
 import os
 import numpy as np
 from collections import deque
-from finpy.Risk import Shift
-from finpy.Risk import MovingMax
-from finpy.Risk import MovingMinimum
-from finpy.Risk import MovingAverage
-from finpy.Risk import MovingPositiveAverage
-from finpy.Risk import MovingNegativeAverage
-from finpy.Risk import MovingSum
-from finpy.Risk import MovingCountedPositive
-from finpy.Risk import MovingCountedNegative
-from finpy.Risk import MovingVariance
-from finpy.Risk import MovingNegativeVariance
-from finpy.Risk import MovingCorrelation
-from finpy.Risk import MovingCorrelationMatrix
+from finpy.Math.Accumulators import Shift
+from finpy.Math.Accumulators import MovingMax
+from finpy.Math.Accumulators import MovingMinimum
+from finpy.Math.Accumulators import MovingAverage
+from finpy.Math.Accumulators import MovingPositiveAverage
+from finpy.Math.Accumulators import MovingNegativeAverage
+from finpy.Math.Accumulators import MovingSum
+from finpy.Math.Accumulators import MovingCountedPositive
+from finpy.Math.Accumulators import MovingCountedNegative
+from finpy.Math.Accumulators import MovingVariance
+from finpy.Math.Accumulators import MovingNegativeVariance
+from finpy.Math.Accumulators import MovingCorrelation
+from finpy.Math.Accumulators import MovingCorrelationMatrix
 
 
 class TestStatefulAccumulators(unittest.TestCase):
@@ -201,7 +201,6 @@ class TestStatefulAccumulators(unittest.TestCase):
                 self.assertAlmostEqual(calculated, expected, 15, "at index {0:d}\n"
                                                                  "Counted positive expected:   {1:f}\n"
                                                                  "Counted positive calculated: {2:f}".format(i, expected, calculated))
-
 
     def testMovingCountedNegative(self):
         window = 120

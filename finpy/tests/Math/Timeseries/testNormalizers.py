@@ -8,7 +8,7 @@ Created on 2015-7-21
 import unittest
 from finpy.DateUtilities.Date import Date
 from finpy.Enums.NormalizingType import NormalizingType
-from finpy.Risk.Normalizers import Normalizer
+from finpy.Math.Timeseries.Normalizers import Normalizer
 from finpy.DateUtilities.Calendar import Calendar
 
 

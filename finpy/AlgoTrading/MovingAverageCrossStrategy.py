@@ -12,7 +12,7 @@ from finpy.AlgoTrading.Backtest import Backtest
 from finpy.AlgoTrading.Data import HistoricalCSVDataHandler
 from finpy.AlgoTrading.Execution import SimulatedExecutionHandler
 from finpy.AlgoTrading.Portfolio import Portfolio
-from finpy.Risk import MovingAverage
+from finpy.Math.Accumulators import MovingAverage
 
 
 class MovingAverageCrossStrategy(Strategy):

@@ -28,8 +28,8 @@ if os.name == "posix":
 else:
     packagePath = sysconfig.get_python_lib()
 
-files = glob.glob("finpy/tests/Risk/data/*.csv")
-datafiles = [(os.path.join(packagePath, "finpy/tests/Risk/data"), files)]
+files = glob.glob("finpy/tests/Math/Accumulators/data/*.csv")
+datafiles = [(os.path.join(packagePath, "finpy/tests/Math/Accumulators/data"), files)]
 
 
 class test(Command):
@@ -68,15 +68,20 @@ setup(
               'finpy.Enums',
               'finpy.Env',
               'finpy.Math',
+              'finpy.Math.Accumulators',
               'finpy.Math.Distributions',
+              'finpy.Math.Timeseries',
               'finpy.PricingEngines',
-              'finpy.Risk',
+              'finpy.Analysis',
               'finpy.tests',
               'finpy.tests.API',
               'finpy.tests.DateUtilities',
               'finpy.tests.Env',
               'finpy.tests.Math',
-              'finpy.tests.Risk',
+              'finpy.tests.Math.Accumulators',
+              'finpy.tests.Math.Distributions',
+              'finpy.tests.Math.Timeseries',
+              'finpy.tests.Analysis',
               'finpy.tests.PricingEngines'
               ],
     py_modules=['finpy.__init__', 'finpy.tests.testSuite'],

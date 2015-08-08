@@ -15,6 +15,6 @@ import finpy.Enums as Enums
 import finpy.Env as Env
 import finpy.Math as Math
 import finpy.PricingEngines as PricingEngines
-import finpy.Risk as Risk
+import finpy.Analysis as Analysis
 import finpy.AlgoTrading as AlgoTrading
 

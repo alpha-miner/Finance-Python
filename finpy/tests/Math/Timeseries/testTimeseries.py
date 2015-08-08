@@ -8,7 +8,7 @@ Created on 2015-7-21
 import unittest
 from finpy.DateUtilities.Date import Date
 from finpy.DateUtilities.Calendar import Calendar
-from finpy.Risk.Timeseries import Timeseries
+from finpy.Math.Timeseries import Timeseries
 
 
 class TestTimeseries(unittest.TestCase):

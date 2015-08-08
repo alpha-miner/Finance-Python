@@ -37,9 +37,15 @@ class Accumulator(object):
     def push(self, **kwargs):
         if not self._isValueHolderContained:
             if isinstance(self._pNames, str):
-                return kwargs[self._pNames]
+                if self._pNames in kwargs:
+                    return kwargs[self._pNames]
+                else:
+                    return None
             elif hasattr(self._pNames, '__iter__'):
-                return tuple(kwargs[p] for p in self._pNames)
+                try:
+                    return tuple(kwargs[p] for p in self._pNames)
+                except KeyError:
+                    return None
         else:
             self._pNames.push(**kwargs)
             return self._pNames.result()

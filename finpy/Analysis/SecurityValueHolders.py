@@ -8,7 +8,7 @@ Created on 2015-8-7
 from abc import ABCMeta
 import copy
 import numpy as np
-
+import pandas as pd
 
 class SecuritiesValues(object):
 

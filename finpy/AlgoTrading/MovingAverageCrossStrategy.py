@@ -27,7 +27,7 @@ class MovingAverageCrossStrategy(Strategy):
         self.events = events
         self.short_sma = MA(shortWindow, 'adj_close', symbolList)
         self.long_sma = MA(longWindow, 'adj_close', symbolList)
-
+        self.fakedTA = MA(longWindow, 'PE', symbolList)
         self.bought = self._calculateInitialBought()
 
     def calculateSignals(self, event):
@@ -37,12 +37,12 @@ class MovingAverageCrossStrategy(Strategy):
             symbol = s
             currDt = self.bars.getLatestBarDatetime(s)
             if short_sma[s] > long_sma[s] and self.bought[s] == 'OUT':
-                print("{0}: BUY {1}".format(currDt, s))
+                #print("{0}: BUY {1}".format(currDt, s))
                 sigDir = 'LONG'
                 self.order(symbol, sigDir)
                 self.bought[s] = 'LONG'
             if short_sma[s] < long_sma[s] and self.bought[s] == "LONG":
-                print("{0}: SELL {1}".format(currDt, s))
+                #print("{0}: SELL {1}".format(currDt, s))
                 sigDir = 'EXIT'
                 self.order(symbol, sigDir)
                 self.bought[s] = 'OUT'

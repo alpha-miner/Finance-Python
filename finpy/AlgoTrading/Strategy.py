@@ -35,8 +35,11 @@ class Strategy(object):
         for s in self.symbolList:
             securityValue = {}
             for name in self._pNames:
-                value = self.bars.getLatestBarValue(s, name)
-                securityValue[name] = value
+                try:
+                    value = self.bars.getLatestBarValue(s, name)
+                    securityValue[name] = value
+                except:
+                    pass
             values[s] = securityValue
 
         for subscriber in self._subscribed:

@@ -77,6 +77,8 @@ class SortedValueHolder(StatefulValueHolder):
 
     def push(self, **kwargs):
         value = super(SortedValueHolder, self).push(**kwargs)
+        if value is None:
+            return
         if self.isFull:
             popout = self._dumpOneValue(kwargs[self._pNames])
             delPos = bisect.bisect_left(self._sortedArray, popout)
@@ -113,6 +115,8 @@ class MovingSum(StatefulValueHolder):
 
     def push(self, **kwargs):
         value = super(MovingSum, self).push(**kwargs)
+        if value is None:
+            return
         popout = self._dumpOneValue(value)
         self._runningSum = self._runningSum - popout + value
 
@@ -128,6 +132,8 @@ class MovingAverage(StatefulValueHolder):
 
     def push(self, **kwargs):
         value = super(MovingAverage, self).push(**kwargs)
+        if value is None:
+            return
         popout = self._dumpOneValue(value)
         self._runningSum = self._runningSum - popout + value
 
@@ -147,6 +153,8 @@ class MovingPositiveAverage(StatefulValueHolder):
 
     def push(self, **kwargs):
         value = super(MovingPositiveAverage, self).push(**kwargs)
+        if value is None:
+            return
         popout = self._dumpOneValue(value)
         if value > 0.0:
             self._runningPositiveCount += 1
@@ -172,6 +180,8 @@ class MovingNegativeAverage(StatefulValueHolder):
 
     def push(self, **kwargs):
         value = super(MovingNegativeAverage, self).push(**kwargs)
+        if value is None:
+            return
         popout = self._dumpOneValue(value)
         if value < 0.0:
             self._runningNegativeCount += 1
@@ -200,6 +210,8 @@ class MovingVariance(StatefulValueHolder):
 
     def push(self, **kwargs):
         value = super(MovingVariance, self).push(**kwargs)
+        if value is None:
+            return
         popout = self._dumpOneValue(value)
         self._runningSum = self._runningSum - popout + value
         self._runningSumSquare = self._runningSumSquare - popout * popout + value * value
@@ -228,6 +240,8 @@ class MovingNegativeVariance(StatefulValueHolder):
 
     def push(self, **kwargs):
         value = super(MovingNegativeVariance, self).push(**kwargs)
+        if value is None:
+            return
         popout = self._dumpOneValue(value)
         if value < 0:
             self._runningNegativeSum += value
@@ -263,6 +277,8 @@ class MovingCountedPositive(StatefulValueHolder):
 
     def push(self, **kwargs):
         value = super(MovingCountedPositive, self).push(**kwargs)
+        if value is None:
+            return
         popout = self._dumpOneValue(value)
 
         if value > 0:
@@ -282,6 +298,8 @@ class MovingCountedNegative(StatefulValueHolder):
 
     def push(self, **kwargs):
         value = super(MovingCountedNegative, self).push(**kwargs)
+        if value is None:
+            return
         popout = self._dumpOneValue(value)
 
         if value < 0:
@@ -306,6 +324,8 @@ class MovingCorrelation(StatefulValueHolder):
 
     def push(self, **kwargs):
         value = super(MovingCorrelation, self).push(**kwargs)
+        if value is None:
+            return
         popout = self._dumpOneValue(value)
         headLeft = popout[0]
         headRight = popout[1]
@@ -349,6 +369,8 @@ class MovingCorrelationMatrix(StatefulValueHolder):
 
     def push(self, **kwargs):
         values = super(MovingCorrelationMatrix, self).push(**kwargs)
+        if values is None:
+            return
         if self._isFirst:
             self._runningSum = np.zeros((1, len(values)))
             self._runningSumCrossSquare = np.zeros((len(values), len(values)))

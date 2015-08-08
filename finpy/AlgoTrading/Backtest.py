@@ -94,5 +94,5 @@ class Backtest(object):
 
     def simulateTrading(self):
         self._runBacktest()
-        self._outputPerformance()
+        #self._outputPerformance()
 

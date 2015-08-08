@@ -71,7 +71,7 @@ class Backtest(object):
                     if event.type == 'MARKET':
                         self.strategy._updateSubscribing()
                         self.strategy.calculateSignals(event)
-                        self.portfolio.updateTimeindex(event)
+                        self.portfolio.updateTimeindex()
                     elif event.type == 'SIGNAL':
                         self.signals += 1
                         self.portfolio.updateSignal(event)

@@ -25,7 +25,7 @@ class Strategy(object):
         self._subscribed = []
         self._pNames = tuple()
         for k, v in self.__dict__.items():
-            if isinstance(v, SecurityValueHolder) or isinstance(v, NamedValueHolder):
+            if isinstance(v, SecurityValueHolder):
                 self._subscribed.append(v)
                 self._pNames = self._pNames + (v.dependency,)
 

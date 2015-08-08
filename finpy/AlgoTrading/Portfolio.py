@@ -46,7 +46,7 @@ class Portfolio(object):
         d['total'] = self.initialCapital
         return d
 
-    def updateTimeindex(self, event):
+    def updateTimeindex(self):
         latestDatetime = self.bars.getLatestBarDatetime(self.symbolList[0])
         dp = deepcopy(self.currentPosition)
         dp['date'] = latestDatetime

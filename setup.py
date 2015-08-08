@@ -73,6 +73,7 @@ setup(
               'finpy.Math.Timeseries',
               'finpy.PricingEngines',
               'finpy.Analysis',
+              'finpy.Analysis.TechnicalAnalysis',
               'finpy.tests',
               'finpy.tests.API',
               'finpy.tests.DateUtilities',

@@ -25,23 +25,24 @@ class MovingAverageCrossStrategy(Strategy):
         self.bars = bars
         self.symbolList = self.bars.symbolList
         self.events = events
-        self.short_sma = MA(shortWindow, 'adj_close')#['AAPL']
-        self.long_sma = MA(longWindow, 'adj_close')#['AAPL']
+        self.short_sma = MA(shortWindow, 'adj_close', symbolList)
+        self.long_sma = MA(longWindow, 'adj_close', symbolList)
+
         self.bought = self._calculateInitialBought()
 
     def calculateSignals(self, event):
+        short_sma = self.short_sma.value
+        long_sma = self.long_sma.value
         for s in self.symbolList:
-            short_sma = self.short_sma.value['AAPL']
-            long_sma = self.long_sma.value['AAPL']
             symbol = s
             currDt = self.bars.getLatestBarDatetime(s)
-            if short_sma > long_sma and self.bought[s] == 'OUT':
-                print("{0}: BUY".format(currDt))
+            if short_sma[s] > long_sma[s] and self.bought[s] == 'OUT':
+                print("{0}: BUY {1}".format(currDt, s))
                 sigDir = 'LONG'
                 self.order(symbol, sigDir)
                 self.bought[s] = 'LONG'
-            if short_sma < long_sma and self.bought[s] == "LONG":
-                print("{0}: SELL".format(currDt))
+            if short_sma[s] < long_sma[s] and self.bought[s] == "LONG":
+                print("{0}: SELL {1}".format(currDt, s))
                 sigDir = 'EXIT'
                 self.order(symbol, sigDir)
                 self.bought[s] = 'OUT'
@@ -55,7 +56,7 @@ class MovingAverageCrossStrategy(Strategy):
 
 if __name__ == "__main__":
     csvDir = "d:/"
-    symbolList = ['AAPL']
+    symbolList = ['AAPL', 'MSFT', 'IBM']
     initialCapital = 100000.0
     heartbeat = 0.0
     startDate = dt.datetime(1990, 1, 1)

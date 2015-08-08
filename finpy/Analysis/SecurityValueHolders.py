@@ -135,47 +135,6 @@ class SecuritiesValues(object):
         return self._values.__str__()
 
 
-class NamedValueHolder(object):
-    def __init__(self, symbol, valueHolder):
-        self._valueHolder = copy.deepcopy(valueHolder)
-        self._symbolList = [symbol]
-
-    def push(self, data):
-        name = set(self._symbolList).intersection(set(data.keys()))
-        if name:
-            self._valueHolder.push(**data[name.pop()])
-
-    @property
-    def value(self):
-        try:
-            return self._valueHolder.value
-        except:
-            return np.nan
-
-    @property
-    def dependency(self):
-        return self._valueHolder._pNames
-
-    @property
-    def window(self):
-        return 1
-
-    def __add__(self, right):
-        return SecurityAddedValueHolder(self, right)
-
-    def __sub__(self, right):
-        return SecuritySubbedValueHolder(self, right)
-
-    def __mul__(self, right):
-        return SecurityMultipliedValueHolder(self, right)
-
-    def __div__(self, right):
-        return SecurityDividedValueHolder(self, right)
-
-    def __truediv__(self, right):
-        return SecurityDividedValueHolder(self, right)
-
-
 class SecurityValueHolder(object):
 
     __metaclass__ = ABCMeta
@@ -183,7 +142,7 @@ class SecurityValueHolder(object):
     def __init__(self, pNames='x', symbolList=None):
         if symbolList is None:
             # should do something to get a global value here
-            self._symbolList = set(['600000.XSHG', 'AAPL', 'GOOG', "Lenovo"])
+            self._symbolList = set(['600000.XSHG', 'AAPL', 'IBM', "MSFT"])
         else:
             self._symbolList = set(symbolList)
         self._pNames = pNames
@@ -259,6 +218,47 @@ class SecurityValueHolder(object):
 
     def __rtruediv__(self, left):
         return SecurityDividedValueHolder(left, self)
+
+
+class NamedValueHolder(SecurityValueHolder):
+    def __init__(self, symbol, valueHolder):
+        self._valueHolder = copy.deepcopy(valueHolder)
+        self._symbolList = [symbol]
+
+    def push(self, data):
+        name = set(self._symbolList).intersection(set(data.keys()))
+        if name:
+            self._valueHolder.push(**data[name.pop()])
+
+    @property
+    def value(self):
+        try:
+            return self._valueHolder.value
+        except:
+            return np.nan
+
+    @property
+    def dependency(self):
+        return self._valueHolder._pNames
+
+    @property
+    def window(self):
+        return 1
+
+    def __add__(self, right):
+        return SecurityAddedValueHolder(self, right)
+
+    def __sub__(self, right):
+        return SecuritySubbedValueHolder(self, right)
+
+    def __mul__(self, right):
+        return SecurityMultipliedValueHolder(self, right)
+
+    def __div__(self, right):
+        return SecurityDividedValueHolder(self, right)
+
+    def __truediv__(self, right):
+        return SecurityDividedValueHolder(self, right)
 
 
 class IdentitySecurityValueHolder(SecurityValueHolder):

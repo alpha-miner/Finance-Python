@@ -10,7 +10,8 @@ from abc import ABCMeta
 from abc import abstractmethod
 import datetime as dt
 from finpy.AlgoTrading.Event import SignalEvent
-from finpy.Math.Accumulators.IAccumulators import Accumulator
+from finpy.Analysis.SecurityValueHolders import SecurityValueHolder
+from finpy.Analysis.SecurityValueHolders import NamedValueHolder
 
 class Strategy(object):
 
@@ -24,21 +25,22 @@ class Strategy(object):
         self._subscribed = []
         self._pNames = tuple()
         for k, v in self.__dict__.items():
-            if isinstance(v, Accumulator):
+            if isinstance(v, SecurityValueHolder) or isinstance(v, NamedValueHolder):
                 self._subscribed.append(v)
-                self._pNames = self._pNames + (v._pNames,)
+                self._pNames = self._pNames + (v.dependency,)
 
     def _updateSubscribing(self):
 
         values = dict()
         for s in self.symbolList:
+            securityValue = {}
             for name in self._pNames:
                 value = self.bars.getLatestBarValue(s, name)
-                values[name] = value
+                securityValue[name] = value
+            values[s] = securityValue
 
         for subscriber in self._subscribed:
-            subscriber.push(**values)
-
+            subscriber.push(values)
 
     def monitoring(self):
         pass

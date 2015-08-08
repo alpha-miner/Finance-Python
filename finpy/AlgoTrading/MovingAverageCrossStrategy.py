@@ -12,7 +12,7 @@ from finpy.AlgoTrading.Backtest import Backtest
 from finpy.AlgoTrading.Data import HistoricalCSVDataHandler
 from finpy.AlgoTrading.Execution import SimulatedExecutionHandler
 from finpy.AlgoTrading.Portfolio import Portfolio
-from finpy.Math.Accumulators import MovingAverage
+from finpy.Analysis.TechnicalAnalysis import SecurityMovingAverage as MA
 
 
 class MovingAverageCrossStrategy(Strategy):
@@ -25,21 +25,14 @@ class MovingAverageCrossStrategy(Strategy):
         self.bars = bars
         self.symbolList = self.bars.symbolList
         self.events = events
-        self.short_sma = MovingAverage(shortWindow, 'adj_close')
-        self.long_sma = MovingAverage(longWindow, 'adj_close')
+        self.short_sma = MA(shortWindow, 'adj_close')#['AAPL']
+        self.long_sma = MA(longWindow, 'adj_close')#['AAPL']
         self.bought = self._calculateInitialBought()
-
-    def _calculateInitialBought(self):
-        self._subscribe()
-        bought = {}
-        for s in self.symbolList:
-            bought[s] = 'OUT'
-        return bought
 
     def calculateSignals(self, event):
         for s in self.symbolList:
-            short_sma = self.short_sma.result()
-            long_sma = self.long_sma.result()
+            short_sma = self.short_sma.value['AAPL']
+            long_sma = self.long_sma.value['AAPL']
             symbol = s
             currDt = self.bars.getLatestBarDatetime(s)
             if short_sma > long_sma and self.bought[s] == 'OUT':
@@ -52,6 +45,13 @@ class MovingAverageCrossStrategy(Strategy):
                 sigDir = 'EXIT'
                 self.order(symbol, sigDir)
                 self.bought[s] = 'OUT'
+
+    def _calculateInitialBought(self):
+        self._subscribe()
+        bought = {}
+        for s in self.symbolList:
+            bought[s] = 'OUT'
+        return bought
 
 if __name__ == "__main__":
     csvDir = "d:/"

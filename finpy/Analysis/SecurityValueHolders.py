@@ -8,7 +8,13 @@ Created on 2015-8-7
 from abc import ABCMeta
 import copy
 import numpy as np
-import pandas as pd
+from finpy.Math.Accumulators.StatefulAccumulators import Shift
+from finpy.Math.Accumulators.IAccumulators import CompoundedValueHolder
+from finpy.Math.Accumulators.IAccumulators import Identity
+from finpy.Math.Accumulators.IAccumulators import AddedValueHolder
+from finpy.Math.Accumulators.IAccumulators import MinusedValueHolder
+from finpy.Math.Accumulators.IAccumulators import MultipliedValueHolder
+from finpy.Math.Accumulators.IAccumulators import DividedValueHolder
 
 class SecuritiesValues(object):
 
@@ -145,7 +151,12 @@ class SecurityValueHolder(object):
             self._symbolList = set(['600000.XSHG', 'AAPL', 'IBM', "MSFT"])
         else:
             self._symbolList = set(symbolList)
-        self._pNames = pNames
+        if isinstance(pNames, SecurityValueHolder):
+            self._pNames = pNames._pNames
+        else:
+            self._pNames = pNames
+        self._window = 1
+        self._returnSize = 1
 
     @property
     def symbolList(self):
@@ -153,11 +164,17 @@ class SecurityValueHolder(object):
 
     @property
     def dependency(self):
-        return self._pNames
+        return {
+            symbol: self._pNames for symbol in self._symbolList
+        }
+
+    @property
+    def valueSize(self):
+        return self._returnSize
 
     @property
     def window(self):
-        return 1
+        return self._window
 
     def push(self, data):
         names = self._symbolList.intersection(set(data.keys()))
@@ -222,28 +239,39 @@ class SecurityValueHolder(object):
 
 class NamedValueHolder(SecurityValueHolder):
     def __init__(self, symbol, valueHolder):
-        self._valueHolder = copy.deepcopy(valueHolder)
         self._symbolList = [symbol]
+        self._window = valueHolder._window
+        self._returnSize = 1
+        self._pNames = valueHolder._pNames
+        self._innerHolders = {
+            symbol: copy.deepcopy(valueHolder)
+        }
 
     def push(self, data):
         name = set(self._symbolList).intersection(set(data.keys()))
         if name:
-            self._valueHolder.push(**data[name.pop()])
+            self._innerHolders[self._symbolList[0]].push(**data[name.pop()])
 
     @property
     def value(self):
         try:
-            return self._valueHolder.value
+            return {
+                self._symbolList[0]: self._innerHolders[self._symbolList[0]].value
+            }
         except:
-            return np.nan
+            return {
+                self._symbolList[0]: np.nan
+            }
 
     @property
     def dependency(self):
-        return self._valueHolder._pNames
+        return {
+            self._symbolList[0]: self._pNames
+        }
 
     @property
     def window(self):
-        return 1
+        return self._window
 
     def __add__(self, right):
         return SecurityAddedValueHolder(self, right)
@@ -263,86 +291,177 @@ class NamedValueHolder(SecurityValueHolder):
 
 class IdentitySecurityValueHolder(SecurityValueHolder):
 
-    def __init__(self, value):
+    def __init__(self, value, n=1):
         self._value = value
         self._symbolList = []
+        self._window = 1
+        self._returnSize = n
+        self._pNames = []
+        self._innerHolders = {
+            'blank': Identity(value, n)
+        }
 
     def push(self, data):
-        pass
+        if len(self._pNames) != 0:
+            self._innerHolders['blank'].push(**data)
 
     @property
     def value(self):
-        return self._value
+        return self._innerHolders['blank'].value
 
 
 class SecurityCombinedValueHolder(SecurityValueHolder):
 
-    def __init__(self, left, right):
-        if isinstance(left, SecurityValueHolder) or isinstance(left, NamedValueHolder):
+    def __init__(self, left, right, HolderType):
+        if isinstance(left, SecurityValueHolder):
             self._left = copy.deepcopy(left)
-            self._right = copy.deepcopy(right)
-            if isinstance(right, NamedValueHolder) or isinstance(right, SecurityValueHolder):
+            if isinstance(right, SecurityValueHolder):
+                self._right = copy.deepcopy(right)
                 self._symbolList = set(self._left._symbolList).union(set(right._symbolList))
             else:
+                self._right = IdentitySecurityValueHolder(right)
                 self._symbolList = set(self._left._symbolList)
         else:
             self._left = IdentitySecurityValueHolder(left)
             self._right = copy.deepcopy(right)
-            if isinstance(right, NamedValueHolder) or isinstance(right, SecurityValueHolder):
+            if isinstance(right, SecurityValueHolder):
                 self._symbolList = set(self._left._symbolList).union(set(right._symbolList))
             else:
                 self._symbolList = set(self._left._symbolList)
 
-    def push(self, data):
-        self._left.push(data)
-        if isinstance(self._right, NamedValueHolder) or isinstance(self._right, SecurityValueHolder):
-            self._right.push(data)
+        self._window = max(self._left.window, self._right.window)
+        self._pNames = list(set(self._left._pNames).union(set(self._right._pNames)))
+        self._returnSize = self._left.valueSize
 
-    @property
-    def left(self):
-        return self._left.value
-
-    @property
-    def right(self):
-        if isinstance(self._right, NamedValueHolder) or isinstance(self._right, SecurityValueHolder):
-            return self._right.value
+        if len(self._right.symbolList) == 0:
+            self._innerHolders = {
+                name: HolderType(self._left._innerHolders[name], self._right._innerHolders['blank']) for name in self._left.symbolList
+            }
+        elif len(self._left.symbolList) == 0:
+            self._innerHolders = {
+                name: HolderType(self._left._innerHolders['blank'], self._right._innerHolders[name]) for name in self._right.symbolList
+            }
         else:
-            return self._right
+            self._innerHolders = {
+                name: HolderType(self._left._innerHolders[name], self._right._innerHolders[name]) for name in self._left.symbolList
+            }
 
-
-class SecurityAddedValueHolder(SecurityCombinedValueHolder):
-    def __init__(self, left, right):
-        super(SecurityAddedValueHolder, self).__init__(left, right)
+    @property
+    def dependency(self):
+        left = self._left.dependency
+        right = self._right.dependency
+        return _merge2dict(left, right)
 
     @property
     def value(self):
-        return self.left + self.right
+        res = {}
+        for name in self._innerHolders:
+            try:
+                res[name] = self._innerHolders[name].value
+            except:
+                res[name] = np.nan
+        return SecuritiesValues(res)
+
+
+class SecurityAddedValueHolder(SecurityCombinedValueHolder):
+
+    def __init__(self, left, right):
+        super(SecurityAddedValueHolder, self).__init__(left, right, AddedValueHolder)
 
 
 class SecuritySubbedValueHolder(SecurityCombinedValueHolder):
 
     def __init__(self, left, right):
-        super(SecuritySubbedValueHolder, self).__init__(left, right)
-
-    @property
-    def value(self):
-        return self.left - self.right
+        super(SecuritySubbedValueHolder, self).__init__(left, right, MinusedValueHolder)
 
 
 class SecurityMultipliedValueHolder(SecurityCombinedValueHolder):
-    def __init__(self, left, right):
-        super(SecurityMultipliedValueHolder, self).__init__(left, right)
 
-    @property
-    def value(self):
-        return self.left * self.right
+    def __init__(self, left, right):
+        super(SecurityMultipliedValueHolder, self).__init__(left, right, MultipliedValueHolder)
 
 
 class SecurityDividedValueHolder(SecurityCombinedValueHolder):
+
     def __init__(self, left, right):
-        super(SecurityDividedValueHolder, self).__init__(left, right)
+        super(SecurityDividedValueHolder, self).__init__(left, right, DividedValueHolder)
+
+
+def SecurityShiftedValueHolder(secValueHolder, n):
+    assert n >= 1, "shift value should always not be less than 1"
+    res = copy.deepcopy(secValueHolder)
+    res._window = secValueHolder.window + n
+    if isinstance(secValueHolder, NamedValueHolder):
+        res._valueHolder = Shift(secValueHolder._valueHolder, n)
+    else:
+        res._innerHolders = {
+            name: Shift(secValueHolder._innerHolders[name], n) for name in secValueHolder._innerHolders
+        }
+    return res
+
+
+class SecurityCompoundedValueHolder(SecurityValueHolder):
+
+    def __init__(self, left, right):
+        self._returnSize =right.valueSize
+        self._symbolList = left.symbolList
+        self._window = left.window + right.window - 1
+        self._pNames = left._pNames
+        if hasattr(right._pNames, '__iter__'):
+            assert left.valueSize == len(right._pNames)
+        else:
+            assert left.valueSize == 1
+
+        self._right = copy.deepcopy(right._innerHolders[right._innerHolders.keys()[0]])
+        if isinstance(left, NamedValueHolder):
+            self._isNamed = True
+            self._left = copy.deepcopy(left._innerHolders[left.symbolList[0]])
+            self._innerHolders = {
+                self._symbolList[0]: CompoundedValueHolder(self._left, self._right)
+            }
+        else:
+            self._isNamed = False
+            self._left = copy.deepcopy(left._innerHolders[left._innerHolders.keys()[0]])
+            self._innerHolders = {
+                name: CompoundedValueHolder(self._left, self._right) for name in self._symbolList
+            }
+
+    def push(self, data):
+        names = set(self._symbolList).intersection(set(data.keys()))
+        for name in names:
+            self._innerHolders[name].push(**data[name])
 
     @property
     def value(self):
-        return self.left / self.right
+        res = {}
+        for name in self._innerHolders:
+            try:
+                res[name] = self._innerHolders[name].value
+            except:
+                res[name] = np.nan
+        return SecuritiesValues(res)
 
+# detail implementation
+
+
+def _merge2dict(left, right):
+    res = {}
+    for name in left:
+        if name in right:
+            if isinstance(left[name], list):
+                if isinstance(right[name], list):
+                    res[name] = left[name] + right[name]
+                else:
+                    res[name] = left[name] + [right[name]]
+            else:
+                if isinstance(right[name], list):
+                    res[name] = [left[name]] + right[name]
+                else:
+                    res[name] = [left[name]] + [right[name]]
+        else:
+            res[name] = left[name]
+
+    for name in right:
+        if name not in left:
+            res[name] = right[name]
+    return res

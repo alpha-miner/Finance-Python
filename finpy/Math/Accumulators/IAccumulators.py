@@ -193,6 +193,7 @@ class ListedValueHolder(Accumulator):
         self._returnSize = left._returnSize + right._returnSize
         self._left = deepcopy(left)
         self._right = deepcopy(right)
+        self._pNames = list(set(left._pNames).union(set(right._pNames)))
         self._dependency = max(self._left._dependency, self._right._dependency)
 
     def push(self, **kwargs):
@@ -247,7 +248,9 @@ class CombinedValueHolder(Accumulator):
         self._returnSize = left._returnSize
         self._left = deepcopy(left)
         self._right = deepcopy(right)
+        self._pNames = list(set(left._pNames).union(set(right._pNames)))
         self._dependency = max(self._left._dependency, self._right._dependency)
+        self._window = self._dependency + 1
 
     def push(self, **kwargs):
         self._left.push(**kwargs)
@@ -365,9 +368,13 @@ class Identity(Accumulator):
             assert value._returnSize == 1, "Identity can only be applied to single return value holder"
             self._dependency = value._dependency
             self._isValueHolder = True
+            self._window = self._dependency + 1
+            self._pNames = value._pNames
         else:
             self._dependency = 0
             self._isValueHolder = False
+            self._window = 1
+            self._pNames = []
         self._value = value
         self._returnSize = n
 
@@ -393,6 +400,7 @@ class CompoundedValueHolder(Accumulator):
         self._left = deepcopy(left)
         self._right = deepcopy(right)
         self._dependency = self._left._dependency + self._right._dependency
+        self._pNames = deepcopy(left._pNames)
 
         if hasattr(self._right._pNames, '__iter__'):
             assert left._returnSize == len(self._right._pNames)
@@ -421,6 +429,8 @@ class BasicFunction(Accumulator):
         self._func = func
         self._args = args
         self._kwargs = kwargs
+        self._window = self._dependency + 1
+        self._pNames = deepcopy(valueHolder._pNames)
 
     def push(self, **kwargs):
         self._valueHolder.push(**kwargs)
@@ -453,6 +463,8 @@ class Pow(Accumulator):
         self._valueHolder = deepcopy(valueHolder)
         self._dependency = valueHolder._dependency
         self._n = n
+        self._window = self._dependency + 1
+        self._pNames = deepcopy(valueHolder._pNames)
 
     def push(self, **kwargs):
         self._valueHolder.push(**kwargs)

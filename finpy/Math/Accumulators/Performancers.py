@@ -14,6 +14,25 @@ from finpy.Math.Accumulators.StatefulAccumulators import MovingNegativeVariance
 from finpy.Math.Accumulators.StatefulAccumulators import MovingCorrelation
 
 
+class MovingLogReturn(StatefulValueHolder):
+    def __init__(self, window=1, pNames='price'):
+        super(MovingSharp, self).__init__(window, pNames)
+
+    def push(self, **kwargs):
+        value = super(MovingSharp, self).push(**kwargs)
+        if value is None:
+            return
+        popout = self._dumpOneValue(value)
+        if popout != 0.0:
+            self._runningReturn = math.log(value/popout)
+
+    def result(self):
+        if self._var.size >= 2:
+            return self._runningReturn
+        else:
+            raise RuntimeError("Container has less than 2 samples")
+
+
 class MovingSharp(StatefulValueHolder):
 
     def __init__(self, window, pNames=('ret', 'riskFree')):
@@ -48,6 +67,8 @@ class MovingSortino(StatefulValueHolder):
 
     def push(self, **kwargs):
         value = super(MovingSortino, self).push(**kwargs)
+        if value is None:
+            return
         ret = value[0]
         benchmark = value[1]
         self._mean.push(x=ret - benchmark)
@@ -73,6 +94,8 @@ class MovingAlphaBeta(StatefulValueHolder):
 
     def push(self, **kwargs):
         value = super(MovingAlphaBeta, self).push(**kwargs)
+        if value is None:
+            return
         pReturn = value[0]
         mReturn = value[1]
         rf = value[2]
@@ -111,6 +134,8 @@ class MovingDrawDown(StatefulValueHolder):
         :return:
         '''
         value = super(MovingDrawDown, self).push(**kwargs)
+        if value is None:
+            return
         self._runningIndex += 1
         self._runningCum += value
         self._maxer.push(x=self._runningCum)
@@ -136,6 +161,8 @@ class MovingAverageDrawdown(StatefulValueHolder):
 
     def push(self, **kwargs):
         value = super(MovingAverageDrawdown, self).push(**kwargs)
+        if value is None:
+            return
         self._drawdownCalculator.push(x=value)
         drawdown, duration, _ = self._drawdownCalculator.result()
         self._drawdownMean.push(x=drawdown)
@@ -154,6 +181,8 @@ class MovingMaxDrawdown(StatefulValueHolder):
 
     def push(self, **kwargs):
         value = super(MovingMaxDrawdown, self).push(**kwargs)
+        if value is None:
+            return
         self._drawdownCalculator.push(x=value)
         drawdown, duration, _ = self._drawdownCalculator.result()
         self._dumpOneValue((drawdown, duration))

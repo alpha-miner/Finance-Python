@@ -11,7 +11,7 @@ from abc import abstractmethod
 import datetime as dt
 from finpy.AlgoTrading.Event import SignalEvent
 from finpy.Analysis.SecurityValueHolders import SecurityValueHolder
-from finpy.Analysis.SecurityValueHolders import NamedValueHolder
+
 
 class Strategy(object):
 
@@ -32,14 +32,17 @@ class Strategy(object):
     def _updateSubscribing(self):
 
         values = dict()
-        for s in self.symbolList:
+        self.count += 1
+        for s in self._pNames[0]:
             securityValue = {}
-            for name in self._pNames:
-                try:
-                    value = self.bars.getLatestBarValue(s, name)
-                    securityValue[name] = value
-                except:
-                    pass
+            if self.count % 2:
+                securityValue['PE'] = float(self.count)
+            fields = self._pNames[0][s]
+            try:
+                value = self.bars.getLatestBarValue(s, fields)
+                securityValue[fields] = value
+            except:
+                 pass
             values[s] = securityValue
 
         for subscriber in self._subscribed:

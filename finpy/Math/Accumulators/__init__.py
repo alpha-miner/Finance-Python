@@ -34,6 +34,7 @@ __all__ = ["Exp",
            "MovingMax",
            "MovingMinimum",
            "MovingVariance",
+           "MovingLogReturn",
            "MovingAlphaBeta",
            "MovingDrawDown",
            "MovingAverageDrawdown",
@@ -74,6 +75,7 @@ from finpy.Math.Accumulators.StatefulAccumulators import MovingCorrelationMatrix
 from finpy.Math.Accumulators.StatefulAccumulators import MovingMax
 from finpy.Math.Accumulators.StatefulAccumulators import MovingMinimum
 
+from finpy.Math.Accumulators.Performancers import MovingLogReturn
 from finpy.Math.Accumulators.Performancers import MovingAlphaBeta
 from finpy.Math.Accumulators.Performancers import MovingDrawDown
 from finpy.Math.Accumulators.Performancers import MovingAverageDrawdown

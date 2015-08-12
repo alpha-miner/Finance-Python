@@ -6,9 +6,15 @@ Created on 2015-7-13
 """
 
 import sys
-sys.path.append('D:\\dev\\gitcafe\\finpy')
+import os
+
+thisFilePath = os.path.abspath(__file__)
+
+sys.path.append(os.path.sep.join(thisFilePath.split(os.path.sep)[:-3]))
+
 import unittest
 import finpy.tests.API as API
+import finpy.tests.Analysis as Analysis
 import finpy.tests.DateUtilities as DateUtilities
 import finpy.tests.Env as Env
 import finpy.tests.Math as Math
@@ -20,6 +26,8 @@ def test():
     suite = unittest.TestSuite()
 
     tests = unittest.TestLoader().loadTestsFromTestCase(API.TestDateUtilities)
+    suite.addTests(tests)
+    tests = unittest.TestLoader().loadTestsFromTestCase(Analysis.TestTechnicalAnalysis)
     suite.addTests(tests)
     tests = unittest.TestLoader().loadTestsFromTestCase(DateUtilities.TestCalendar)
     suite.addTests(tests)

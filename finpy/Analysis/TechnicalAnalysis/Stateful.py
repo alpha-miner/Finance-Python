@@ -5,6 +5,7 @@ Created on 2015-8-8
 @author: cheng.li
 """
 
+import copy
 from finpy.Analysis.SecurityValueHolders import SecurityValueHolder
 from finpy.Math.Accumulators.StatefulAccumulators import MovingAverage
 from finpy.Math.Accumulators.StatefulAccumulators import MovingMax
@@ -23,15 +24,17 @@ class SecuritySingleValueHolder(SecurityValueHolder):
 
         if isinstance(pNames, SecurityValueHolder):
             self._symbolList = pNames.symbolList
+            self._window = window + pNames.window - 1
+            self._pNames = pNames._pNames
             self._innerHolders = \
                 {
-                    name: HolderType(self._window, pNames._innerHolders[name]) for name in self._symbolList
+                    name: HolderType(window, copy.deepcopy(pNames._innerHolders[name])) for name in self._symbolList
                 }
 
         else:
             self._innerHolders = \
                 {
-                    name: HolderType(self._window, self._pNames) for name in self._symbolList
+                    name: HolderType(window, self._pNames) for name in self._symbolList
                 }
 
 
@@ -76,10 +79,3 @@ class SecurityMovingLogReturn(SecuritySingleValueHolder):
     def __init__(self, window, pNames='x', symbolList=None):
         super(SecurityMovingLogReturn, self).__init__(window, MovingLogReturn, pNames,  symbolList)
 
-
-if __name__ == "__main__":
-    s1 = SecurityMovingMax(10, 'close', ['AAPL', 'IBM'])
-    s2 = SecurityMovingMinimum(20, 'open', ['IBM', 'AAPL'])
-    s3 = SecurityMovingMinimum(20, 'PE', ['IBM', 'AAPL'])
-    s3 = 3 + s1['AAPL'] * s3['AAPL'] + 4
-    print(s3.dependency)

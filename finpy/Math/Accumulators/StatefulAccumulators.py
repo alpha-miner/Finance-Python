@@ -11,6 +11,11 @@ import numpy as np
 from copy import deepcopy
 from finpy.Math.Accumulators.IAccumulators import Accumulator
 
+def _checkParameterList(pNames):
+    if not isinstance(pNames, Accumulator) and len(pNames) > 1 and not isinstance(pNames, str):
+        raise RuntimeError("This value holder (e.g. Max or Minimum) can't hold more than 2 parameter names ({0})"
+                           " provided".format(pNames))
+
 
 class StatefulValueHolder(Accumulator):
 
@@ -73,6 +78,7 @@ class SortedValueHolder(StatefulValueHolder):
 
     def __init__(self, window, pNames='x'):
         super(SortedValueHolder, self).__init__(window, pNames)
+        _checkParameterList(pNames)
         self._sortedArray = []
 
     def push(self, **kwargs):
@@ -80,12 +86,12 @@ class SortedValueHolder(StatefulValueHolder):
         if value is None:
             return
         if self.isFull:
-            popout = self._dumpOneValue(kwargs[self._pNames])
+            popout = self._dumpOneValue(value)
             delPos = bisect.bisect_left(self._sortedArray, popout)
             del self._sortedArray[delPos]
             bisect.insort_left(self._sortedArray, value)
         else:
-            _ = self._dumpOneValue(kwargs[self._pNames])
+            _ = self._dumpOneValue(value)
             bisect.insort_left(self._sortedArray, value)
 
 
@@ -111,6 +117,7 @@ class MovingSum(StatefulValueHolder):
 
     def __init__(self, window, pNames='x'):
         super(MovingSum, self).__init__(window, pNames)
+        _checkParameterList(pNames)
         self._runningSum = 0.0
 
     def push(self, **kwargs):
@@ -128,6 +135,7 @@ class MovingAverage(StatefulValueHolder):
 
     def __init__(self, window, pNames='x'):
         super(MovingAverage, self).__init__(window, pNames)
+        _checkParameterList(pNames)
         self._runningSum = 0.0
 
     def push(self, **kwargs):
@@ -148,6 +156,7 @@ class MovingPositiveAverage(StatefulValueHolder):
 
     def __init__(self, window, pNames='x'):
         super(MovingPositiveAverage, self).__init__(window, pNames)
+        _checkParameterList(pNames)
         self._runningPositiveSum = 0.0
         self._runningPositiveCount = 0
 
@@ -175,6 +184,7 @@ class MovingNegativeAverage(StatefulValueHolder):
 
     def __init__(self, window, pNames='x'):
         super(MovingNegativeAverage, self).__init__(window, pNames)
+        _checkParameterList(pNames)
         self._runningNegativeSum = 0.0
         self._runningNegativeCount = 0
 
@@ -202,6 +212,7 @@ class MovingVariance(StatefulValueHolder):
 
     def __init__(self, window, pNames='x', isPopulation=False):
         super(MovingVariance, self).__init__(window, pNames)
+        _checkParameterList(pNames)
         self._runningSum = 0.0
         self._runningSumSquare = 0.0
         self._isPop = isPopulation
@@ -233,6 +244,7 @@ class MovingNegativeVariance(StatefulValueHolder):
 
     def __init__(self, window, pNames='x', isPopulation=False):
         super(MovingNegativeVariance, self).__init__(window, pNames)
+        _checkParameterList(pNames)
         self._runningNegativeSum = 0.0
         self._runningNegativeSumSquare = 0.0
         self._runningNegativeCount = 0
@@ -273,6 +285,7 @@ class MovingCountedPositive(StatefulValueHolder):
 
     def __init__(self, window, pNames='x'):
         super(MovingCountedPositive, self).__init__(window, pNames)
+        _checkParameterList(pNames)
         self._counts = 0
 
     def push(self, **kwargs):
@@ -294,6 +307,7 @@ class MovingCountedNegative(StatefulValueHolder):
 
     def __init__(self, window, pNames='x'):
         super(MovingCountedNegative, self).__init__(window, pNames)
+        _checkParameterList(pNames)
         self._counts = 0
 
     def push(self, **kwargs):

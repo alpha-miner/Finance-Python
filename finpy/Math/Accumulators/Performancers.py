@@ -12,14 +12,16 @@ from finpy.Math.Accumulators.StatefulAccumulators import MovingAverage
 from finpy.Math.Accumulators.StatefulAccumulators import MovingVariance
 from finpy.Math.Accumulators.StatefulAccumulators import MovingNegativeVariance
 from finpy.Math.Accumulators.StatefulAccumulators import MovingCorrelation
+from finpy.Math.Accumulators.StatefulAccumulators import _checkParameterList
 
 
 class MovingLogReturn(StatefulValueHolder):
     def __init__(self, window=1, pNames='price'):
-        super(MovingSharp, self).__init__(window, pNames)
+        super(MovingLogReturn, self).__init__(window, pNames)
+        _checkParameterList(pNames)
 
     def push(self, **kwargs):
-        value = super(MovingSharp, self).push(**kwargs)
+        value = super(MovingLogReturn, self).push(**kwargs)
         if value is None:
             return
         popout = self._dumpOneValue(value)
@@ -27,7 +29,7 @@ class MovingLogReturn(StatefulValueHolder):
             self._runningReturn = math.log(value/popout)
 
     def result(self):
-        if self._var.size >= 2:
+        if self.size >= 2:
             return self._runningReturn
         else:
             raise RuntimeError("Container has less than 2 samples")

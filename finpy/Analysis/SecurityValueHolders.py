@@ -16,6 +16,7 @@ from finpy.Math.Accumulators.IAccumulators import MinusedValueHolder
 from finpy.Math.Accumulators.IAccumulators import MultipliedValueHolder
 from finpy.Math.Accumulators.IAccumulators import DividedValueHolder
 
+
 class SecuritiesValues(object):
 
     def __init__(self, values):
@@ -28,6 +29,9 @@ class SecuritiesValues(object):
         return SecuritiesValues({
             name: -self._values[name] for name in self._values
         })
+
+    def __iter__(self):
+        return self._values.__iter__()
 
     def __add__(self, right):
         if isinstance(right, SecuritiesValues):

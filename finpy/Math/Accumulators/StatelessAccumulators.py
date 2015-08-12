@@ -7,6 +7,7 @@ Created on 2015-7-25
 
 import math
 from finpy.Math.Accumulators.IAccumulators import Accumulator
+from finpy.Math.Accumulators.StatefulAccumulators import _checkParameterList
 
 
 class StatelessAccumulator(Accumulator):
@@ -21,6 +22,7 @@ class StatelessAccumulator(Accumulator):
 class Max(StatelessAccumulator):
     def __init__(self, pNames='x'):
         super(Max, self).__init__(pNames)
+        _checkParameterList(pNames)
         self._currentMax = None
         self._returnSize = 1
 
@@ -41,6 +43,7 @@ class Max(StatelessAccumulator):
 class Minimum(StatelessAccumulator):
     def __init__(self, pNames='x'):
         super(Minimum, self).__init__(pNames)
+        _checkParameterList(pNames)
         self._currentMin = None
         self._returnSize = 1
 
@@ -61,6 +64,7 @@ class Minimum(StatelessAccumulator):
 class Sum(StatelessAccumulator):
     def __init__(self, pNames='x'):
         super(Sum, self).__init__(pNames)
+        _checkParameterList(pNames)
         self._currentSum = 0.0
         self._returnSize = 1
 
@@ -77,6 +81,7 @@ class Sum(StatelessAccumulator):
 class Average(StatelessAccumulator):
     def __init__(self, pNames='x'):
         super(Average, self).__init__(pNames)
+        _checkParameterList(pNames)
         self._currentSum = 0.0
         self._currentCount = 0
         self._returnSize = 1
@@ -93,6 +98,7 @@ class Average(StatelessAccumulator):
 class Variance(StatelessAccumulator):
     def __init__(self, pNames='x', isPopulation=False):
         super(Variance, self).__init__(pNames)
+        _checkParameterList(pNames)
         self._currentSum = 0.0
         self._currentSumSquare = 0.0
         self._currentCount = 0

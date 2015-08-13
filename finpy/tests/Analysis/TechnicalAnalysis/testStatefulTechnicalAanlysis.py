@@ -31,15 +31,15 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
         ibmClose = np.random.randn(1000)
         ibmOpen = np.random.randn(1000)
         self.ibm = {'close': ibmClose, 'open': ibmOpen}
-        self.dataSet = {'AAPL': self.aapl, 'IBM': self.ibm}
+        self.dataSet = {'aapl': self.aapl, 'ibm': self.ibm}
 
     def testSecurityMovingAverage(self):
         window = 10
-        ma1 = SecurityMovingAverage(window, ['close'], ['AAPL', 'IBM'])
+        ma1 = SecurityMovingAverage(window, ['close'], ['aapl', 'ibm'])
 
         for i in range(len(self.aapl['close'])):
-            data = {'AAPL': {'close': self.aapl['close'][i], 'open': self.aapl['open'][i]}}
-            data['IBM'] = {'close': self.ibm['close'][i], 'open': self.ibm['open'][i]}
+            data = {'aapl': {'close': self.aapl['close'][i], 'open': self.aapl['open'][i]}}
+            data['ibm'] = {'close': self.ibm['close'][i], 'open': self.ibm['open'][i]}
             ma1.push(data)
             if i < 10:
                 start = 0
@@ -55,15 +55,15 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
                                                                  'calculated: {2:.12f}'.format(i, expected, calculated))
 
         with self.assertRaises(RuntimeError):
-            _ = SecurityMovingAverage(window, ['close', 'open'], ['AAPL', 'IBM'])
+            _ = SecurityMovingAverage(window, ['close', 'open'], ['aapl', 'ibm'])
 
     def testSecurityMovingMax(self):
         window = 10
-        ma1 = SecurityMovingMax(window, ['close'], ['AAPL', 'IBM'])
+        ma1 = SecurityMovingMax(window, ['close'], ['aapl', 'ibm'])
 
         for i in range(len(self.aapl['close'])):
-            data = {'AAPL': {'close': self.aapl['close'][i], 'open': self.aapl['open'][i]}}
-            data['IBM'] = {'close': self.ibm['close'][i], 'open': self.ibm['open'][i]}
+            data = {'aapl': {'close': self.aapl['close'][i], 'open': self.aapl['open'][i]}}
+            data['ibm'] = {'close': self.ibm['close'][i], 'open': self.ibm['open'][i]}
             ma1.push(data)
             if i < 10:
                 start = 0
@@ -79,15 +79,15 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
                                                                  'calculated: {2:.12f}'.format(i, expected, calculated))
 
         with self.assertRaises(RuntimeError):
-            _ = SecurityMovingMax(window, ['close', 'open'], ['AAPL', 'IBM'])
+            _ = SecurityMovingMax(window, ['close', 'open'], ['aapl', 'ibm'])
 
     def testSecurityMovingMinimum(self):
         window = 10
-        ma1 = SecurityMovingMinimum(window, ['close'], ['AAPL', 'IBM'])
+        ma1 = SecurityMovingMinimum(window, ['close'], ['aapl', 'ibm'])
 
         for i in range(len(self.aapl['close'])):
-            data = {'AAPL': {'close': self.aapl['close'][i], 'open': self.aapl['open'][i]}}
-            data['IBM'] = {'close': self.ibm['close'][i], 'open': self.ibm['open'][i]}
+            data = {'aapl': {'close': self.aapl['close'][i], 'open': self.aapl['open'][i]}}
+            data['ibm'] = {'close': self.ibm['close'][i], 'open': self.ibm['open'][i]}
             ma1.push(data)
             if i < 10:
                 start = 0
@@ -103,15 +103,15 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
                                                                  'calculated: {2:.12f}'.format(i, expected, calculated))
 
         with self.assertRaises(RuntimeError):
-            _ = SecurityMovingMinimum(window, ['close', 'open'], ['AAPL', 'IBM'])
+            _ = SecurityMovingMinimum(window, ['close', 'open'], ['aapl', 'ibm'])
 
     def testSecurityMovingSum(self):
         window = 10
-        ma1 = SecurityMovingSum(window, ['close'], ['AAPL', 'IBM'])
+        ma1 = SecurityMovingSum(window, ['close'], ['aapl', 'ibm'])
 
         for i in range(len(self.aapl['close'])):
-            data = {'AAPL': {'close': self.aapl['close'][i], 'open': self.aapl['open'][i]}}
-            data['IBM'] = {'close': self.ibm['close'][i], 'open': self.ibm['open'][i]}
+            data = {'aapl': {'close': self.aapl['close'][i], 'open': self.aapl['open'][i]}}
+            data['ibm'] = {'close': self.ibm['close'][i], 'open': self.ibm['open'][i]}
             ma1.push(data)
             if i < 10:
                 start = 0
@@ -128,11 +128,11 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
 
     def testSecurityMovingCountedPositive(self):
         window = 10
-        ma1 = SecurityMovingCountedPositive(window, ['close'], ['AAPL', 'IBM'])
+        ma1 = SecurityMovingCountedPositive(window, ['close'], ['aapl', 'ibm'])
 
         for i in range(len(self.aapl['close'])):
-            data = {'AAPL': {'close': self.aapl['close'][i], 'open': self.aapl['open'][i]}}
-            data['IBM'] = {'close': self.ibm['close'][i], 'open': self.ibm['open'][i]}
+            data = {'aapl': {'close': self.aapl['close'][i], 'open': self.aapl['open'][i]}}
+            data['ibm'] = {'close': self.ibm['close'][i], 'open': self.ibm['open'][i]}
             ma1.push(data)
             if i < 10:
                 start = 0
@@ -148,15 +148,15 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
                                                                  'calculated: {2:.12f}'.format(i, expected, calculated))
 
         with self.assertRaises(RuntimeError):
-            _ = SecurityMovingCountedPositive(window, ['close', 'open'], ['AAPL', 'IBM'])
+            _ = SecurityMovingCountedPositive(window, ['close', 'open'], ['aapl', 'ibm'])
 
     def testSecurityMovingPositiveAverage(self):
         window = 10
-        ma1 = SecurityMovingPositiveAverage(window, ['close'], ['AAPL', 'IBM'])
+        ma1 = SecurityMovingPositiveAverage(window, ['close'], ['aapl', 'ibm'])
 
         for i in range(len(self.aapl['close'])):
-            data = {'AAPL': {'close': self.aapl['close'][i], 'open': self.aapl['open'][i]}}
-            data['IBM'] = {'close': self.ibm['close'][i], 'open': self.ibm['open'][i]}
+            data = {'aapl': {'close': self.aapl['close'][i], 'open': self.aapl['open'][i]}}
+            data['ibm'] = {'close': self.ibm['close'][i], 'open': self.ibm['open'][i]}
             ma1.push(data)
             if i < 10:
                 start = 0
@@ -176,20 +176,20 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
                                                                  'calculated: {2:.12f}'.format(i, expected, calculated))
 
         with self.assertRaises(RuntimeError):
-            _ = SecurityMovingPositiveAverage(window, ['close', 'open'], ['AAPL', 'IBM'])
+            _ = SecurityMovingPositiveAverage(window, ['close', 'open'], ['aapl', 'ibm'])
 
     def testSecurityMovingLogReturn(self):
         window = 10
-        ma1 = SecurityMovingLogReturn(window, ['close'], ['AAPL', 'IBM'])
+        ma1 = SecurityMovingLogReturn(window, ['close'], ['aapl', 'ibm'])
         self.newDataSet = copy.deepcopy(self.dataSet)
-        self.newDataSet['AAPL']['close'] = np.exp(self.newDataSet['AAPL']['close'])
-        self.newDataSet['AAPL']['open'] = np.exp(self.newDataSet['AAPL']['open'])
-        self.newDataSet['IBM']['close'] = np.exp(self.newDataSet['IBM']['close'])
-        self.newDataSet['IBM']['open'] = np.exp(self.newDataSet['IBM']['open'])
+        self.newDataSet['aapl']['close'] = np.exp(self.newDataSet['aapl']['close'])
+        self.newDataSet['aapl']['open'] = np.exp(self.newDataSet['aapl']['open'])
+        self.newDataSet['ibm']['close'] = np.exp(self.newDataSet['ibm']['close'])
+        self.newDataSet['ibm']['open'] = np.exp(self.newDataSet['ibm']['open'])
 
         for i in range(len(self.aapl['close'])):
-            data = {'AAPL': {'close': self.newDataSet['AAPL']['close'][i], 'open': self.newDataSet['AAPL']['open'][i]}}
-            data['IBM'] = {'close': self.newDataSet['IBM']['close'][i], 'open': self.newDataSet['IBM']['open'][i]}
+            data = {'aapl': {'close': self.newDataSet['aapl']['close'][i], 'open': self.newDataSet['aapl']['open'][i]}}
+            data['ibm'] = {'close': self.newDataSet['ibm']['close'][i], 'open': self.newDataSet['ibm']['open'][i]}
             ma1.push(data)
             if i < 10:
                 start = 0
@@ -207,17 +207,17 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
                                                                      'calculated: {2:.12f}'.format(i, expected, calculated))
 
         with self.assertRaises(RuntimeError):
-            _ = SecurityMovingLogReturn(window, ['close', 'open'], ['AAPL', 'IBM'])
+            _ = SecurityMovingLogReturn(window, ['close', 'open'], ['aapl', 'ibm'])
 
     def testSecurityMovingHistoricalWindow(self):
         window = 5
-        mh = SecurityMovingHistoricalWindow(window, 'close', ['AAPL', 'IBM'])
+        mh = SecurityMovingHistoricalWindow(window, 'close', ['aapl', 'ibm'])
 
-        benchmark = {'AAPL': deque(maxlen=window),
-                     'IBM': deque(maxlen=window)}
+        benchmark = {'aapl': deque(maxlen=window),
+                     'ibm': deque(maxlen=window)}
         for i in range(len(self.aapl['close'])):
-            data = {'AAPL': {'close': self.aapl['close'][i]},
-                    'IBM': {'close': self.ibm['close'][i]}}
+            data = {'aapl': {'close': self.aapl['close'][i]},
+                    'ibm': {'close': self.ibm['close'][i]}}
 
             mh.push(data)
             for name in benchmark:
@@ -243,10 +243,9 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
                                                                                                                  benchmark[name][-1],
                                                                                                                  container[name][k]))
 
-
     def testValueHolderCompounding(self):
         window = 10
-        ma1 = SecurityMovingAverage(window, 'close', ['AAPL'])
+        ma1 = SecurityMovingAverage(window, 'close', ['aapl'])
         compounded1 = SecurityMovingMax(2, ma1)
         compounded2 = SecurityMovingAverage(2, ma1)
 
@@ -254,15 +253,15 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
 
         container = [np.nan, np.nan]
         for i in range(len(self.aapl['close'])):
-            data = {'AAPL': {'close': self.aapl['close'][i], 'open': self.aapl['open'][i]}}
+            data = {'aapl': {'close': self.aapl['close'][i], 'open': self.aapl['open'][i]}}
             ma1.push(data)
             compounded1.push(data)
             compounded2.push(data)
 
-            container[i % 2] = ma1.value['AAPL']
+            container[i % 2] = ma1.value['aapl']
 
             if i >= 1:
-                self.assertAlmostEqual(max(container), compounded1.value['AAPL'], 12)
-                self.assertAlmostEqual(np.mean((container)), compounded2.value['AAPL'], 12)
+                self.assertAlmostEqual(max(container), compounded1.value['aapl'], 12)
+                self.assertAlmostEqual(np.mean((container)), compounded2.value['aapl'], 12)
 
 

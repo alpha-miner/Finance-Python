@@ -7,6 +7,7 @@ Created on 2015-7-9
 
 __all__ = ['BizDayConventions',
            'DateGeneration',
+           'Factors',
            'Months',
            'NormalizingType',
            'OptionType',
@@ -15,6 +16,7 @@ __all__ = ['BizDayConventions',
 
 from finpy.Enums.BizDayConventions import BizDayConventions
 from finpy.Enums.DateGeneration import DateGeneration
+from finpy.Enums.Factors import Factors
 from finpy.Enums.Months import Months
 from finpy.Enums.NormalizingType import NormalizingType
 from finpy.Enums.OptionType import OptionType

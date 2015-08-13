@@ -7,6 +7,7 @@ Created on 2015-7-9
 
 from enum import IntEnum
 
+
 class Months(IntEnum):
     January = 1
     February = 2

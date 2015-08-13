@@ -246,16 +246,16 @@ class IdentitySecurityValueHolder(SecurityValueHolder):
         self._returnSize = n
         self._pNames = []
         self._innerHolders = {
-            'blank': Identity(value, n)
+            'wildCard': Identity(value, n)
         }
 
     def push(self, data):
         if len(self._pNames) != 0:
-            self._innerHolders['blank'].push(**data)
+            self._innerHolders['wildCard'].push(**data)
 
     @property
     def value(self):
-        return self._innerHolders['blank'].value
+        return self._innerHolders['wildCard'].value
 
 
 class SecurityCombinedValueHolder(SecurityValueHolder):

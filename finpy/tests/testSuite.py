@@ -27,7 +27,9 @@ def test():
 
     tests = unittest.TestLoader().loadTestsFromTestCase(API.TestDateUtilities)
     suite.addTests(tests)
-    tests = unittest.TestLoader().loadTestsFromTestCase(Analysis.TestTechnicalAnalysis)
+    tests = unittest.TestLoader().loadTestsFromTestCase(Analysis.TestSecurityValueHolders)
+    suite.addTests(tests)
+    tests = unittest.TestLoader().loadTestsFromTestCase(Analysis.TechnicalAnalysis.TestStatefulTechnicalAnalysis)
     suite.addTests(tests)
     tests = unittest.TestLoader().loadTestsFromTestCase(DateUtilities.TestCalendar)
     suite.addTests(tests)

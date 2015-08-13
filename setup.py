@@ -61,8 +61,7 @@ setup(
     author_email=AUTHOR_EMAIL,
     license="commercial",
     url=URL,
-    packages=[
-              'finpy.API',
+    packages=['finpy.API',
               'finpy.AlgoTrading',
               'finpy.DateUtilities',
               'finpy.Enums',
@@ -83,8 +82,8 @@ setup(
               'finpy.tests.Math.Distributions',
               'finpy.tests.Math.Timeseries',
               'finpy.tests.Analysis',
-              'finpy.tests.PricingEngines'
-              ],
+              'finpy.tests.Analysis.TechnicalAnalysis',
+              'finpy.tests.PricingEngines'],
     py_modules=['finpy.__init__', 'finpy.tests.testSuite'],
     data_files=datafiles,
     classifiers=[

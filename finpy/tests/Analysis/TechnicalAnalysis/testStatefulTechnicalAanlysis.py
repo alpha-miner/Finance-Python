@@ -18,7 +18,7 @@ from finpy.Analysis.TechnicalAnalysis import SecurityMovingPositiveAverage
 from finpy.Analysis.TechnicalAnalysis import SecurityMovingLogReturn
 
 
-class TestTechnicalAnalysis(unittest.TestCase):
+class TestStatefulTechnicalAnalysis(unittest.TestCase):
 
     def setUp(self):
         # preparing market data

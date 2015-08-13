@@ -194,7 +194,6 @@ class SecurityValueHolder(object):
                 }
             return res
         elif item in self._innerHolders:
-            #return NamedValueHolder(item, self._innerHolders[item])
             res = copy.deepcopy(self)
             res._symbolList = set([item])
             assert len(res._symbolList) == len([item]), "security name can't be duplicated"

@@ -343,17 +343,18 @@ class MovingHistoricalWindow(StatefulValueHolder):
 
     def __getitem__(self, item):
         length = self.size
+        if item >= length:
+            raise ValueError("index {0} is out of the bound of the historical current length {1}".format(item, length))
         if self._start:
             recentPoint = self._start - 1
         else:
             recentPoint = self._start + length - 1
 
         offsetPoint = (recentPoint - item + length) % length
-        assert offsetPoint >= 0, "{0} is out of the bound of the historical current lenght {1}".format(item, length)
         return self._con[offsetPoint]
 
     def result(self):
-        return self._con
+        return [self.__getitem__(i) for i in range(self.size)]
 
 
 # Calculator for one pair of series

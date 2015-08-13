@@ -9,6 +9,7 @@ import unittest
 import math
 import numpy as np
 import copy
+from collections import deque
 from finpy.Analysis.TechnicalAnalysis import SecurityMovingAverage
 from finpy.Analysis.TechnicalAnalysis import SecurityMovingMax
 from finpy.Analysis.TechnicalAnalysis import SecurityMovingMinimum
@@ -16,6 +17,7 @@ from finpy.Analysis.TechnicalAnalysis import SecurityMovingSum
 from finpy.Analysis.TechnicalAnalysis import SecurityMovingCountedPositive
 from finpy.Analysis.TechnicalAnalysis import SecurityMovingPositiveAverage
 from finpy.Analysis.TechnicalAnalysis import SecurityMovingLogReturn
+from finpy.Analysis.TechnicalAnalysis import SecurityMovingHistoricalWindow
 
 
 class TestStatefulTechnicalAnalysis(unittest.TestCase):
@@ -206,6 +208,41 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
 
         with self.assertRaises(RuntimeError):
             _ = SecurityMovingLogReturn(window, ['close', 'open'], ['AAPL', 'IBM'])
+
+    def testSecurityMovingHistoricalWindow(self):
+        window = 5
+        mh = SecurityMovingHistoricalWindow(window, 'close', ['AAPL', 'IBM'])
+
+        benchmark = {'AAPL': deque(maxlen=window),
+                     'IBM': deque(maxlen=window)}
+        for i in range(len(self.aapl['close'])):
+            data = {'AAPL': {'close': self.aapl['close'][i]},
+                    'IBM': {'close': self.ibm['close'][i]}}
+
+            mh.push(data)
+            for name in benchmark:
+                benchmark[name].append(data[name]['close'])
+
+            if i >= 1:
+                # check by get item methon
+                container = mh.value
+                for k in range(min(i+1, window)):
+                    calculated = mh[k]
+                    for name in calculated:
+                        self.assertAlmostEqual(calculated[name], benchmark[name][-1-k], "at index {0} positon {1} and symbol {2}\n"
+                                                                                        "expected:   {3}\n"
+                                                                                        "calculated: {4}".format(i, k, name,
+                                                                                                                 benchmark[name][-1],
+                                                                                                                 calculated[name]))
+                # check by value method
+                for k in range(min(i+1, window)):
+                    for name in calculated:
+                        self.assertAlmostEqual(container[name][k], benchmark[name][-1-k], "at index {0} positon {1} and symbol {2}\n"
+                                                                                        "expected:   {3}\n"
+                                                                                        "calculated: {4}".format(i, k, name,
+                                                                                                                 benchmark[name][-1],
+                                                                                                                 container[name][k]))
+
 
     def testValueHolderCompounding(self):
         window = 10

@@ -20,7 +20,7 @@ from finpy.Math.Accumulators.IAccumulators import DividedValueHolder
 class SecuritiesValues(object):
 
     def __init__(self, values):
-        self._values = values
+        self._values = copy.deepcopy(values)
 
     def __getitem__(self, item):
         return self._values[item]
@@ -32,6 +32,9 @@ class SecuritiesValues(object):
 
     def __iter__(self):
         return self._values.__iter__()
+
+    def __len__(self):
+        return self._values.__len__()
 
     def __add__(self, right):
         if isinstance(right, SecuritiesValues):
@@ -69,20 +72,11 @@ class SecuritiesValues(object):
             )
 
     def __rsub__(self, left):
-        if isinstance(left, SecuritiesValues):
-            assert self._values.keys() == left._values.keys(), "left security names {0} is not equal to right {1}" \
-                                                                .format(left._values.keys(), self._values.keys())
-            return SecuritiesValues(
-                {
-                    name: left._values[name] - self._values[name] for name in self._values
-                }
-            )
-        else:
-            return SecuritiesValues(
-                {
-                    name: left - self._values[name] for name in self._values
-                }
-            )
+        return SecuritiesValues(
+            {
+                name: left - self._values[name] for name in self._values
+            }
+        )
 
     def __mul__(self, right):
         if isinstance(right, SecuritiesValues):
@@ -120,20 +114,11 @@ class SecuritiesValues(object):
             )
 
     def __rdiv__(self, left):
-        if isinstance(left, SecuritiesValues):
-            assert self._values.keys() == left._values.keys(), "left security names {0} is not equal to right {1}" \
-                                                               .format(left._values.keys(), self._values.keys())
-            return SecuritiesValues(
-                {
-                    name: left._values[name] / self._values[name] for name in self._values
-                }
-            )
-        else:
-            return SecuritiesValues(
-                {
-                    name: left / self._values[name] for name in self._values
-                }
-            )
+        return SecuritiesValues(
+            {
+                name: left / self._values[name] for name in self._values
+            }
+        )
 
     def __truediv__(self, right):
         return self.__div__(right)
@@ -158,13 +143,16 @@ class SecurityValueHolder(object):
         if isinstance(pNames, SecurityValueHolder):
             self._pNames = pNames._pNames
         else:
-            self._pNames = pNames
+            if hasattr(pNames, '__iter__') and len(pNames) == 1:
+                self._pNames = pNames[0]
+            else:
+                self._pNames = pNames
         self._window = 1
         self._returnSize = 1
 
     @property
     def symbolList(self):
-        return self._symbolList
+        return list(self._symbolList)
 
     @property
     def dependency(self):
@@ -181,7 +169,7 @@ class SecurityValueHolder(object):
         return self._window
 
     def push(self, data):
-        names = self._symbolList.intersection(set(data.keys()))
+        names = set(self._symbolList).intersection(set(data.keys()))
         for name in names:
             self._innerHolders[name].push(**data[name])
 

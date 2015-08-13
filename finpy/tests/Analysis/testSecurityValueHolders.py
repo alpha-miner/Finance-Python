@@ -6,8 +6,10 @@ Created on 2015-8-12
 """
 
 import unittest
+from finpy.Enums import Factors
 from finpy.Analysis.SecurityValueHolders import SecurityValueHolder
 from finpy.Analysis.SecurityValueHolders import SecuritiesValues
+from finpy.Analysis.SecurityValueHolders import dependencyCalculator
 from finpy.Analysis.TechnicalAnalysis import SecurityMovingAverage
 from finpy.Analysis.TechnicalAnalysis import SecurityMovingMax
 
@@ -90,7 +92,7 @@ class TestSecurityValueHolders(unittest.TestCase):
     def testBasicFunctions(self):
         window = 10
         pNames = ['close']
-        symbolList = ['AAPL', 'IBM']
+        symbolList = ['aapl', 'ibm']
         testValueHolder = SecurityMovingAverage(window, pNames, symbolList)
         dependency = {
             name: pNames[0] for name in symbolList
@@ -129,7 +131,21 @@ class TestSecurityValueHolders(unittest.TestCase):
         self.assertEqual(test4.valueSize, 1)
         self.assertEqual(test4.window, window + 2 * window2 - 2)
 
-    def testNamedValueHolder(self):
+    def testDependencyCalculation(self):
+        h1 = SecurityMovingMax(5, 'close', ['AAPL', 'IBM'])
+        h2 = SecurityMovingAverage(6, 'open', ['GOOG'])
+        h3 = SecurityMovingAverage(4, h1)
+        h4 = SecurityMovingAverage(3, 'pe', ['AAPL', 'IBM', 'GOOG'])
+        h5 = SecurityMovingAverage(3, Factors.PE, ['QQQ'])
+
+        expected = {'close': ['aapl', 'ibm'],
+                    'pe': ['goog', 'aapl', 'ibm', 'qqq'],
+                    'open': ['goog']}
+        calculated = dict(dependencyCalculator(h1, h2, h3, h4, h5))
+        for name in expected:
+            self.assertEqual(set(expected[name]), set(calculated[name]))
+
+    def testItemizedValueHolder(self):
         window = 10
         pNames = 'close'
         symbolList = ['AAPL', 'IBM', 'GOOG']
@@ -137,19 +153,23 @@ class TestSecurityValueHolders(unittest.TestCase):
 
         # single named value holder
         test1 = test['IBM']
-        self.assertEqual(set(test1.symbolList), set(['IBM']))
-        self.assertEqual(test1.dependency, {'IBM': pNames})
+        self.assertEqual(set(test1.symbolList), set(['ibm']))
+        self.assertEqual(test1.dependency, {'ibm': pNames})
         self.assertEqual(test1.valueSize, 1)
         self.assertEqual(test1.window, window)
 
         # multi-valued named value holder
         test2 = test['IBM', 'GOOG']
         dependency = {
-            name: pNames for name in ['IBM', 'GOOG']
+            name: pNames for name in ['ibm', 'goog']
         }
         self.assertTrue(isinstance(test2, SecurityValueHolder))
-        self.assertEqual(set(test2.symbolList), set(['IBM', 'GOOG']))
+        self.assertEqual(set(test2.symbolList), set(['ibm', 'goog']))
         self.assertEqual(test2.dependency, dependency)
         self.assertEqual(test2.valueSize, 1)
         self.assertEqual(test2.window, window)
+
+    def testAddedSecurityValueHolders(self):
+        pass
+
 

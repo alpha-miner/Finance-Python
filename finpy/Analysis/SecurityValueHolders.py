@@ -7,6 +7,7 @@ Created on 2015-8-7
 
 from abc import ABCMeta
 import copy
+from collections import defaultdict
 import numpy as np
 from finpy.Math.Accumulators.StatefulAccumulators import Shift
 from finpy.Math.Accumulators.IAccumulators import CompoundedValueHolder
@@ -137,16 +138,18 @@ class SecurityValueHolder(object):
     def __init__(self, pNames='x', symbolList=None):
         if symbolList is None:
             # should do something to get a global value here
-            self._symbolList = set(['600000.XSHG', 'AAPL', 'IBM', "MSFT"])
+            self._symbolList = set(['600000.xshg', 'aapl', 'ibm', "msft"])
         else:
-            self._symbolList = set(symbolList)
+            self._symbolList = set(s.lower() for s in symbolList)
         if isinstance(pNames, SecurityValueHolder):
             self._pNames = pNames._pNames
         else:
             if hasattr(pNames, '__iter__') and len(pNames) == 1:
-                self._pNames = pNames[0]
+                self._pNames = pNames[0].lower()
+            elif hasattr(pNames, '__iter__') and len(pNames) >= 1:
+                self._pNames = [name.lower() for name in pNames]
             else:
-                self._pNames = pNames
+                self._pNames = pNames.lower()
         self._window = 1
         self._returnSize = 1
 
@@ -186,14 +189,15 @@ class SecurityValueHolder(object):
     def __getitem__(self, item):
         if isinstance(item, tuple):
             res = copy.deepcopy(self)
-            res._symbolList = set(item)
+            res._symbolList = set(i.lower() for i in item)
             assert len(res._symbolList) == len(item), "security name can't be duplicated"
             res._innerHolders = \
                 {
                     name: self._innerHolders[name] for name in res._symbolList
                 }
             return res
-        elif item in self._innerHolders:
+        elif item.lower() in self._innerHolders:
+            item = item.lower()
             res = copy.deepcopy(self)
             res._symbolList = set([item])
             assert len(res._symbolList) == len([item]), "security name can't be duplicated"
@@ -378,6 +382,21 @@ class SecurityCompoundedValueHolder(SecurityValueHolder):
                 res[name] = np.nan
         return SecuritiesValues(res)
 
+
+def dependencyCalculator(*args):
+    res = defaultdict(list)
+    tmp = {}
+    for value in args:
+        tmp = _merge2dict(tmp, value.dependency)
+
+    for name in tmp:
+        if isinstance(tmp[name], list):
+            for field in tmp[name]:
+                res[field].append(name)
+        else:
+            res[tmp[name]].append(name)
+    return res
+
 # detail implementation
 
 
@@ -387,14 +406,14 @@ def _merge2dict(left, right):
         if name in right:
             if isinstance(left[name], list):
                 if isinstance(right[name], list):
-                    res[name] = left[name] + right[name]
+                    res[name] = list(set(left[name] + right[name]))
                 else:
-                    res[name] = left[name] + [right[name]]
+                    res[name] = list(set(left[name] + [right[name]]))
             else:
                 if isinstance(right[name], list):
-                    res[name] = [left[name]] + right[name]
+                    res[name] = list(set([left[name]] + right[name]))
                 else:
-                    res[name] = [left[name]] + [right[name]]
+                    res[name] = list(set([left[name]] + [right[name]]))
         else:
             res[name] = left[name]
 

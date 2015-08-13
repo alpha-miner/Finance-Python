@@ -6,9 +6,11 @@ Created on 2015-8-8
 """
 
 __all__ = ['SecurityShiftedValueHolder',
-           'SecurityCompoundedValueHolder'
+           'SecurityCompoundedValueHolder',
+           'dependencyCalculator',
            'TechnicalAnalysis']
 
 from finpy.Analysis.SecurityValueHolders import SecurityShiftedValueHolder
 from finpy.Analysis.SecurityValueHolders import SecurityCompoundedValueHolder
+from finpy.Analysis.SecurityValueHolders import dependencyCalculator
 from finpy.Analysis import TechnicalAnalysis

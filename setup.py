@@ -41,7 +41,7 @@ class test(Command):
         ]
 
     def initialize_options(self):
-        self.test_dir = 'tests'
+        pass
 
     def finalize_options(self):
         sys.path.insert(0, self.test_dir)

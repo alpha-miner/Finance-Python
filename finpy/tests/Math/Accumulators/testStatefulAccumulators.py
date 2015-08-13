@@ -21,11 +21,15 @@ from finpy.Math.Accumulators import MovingCountedPositive
 from finpy.Math.Accumulators import MovingCountedNegative
 from finpy.Math.Accumulators import MovingVariance
 from finpy.Math.Accumulators import MovingNegativeVariance
+from finpy.Math.Accumulators import MovingHistoricalWindow
 from finpy.Math.Accumulators import MovingCorrelation
 from finpy.Math.Accumulators import MovingCorrelationMatrix
 
 
 class TestStatefulAccumulators(unittest.TestCase):
+
+    def setUp(self):
+        self.sample = np.random.randn(10000)
 
     def testShiftValueHolder(self):
         ma = MovingAverage(10, 'close')
@@ -323,6 +327,36 @@ class TestStatefulAccumulators(unittest.TestCase):
                     self.assertAlmostEqual(calculated, expected, 7, "at index {0:d}\n"
                                                                     "Negative variance expected:   {1:f}\n"
                                                                     "Negative variance calculated: {2:f}".format(i, expected, calculated))
+
+    def testMovingHistoricalWindow(self):
+        # test simple historical value holder
+        window = 5
+        mh = MovingHistoricalWindow(window, "x")
+        benchmarkContainer = deque(maxlen=window)
+        for i, data in enumerate(self.sample):
+            mh.push(x=data)
+            benchmarkContainer.append(data)
+
+            for k in range(mh.size):
+                expected = benchmarkContainer[mh.size - 1 - k]
+                calculated = mh[k]
+                self.assertAlmostEqual(expected, calculated)
+
+        # test compounded historical value holder
+        ma = MovingSum(window, 'x')
+        mh = MovingHistoricalWindow(window, ma)
+        benchmarkContainer = deque(maxlen=window)
+        for i, data in enumerate(self.sample):
+            ma.push(x=data)
+            mh.push(x=data)
+            benchmarkContainer.append(ma.value)
+
+            for k in range(mh.size):
+                expected = benchmarkContainer[mh.size - 1 - k]
+                calculated = mh[k]
+                self.assertAlmostEqual(expected, calculated, 12, "at index {0} and positon {1}\n"
+                                                                 "expected:   {2}\n"
+                                                                 "calculated: {3}".format(i, k, expected, calculated))
 
     def testMovingCorrelation(self):
         dirName = os.path.dirname(os.path.abspath(__file__))

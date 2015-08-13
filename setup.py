@@ -44,7 +44,7 @@ class test(Command):
         pass
 
     def finalize_options(self):
-        sys.path.insert(0, self.test_dir)
+        pass
 
     def run(self):
         if sys.platform == 'win32':

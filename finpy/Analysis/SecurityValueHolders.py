@@ -144,9 +144,9 @@ class SecurityValueHolder(object):
         if isinstance(pNames, SecurityValueHolder):
             self._pNames = pNames._pNames
         else:
-            if hasattr(pNames, '__iter__') and len(pNames) == 1:
+            if not isinstance(pNames, str) and len(pNames) == 1:
                 self._pNames = pNames[0].lower()
-            elif hasattr(pNames, '__iter__') and len(pNames) >= 1:
+            elif not isinstance(pNames, str) and len(pNames) >= 1:
                 self._pNames = [name.lower() for name in pNames]
             else:
                 self._pNames = pNames.lower()
@@ -355,7 +355,7 @@ class SecurityCompoundedValueHolder(SecurityValueHolder):
         self._symbolList = left.symbolList
         self._window = left.window + right.window - 1
         self._pNames = left._pNames
-        if hasattr(right._pNames, '__iter__'):
+        if not isinstance(right._pNames, str):
             assert left.valueSize == len(right._pNames)
         else:
             assert left.valueSize == 1

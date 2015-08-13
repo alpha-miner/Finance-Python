@@ -113,7 +113,8 @@ class TestSecurityValueHolders(unittest.TestCase):
         }
 
         self.assertEqual(set(binaryValueHolder.symbolList), set(symbolList))
-        self.assertEqual(binaryValueHolder.dependency, dependency2)
+        for name in dependency2:
+            self.assertEqual(set(binaryValueHolder.dependency[name]), set(dependency2[name]))
         self.assertEqual(binaryValueHolder.valueSize, 1)
         self.assertEqual(binaryValueHolder.window, max(window, window2))
 

@@ -32,7 +32,7 @@ class Accumulator(object):
             raise RuntimeError("parameters' name list should not be empty")
         else:
             assert isinstance(pNames, str) or isinstance(pNames, Accumulator), '{0} in pNames should be a plain string or an value holder. But it is {1}'.format(pNames, type(pNames))
-            self._pNames = pNames
+            self._pNames = deepcopy(pNames)
 
     def push(self, **kwargs):
         if not self._isValueHolderContained:

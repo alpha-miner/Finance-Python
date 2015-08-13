@@ -21,6 +21,9 @@ class StatefulValueHolder(Accumulator):
 
     def __init__(self, window, pNames):
         super(StatefulValueHolder, self).__init__(pNames)
+        if not isinstance(window, int):
+            raise ValueError("window parameter should be a positive int however {0} received"
+                             .format(window))
         assert window > 0, "window length should be greater than 0"
         self._returnSize = 1
         self._window = window

@@ -337,6 +337,10 @@ class TestStatefulAccumulators(unittest.TestCase):
             mh.push(x=data)
             benchmarkContainer.append(data)
 
+            if i == 0:
+                with self.assertRaises(ValueError):
+                    _ = mh[1]
+
             for k in range(mh.size):
                 expected = benchmarkContainer[mh.size - 1 - k]
                 calculated = mh[k]
@@ -350,6 +354,10 @@ class TestStatefulAccumulators(unittest.TestCase):
             ma.push(x=data)
             mh.push(x=data)
             benchmarkContainer.append(ma.value)
+
+            if i == 0:
+                with self.assertRaises(ValueError):
+                    _ = mh[1]
 
             for k in range(mh.size):
                 expected = benchmarkContainer[mh.size - 1 - k]

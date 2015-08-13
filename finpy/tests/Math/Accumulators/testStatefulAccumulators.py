@@ -354,7 +354,7 @@ class TestStatefulAccumulators(unittest.TestCase):
             for k in range(mh.size):
                 expected = benchmarkContainer[mh.size - 1 - k]
                 calculated = mh[k]
-                self.assertAlmostEqual(expected, calculated, 12, "at index {0} and positon {1}\n"
+                self.assertAlmostEqual(expected, calculated, 12, "at index {0} and position {1}\n"
                                                                  "expected:   {2}\n"
                                                                  "calculated: {3}".format(i, k, expected, calculated))
 

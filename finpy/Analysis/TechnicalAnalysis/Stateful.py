@@ -6,6 +6,7 @@ Created on 2015-8-8
 """
 
 import copy
+import numpy as np
 from finpy.Analysis.SecurityValueHolders import SecurityValueHolder
 from finpy.Analysis.SecurityValueHolders import SecuritiesValues
 from finpy.Math.Accumulators.StatefulAccumulators import MovingAverage
@@ -91,32 +92,15 @@ class SecurityMovingHistoricalWindow(SecuritySingleValueHolder):
         if isinstance(item, str):
             return super(SecurityMovingHistoricalWindow, self).__getitem__(item)
         elif isinstance(item, int):
-            values = self.value
-            res = SecuritiesValues(
-                {
-                    name: self._innerHolders[name][item] for name in values
-                }
-            )
-            return res
+            res = {}
+            for name in self._innerHolders:
+                try:
+                    res[name] = self._innerHolders[name].value[item]
+                except:
+                    res[name] = np.nan
+            return SecuritiesValues(res)
         else:
             raise RuntimeError("{0} is not recognized as valid int or string".forma(item))
 
-
-if __name__ == "__main__":
-
-    import numpy as np
-
-    hist = SecurityMovingHistoricalWindow(10, pNames='close', symbolList=['AAPL', 'IBM', 'GOOG'])
-    datas = np.random.randn(100)
-
-    for i, d in enumerate(datas):
-        data = {
-            'AAPL': {'close': d},
-            'IBM': {'close': d},
-            'GOOG': {'close': d},
-        }
-        hist.push(data)
-        if i >= 1:
-            print(hist[1].__str__(), data)
 
 

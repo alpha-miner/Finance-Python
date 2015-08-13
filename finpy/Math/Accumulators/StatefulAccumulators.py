@@ -325,6 +325,34 @@ class MovingCountedNegative(StatefulValueHolder):
         return self._counts
 
 
+class MovingHistoricalWindow(StatefulValueHolder):
+
+    def __init__(self, window, pNames='x'):
+        super(MovingHistoricalWindow, self).__init__(window, pNames)
+        _checkParameterList(pNames)
+        self._returnSize = window
+
+    def push(self, **kwargs):
+        value = super(MovingHistoricalWindow, self).push(**kwargs)
+        if value is None:
+            return
+        _ = self._dumpOneValue(value)
+
+    def __getitem__(self, item):
+        length = self.size
+        if self._start:
+            recentPoint = self._start - 1
+        else:
+            recentPoint = self._start + length - 1
+
+        offsetPoint = (recentPoint - item + length) % length
+        assert offsetPoint >= 0, "{0} is out of the bound of the historical current lenght {1}".format(item, length)
+        return self._con[offsetPoint]
+
+    def result(self):
+        return self._con
+
+
 # Calculator for one pair of series
 class MovingCorrelation(StatefulValueHolder):
 
@@ -404,5 +432,3 @@ class MovingCorrelationMatrix(StatefulValueHolder):
             return nominator / denominator
         else:
             raise RuntimeError("Container has less than 2 samples")
-
-

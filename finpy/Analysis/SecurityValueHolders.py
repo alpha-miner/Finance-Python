@@ -194,9 +194,17 @@ class SecurityValueHolder(object):
                 }
             return res
         elif item in self._innerHolders:
-            return NamedValueHolder(item, self._innerHolders[item])
+            #return NamedValueHolder(item, self._innerHolders[item])
+            res = copy.deepcopy(self)
+            res._symbolList = set([item])
+            assert len(res._symbolList) == len([item]), "security name can't be duplicated"
+            res._innerHolders = \
+                {
+                    name: self._innerHolders[name] for name in res._symbolList
+                }
+            return res
         else:
-            raise TypeError("")
+            raise TypeError("{0} is not a valid index".format(item))
 
     def __add__(self, right):
         return SecurityAddedValueHolder(self, right)
@@ -227,58 +235,6 @@ class SecurityValueHolder(object):
 
     def __rtruediv__(self, left):
         return SecurityDividedValueHolder(left, self)
-
-
-class NamedValueHolder(SecurityValueHolder):
-    def __init__(self, symbol, valueHolder):
-        self._symbolList = [symbol]
-        self._window = valueHolder._window
-        self._returnSize = 1
-        self._pNames = valueHolder._pNames
-        self._innerHolders = {
-            symbol: copy.deepcopy(valueHolder)
-        }
-
-    def push(self, data):
-        name = set(self._symbolList).intersection(set(data.keys()))
-        if name:
-            self._innerHolders[self._symbolList[0]].push(**data[name.pop()])
-
-    @property
-    def value(self):
-        try:
-            return {
-                self._symbolList[0]: self._innerHolders[self._symbolList[0]].value
-            }
-        except:
-            return {
-                self._symbolList[0]: np.nan
-            }
-
-    @property
-    def dependency(self):
-        return {
-            self._symbolList[0]: self._pNames
-        }
-
-    @property
-    def window(self):
-        return self._window
-
-    def __add__(self, right):
-        return SecurityAddedValueHolder(self, right)
-
-    def __sub__(self, right):
-        return SecuritySubbedValueHolder(self, right)
-
-    def __mul__(self, right):
-        return SecurityMultipliedValueHolder(self, right)
-
-    def __div__(self, right):
-        return SecurityDividedValueHolder(self, right)
-
-    def __truediv__(self, right):
-        return SecurityDividedValueHolder(self, right)
 
 
 class IdentitySecurityValueHolder(SecurityValueHolder):
@@ -383,12 +339,9 @@ def SecurityShiftedValueHolder(secValueHolder, n):
     assert n >= 1, "shift value should always not be less than 1"
     res = copy.deepcopy(secValueHolder)
     res._window = secValueHolder.window + n
-    if isinstance(secValueHolder, NamedValueHolder):
-        res._valueHolder = Shift(secValueHolder._valueHolder, n)
-    else:
-        res._innerHolders = {
-            name: Shift(secValueHolder._innerHolders[name], n) for name in secValueHolder._innerHolders
-        }
+    res._innerHolders = {
+        name: Shift(secValueHolder._innerHolders[name], n) for name in secValueHolder._innerHolders
+    }
     return res
 
 
@@ -405,18 +358,11 @@ class SecurityCompoundedValueHolder(SecurityValueHolder):
             assert left.valueSize == 1
 
         self._right = copy.deepcopy(right._innerHolders[right._innerHolders.keys()[0]])
-        if isinstance(left, NamedValueHolder):
-            self._isNamed = True
-            self._left = copy.deepcopy(left._innerHolders[left.symbolList[0]])
-            self._innerHolders = {
-                self._symbolList[0]: CompoundedValueHolder(self._left, self._right)
-            }
-        else:
-            self._isNamed = False
-            self._left = copy.deepcopy(left._innerHolders[left._innerHolders.keys()[0]])
-            self._innerHolders = {
-                name: CompoundedValueHolder(self._left, self._right) for name in self._symbolList
-            }
+        self._isNamed = False
+        self._left = copy.deepcopy(left._innerHolders[left._innerHolders.keys()[0]])
+        self._innerHolders = {
+            name: CompoundedValueHolder(self._left, self._right) for name in self._symbolList
+        }
 
     def push(self, data):
         names = set(self._symbolList).intersection(set(data.keys()))

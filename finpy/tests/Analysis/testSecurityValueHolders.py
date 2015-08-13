@@ -7,7 +7,6 @@ Created on 2015-8-12
 
 import unittest
 from finpy.Analysis.SecurityValueHolders import SecurityValueHolder
-from finpy.Analysis.SecurityValueHolders import NamedValueHolder
 from finpy.Analysis.SecurityValueHolders import SecuritiesValues
 from finpy.Analysis.TechnicalAnalysis import SecurityMovingAverage
 from finpy.Analysis.TechnicalAnalysis import SecurityMovingMax
@@ -138,7 +137,6 @@ class TestSecurityValueHolders(unittest.TestCase):
 
         # single named value holder
         test1 = test['IBM']
-        self.assertTrue(isinstance(test1, NamedValueHolder))
         self.assertEqual(set(test1.symbolList), set(['IBM']))
         self.assertEqual(test1.dependency, {'IBM': pNames})
         self.assertEqual(test1.valueSize, 1)

@@ -70,6 +70,7 @@ setup(
               'finpy.Math.Accumulators',
               'finpy.Math.Distributions',
               'finpy.Math.Timeseries',
+              'finpy.Patterns',
               'finpy.PricingEngines',
               'finpy.Analysis',
               'finpy.Analysis.TechnicalAnalysis',

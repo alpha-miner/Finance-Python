@@ -18,3 +18,7 @@ class TestSettings(unittest.TestCase):
                                                                  "expected: {0}\n"
                                                                  "returned: {1}".format(referenceDate,
                                                                                         Settings.evaluationDate))
+
+        # check wrong input
+        with self.assertRaises(ValueError):
+            Settings.evaluationDate = 2

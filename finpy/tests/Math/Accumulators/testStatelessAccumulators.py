@@ -21,10 +21,10 @@ class TestStatelessAccumulators(unittest.TestCase):
         self.samplesClose = np.random.randn(10000)
 
     def testMax(self):
-        mm = Max(pNames='close')
+        mm = Max(dependency='close')
 
         for i, value in enumerate(self.samplesClose):
-            mm.push(close=value)
+            mm.push(dict(close=value))
             expected = max(self.samplesClose[:i+1])
             calculated = mm.result()
 
@@ -33,10 +33,10 @@ class TestStatelessAccumulators(unittest.TestCase):
                                                              "calculated max: {2:f}".format(i, expected, calculated))
 
     def testMinimum(self):
-        mm = Minimum(pNames='close')
+        mm = Minimum(dependency='close')
 
         for i, value in enumerate(self.samplesClose):
-            mm.push(close=value)
+            mm.push(dict(close=value))
             expected = min(self.samplesClose[:i+1])
             calculated = mm.result()
 
@@ -45,10 +45,10 @@ class TestStatelessAccumulators(unittest.TestCase):
                                                              "calculated min: {2:f}".format(i, expected, calculated))
 
     def testSum(self):
-        mm = Sum(pNames='close')
+        mm = Sum(dependency='close')
 
         for i, value in enumerate(self.samplesClose):
-            mm.push(close=value)
+            mm.push(dict(close=value))
             expected = np.sum(self.samplesClose[:i+1])
             calculated = mm.result()
 
@@ -58,12 +58,12 @@ class TestStatelessAccumulators(unittest.TestCase):
 
     def testVariance(self):
         # np.var is population variance
-        mm = Variance(pNames='close', isPopulation=True)
-        mm2 = Variance(pNames='close',)
+        mm = Variance(dependency='close', isPopulation=True)
+        mm2 = Variance(dependency='close',)
 
         for i, value in enumerate(self.samplesClose):
-            mm.push(close=value)
-            mm2.push(close=value)
+            mm.push(dict(close=value))
+            mm2.push(dict(close=value))
             expected = np.var(self.samplesClose[:i+1])
             calculated = mm.result()
 
@@ -82,10 +82,10 @@ class TestStatelessAccumulators(unittest.TestCase):
                                                                  "calculated var: {2:f}".format(i, expected, calculated))
 
     def testCorrelation(self):
-        mm = Correlation(pNames=['close', 'open'])
+        mm = Correlation(dependency=['close', 'open'])
 
         for i, (openPrice, closePrice) in enumerate(zip(self.samplesOpen, self.samplesClose)):
-            mm.push(open=openPrice, close=closePrice)
+            mm.push(dict(open=openPrice, close=closePrice))
             if i == 0:
                 with self.assertRaises(RuntimeError):
                     _ = mm.result()

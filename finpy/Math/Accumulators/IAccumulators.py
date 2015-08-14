@@ -15,40 +15,40 @@ class Accumulator(object):
 
     __metaclass__ = ABCMeta
 
-    def __init__(self, pNames):
-        if isinstance(pNames, Accumulator):
+    def __init__(self, dependency):
+        if isinstance(dependency, Accumulator):
             self._isValueHolderContained = True
         else:
             self._isValueHolderContained = False
-        if hasattr(pNames, '__iter__') and len(pNames) >= 2:
-            for name in pNames:
+        if hasattr(dependency, '__iter__') and len(dependency) >= 2:
+            for name in dependency:
                 assert isinstance(name, str), '{0} in pNames should be a plain string. But it is {1}'.format(name, type(name))
-            self._pNames = pNames
-        elif hasattr(pNames, '__iter__') and len(pNames) == 1:
-            for name in pNames:
+            self._dependency = dependency
+        elif hasattr(dependency, '__iter__') and len(dependency) == 1:
+            for name in dependency:
                 assert isinstance(name, str), '{0} in pNames should be a plain string. But it is {1}'.format(name, type(name))
-            self._pNames = pNames[0]
-        elif hasattr(pNames, '__iter__'):
+            self._dependency = dependency[0]
+        elif hasattr(dependency, '__iter__'):
             raise RuntimeError("parameters' name list should not be empty")
         else:
-            assert isinstance(pNames, str) or isinstance(pNames, Accumulator), '{0} in pNames should be a plain string or an value holder. But it is {1}'.format(pNames, type(pNames))
-            self._pNames = deepcopy(pNames)
+            assert isinstance(dependency, str) or isinstance(dependency, Accumulator), '{0} in pNames should be a plain string or an value holder. But it is {1}'.format(pNames, type(pNames))
+            self._dependency = deepcopy(dependency)
 
-    def push(self, **kwargs):
+    def push(self, data):
         if not self._isValueHolderContained:
-            if isinstance(self._pNames, str):
-                if self._pNames in kwargs:
-                    return kwargs[self._pNames]
+            if isinstance(self._dependency, str):
+                if self._dependency in data:
+                    return data[self._dependency]
                 else:
                     return None
-            elif hasattr(self._pNames, '__iter__'):
+            elif hasattr(self._dependency, '__iter__'):
                 try:
-                    return tuple(kwargs[p] for p in self._pNames)
+                    return tuple(data[p] for p in self._dependency)
                 except KeyError:
                     return None
         else:
-            self._pNames.push(**kwargs)
-            return self._pNames.result()
+            self._dependency.push(data)
+            return self._dependency.result()
 
     @abstractmethod
     def result(self):
@@ -57,6 +57,18 @@ class Accumulator(object):
     @property
     def value(self):
         return self.result()
+
+    @property
+    def window(self):
+        return self._window
+
+    @property
+    def valueSize(self):
+        return self._returnSize
+
+    @property
+    def dependency(self):
+        return self._dependency
 
     def __add__(self, right):
         if isinstance(right, Accumulator):
@@ -173,12 +185,14 @@ class Accumulator(object):
 class NegativeValueHolder(Accumulator):
 
     def __init__(self, valueHolder):
-        self._returnSize = valueHolder._returnSize
         self._valueHolder = deepcopy(valueHolder)
-        self._dependency = valueHolder._dependency
+        self._returnSize = valueHolder.valueSize
+        self._window = valueHolder.window
+        self._containerSize = valueHolder._containerSize
+        self._dependency = deepcopy(valueHolder.dependency)
 
-    def push(self, **kwargs):
-        self._valueHolder.push(**kwargs)
+    def push(self, data):
+        self._valueHolder.push(data)
 
     def result(self):
         res = self._valueHolder.result()
@@ -190,15 +204,16 @@ class NegativeValueHolder(Accumulator):
 
 class ListedValueHolder(Accumulator):
     def __init__(self, left, right):
-        self._returnSize = left._returnSize + right._returnSize
+        self._returnSize = left.valueSize + right.valueSize
         self._left = deepcopy(left)
         self._right = deepcopy(right)
-        self._pNames = list(set(left._pNames).union(set(right._pNames)))
-        self._dependency = max(self._left._dependency, self._right._dependency)
+        self._dependency = list(set(left.dependency).union(set(right.dependency)))
+        self._window = max(self._left.window, self._right.window)
+        self._containerSize = max(self._left._containerSize, self._right._containerSize)
 
-    def push(self, **kwargs):
-        self._left.push(**kwargs)
-        self._right.push(**kwargs)
+    def push(self, data):
+        self._left.push(data)
+        self._right.push(data)
 
     def result(self):
         resLeft = self._left.result()
@@ -229,11 +244,13 @@ class TruncatedValueHolder(Accumulator):
             self._stop = None
             self._returnSize = 1
 
-        self._valueHolder = valueHolder
+        self._valueHolder = deepcopy(valueHolder)
         self._dependency = self._valueHolder._dependency
+        self._window = valueHolder._window
+        self._containerSize = valueHolder._containerSize
 
-    def push(self, **kwargs):
-        self._valueHolder.push(**kwargs)
+    def push(self, data):
+        self._valueHolder.push(data)
 
     def result(self):
         if self._stop is None:
@@ -248,13 +265,13 @@ class CombinedValueHolder(Accumulator):
         self._returnSize = left._returnSize
         self._left = deepcopy(left)
         self._right = deepcopy(right)
-        self._pNames = list(set(left._pNames).union(set(right._pNames)))
-        self._dependency = max(self._left._dependency, self._right._dependency)
-        self._window = self._dependency + 1
+        self._dependency = list(set(left._dependency).union(set(right._dependency)))
+        self._window = max(self._left._window, self._right._window)
+        self._containerSize = max(self._left._containerSize, self._right._containerSize)
 
-    def push(self, **kwargs):
-        self._left.push(**kwargs)
-        self._right.push(**kwargs)
+    def push(self, data):
+        self._left.push(data)
+        self._right.push(data)
 
 
 class AddedValueHolder(CombinedValueHolder):
@@ -365,22 +382,22 @@ class Identity(Accumulator):
 
     def __init__(self, value, n=1):
         if isinstance(value, Accumulator):
-            assert value._returnSize == 1, "Identity can only be applied to single return value holder"
+            assert value.valueSize == 1, "Identity can only be applied to single return value holder"
             self._dependency = value._dependency
             self._isValueHolder = True
-            self._window = self._dependency + 1
-            self._pNames = value._pNames
+            self._window = value.window
+            self._containerSize = value._containerSize
         else:
-            self._dependency = 0
+            self._dependency = []
             self._isValueHolder = False
             self._window = 1
-            self._pNames = []
+            self._containerSize = 1
         self._value = value
         self._returnSize = n
 
-    def push(self, **kwargs):
+    def push(self, data):
         if self._isValueHolder:
-            self._value.push(**kwargs)
+            self._value.push(data)
 
     def result(self):
         if self._isValueHolder:
@@ -399,22 +416,23 @@ class CompoundedValueHolder(Accumulator):
         self._returnSize = right._returnSize
         self._left = deepcopy(left)
         self._right = deepcopy(right)
-        self._dependency = self._left._dependency + self._right._dependency
-        self._pNames = deepcopy(left._pNames)
+        self._window = self._left.window + self._right.window - 1
+        self._containerSize = self._right._containerSize
+        self._dependency = deepcopy(left._dependency)
 
-        if hasattr(self._right._pNames, '__iter__'):
-            assert left._returnSize == len(self._right._pNames)
+        if hasattr(self._right._dependency, '__iter__'):
+            assert left.valueSize == len(self._right.dependency)
         else:
-            assert left._returnSize == 1
+            assert left.valueSize == 1
 
-    def push(self, **kwargs):
-        self._left.push(**kwargs)
+    def push(self, data):
+        self._left.push(data)
         values = self._left.result()
         if hasattr(values, '__iter__'):
-            parameters = dict((name, value) for name, value in zip(self._right._pNames, values))
+            parameters = dict((name, value) for name, value in zip(self._right._dependency, values))
         else:
-            parameters = {self._right._pNames:values}
-        self._right.push(**parameters)
+            parameters = {self._right._dependency: values}
+        self._right.push(parameters)
 
     def result(self):
         return self._right.result()
@@ -425,15 +443,15 @@ class BasicFunction(Accumulator):
     def __init__(self, valueHolder, func, *args, **kwargs):
         self._returnSize = valueHolder._returnSize
         self._valueHolder = deepcopy(valueHolder)
-        self._dependency = valueHolder._dependency
+        self._dependency = deepcopy(valueHolder._dependency)
         self._func = func
         self._args = args
         self._kwargs = kwargs
-        self._window = self._dependency + 1
-        self._pNames = deepcopy(valueHolder._pNames)
+        self._window = valueHolder.window
+        self._containerSize = valueHolder._containerSize
 
-    def push(self, **kwargs):
-        self._valueHolder.push(**kwargs)
+    def push(self, data):
+        self._valueHolder.push(data)
 
     def result(self):
         origValue = self._valueHolder.result()
@@ -461,13 +479,12 @@ class Pow(Accumulator):
     def __init__(self, valueHolder, n):
         self._returnSize = valueHolder._returnSize
         self._valueHolder = deepcopy(valueHolder)
-        self._dependency = valueHolder._dependency
+        self._dependency = deepcopy(valueHolder._dependency)
         self._n = n
-        self._window = self._dependency + 1
-        self._pNames = deepcopy(valueHolder._pNames)
+        self._window = valueHolder.window
 
-    def push(self, **kwargs):
-        self._valueHolder.push(**kwargs)
+    def push(self, data):
+        self._valueHolder.push(data)
 
     def result(self):
         origValue = self._valueHolder.result()

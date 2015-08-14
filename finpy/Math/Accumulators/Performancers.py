@@ -16,12 +16,12 @@ from finpy.Math.Accumulators.StatefulAccumulators import _checkParameterList
 
 
 class MovingLogReturn(StatefulValueHolder):
-    def __init__(self, window=1, pNames='price'):
-        super(MovingLogReturn, self).__init__(window, pNames)
-        _checkParameterList(pNames)
+    def __init__(self, window=1, dependency='price'):
+        super(MovingLogReturn, self).__init__(window, dependency)
+        _checkParameterList(dependency)
 
-    def push(self, **kwargs):
-        value = super(MovingLogReturn, self).push(**kwargs)
+    def push(self, data):
+        value = super(MovingLogReturn, self).push(data)
         if value is None:
             return
         popout = self._dumpOneValue(value)
@@ -37,21 +37,22 @@ class MovingLogReturn(StatefulValueHolder):
 
 class MovingSharp(StatefulValueHolder):
 
-    def __init__(self, window, pNames=('ret', 'riskFree')):
-        super(MovingSharp, self).__init__(window, pNames)
-        self._mean = MovingAverage(window, pNames='x')
-        self._var = MovingVariance(window, pNames='x', isPopulation=False)
+    def __init__(self, window, dependency=('ret', 'riskFree')):
+        super(MovingSharp, self).__init__(window, dependency)
+        self._mean = MovingAverage(window, dependency='x')
+        self._var = MovingVariance(window, dependency='x', isPopulation=False)
 
-    def push(self, **kwargs):
+    def push(self, data):
         '''
         @value: annualized return value
         @benchmark: annualized benchmark treasury bond yield
         '''
-        value = super(MovingSharp, self).push(**kwargs)
+        value = super(MovingSharp, self).push(data)
         ret = value[0]
         benchmark = value[1]
-        self._mean.push(x=ret - benchmark)
-        self._var.push(x=ret - benchmark)
+        data = {'x': ret - benchmark}
+        self._mean.push(data)
+        self._var.push(data)
 
     def result(self):
         if self._var.size >= 2:
@@ -62,19 +63,20 @@ class MovingSharp(StatefulValueHolder):
 
 class MovingSortino(StatefulValueHolder):
 
-    def __init__(self, window, pNames=('ret', 'riskFree')):
-        super(MovingSortino, self).__init__(window, pNames)
-        self._mean = MovingAverage(window, pNames='x')
-        self._negativeVar = MovingNegativeVariance(window, pNames='x')
+    def __init__(self, window, dependency=('ret', 'riskFree')):
+        super(MovingSortino, self).__init__(window, dependency)
+        self._mean = MovingAverage(window, dependency='x')
+        self._negativeVar = MovingNegativeVariance(window, dependency='x')
 
-    def push(self, **kwargs):
-        value = super(MovingSortino, self).push(**kwargs)
+    def push(self, data):
+        value = super(MovingSortino, self).push(data)
         if value is None:
             return
         ret = value[0]
         benchmark = value[1]
-        self._mean.push(x=ret - benchmark)
-        self._negativeVar.push(x=ret - benchmark)
+        data = {'x': ret - benchmark}
+        self._mean.push(data)
+        self._negativeVar.push(data)
 
     def result(self):
         if self._mean.size >= 2:
@@ -85,27 +87,28 @@ class MovingSortino(StatefulValueHolder):
 
 class MovingAlphaBeta(StatefulValueHolder):
 
-    def __init__(self, window, pNames=('pRet', 'mRet', 'riskFree')):
+    def __init__(self, window, dependency=('pRet', 'mRet', 'riskFree')):
         self._returnSize = 2
-        super(MovingAlphaBeta, self).__init__(window, pNames)
-        self._pReturnMean = MovingAverage(window, pNames='x')
-        self._mReturnMean = MovingAverage(window, pNames='y')
-        self._pReturnVar = MovingVariance(window, pNames='x')
-        self._mReturnVar = MovingVariance(window, pNames='y')
-        self._correlationHolder = MovingCorrelation(window, pNames=['x', 'y'])
+        super(MovingAlphaBeta, self).__init__(window, dependency)
+        self._pReturnMean = MovingAverage(window, dependency='x')
+        self._mReturnMean = MovingAverage(window, dependency='y')
+        self._pReturnVar = MovingVariance(window, dependency='x')
+        self._mReturnVar = MovingVariance(window, dependency='y')
+        self._correlationHolder = MovingCorrelation(window, dependency=['x', 'y'])
 
-    def push(self, **kwargs):
-        value = super(MovingAlphaBeta, self).push(**kwargs)
+    def push(self, data):
+        value = super(MovingAlphaBeta, self).push(data)
         if value is None:
             return
         pReturn = value[0]
         mReturn = value[1]
         rf = value[2]
-        self._pReturnMean.push(x=pReturn - rf)
-        self._mReturnMean.push(y=mReturn - rf)
-        self._pReturnVar.push(x=pReturn - rf)
-        self._mReturnVar.push(y=mReturn - rf)
-        self._correlationHolder.push(x=pReturn - rf, y=mReturn - rf)
+        data = {'x': pReturn - rf, 'y': mReturn - rf}
+        self._pReturnMean.push(data)
+        self._mReturnMean.push(data)
+        self._pReturnVar.push(data)
+        self._mReturnVar.push(data)
+        self._correlationHolder.push(data)
 
     def result(self):
         if self._pReturnMean.size >= 2:
@@ -121,26 +124,26 @@ class MovingAlphaBeta(StatefulValueHolder):
 
 class MovingDrawDown(StatefulValueHolder):
 
-    def __init__(self, window, pNames='ret'):
-        super(MovingDrawDown, self).__init__(window, pNames)
+    def __init__(self, window, dependency='ret'):
+        super(MovingDrawDown, self).__init__(window, dependency)
         self._returnSize = 3
-        self._maxer = MovingMax(window+1, pNames='x')
-        self._maxer.push(x=0.0)
+        self._maxer = MovingMax(window+1, dependency='x')
+        self._maxer.push(dict(x=0.0))
         self._runningCum = 0.0
         self._highIndex = 0
         self._runningIndex = 0
 
-    def push(self, **kwargs):
+    def push(self, data):
         '''
         :param value: expected to be exponential annualized return
         :return:
         '''
-        value = super(MovingDrawDown, self).push(**kwargs)
+        value = super(MovingDrawDown, self).push(data)
         if value is None:
             return
         self._runningIndex += 1
         self._runningCum += value
-        self._maxer.push(x=self._runningCum)
+        self._maxer.push(dict(x=self._runningCum))
         self._currentMax = self._maxer.result()
         if self._runningCum >= self._currentMax:
             self._highIndex = self._runningIndex
@@ -154,21 +157,21 @@ class MovingDrawDown(StatefulValueHolder):
 
 class MovingAverageDrawdown(StatefulValueHolder):
 
-    def __init__(self, window, pNames='ret'):
-        super(MovingAverageDrawdown, self).__init__(window, pNames)
+    def __init__(self, window, dependency='ret'):
+        super(MovingAverageDrawdown, self).__init__(window, dependency)
         self._returnSize = 2
-        self._drawdownCalculator = MovingDrawDown(window, pNames='x')
-        self._drawdownMean = MovingAverage(window, pNames='x')
-        self._durationMean = MovingAverage(window, pNames='x')
+        self._drawdownCalculator = MovingDrawDown(window, dependency='ret')
+        self._drawdownMean = MovingAverage(window, dependency='drawdown')
+        self._durationMean = MovingAverage(window, dependency='duration')
 
-    def push(self, **kwargs):
-        value = super(MovingAverageDrawdown, self).push(**kwargs)
+    def push(self, data):
+        value = super(MovingAverageDrawdown, self).push(data)
         if value is None:
             return
-        self._drawdownCalculator.push(x=value)
+        self._drawdownCalculator.push(dict(ret=value))
         drawdown, duration, _ = self._drawdownCalculator.result()
-        self._drawdownMean.push(x=drawdown)
-        self._durationMean.push(x=duration)
+        self._drawdownMean.push(dict(drawdown=drawdown))
+        self._durationMean.push(dict(duration=duration))
 
     def result(self):
         return self._drawdownMean.result(), self._durationMean.result()
@@ -176,16 +179,16 @@ class MovingAverageDrawdown(StatefulValueHolder):
 
 class MovingMaxDrawdown(StatefulValueHolder):
 
-    def __init__(self, window, pNames='ret'):
-        super(MovingMaxDrawdown, self).__init__(window, pNames)
+    def __init__(self, window, dependency='ret'):
+        super(MovingMaxDrawdown, self).__init__(window, dependency)
         self._returnSize = 2
         self._drawdownCalculator = MovingDrawDown(window, 'x')
 
-    def push(self, **kwargs):
-        value = super(MovingMaxDrawdown, self).push(**kwargs)
+    def push(self, data):
+        value = super(MovingMaxDrawdown, self).push(data)
         if value is None:
             return
-        self._drawdownCalculator.push(x=value)
+        self._drawdownCalculator.push(dict(x=value))
         drawdown, duration, _ = self._drawdownCalculator.result()
         self._dumpOneValue((drawdown, duration))
 

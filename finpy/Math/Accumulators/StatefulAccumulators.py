@@ -11,23 +11,23 @@ import numpy as np
 from copy import deepcopy
 from finpy.Math.Accumulators.IAccumulators import Accumulator
 
-def _checkParameterList(pNames):
-    if not isinstance(pNames, Accumulator) and len(pNames) > 1 and not isinstance(pNames, str):
+def _checkParameterList(dependency):
+    if not isinstance(dependency, Accumulator) and len(dependency) > 1 and not isinstance(dependency, str):
         raise RuntimeError("This value holder (e.g. Max or Minimum) can't hold more than 2 parameter names ({0})"
-                           " provided".format(pNames))
+                           " provided".format(dependency))
 
 
 class StatefulValueHolder(Accumulator):
 
-    def __init__(self, window, pNames):
-        super(StatefulValueHolder, self).__init__(pNames)
+    def __init__(self, window, dependency):
+        super(StatefulValueHolder, self).__init__(dependency)
         if not isinstance(window, int):
             raise ValueError("window parameter should be a positive int however {0} received"
                              .format(window))
         assert window > 0, "window length should be greater than 0"
         self._returnSize = 1
         self._window = window
-        self._dependency = window - 1
+        self._containerSize = window
         self._con = []
         self._isFull = 0
         self._start = 0
@@ -50,8 +50,8 @@ class StatefulValueHolder(Accumulator):
             # use list as circular queue
             popout = self._con[self._start]
             self._con[self._start] = value
-            self._start = (self._start + 1) % self._window
-        elif len(self._con) + 1 == self._window:
+            self._start = (self._start + 1) % self._containerSize
+        elif len(self._con) + 1 == self._containerSize:
             self._con.append(value)
             self._isFull = 1
         else:
@@ -62,15 +62,16 @@ class StatefulValueHolder(Accumulator):
 class Shift(StatefulValueHolder):
 
     def __init__(self, valueHolder, N=1):
-        super(Shift, self).__init__(N, valueHolder._pNames)
+        super(Shift, self).__init__(N, valueHolder._dependency)
         assert N >= 1, "shift value should always not be less than 1"
         self._valueHolder = deepcopy(valueHolder)
-        self._pNames = valueHolder._pNames
-        self._dependency = valueHolder._dependency + N
-        self._returnSize = valueHolder._returnSize
+        self._window = valueHolder.window + N
+        self._containerSize = N
+        self._returnSize = valueHolder.valueSize
+        self._dependency = deepcopy(valueHolder.dependency)
 
-    def push(self, **kwargs):
-        self._valueHolder.push(**kwargs)
+    def push(self, data):
+        self._valueHolder.push(data)
         self._popout = super(Shift, self)._dumpOneValue(self._valueHolder.result())
 
     def result(self):
@@ -79,13 +80,13 @@ class Shift(StatefulValueHolder):
 
 class SortedValueHolder(StatefulValueHolder):
 
-    def __init__(self, window, pNames='x'):
-        super(SortedValueHolder, self).__init__(window, pNames)
-        _checkParameterList(pNames)
+    def __init__(self, window, dependency='x'):
+        super(SortedValueHolder, self).__init__(window, dependency)
+        _checkParameterList(dependency)
         self._sortedArray = []
 
-    def push(self, **kwargs):
-        value = super(SortedValueHolder, self).push(**kwargs)
+    def push(self, data):
+        value = super(SortedValueHolder, self).push(data)
         if value is None:
             return
         if self.isFull:
@@ -100,8 +101,8 @@ class SortedValueHolder(StatefulValueHolder):
 
 class MovingMax(SortedValueHolder):
 
-    def __init__(self, window, pNames='x'):
-        super(MovingMax, self).__init__(window, pNames)
+    def __init__(self, window, dependency='x'):
+        super(MovingMax, self).__init__(window, dependency)
 
     def result(self):
         return self._sortedArray[-1]
@@ -109,8 +110,8 @@ class MovingMax(SortedValueHolder):
 
 class MovingMinimum(SortedValueHolder):
 
-    def __init__(self, window, pNames='x'):
-        super(MovingMinimum, self).__init__(window, pNames)
+    def __init__(self, window, dependency='x'):
+        super(MovingMinimum, self).__init__(window, dependency)
 
     def result(self):
         return self._sortedArray[0]
@@ -118,13 +119,13 @@ class MovingMinimum(SortedValueHolder):
 
 class MovingSum(StatefulValueHolder):
 
-    def __init__(self, window, pNames='x'):
-        super(MovingSum, self).__init__(window, pNames)
-        _checkParameterList(pNames)
+    def __init__(self, window, dependency='x'):
+        super(MovingSum, self).__init__(window, dependency)
+        _checkParameterList(dependency)
         self._runningSum = 0.0
 
-    def push(self, **kwargs):
-        value = super(MovingSum, self).push(**kwargs)
+    def push(self, data):
+        value = super(MovingSum, self).push(data)
         if value is None:
             return
         popout = self._dumpOneValue(value)
@@ -136,13 +137,13 @@ class MovingSum(StatefulValueHolder):
 
 class MovingAverage(StatefulValueHolder):
 
-    def __init__(self, window, pNames='x'):
-        super(MovingAverage, self).__init__(window, pNames)
-        _checkParameterList(pNames)
+    def __init__(self, window, dependency='x'):
+        super(MovingAverage, self).__init__(window, dependency)
+        _checkParameterList(dependency)
         self._runningSum = 0.0
 
-    def push(self, **kwargs):
-        value = super(MovingAverage, self).push(**kwargs)
+    def push(self, data):
+        value = super(MovingAverage, self).push(data)
         if value is None:
             return
         popout = self._dumpOneValue(value)
@@ -157,14 +158,14 @@ class MovingAverage(StatefulValueHolder):
 
 class MovingPositiveAverage(StatefulValueHolder):
 
-    def __init__(self, window, pNames='x'):
-        super(MovingPositiveAverage, self).__init__(window, pNames)
-        _checkParameterList(pNames)
+    def __init__(self, window, dependency='x'):
+        super(MovingPositiveAverage, self).__init__(window, dependency)
+        _checkParameterList(dependency)
         self._runningPositiveSum = 0.0
         self._runningPositiveCount = 0
 
-    def push(self, **kwargs):
-        value = super(MovingPositiveAverage, self).push(**kwargs)
+    def push(self, data):
+        value = super(MovingPositiveAverage, self).push(data)
         if value is None:
             return
         popout = self._dumpOneValue(value)
@@ -185,14 +186,14 @@ class MovingPositiveAverage(StatefulValueHolder):
 
 class MovingNegativeAverage(StatefulValueHolder):
 
-    def __init__(self, window, pNames='x'):
-        super(MovingNegativeAverage, self).__init__(window, pNames)
-        _checkParameterList(pNames)
+    def __init__(self, window, dependency='x'):
+        super(MovingNegativeAverage, self).__init__(window, dependency)
+        _checkParameterList(dependency)
         self._runningNegativeSum = 0.0
         self._runningNegativeCount = 0
 
-    def push(self, **kwargs):
-        value = super(MovingNegativeAverage, self).push(**kwargs)
+    def push(self, data):
+        value = super(MovingNegativeAverage, self).push(data)
         if value is None:
             return
         popout = self._dumpOneValue(value)
@@ -213,17 +214,17 @@ class MovingNegativeAverage(StatefulValueHolder):
 
 class MovingVariance(StatefulValueHolder):
 
-    def __init__(self, window, pNames='x', isPopulation=False):
-        super(MovingVariance, self).__init__(window, pNames)
-        _checkParameterList(pNames)
+    def __init__(self, window, dependency='x', isPopulation=False):
+        super(MovingVariance, self).__init__(window, dependency)
+        _checkParameterList(dependency)
         self._runningSum = 0.0
         self._runningSumSquare = 0.0
         self._isPop = isPopulation
         if not self._isPop:
             assert window >= 2, "sampling variance can't be calculated with window size < 2"
 
-    def push(self, **kwargs):
-        value = super(MovingVariance, self).push(**kwargs)
+    def push(self, data):
+        value = super(MovingVariance, self).push(data)
         if value is None:
             return
         popout = self._dumpOneValue(value)
@@ -245,16 +246,16 @@ class MovingVariance(StatefulValueHolder):
 
 class MovingNegativeVariance(StatefulValueHolder):
 
-    def __init__(self, window, pNames='x', isPopulation=False):
-        super(MovingNegativeVariance, self).__init__(window, pNames)
-        _checkParameterList(pNames)
+    def __init__(self, window, dependency='x', isPopulation=False):
+        super(MovingNegativeVariance, self).__init__(window, dependency)
+        _checkParameterList(dependency)
         self._runningNegativeSum = 0.0
         self._runningNegativeSumSquare = 0.0
         self._runningNegativeCount = 0
         self._isPop = isPopulation
 
-    def push(self, **kwargs):
-        value = super(MovingNegativeVariance, self).push(**kwargs)
+    def push(self, data):
+        value = super(MovingNegativeVariance, self).push(data)
         if value is None:
             return
         popout = self._dumpOneValue(value)
@@ -286,13 +287,13 @@ class MovingNegativeVariance(StatefulValueHolder):
 
 class MovingCountedPositive(StatefulValueHolder):
 
-    def __init__(self, window, pNames='x'):
-        super(MovingCountedPositive, self).__init__(window, pNames)
-        _checkParameterList(pNames)
+    def __init__(self, window, dependency='x'):
+        super(MovingCountedPositive, self).__init__(window, dependency)
+        _checkParameterList(dependency)
         self._counts = 0
 
-    def push(self, **kwargs):
-        value = super(MovingCountedPositive, self).push(**kwargs)
+    def push(self, data):
+        value = super(MovingCountedPositive, self).push(data)
         if value is None:
             return
         popout = self._dumpOneValue(value)
@@ -308,13 +309,13 @@ class MovingCountedPositive(StatefulValueHolder):
 
 class MovingCountedNegative(StatefulValueHolder):
 
-    def __init__(self, window, pNames='x'):
-        super(MovingCountedNegative, self).__init__(window, pNames)
-        _checkParameterList(pNames)
+    def __init__(self, window, dependency='x'):
+        super(MovingCountedNegative, self).__init__(window, dependency)
+        _checkParameterList(dependency)
         self._counts = 0
 
-    def push(self, **kwargs):
-        value = super(MovingCountedNegative, self).push(**kwargs)
+    def push(self, data):
+        value = super(MovingCountedNegative, self).push(data)
         if value is None:
             return
         popout = self._dumpOneValue(value)
@@ -330,13 +331,13 @@ class MovingCountedNegative(StatefulValueHolder):
 
 class MovingHistoricalWindow(StatefulValueHolder):
 
-    def __init__(self, window, pNames='x'):
-        super(MovingHistoricalWindow, self).__init__(window, pNames)
-        _checkParameterList(pNames)
+    def __init__(self, window, dependency='x'):
+        super(MovingHistoricalWindow, self).__init__(window, dependency)
+        _checkParameterList(dependency)
         self._returnSize = window
 
-    def push(self, **kwargs):
-        value = super(MovingHistoricalWindow, self).push(**kwargs)
+    def push(self, data):
+        value = super(MovingHistoricalWindow, self).push(data)
         if value is None:
             return
         _ = self._dumpOneValue(value)
@@ -360,16 +361,16 @@ class MovingHistoricalWindow(StatefulValueHolder):
 # Calculator for one pair of series
 class MovingCorrelation(StatefulValueHolder):
 
-    def __init__(self, window, pNames=('x', 'y')):
-        super(MovingCorrelation, self).__init__(window, pNames)
+    def __init__(self, window, dependency=('x', 'y')):
+        super(MovingCorrelation, self).__init__(window, dependency)
         self._runningSumLeft = 0.0
         self._runningSumRight = 0.0
         self._runningSumSquareLeft = 0.0
         self._runningSumSquareRight = 0.0
         self._runningSumCrossSquare = 0.0
 
-    def push(self, **kwargs):
-        value = super(MovingCorrelation, self).push(**kwargs)
+    def push(self, data):
+        value = super(MovingCorrelation, self).push(data)
         if value is None:
             return
         popout = self._dumpOneValue(value)
@@ -406,15 +407,15 @@ class MovingCorrelation(StatefulValueHolder):
 # Calculator for several series
 class MovingCorrelationMatrix(StatefulValueHolder):
 
-    def __init__(self, window, pNames='values'):
-        super(MovingCorrelationMatrix, self).__init__(window, pNames)
+    def __init__(self, window, dependency='values'):
+        super(MovingCorrelationMatrix, self).__init__(window, dependency)
         self._isFirst = True
         self._runningSum = None
         self._runningSumSquare = None
         self._runningSumCrossSquare = None
 
-    def push(self, **kwargs):
-        values = super(MovingCorrelationMatrix, self).push(**kwargs)
+    def push(self, data):
+        values = super(MovingCorrelationMatrix, self).push(data)
         if values is None:
             return
         if self._isFirst:

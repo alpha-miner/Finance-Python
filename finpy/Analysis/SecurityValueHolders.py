@@ -174,7 +174,7 @@ class SecurityValueHolder(object):
     def push(self, data):
         names = set(self._symbolList).intersection(set(data.keys()))
         for name in names:
-            self._innerHolders[name].push(**data[name])
+            self._innerHolders[name].push(data[name])
 
     @property
     def value(self):

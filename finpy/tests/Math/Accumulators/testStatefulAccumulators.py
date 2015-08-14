@@ -39,29 +39,29 @@ class TestStatefulAccumulators(unittest.TestCase):
 
         test = Shift(ma, N=1)
 
-        test.push(close=2.0)
-        ma.push(close=2.0)
+        test.push(dict(close=2.0))
+        ma.push(dict(close=2.0))
         previous = ma.result()
-        test.push(close=5.0)
-        ma.push(close=5.0)
+        test.push(dict(close=5.0))
+        ma.push(dict(close=5.0))
 
         self.assertAlmostEqual(previous, test.result())
 
         previous = ma.result()
-        test.push(close=10.0)
+        test.push(dict(close=10.0))
         self.assertAlmostEqual(previous, test.result())
 
     def testMovingAverager(self):
         window = 120
         total = 2500
 
-        mv = MovingAverage(window, pNames='z')
+        mv = MovingAverage(window, dependency='z')
         runningSum = 0.0
         con = []
         for i in range(total):
             value = float(i)
             con.append(value)
-            mv.push(z=value)
+            mv.push(dict(z=value))
             runningSum += value
             if i >= window:
                 runningSum -= con[0]
@@ -79,7 +79,7 @@ class TestStatefulAccumulators(unittest.TestCase):
         filePath = os.path.join(dirName, 'data/averagepostiveandnegative_random.csv')
 
         window = 20
-        mv = MovingPositiveAverage(window, pNames='z')
+        mv = MovingPositiveAverage(window, dependency='z')
         self.assertAlmostEqual(mv.result(), 0.0, 15)
 
         with open(filePath, 'r') as fileHandler:
@@ -88,7 +88,7 @@ class TestStatefulAccumulators(unittest.TestCase):
             for i, row in enumerate(reader):
                 if i == 0:
                     continue
-                mv.push(z=float(row[1]))
+                mv.push(dict(z=float(row[1])))
                 if i >= window:
                     expected = float(row[6])
                     calculated = mv.result()
@@ -96,13 +96,12 @@ class TestStatefulAccumulators(unittest.TestCase):
                                                                     "Positive average expected:   {1:f}\n"
                                                                     "positive average calculated: {2:f}".format(i, expected, calculated))
 
-
     def testMovingNegativeAverager(self):
         dirName = os.path.dirname(os.path.abspath(__file__))
         filePath = os.path.join(dirName, 'data/averagepostiveandnegative_random.csv')
 
         window = 20
-        mv = MovingNegativeAverage(window, pNames='z')
+        mv = MovingNegativeAverage(window, dependency='z')
         self.assertAlmostEqual(mv.result(), 0.0, 15)
 
         with open(filePath, 'r') as fileHandler:
@@ -111,7 +110,7 @@ class TestStatefulAccumulators(unittest.TestCase):
             for i, row in enumerate(reader):
                 if i == 0:
                     continue
-                mv.push(z=float(row[1]))
+                mv.push(dict(z=float(row[1])))
                 if i >= window:
                     expected = float(row[7])
                     calculated = mv.result()
@@ -123,13 +122,13 @@ class TestStatefulAccumulators(unittest.TestCase):
         window = 120
         total = 2500
 
-        mv = MovingSum(window, pNames=['z'])
+        mv = MovingSum(window, dependency=['z'])
         runningSum = 0.0
         con = []
         for i in range(total):
             value = float(i)
             con.append(value)
-            mv.push(z=value)
+            mv.push(dict(z=value))
             runningSum += value
 
             if i >= window:
@@ -146,13 +145,13 @@ class TestStatefulAccumulators(unittest.TestCase):
     def testMovingMax(self):
         window = 120
 
-        mv = MovingMax(window, pNames='z')
+        mv = MovingMax(window, dependency='z')
         total = np.random.randn(2500)
         con = deque(maxlen=window)
         for i, value in enumerate(total):
             value = float(value)
             con.append(value)
-            mv.push(z=value)
+            mv.push(dict(z=value))
             runningMax = max(con)
 
             expected = runningMax
@@ -164,13 +163,13 @@ class TestStatefulAccumulators(unittest.TestCase):
     def testMovingMinimum(self):
         window = 120
 
-        mv = MovingMinimum(window, pNames='z')
+        mv = MovingMinimum(window, dependency='z')
         total = np.random.randn(2500)
         con = deque(maxlen=window)
         for i, value in enumerate(total):
             value = float(value)
             con.append(value)
-            mv.push(z=value)
+            mv.push(dict(z=value))
             runningMin = min(con)
 
             expected = runningMin
@@ -179,20 +178,19 @@ class TestStatefulAccumulators(unittest.TestCase):
                                                              "Min expected:   {1:f}\n"
                                                              "Min calculated: {2:f}".format(i, expected, calculated))
 
-
     def testMovingCountedPositive(self):
         window = 120
         total = 2500
 
         values = [1.0 if i % 2 else -1.0 for i in range(total)]
-        mv = MovingCountedPositive(window, pNames='z')
+        mv = MovingCountedPositive(window, dependency='z')
         runningCount = 0
         con = []
         for i, value in enumerate(values):
             if i % 2:
                 runningCount += 1
             con.append(i)
-            mv.push(z=value)
+            mv.push(dict(z=value))
 
             if i >= window:
                 if con[0] % 2:
@@ -211,14 +209,14 @@ class TestStatefulAccumulators(unittest.TestCase):
         total = 2500
 
         values = [1.0 if i % 2 else -1.0 for i in range(total)]
-        mv = MovingCountedNegative(window, pNames='z')
+        mv = MovingCountedNegative(window, dependency='z')
         runningCount = 0
         con = []
         for i, value in enumerate(values):
             if not i % 2:
                 runningCount += 1
             con.append(i)
-            mv.push(z=value)
+            mv.push(dict(z=value))
 
             if i >= window:
                 if not con[0] % 2:
@@ -237,14 +235,14 @@ class TestStatefulAccumulators(unittest.TestCase):
         total = 2500
 
         # Test moving population variance
-        mv = MovingVariance(window, pNames='z', isPopulation=True)
+        mv = MovingVariance(window, dependency='z', isPopulation=True)
         runningSum = 0.0
         runningSumSquare = 0.0
         con = []
         for i in range(total):
             value = float(i)
             con.append(value)
-            mv.push(z=value)
+            mv.push(dict(z=value))
             runningSum += value
             runningSumSquare += value * value
 
@@ -261,14 +259,14 @@ class TestStatefulAccumulators(unittest.TestCase):
                                                                  "Var calculated: {2:f}".format(i, expected, calculated))
 
         # Test moving sample variance
-        mv = MovingVariance(window, pNames='z', isPopulation=False)
+        mv = MovingVariance(window, dependency='z', isPopulation=False)
         runningSum = 0.0
         runningSumSquare = 0.0
         con = []
         for i in range(total):
             value = float(i)
             con.append(value)
-            mv.push(z=value)
+            mv.push(dict(z=value))
             runningSum += value
             runningSumSquare += value * value
 
@@ -291,15 +289,15 @@ class TestStatefulAccumulators(unittest.TestCase):
 
     def testMovingNegativeVariancer(self):
         # test without enough negative value
-        mv = MovingNegativeVariance(20, pNames='z', isPopulation=True)
-        mv.push(z=20.)
+        mv = MovingNegativeVariance(20, dependency='z', isPopulation=True)
+        mv.push(dict(z=20.))
 
         with self.assertRaises(RuntimeError):
             _ = mv.result()
 
-        mv = MovingNegativeVariance(20, pNames='z', isPopulation=False)
-        mv.push(z=20.)
-        mv.push(z=-20.)
+        mv = MovingNegativeVariance(20, dependency='z', isPopulation=False)
+        mv.push(dict(z=20.))
+        mv.push(dict(z=-20.))
 
         with self.assertRaises(RuntimeError):
             _ = mv.result()
@@ -308,14 +306,14 @@ class TestStatefulAccumulators(unittest.TestCase):
         filePath = os.path.join(dirName, 'data/negativevariance.csv')
 
         window = 20
-        mv = MovingNegativeVariance(window, pNames='z')
+        mv = MovingNegativeVariance(window, dependency='z')
 
         with open(filePath, 'r') as fileHandler:
             reader = csv.reader(fileHandler)
             for i, row in enumerate(reader):
                 if i == 0:
                     continue
-                mv.push(z=float(row[1]))
+                mv.push(dict(z=float(row[1])))
 
                 if mv._runningNegativeCount == 1:
                     with self.assertRaises(RuntimeError):
@@ -334,7 +332,7 @@ class TestStatefulAccumulators(unittest.TestCase):
         mh = MovingHistoricalWindow(window, "x")
         benchmarkContainer = deque(maxlen=window)
         for i, data in enumerate(self.sample):
-            mh.push(x=data)
+            mh.push(dict(x=data))
             benchmarkContainer.append(data)
 
             if i == 0:
@@ -351,8 +349,8 @@ class TestStatefulAccumulators(unittest.TestCase):
         mh = MovingHistoricalWindow(window, ma)
         benchmarkContainer = deque(maxlen=window)
         for i, data in enumerate(self.sample):
-            ma.push(x=data)
-            mh.push(x=data)
+            ma.push(dict(x=data))
+            mh.push(dict(x=data))
             benchmarkContainer.append(ma.value)
 
             if i == 0:
@@ -371,7 +369,7 @@ class TestStatefulAccumulators(unittest.TestCase):
         filePath = os.path.join(dirName, 'data/correlation.csv')
 
         window = 120
-        mv = MovingCorrelation(window, pNames=['z', 't'])
+        mv = MovingCorrelation(window, dependency=['z', 't'])
 
         with open(filePath, 'r') as fileHandler:
             reader = csv.reader(fileHandler)
@@ -379,7 +377,7 @@ class TestStatefulAccumulators(unittest.TestCase):
             for i, row in enumerate(reader):
                 if i == 0:
                     continue
-                mv.push(z=float(row[0]), t=float(row[1]))
+                mv.push(dict(z=float(row[0]), t=float(row[1])))
 
                 if i == 1:
                     with self.assertRaises(RuntimeError):
@@ -412,14 +410,14 @@ class TestStatefulAccumulators(unittest.TestCase):
 
         window = 100
 
-        mv = MovingCorrelationMatrix(window, pNames='samples')
+        mv = MovingCorrelationMatrix(window, dependency='samples')
 
         with open(filePath, 'r') as fileHandler:
             reader = csv.reader(fileHandler)
 
             for i, row in enumerate(reader):
                 row = [float(value) for value in row]
-                mv.push(samples=row)
+                mv.push(dict(samples=row))
                 if i == 0:
                     with self.assertRaises(RuntimeError):
                         _ = mv.result()

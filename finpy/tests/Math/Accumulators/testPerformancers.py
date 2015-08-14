@@ -29,7 +29,8 @@ class TestPerformancers(unittest.TestCase):
             for i, row in enumerate(reader):
                 if i == 0:
                     continue
-                mv.push(ret=float(row[1]), riskFree=float(row[2]))
+                data = {'ret': float(row[1]), 'riskFree': float(row[2])}
+                mv.push(data)
                 if i == 1:
                     with self.assertRaises(RuntimeError):
                         _ = mv.result()
@@ -52,7 +53,7 @@ class TestPerformancers(unittest.TestCase):
             for i, row in enumerate(reader):
                 if i == 0:
                     continue
-                mv.push(ret=float(row[2]), riskFree=float(row[3]))
+                mv.push(dict(ret=float(row[2]), riskFree=float(row[3])))
                 if i == 1:
                     with self.assertRaises(RuntimeError):
                         _ = mv.result()
@@ -75,7 +76,7 @@ class TestPerformancers(unittest.TestCase):
             for i, row in enumerate(reader):
                 if i == 0:
                     continue
-                mv.push(pRet=float(row[0]), mRet=float(row[1]), riskFree=float(row[2]))
+                mv.push(dict(pRet=float(row[0]), mRet=float(row[1]), riskFree=float(row[2])))
                 if i == 1:
                     with self.assertRaises(RuntimeError):
                         _ = mv.result()
@@ -102,7 +103,7 @@ class TestPerformancers(unittest.TestCase):
             for i, row in enumerate(reader):
                 if i == 0:
                     continue
-                mv.push(ret=float(row[1]))
+                mv.push(dict(ret=float(row[1])))
                 expectedDrawdown = float(row[2])
                 calculatedDrawdown = mv.result()[0]
                 self.assertAlmostEqual(calculatedDrawdown, expectedDrawdown, 10, "at index {0:d}\n"
@@ -121,7 +122,7 @@ class TestPerformancers(unittest.TestCase):
             for i, row in enumerate(reader):
                 if i == 0:
                     continue
-                mv.push(ret=float(row[1]))
+                mv.push(dict(ret=float(row[1])))
                 expectedDrawdown = float(row[2])
                 calculatedDrawdown = mv.result()[0]
                 self.assertAlmostEqual(calculatedDrawdown, expectedDrawdown, 10, "at index {0:d}\n"
@@ -140,7 +141,7 @@ class TestPerformancers(unittest.TestCase):
             for i, row in enumerate(reader):
                 if i == 0:
                     continue
-                mv.push(ret=float(row[1]))
+                mv.push(dict(ret=float(row[1])))
                 expectedDrawdown = float(row[4])
                 calculatedDrawdown = mv.result()[0]
                 self.assertAlmostEqual(calculatedDrawdown, expectedDrawdown, 7, "at index {0:d}\n"
@@ -159,7 +160,7 @@ class TestPerformancers(unittest.TestCase):
             for i, row in enumerate(reader):
                 if i == 0:
                     continue
-                mv.push(ret=float(row[1]))
+                mv.push(dict(ret=float(row[1])))
                 expectedDrawdown = float(row[5])
                 calculatedDrawdown = mv.result()[0]
                 self.assertAlmostEqual(calculatedDrawdown, expectedDrawdown, 7, "at index {0:d}\n"
@@ -178,7 +179,7 @@ class TestPerformancers(unittest.TestCase):
             for i, row in enumerate(reader):
                 if i == 0:
                     continue
-                mv.push(ret=float(row[1]))
+                mv.push(dict(ret=float(row[1])))
                 expectedDrawdown = float(row[5])
                 calculatedDrawdown = mv.result()[0]
                 self.assertAlmostEqual(calculatedDrawdown, expectedDrawdown, 7, "at index {0:d}\n"

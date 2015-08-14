@@ -43,10 +43,10 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
 
         # check parameter list should not be empty
         with self.assertRaises(RuntimeError):
-            Max(pNames=[])
+            Max(dependency=[])
 
-        m = Max(pNames='x')
-        m.push(x=10.0)
+        m = Max(dependency='x')
+        m.push({'x': 10.0})
         self.assertAlmostEqual(m.result(), m.value)
 
     def testPlusOperator(self):
@@ -57,11 +57,12 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
         concated2 = ma5 + (ma5 ^ ma20)
 
         for i, (open, close) in enumerate(zip(self.sampleOpen, self.sampleClose)):
-            ma5.push(close=close)
-            ma20.push(open=open)
-            plusRes.push(open=open, close=close)
-            concated.push(open=open, close=close)
-            concated2.push(open=open, close=close)
+            data = {'close': close, 'open': open}
+            ma5.push(data)
+            ma20.push(data)
+            plusRes.push(data)
+            concated.push(data)
+            concated2.push(data)
 
             expected = ma5.result() + ma20.result()
             calculated = plusRes.result()
@@ -96,12 +97,13 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
         concated3 = (ma5 ^ ma20) + ma5
 
         for i, close in enumerate(self.sampleClose):
-            ma5.push(close=close)
-            ma20.push(close=close)
-            plusRes.push(close=close)
-            concated.push(close=close)
-            concated2.push(close=close)
-            concated3.push(close=close)
+            data = {'close': close}
+            ma5.push(data)
+            ma20.push(data)
+            plusRes.push(data)
+            concated.push(data)
+            concated2.push(data)
+            concated3.push(data)
 
             expected = 5.0 + ma20.result()
             calculated = plusRes.result()
@@ -140,10 +142,11 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
         concated = (MovingAverage(5, 'close') ^ Sum('open')) - Sum('open')
 
         for i, (open, close) in enumerate(zip(self.sampleOpen, self.sampleClose)):
-            ma5.push(close=close)
-            sumTotal.push(open=open)
-            subRes.push(open=open, close=close)
-            concated.push(open=open, close=close)
+            data = {'close': close, 'open': open}
+            ma5.push(data)
+            sumTotal.push(data)
+            subRes.push(data)
+            concated.push(data)
 
             expected = ma5.result() - sumTotal.result()
             calculated = subRes.result()
@@ -167,10 +170,11 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
         concated = sumTotal - (ma20 ^ sumTotal)
 
         for i, close in enumerate(self.sampleClose):
-            ma20.push(close=close)
-            sumTotal.push(close=close)
-            subRes.push(close=close)
-            concated.push(close=close)
+            data = {'close': close}
+            ma20.push(data)
+            sumTotal.push(data)
+            subRes.push(data)
+            concated.push(data)
 
             expected = 5.0 - ma20.result()
             calculated = subRes.result()
@@ -195,11 +199,12 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
         concated2 = Average('open') * (Average('open') ^ mv5)
 
         for i, (open, close) in enumerate(zip(self.sampleOpen, self.sampleClose)):
-            mv5.push(close=close)
-            average.push(open=open)
-            mulRes.push(open=open, close=close)
-            concated.push(open=open, close=close)
-            concated2.push(open=open, close=close)
+            data = {'close': close, 'open': open}
+            mv5.push(data)
+            average.push(data)
+            mulRes.push(data)
+            concated.push(data)
+            concated2.push(data)
 
             if i >= 1:
                 expected = mv5.result() * average.result()
@@ -232,10 +237,11 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
         concated = 5.0 * (MovingAverage(20, 'close') ^ Average('open'))
 
         for i, (open, close) in enumerate(zip(self.sampleOpen, self.sampleClose)):
-            average.push(open=open)
-            ma20.push(close=close)
-            mulRes.push(close=close)
-            concated.push(open=open,close=close)
+            data = {'close': close, 'open': open}
+            average.push(data)
+            ma20.push(data)
+            mulRes.push(data)
+            concated.push(data)
 
             expected = 5.0 * ma20.result()
             calculated = mulRes.result()
@@ -260,11 +266,12 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
         concated2 = MovingCorrelation(5, ['open', 'close']) / (Minimum('open') ^ MovingCorrelation(5, ['open', 'close']))
 
         for i, (open, close) in enumerate(zip(self.sampleOpen, self.sampleClose)):
-            mc5.push(open=open, close=close)
-            minum.push(open=open)
-            divRes.push(open=open, close=close)
-            concated.push(open=open, close=close)
-            concated2.push(open=open, close=close)
+            data = {'close': close, 'open': open}
+            mc5.push(data)
+            minum.push(data)
+            divRes.push(data)
+            concated.push(data)
+            concated2.push(data)
 
             if i >= 1:
                 expected = minum.result() / mc5.result()
@@ -297,9 +304,10 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
         concated = (5.0 ^ MovingAverage(20, 'close')) / MovingAverage(20, 'close')
 
         for i, close in enumerate(self.sampleClose):
-            ma20.push(close=close)
-            divRes.push(close=close)
-            concated.push(close=close)
+            data = {'close': close}
+            ma20.push(data)
+            divRes.push(data)
+            concated.push(data)
 
             expected = 5.0 / ma20.result()
             calculated = divRes.result()
@@ -323,10 +331,11 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
         res = (MovingAverage(20, 'close') - MovingAverage(120, 'close')) / MovingMax(50, 'open')
 
         for i, (open, close) in enumerate(zip(self.sampleOpen, self.sampleClose)):
-            ma20.push(close=close)
-            ma120.push(close=close)
-            mmax.push(open=open)
-            res.push(open=open, close=close)
+            data = {'close': close, 'open': open}
+            ma20.push(data)
+            ma120.push(data)
+            mmax.push(data)
+            res.push(data)
 
             expected = (ma20.result() - ma120.result()) / mmax.result()
             calculated = res.result()
@@ -340,9 +349,10 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
         negma20square = -(ma20 ^ ma20)
 
         for i, close in enumerate(self.sampleClose):
-            ma20.push(close=close)
-            negma20.push(close=close)
-            negma20square.push(close=close)
+            data = {'close': close}
+            ma20.push(data)
+            negma20.push(data)
+            negma20square.push(data)
 
             expected = -ma20.result()
             calculated = negma20.result()
@@ -365,12 +375,13 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
         listHolder3 = MovingAverage(20, 'close') ^ 2.0
 
         for i, (open, close) in enumerate(zip(self.sampleOpen, self.sampleClose)):
-            ma20.push(close=close)
-            maxer.push(open=open)
-            minimumer.push(close=close)
-            listHolder.push(open=open, close=close)
-            listHolder2.push(close=close)
-            listHolder3.push(close=close)
+            data = {'close': close, 'open': open}
+            ma20.push(data)
+            maxer.push(data)
+            minimumer.push(data)
+            listHolder.push(data)
+            listHolder2.push(data)
+            listHolder3.push(data)
 
             expected = (ma20.result(), maxer.result(), minimumer.result())
             calculated = listHolder.result()
@@ -400,18 +411,21 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
         max5ma2 = MovingAverage(5, Max('close'))
         average = Average('close')
         sumM = Sum('close')
-        mvTest = Correlation(pNames=('x', 'y'))
-        mvCorr = (Average('close') ^ Sum('close')) >> Correlation(pNames=('x', 'y'))
+        mvTest = Correlation(dependency=('x', 'y'))
+        mvCorr = (Average('close') ^ Sum('close')) >> Correlation(dependency=('x', 'y'))
 
         for i, close in enumerate(self.sampleClose):
-            maxer.push(close=close)
-            ma5.push(x=maxer.result())
-            max5ma.push(close=close)
-            max5ma2.push(close=close)
-            average.push(close=close)
-            sumM.push(close=close)
-            mvTest.push(x=average.result(), y=sumM.result())
-            mvCorr.push(close=close)
+            data = {'close': close, 'open': open}
+            maxer.push(data)
+            data2 = {'x': maxer.result()}
+            ma5.push(data2)
+            max5ma.push(data)
+            max5ma2.push(data)
+            average.push(data)
+            sumM.push(data)
+            data3 = {'x': average.result(), 'y': sumM.result()}
+            mvTest.push(data3)
+            mvCorr.push(data)
 
             expected = ma5.result()
             calculated = max5ma.result()
@@ -435,9 +449,9 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
             _ = Max('close') >> math.sqrt
 
         with self.assertRaises(AssertionError):
-            _ = (Max('close') ^ Minimum('close')) >> MovingCorrelation(20, pNames=('x', 'y', 'z'))
+            _ = (Max('close') ^ Minimum('close')) >> MovingCorrelation(20, dependency=('x', 'y', 'z'))
 
-        (Max('close') ^ Minimum('close')) >> MovingCorrelation(20, pNames=('x', 'y'))
+        (Max('close') ^ Minimum('close')) >> MovingCorrelation(20, dependency=('x', 'y'))
 
     def testListedAndCompoundedOperator(self):
         maClose = MovingAverage(20, 'close')
@@ -450,10 +464,11 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
         maOpenContainer = deque(maxlen=20)
 
         for i, (open, close, rf) in enumerate(zip(self.sampleOpen, self.sampleClose, self.sampleRf)):
-            maClose.push(close=close)
-            maOpen.push(open=open)
-            maRf.push(rf=rf)
-            mc.push(open=open, close=close, rf=rf)
+            data = {'close': close, 'open': open, 'rf': rf}
+            maClose.push(data)
+            maOpen.push(data)
+            maRf.push(data)
+            mc.push(data)
             maCloseContainer.append(maClose.result() - maRf.result())
             maOpenContainer.append(maOpen.result() - maRf.result())
 
@@ -479,28 +494,27 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
             _ = TruncatedValueHolder(ma20, 1)
 
         test = TruncatedValueHolder(ma20 ^ max5, 1)
-        test.push(close=10.0, open=5.0)
-        test.push(close=10.0, open=20.0)
+        test.push(dict(close=10.0, open=5.0))
+        test.push(dict(close=10.0, open=20.0))
         self.assertAlmostEqual(test.result(), 20.0, 15)
 
         test = TruncatedValueHolder(ma20 ^ max5, 0)
-        test.push(close=10.0, open=5.0)
-        test.push(close=15.0,open=20.0)
+        test.push(dict(close=10.0, open=5.0))
+        test.push(dict(close=15.0,open=20.0))
         self.assertAlmostEqual(test.result(), 12.50, 15)
 
         test = TruncatedValueHolder(ma20 ^ max5, slice(1, 2))
-        test.push(close=10.0, open=5.0)
-        test.push(close=15.0, open=20.0)
+        test.push(dict(close=10.0, open=5.0))
+        test.push(dict(close=15.0, open=20.0))
         self.assertAlmostEqual(test.result(), (20.0,), 15)
 
         test = TruncatedValueHolder(ma20 ^ max5, slice(0, -1))
-        test.push(close=10.0, open=5.0)
-        test.push(close=15.0, open=20.0)
+        test.push(dict(close=10.0, open=5.0))
+        test.push(dict(close=15.0, open=20.0))
         self.assertAlmostEqual(test.result(), (12.5,), 15)
 
         with self.assertRaises(RuntimeError):
             _ = TruncatedValueHolder(ma20 ^ max5, slice(1, -2))
-
 
     def testGetItemOperator(self):
         listHolder = MovingAverage(20, 'close') ^ Max('open') ^ Minimum('close')
@@ -509,9 +523,10 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
         maxer = Max('open')
 
         for i, (open, close) in enumerate(zip(self.sampleOpen, self.sampleClose)):
-            listHolder1.push(open=open, close=close)
-            listHolder2.push(open=open, close=close)
-            maxer.push(open=open)
+            data = {'close': close, 'open': open}
+            listHolder1.push(data)
+            listHolder2.push(data)
+            maxer.push(data)
 
             expected = maxer.result()
             calculated = listHolder1.result()
@@ -529,21 +544,21 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
         m2 = Minimum('x')
         cmp = m1 <= m2
 
-        cmp.push(x=1.0)
+        cmp.push(dict(x=1.0))
         self.assertEqual(True, cmp.result())
-        cmp.push(x=2.0)
+        cmp.push(dict(x=2.0))
         self.assertEqual(False, cmp.result())
 
         cmp = (m1 ^ m2) <= m2
-        cmp.push(x=1.0)
+        cmp.push(dict(x=1.0))
         self.assertEqual((True, True), cmp.result())
-        cmp.push(x=2.0)
+        cmp.push(dict(x=2.0))
         self.assertEqual((False, True), cmp.result())
 
         cmp = m1 <= (m1 ^ m2)
-        cmp.push(x=1.0)
+        cmp.push(dict(x=1.0))
         self.assertEqual((True, True), cmp.result())
-        cmp.push(x=2.0)
+        cmp.push(dict(x=2.0))
         self.assertEqual((True, False), cmp.result())
 
     def testLessOperator(self):
@@ -551,21 +566,21 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
         m2 = Max('x')
         cmp = m1 < m2
 
-        cmp.push(x=1.0)
+        cmp.push(dict(x=1.0))
         self.assertEqual(False, cmp.result())
-        cmp.push(x=2.0)
+        cmp.push(dict(x=2.0))
         self.assertEqual(True, cmp.result())
 
         cmp = (m1 ^ m2) < m2
-        cmp.push(x=1.0)
+        cmp.push(dict(x=1.0))
         self.assertEqual((False, False), cmp.result())
-        cmp.push(x=2.0)
+        cmp.push(dict(x=2.0))
         self.assertEqual((True, False), cmp.result())
 
         cmp = m1 < (m1 ^ m2)
-        cmp.push(x=1.0)
+        cmp.push(dict(x=1.0))
         self.assertEqual((False, False), cmp.result())
-        cmp.push(x=2.0)
+        cmp.push(dict(x=2.0))
         self.assertEqual((False, True), cmp.result())
 
     def testGreaterOrEqualOperator(self):
@@ -573,21 +588,21 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
         m2 = Max('x')
         cmp = m1 >= m2
 
-        cmp.push(x=1.0)
+        cmp.push(dict(x=1.0))
         self.assertEqual(True, cmp.result())
-        cmp.push(x=2.0)
+        cmp.push(dict(x=2.0))
         self.assertEqual(False, cmp.result())
 
         cmp = (m1 ^ m2) >= m2
-        cmp.push(x=1.0)
+        cmp.push(dict(x=1.0))
         self.assertEqual((True, True), cmp.result())
-        cmp.push(x=2.0)
+        cmp.push(dict(x=2.0))
         self.assertEqual((False, True), cmp.result())
 
         cmp = m1 >= (m1 ^ m2)
-        cmp.push(x=1.0)
+        cmp.push(dict(x=1.0))
         self.assertEqual((True, True), cmp.result())
-        cmp.push(x=2.0)
+        cmp.push(dict(x=2.0))
         self.assertEqual((True, False), cmp.result())
 
     def testGreaterOperator(self):
@@ -595,21 +610,21 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
         m2 = Minimum('x')
         cmp = m1 > m2
 
-        cmp.push(x=1.0)
+        cmp.push(dict(x=1.0))
         self.assertEqual(False, cmp.result())
-        cmp.push(x=2.0)
+        cmp.push(dict(x=2.0))
         self.assertEqual(True, cmp.result())
 
         cmp = (m1 ^ m2) > m2
-        cmp.push(x=1.0)
+        cmp.push(dict(x=1.0))
         self.assertEqual((False, False), cmp.result())
-        cmp.push(x=2.0)
+        cmp.push(dict(x=2.0))
         self.assertEqual((True, False), cmp.result())
 
         cmp = m1 > (m1 ^ m2)
-        cmp.push(x=1.0)
+        cmp.push(dict(x=1.0))
         self.assertEqual((False, False), cmp.result())
-        cmp.push(x=2.0)
+        cmp.push(dict(x=2.0))
         self.assertEqual((False, True), cmp.result())
 
     def testExpFunction(self):
@@ -618,9 +633,10 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
         holder2 = MovingAverage(5, 'close') >> Exp
 
         for i, close in enumerate(self.sampleClose):
-            ma5.push(close=close)
-            holder.push(close=close)
-            holder2.push(close=close)
+            data = {'close': close}
+            ma5.push(data)
+            holder.push(data)
+            holder2.push(data)
 
             expected = math.exp(ma5.result())
             calculated = holder.result()
@@ -641,9 +657,10 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
         sampleClose = np.exp(self.sampleClose)
 
         for i, close in enumerate(sampleClose):
-            ma5.push(close=close)
-            holder.push(close=close)
-            holder2.push(close=close)
+            data = {'close': close}
+            ma5.push(data)
+            holder.push(data)
+            holder2.push(data)
 
             expected = math.log(ma5.result())
             calculated = holder.result()
@@ -664,8 +681,9 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
         sampleClose = np.square(self.sampleClose)
 
         for i, close in enumerate(sampleClose):
-            ma5.push(close=close)
-            holder.push(close=close)
+            data = {'close': close}
+            ma5.push(data)
+            holder.push(data)
 
             expected = math.sqrt(ma5.result())
             calculated = holder.result()
@@ -678,8 +696,9 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
         holder = Abs(ma5)
 
         for i, close in enumerate(self.sampleClose):
-            ma5.push(close=close)
-            holder.push(close=close)
+            data = {'close': close}
+            ma5.push(data)
+            holder.push(data)
 
             expected = abs(ma5.result())
             calculated = holder.result()
@@ -693,9 +712,10 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
         holder2 = Pow(ma5min ^ ma5min, 3)
 
         for i, close in enumerate(self.sampleClose):
-            ma5min.push(close=close)
-            holder.push(close=close)
-            holder2.push(close=close)
+            data = {'close': close}
+            ma5min.push(data)
+            holder.push(data)
+            holder2.push(data)
 
             expected = math.pow(ma5min.result(), 3)
             calculated = holder.result()
@@ -716,8 +736,9 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
         sampleClose = np.cos(self.sampleClose)
 
         for i, close in enumerate(sampleClose):
-            ma5.push(close=close)
-            holder.push(close=close)
+            data = {'close': close}
+            ma5.push(data)
+            holder.push(data)
 
             expected = math.acos(ma5.result())
             calculated = holder.result()
@@ -732,8 +753,9 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
         sampleClose = np.cosh(self.sampleClose)
 
         for i, close in enumerate(sampleClose):
-            ma5.push(close=close)
-            holder.push(close=close)
+            data = {'close': close}
+            ma5.push(data)
+            holder.push(data)
 
             expected = math.acosh(ma5.result())
             calculated = holder.result()
@@ -748,8 +770,9 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
         sampleClose = np.sin(self.sampleClose)
 
         for i, close in enumerate(sampleClose):
-            ma5.push(close=close)
-            holder.push(close=close)
+            data = {'close': close}
+            ma5.push(data)
+            holder.push(data)
 
             expected = math.asin(ma5.result())
             calculated = holder.result()
@@ -764,8 +787,9 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
         sampleClose = np.sinh(self.sampleClose)
 
         for i, close in enumerate(sampleClose):
-            ma5.push(close=close)
-            holder.push(close=close)
+            data = {'close': close}
+            ma5.push(data)
+            holder.push(data)
 
             expected = math.asinh(ma5.result())
             calculated = holder.result()

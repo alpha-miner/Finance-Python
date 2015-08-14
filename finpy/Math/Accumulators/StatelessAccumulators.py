@@ -12,22 +12,23 @@ from finpy.Math.Accumulators.StatefulAccumulators import _checkParameterList
 
 class StatelessAccumulator(Accumulator):
 
-    def __init__(self, pNames='x'):
-        super(StatelessAccumulator, self).__init__(pNames)
+    def __init__(self, dependency='x'):
+        super(StatelessAccumulator, self).__init__(dependency)
         self._currentMax = None
         self._returnSize = 1
-        self._dependency = 0
+        self._window = 1
+        self._containerSize = 1
 
 
 class Max(StatelessAccumulator):
-    def __init__(self, pNames='x'):
-        super(Max, self).__init__(pNames)
-        _checkParameterList(pNames)
+    def __init__(self, dependency='x'):
+        super(Max, self).__init__(dependency)
+        _checkParameterList(dependency)
         self._currentMax = None
         self._returnSize = 1
 
-    def push(self, **kwargs):
-        value = super(Max, self).push(**kwargs)
+    def push(self, data):
+        value = super(Max, self).push(data)
         if value is None:
             return
         if self._currentMax is None:
@@ -41,14 +42,14 @@ class Max(StatelessAccumulator):
 
 
 class Minimum(StatelessAccumulator):
-    def __init__(self, pNames='x'):
-        super(Minimum, self).__init__(pNames)
-        _checkParameterList(pNames)
+    def __init__(self, dependency='x'):
+        super(Minimum, self).__init__(dependency)
+        _checkParameterList(dependency)
         self._currentMin = None
         self._returnSize = 1
 
-    def push(self, **kwargs):
-        value = super(Minimum, self).push(**kwargs)
+    def push(self, data):
+        value = super(Minimum, self).push(data)
         if value is None:
             return
         if self._currentMin is None:
@@ -62,14 +63,14 @@ class Minimum(StatelessAccumulator):
 
 
 class Sum(StatelessAccumulator):
-    def __init__(self, pNames='x'):
-        super(Sum, self).__init__(pNames)
-        _checkParameterList(pNames)
+    def __init__(self, dependency='x'):
+        super(Sum, self).__init__(dependency)
+        _checkParameterList(dependency)
         self._currentSum = 0.0
         self._returnSize = 1
 
-    def push(self, **kwargs):
-        value = super(Sum, self).push(**kwargs)
+    def push(self, data):
+        value = super(Sum, self).push(data)
         if value is None:
             return
         self._currentSum += value
@@ -79,15 +80,15 @@ class Sum(StatelessAccumulator):
 
 
 class Average(StatelessAccumulator):
-    def __init__(self, pNames='x'):
-        super(Average, self).__init__(pNames)
-        _checkParameterList(pNames)
+    def __init__(self, dependency='x'):
+        super(Average, self).__init__(dependency)
+        _checkParameterList(dependency)
         self._currentSum = 0.0
         self._currentCount = 0
         self._returnSize = 1
 
-    def push(self, **kwargs):
-        value = super(Average, self).push(**kwargs)
+    def push(self, data):
+        value = super(Average, self).push(data)
         self._currentSum += value
         self._currentCount += 1
 
@@ -96,17 +97,17 @@ class Average(StatelessAccumulator):
 
 
 class Variance(StatelessAccumulator):
-    def __init__(self, pNames='x', isPopulation=False):
-        super(Variance, self).__init__(pNames)
-        _checkParameterList(pNames)
+    def __init__(self, dependency='x', isPopulation=False):
+        super(Variance, self).__init__(dependency)
+        _checkParameterList(dependency)
         self._currentSum = 0.0
         self._currentSumSquare = 0.0
         self._currentCount = 0
         self._isPop = isPopulation
         self._returnSize = 1
 
-    def push(self, **kwargs):
-        value = super(Variance, self).push(**kwargs)
+    def push(self, data):
+        value = super(Variance, self).push(data)
         if value is None:
             return
         self._currentSum += value
@@ -126,8 +127,8 @@ class Variance(StatelessAccumulator):
 
 
 class Correlation(StatelessAccumulator):
-    def __init__(self, pNames=('x', 'y')):
-        super(Correlation, self).__init__(pNames)
+    def __init__(self, dependency=('x', 'y')):
+        super(Correlation, self).__init__(dependency)
         self._runningSumLeft = 0.0
         self._runningSumRight = 0.0
         self._runningSumSquareLeft = 0.0
@@ -136,8 +137,8 @@ class Correlation(StatelessAccumulator):
         self._currentCount = 0
         self._returnSize = 1
 
-    def push(self, **kwargs):
-        value = super(Correlation, self).push(**kwargs)
+    def push(self, data):
+        value = super(Correlation, self).push(data)
         if value is None:
             return
         self._runningSumLeft = self._runningSumLeft + value[0]

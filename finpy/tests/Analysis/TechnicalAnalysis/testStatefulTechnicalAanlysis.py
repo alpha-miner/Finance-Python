@@ -24,6 +24,7 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
 
     def setUp(self):
         # preparing market data
+        np.random.seed(0)
         aaplClose = np.random.randn(1000)
         aaplOpen = np.random.randn(1000)
         self.aapl = {'close': aaplClose, 'open': aaplOpen}

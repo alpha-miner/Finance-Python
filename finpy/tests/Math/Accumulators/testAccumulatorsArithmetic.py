@@ -35,6 +35,7 @@ from finpy.Math.Accumulators.Performancers import MovingAlphaBeta
 class TestAccumulatorsArithmetic(unittest.TestCase):
 
     def setUp(self):
+        np.random.seed(0)
         self.sampleOpen = np.random.randn(10000)
         self.sampleClose = np.random.randn(10000)
         self.sampleRf = np.random.randn(10000)

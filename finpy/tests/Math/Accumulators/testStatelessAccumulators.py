@@ -17,6 +17,7 @@ from finpy.Math.Accumulators.StatelessAccumulators import Correlation
 class TestStatelessAccumulators(unittest.TestCase):
 
     def setUp(self):
+        np.random.seed(0)
         self.samplesOpen = np.random.randn(10000)
         self.samplesClose = np.random.randn(10000)
 

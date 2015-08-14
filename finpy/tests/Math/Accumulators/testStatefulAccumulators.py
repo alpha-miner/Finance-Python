@@ -29,6 +29,7 @@ from finpy.Math.Accumulators import MovingCorrelationMatrix
 class TestStatefulAccumulators(unittest.TestCase):
 
     def setUp(self):
+        np.random.seed(0)
         self.sample = np.random.randn(10000)
 
     def testShiftValueHolder(self):

@@ -21,7 +21,6 @@ from finpy.Analysis.TechnicalAnalysis import SecurityMovingHistoricalWindow
 
 
 class TestStatefulTechnicalAnalysis(unittest.TestCase):
-
     def setUp(self):
         # preparing market data
         np.random.seed(0)
@@ -49,7 +48,7 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
 
             value = ma1.value
             for name in value:
-                expected = np.mean(self.dataSet[name]['close'][start:(i+1)])
+                expected = np.mean(self.dataSet[name]['close'][start:(i + 1)])
                 calculated = value[name]
                 self.assertAlmostEqual(expected, calculated, 12, 'at index {0}\n'
                                                                  'expected:   {1:.12f}\n'
@@ -69,11 +68,11 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
             if i < 10:
                 start = 0
             else:
-                start = i+1 - window
+                start = i + 1 - window
 
             value = ma1.value
             for name in value:
-                expected = np.max(self.dataSet[name]['close'][start:(i+1)])
+                expected = np.max(self.dataSet[name]['close'][start:(i + 1)])
                 calculated = value[name]
                 self.assertAlmostEqual(expected, calculated, 12, 'at index {0}\n'
                                                                  'expected:   {1:.12f}\n'
@@ -97,7 +96,7 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
 
             value = ma1.value
             for name in value:
-                expected = np.min(self.dataSet[name]['close'][start:(i+1)])
+                expected = np.min(self.dataSet[name]['close'][start:(i + 1)])
                 calculated = value[name]
                 self.assertAlmostEqual(expected, calculated, 12, 'at index {0}\n'
                                                                  'expected:   {1:.12f}\n'
@@ -121,7 +120,7 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
 
             value = ma1.value
             for name in value:
-                expected = np.sum(self.dataSet[name]['close'][start:(i+1)])
+                expected = np.sum(self.dataSet[name]['close'][start:(i + 1)])
                 calculated = value[name]
                 self.assertAlmostEqual(expected, calculated, 12, 'at index {0}\n'
                                                                  'expected:   {1:.12f}\n'
@@ -142,7 +141,7 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
 
             value = ma1.value
             for name in value:
-                expected = np.sum(self.dataSet[name]['close'][start:(i+1)] > 0.0)
+                expected = np.sum(self.dataSet[name]['close'][start:(i + 1)] > 0.0)
                 calculated = value[name]
                 self.assertAlmostEqual(expected, calculated, 12, 'at index {0}\n'
                                                                  'expected:   {1:.12f}\n'
@@ -166,7 +165,7 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
 
             value = ma1.value
             for name in value:
-                sampled = list(filter(lambda x: x > 0, self.dataSet[name]['close'][start:(i+1)]))
+                sampled = list(filter(lambda x: x > 0, self.dataSet[name]['close'][start:(i + 1)]))
                 if len(sampled) > 0:
                     expected = np.mean(sampled)
                 else:
@@ -199,13 +198,14 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
 
             value = ma1.value
             for name in value:
-                sampled = self.newDataSet[name]['close'][start:(i+1)]
+                sampled = self.newDataSet[name]['close'][start:(i + 1)]
                 if i >= 10:
-                    expected = math.log(sampled[-1]/sampled[0])
+                    expected = math.log(sampled[-1] / sampled[0])
                     calculated = value[name]
                     self.assertAlmostEqual(expected, calculated, 12, 'at index {0}\n'
                                                                      'expected:   {1:.12f}\n'
-                                                                     'calculated: {2:.12f}'.format(i, expected, calculated))
+                                                                     'calculated: {2:.12f}'.format(i, expected,
+                                                                                                   calculated))
 
         with self.assertRaises(RuntimeError):
             _ = SecurityMovingLogReturn(window, ['close', 'open'], ['aapl', 'ibm'])
@@ -227,22 +227,24 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
             if i >= 1:
                 # check by get item methon
                 container = mh.value
-                for k in range(min(i+1, window)):
+                for k in range(min(i + 1, window)):
                     calculated = mh[k]
                     for name in calculated:
-                        self.assertAlmostEqual(calculated[name], benchmark[name][-1-k], "at index {0} positon {1} and symbol {2}\n"
-                                                                                        "expected:   {3}\n"
-                                                                                        "calculated: {4}".format(i, k, name,
-                                                                                                                 benchmark[name][-1],
-                                                                                                                 calculated[name]))
+                        self.assertAlmostEqual(calculated[name], benchmark[name][-1 - k],
+                                               "at index {0} positon {1} and symbol {2}\n"
+                                               "expected:   {3}\n"
+                                               "calculated: {4}".format(i, k, name,
+                                                                        benchmark[name][-1],
+                                                                        calculated[name]))
                 # check by value method
-                for k in range(min(i+1, window)):
+                for k in range(min(i + 1, window)):
                     for name in calculated:
-                        self.assertAlmostEqual(container[name][k], benchmark[name][-1-k], "at index {0} positon {1} and symbol {2}\n"
-                                                                                        "expected:   {3}\n"
-                                                                                        "calculated: {4}".format(i, k, name,
-                                                                                                                 benchmark[name][-1],
-                                                                                                                 container[name][k]))
+                        self.assertAlmostEqual(container[name][k], benchmark[name][-1 - k],
+                                               "at index {0} positon {1} and symbol {2}\n"
+                                               "expected:   {3}\n"
+                                               "calculated: {4}".format(i, k, name,
+                                                                        benchmark[name][-1],
+                                                                        container[name][k]))
 
     def testValueHolderCompounding(self):
         window = 10
@@ -264,5 +266,3 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
             if i >= 1:
                 self.assertAlmostEqual(max(container), compounded1.value['aapl'], 12)
                 self.assertAlmostEqual(np.mean((container)), compounded2.value['aapl'], 12)
-
-

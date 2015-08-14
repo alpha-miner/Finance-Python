@@ -9,7 +9,6 @@ from collections import OrderedDict
 
 
 class Timeseries(object):
-
     def __init__(self, dates, values):
         assert len(dates) == len(values), "dates and values should have same length"
         self._values = OrderedDict()
@@ -28,4 +27,3 @@ class Timeseries(object):
 
     def __getitem__(self, date):
         return self._values[date]
-

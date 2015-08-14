@@ -14,6 +14,3 @@ from finpy.DateUtilities.Calendar import Calendar
 from finpy.DateUtilities.Date import Date
 from finpy.DateUtilities.Period import Period
 from finpy.DateUtilities.Schedule import Schedule
-
-
-

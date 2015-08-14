@@ -20,7 +20,6 @@ from finpy.Math.Accumulators.Performancers import MovingLogReturn
 
 
 class SecuritySingleValueHolder(SecurityValueHolder):
-
     def __init__(self, window, HolderType, dependency='x', symbolList=None):
         super(SecuritySingleValueHolder, self).__init__(dependency, symbolList)
         self._window = window
@@ -32,61 +31,53 @@ class SecuritySingleValueHolder(SecurityValueHolder):
             self._innerHolders = \
                 {
                     name: HolderType(window, copy.deepcopy(dependency._innerHolders[name])) for name in self._symbolList
-                }
+                    }
 
         else:
             self._innerHolders = \
                 {
                     name: HolderType(window, self._dependency) for name in self._symbolList
-                }
+                    }
 
 
 class SecurityMovingAverage(SecuritySingleValueHolder):
-
     def __init__(self, window, dependency='x', symbolList=None):
-        super(SecurityMovingAverage, self).__init__(window, MovingAverage, dependency,  symbolList)
+        super(SecurityMovingAverage, self).__init__(window, MovingAverage, dependency, symbolList)
 
 
 class SecurityMovingMax(SecuritySingleValueHolder):
-
     def __init__(self, window, dependency='x', symbolList=None):
-        super(SecurityMovingMax, self).__init__(window, MovingMax, dependency,  symbolList)
+        super(SecurityMovingMax, self).__init__(window, MovingMax, dependency, symbolList)
 
 
 class SecurityMovingMinimum(SecuritySingleValueHolder):
-
     def __init__(self, window, dependency='x', symbolList=None):
-        super(SecurityMovingMinimum, self).__init__(window, MovingMinimum, dependency,  symbolList)
+        super(SecurityMovingMinimum, self).__init__(window, MovingMinimum, dependency, symbolList)
 
 
 class SecurityMovingSum(SecuritySingleValueHolder):
-
     def __init__(self, window, dependency='x', symbolList=None):
-        super(SecurityMovingSum, self).__init__(window, MovingSum, dependency,  symbolList)
+        super(SecurityMovingSum, self).__init__(window, MovingSum, dependency, symbolList)
 
 
 class SecurityMovingCountedPositive(SecuritySingleValueHolder):
-
     def __init__(self, window, dependency='x', symbolList=None):
-        super(SecurityMovingCountedPositive, self).__init__(window, MovingCountedPositive, dependency,  symbolList)
+        super(SecurityMovingCountedPositive, self).__init__(window, MovingCountedPositive, dependency, symbolList)
 
 
 class SecurityMovingPositiveAverage(SecuritySingleValueHolder):
-
     def __init__(self, window, dependency='x', symbolList=None):
-        super(SecurityMovingPositiveAverage, self).__init__(window, MovingPositiveAverage, dependency,  symbolList)
+        super(SecurityMovingPositiveAverage, self).__init__(window, MovingPositiveAverage, dependency, symbolList)
 
 
 class SecurityMovingLogReturn(SecuritySingleValueHolder):
-
     def __init__(self, window, dependency='x', symbolList=None):
-        super(SecurityMovingLogReturn, self).__init__(window, MovingLogReturn, dependency,  symbolList)
+        super(SecurityMovingLogReturn, self).__init__(window, MovingLogReturn, dependency, symbolList)
 
 
 class SecurityMovingHistoricalWindow(SecuritySingleValueHolder):
-
     def __init__(self, window, dependency='x', symbolList=None):
-        super(SecurityMovingHistoricalWindow, self).__init__(window, MovingHistoricalWindow, dependency,  symbolList)
+        super(SecurityMovingHistoricalWindow, self).__init__(window, MovingHistoricalWindow, dependency, symbolList)
 
     def __getitem__(self, item):
         if isinstance(item, str):
@@ -101,6 +92,3 @@ class SecurityMovingHistoricalWindow(SecuritySingleValueHolder):
             return SecuritiesValues(res)
         else:
             raise RuntimeError("{0} is not recognized as valid int or string".forma(item))
-
-
-

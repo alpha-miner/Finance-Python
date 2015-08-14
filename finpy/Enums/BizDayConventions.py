@@ -8,6 +8,7 @@ Created on 2015-7-9
 from enum import IntEnum
 from enum import unique
 
+
 @unique
 class BizDayConventions(IntEnum):
     Following = 0

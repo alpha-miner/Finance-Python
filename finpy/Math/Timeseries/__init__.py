@@ -10,4 +10,3 @@ __all__ = ['Timeseries',
 
 from finpy.Math.Timeseries.Timeseries import Timeseries
 from finpy.Math.Timeseries.Normalizers import Normalizer
-

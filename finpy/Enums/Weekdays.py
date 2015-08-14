@@ -8,6 +8,7 @@ Created on 2015-7-9
 from enum import IntEnum
 from enum import unique
 
+
 @unique
 class Weekdays(IntEnum):
     Sunday = 1
@@ -17,4 +18,3 @@ class Weekdays(IntEnum):
     Thursday = 5
     Friday = 6
     Saturday = 7
-

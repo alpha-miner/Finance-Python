@@ -13,7 +13,6 @@ from finpy.Enums import Weekdays
 
 
 class TestDate(unittest.TestCase):
-
     def testBasicFunctions(self):
         year = 2015
         month = 7
@@ -45,38 +44,44 @@ class TestDate(unittest.TestCase):
         self.assertEqual(testDate.dayOfYear(), testDate - Date(2015, 1, 1) + 1, "date day:\n"
                                                                                 "expected:   {0:d}\n"
                                                                                 "calculated: {1:d}"
-                                                                                .format(testDate - Date(2015, 1, 1) + 1, testDate.dayOfYear()))
+                         .format(testDate - Date(2015, 1, 1) + 1, testDate.dayOfYear()))
         self.assertEqual(testDate.weekday(), 6, "date weekday:\n"
                                                 "expected:   {0:d}\n"
                                                 "calculated: {1:d}".format(5, testDate.weekday()))
 
         self.assertEqual(testDate.toDateTime(), dt.date(year, month, day), "date datetime representation\n"
                                                                            "expected:   {0}\n"
-                                                                           "calculated: {1}".format(dt.datetime(year, month, day), testDate.toDateTime()))
+                                                                           "calculated: {1}".format(
+            dt.datetime(year, month, day), testDate.toDateTime()))
 
         serialNumber = testDate.serialNumber
         serialDate = Date(serialNumber=serialNumber)
 
         self.assertEqual(serialDate, testDate, "date excel serial number representation\n"
                                                "expected:   {0:d}"
-                                               "calculated: {1:d}".format(serialDate.serialNumber, testDate.serialNumber))
+                                               "calculated: {1:d}".format(serialDate.serialNumber,
+                                                                          testDate.serialNumber))
 
         # test comparisons
         previousDate = testDate - 1
         self.assertTrue(previousDate < testDate, "{0} is not earlier than {1}".format(previousDate, testDate))
-        self.assertFalse(previousDate >= testDate, "{0} should not be later than or equal to {1}".format(previousDate, testDate))
-        self.assertTrue((previousDate + 1) == testDate, "{0} plus one day should be equal to {1}".format(previousDate, testDate))
+        self.assertFalse(previousDate >= testDate,
+                         "{0} should not be later than or equal to {1}".format(previousDate, testDate))
+        self.assertTrue((previousDate + 1) == testDate,
+                        "{0} plus one day should be equal to {1}".format(previousDate, testDate))
 
         # check static members
         self.assertEqual(Date.minDate(), Date(1901, 1, 1), "min date is wrong")
         self.assertEqual(Date.maxDate(), Date(2199, 12, 31), "max date is wrong")
         self.assertEqual(Date.endOfMonth(testDate), Date(year, month, 31), "end of month is wrong")
         self.assertTrue(Date.isEndOfMonth(Date(year, month, 31)), "{0} should be the end of month")
-        self.assertEqual(Date.nextWeekday(testDate, testDate.weekday()), testDate, "{0}'s next same week day should be {1}"
-                                                                                   .format(testDate, testDate))
+        self.assertEqual(Date.nextWeekday(testDate, testDate.weekday()), testDate,
+                         "{0}'s next same week day should be {1}"
+                         .format(testDate, testDate))
         self.assertEqual(Date.todaysDate().toDateTime(), dt.date.today(), "today's date\n"
                                                                           "expected:   {0}\n"
-                                                                          "calculated: {1}".format(dt.date.today(), Date.todaysDate()))
+                                                                          "calculated: {1}".format(dt.date.today(),
+                                                                                                   Date.todaysDate()))
 
         # nth-week day
         with self.assertRaises(AssertionError):
@@ -117,13 +122,15 @@ class TestDate(unittest.TestCase):
         expectedDate = Date(year - 1, month - 2, day)
         self.assertEqual(oneYearAndTwoMonthsBefore, expectedDate, "date - 14m period\n"
                                                                   "expected:   {0}\n"
-                                                                  "calculated: {1}".format(expectedDate, threeMonthsBefore))
+                                                                  "calculated: {1}".format(expectedDate,
+                                                                                           threeMonthsBefore))
 
         oneYearAndTwoMonthsBefore = testDate + "14m"
         expectedDate = Date(year + 1, month + 2, day)
         self.assertEqual(oneYearAndTwoMonthsBefore, expectedDate, "date + 14m period\n"
                                                                   "expected:   {0}\n"
-                                                                  "calculated: {1}".format(expectedDate, threeMonthsBefore))
+                                                                  "calculated: {1}".format(expectedDate,
+                                                                                           threeMonthsBefore))
 
         fiveMonthsAfter = testDate + "5m"
         expectedDate = Date(year, month + 5, day)
@@ -141,7 +148,7 @@ class TestDate(unittest.TestCase):
         yold = Date.fromExcelSerialNumber(minDate - 1).year()
         wdold = Date.fromExcelSerialNumber(minDate - 1).weekday()
 
-        for i in range(minDate, maxDate+1):
+        for i in range(minDate, maxDate + 1):
             t = Date.fromExcelSerialNumber(i)
             serial = t.serialNumber
             self.assertEqual(serial, i, "inconsistent serial number:\n"
@@ -154,7 +161,7 @@ class TestDate(unittest.TestCase):
             y = t.year()
             wd = t.weekday()
 
-            flag = (dy == dyold+1) or \
+            flag = (dy == dyold + 1) or \
                    (dy == 1 and dyold == 365 and not Date.isLeap(yold)) or \
                    (dy == 1 and dyold == 366 and Date.isLeap(yold))
 
@@ -165,9 +172,9 @@ class TestDate(unittest.TestCase):
 
             dyold = dy
 
-            flag = (d == dold+1 and m == mold and y == yold) or \
-                   (d == 1 and m == mold+1 and y == yold) or \
-                   (d == 1 and m == 1 and y == yold+1)
+            flag = (d == dold + 1 and m == mold and y == yold) or \
+                   (d == 1 and m == mold + 1 and y == yold) or \
+                   (d == 1 and m == 1 and y == yold + 1)
 
             self.assertTrue(flag, "wrong day,month,year increment: \n"
                                   "    date: {0}\n"
@@ -227,7 +234,7 @@ class TestDate(unittest.TestCase):
                               " input date:    {0}\n"
                               " day of month:  {1:d}\n"
                               " month:         {2:d}\n"
-                              " year:          {3:d}".format(input_date, d.dayOfMonth(), d.month(),  d.year()))
+                              " year:          {3:d}".format(input_date, d.dayOfMonth(), d.month(), d.year()))
 
     def testParseDates(self):
         input_date = "2006-01-15"

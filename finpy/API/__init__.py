@@ -12,11 +12,11 @@ __all__ = ["datesList",
            "adjustDateByCalendar",
            "advanceDateByCalendar"]
 
-from finpy.API.DateUtilites import datesList
-from finpy.API.DateUtilites import bizDatesList
-from finpy.API.DateUtilites import holDatesList
-from finpy.API.DateUtilites import advanceDate
-from finpy.API.DateUtilites import adjustDateByCalendar
-from finpy.API.DateUtilites import advanceDateByCalendar
+from finpy.API.DateUtilities import datesList
+from finpy.API.DateUtilities import bizDatesList
+from finpy.API.DateUtilities import holDatesList
+from finpy.API.DateUtilities import advanceDate
+from finpy.API.DateUtilities import adjustDateByCalendar
+from finpy.API.DateUtilities import advanceDateByCalendar
 
 

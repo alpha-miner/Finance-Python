@@ -8,6 +8,7 @@ Created on 2015-7-15
 from enum import IntEnum
 from enum import unique
 
+
 @unique
 class DateGeneration(IntEnum):
     Zero = 0

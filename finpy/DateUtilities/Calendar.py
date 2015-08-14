@@ -28,7 +28,7 @@ class Calendar(object):
         return self._impl.isWeekEnd(weekday)
 
     def isEndOfMonth(self, d):
-        return d.month() != self.adjustDate(d+1).month()
+        return d.month() != self.adjustDate(d + 1).month()
 
     def endOfMonth(self, d):
         return self.adjustDate(Date.endOfMonth(d), BizDayConventions.Preceding)
@@ -64,7 +64,7 @@ class Calendar(object):
         d1 = d
 
         if c == BizDayConventions.Following or c == BizDayConventions.ModifiedFollowing or \
-                c == BizDayConventions.HalfMonthModifiedFollowing:
+                        c == BizDayConventions.HalfMonthModifiedFollowing:
             while self.isHoliday(d1):
                 d1 += 1
             if c == BizDayConventions.ModifiedFollowing or c == BizDayConventions.HalfMonthModifiedFollowing:
@@ -92,7 +92,7 @@ class Calendar(object):
             raise RuntimeError("unknown business-day convention")
         return d1
 
-    def advanceDate(self, d, period, c=BizDayConventions.Following, endOfMonth = False):
+    def advanceDate(self, d, period, c=BizDayConventions.Following, endOfMonth=False):
 
         if isinstance(period, str):
             period = Period(period)
@@ -126,7 +126,7 @@ class Calendar(object):
                 return self.endOfMonth(d1)
             return self.adjustDate(d1, c)
 
-    def holDatesList(self, fromDate, toDate, includeWeekEnds = True):
+    def holDatesList(self, fromDate, toDate, includeWeekEnds=True):
         assert fromDate <= toDate, "from date ({0:s} must be earlier than to date {1:s}".format(fromDate, toDate)
         result = []
         d = fromDate
@@ -145,6 +145,7 @@ class Calendar(object):
                 result.append(d)
             d += 1
         return result
+
 
 class ChinaSseImpl(object):
     def __init__(self):
@@ -168,154 +169,155 @@ class ChinaSseImpl(object):
                 or (y == 2013 and d <= 3 and m == Months.January) \
                 or (y == 2014 and d == 1 and m == Months.January) \
                 or (y == 2015 and d <= 3 and m == Months.January) \
-                or (y == 2004 and d >= 19 and d <= 28 and m == Months.January) \
-                or (y == 2005 and d >= 7 and d <= 15 and m == Months.February) \
+                or (y == 2004 and 19 <= d <= 28 and m == Months.January) \
+                or (y == 2005 and 7 <= d <= 15 and m == Months.February) \
                 or (y == 2006 and ((d >= 26 and m == Months.January) or (d <= 3 and m == Months.February))) \
-                or (y == 2007 and d >= 17 and d <= 25 and m == Months.February) \
-                or (y == 2008 and d >= 6 and d <= 12 and m == Months.February) \
-                or (y == 2009 and d >= 26 and d <= 30 and m == Months.January) \
-                or (y == 2010 and d >= 15 and d <= 19 and m == Months.February) \
-                or (y == 2011 and d >= 2 and d <= 8 and m == Months.February) \
-                or (y == 2012 and d >= 23 and d <= 28 and m == Months.January) \
-                or (y == 2013 and d >= 11 and d <= 15 and m == Months.February) \
+                or (y == 2007 and 17 <= d <= 25 and m == Months.February) \
+                or (y == 2008 and 6 <= d <= 12 and m == Months.February) \
+                or (y == 2009 and 26 <= d <= 30 and m == Months.January) \
+                or (y == 2010 and 15 <= d <= 19 and m == Months.February) \
+                or (y == 2011 and 2 <= d <= 8 and m == Months.February) \
+                or (y == 2012 and 23 <= d <= 28 and m == Months.January) \
+                or (y == 2013 and 11 <= d <= 15 and m == Months.February) \
                 or (y == 2014 and d >= 31 and m == Months.January) \
                 or (y == 2014 and d <= 6 and m == Months.February) \
-                or (y == 2015 and d >= 18 and d <= 24 and m == Months.February) \
+                or (y == 2015 and 18 <= d <= 24 and m == Months.February) \
                 or (y <= 2008 and d == 4 and m == Months.April) \
                 or (y == 2009 and d == 6 and m == Months.April) \
                 or (y == 2010 and d == 5 and m == Months.April) \
-                or (y == 2011 and d >= 3 and d <= 5 and m == Months.April) \
-                or (y == 2012 and d >= 2 and d <= 4 and m == Months.April) \
-                or (y == 2013 and d >= 4 and d <= 5 and m == Months.April) \
+                or (y == 2011 and 3 <= d <= 5 and m == Months.April) \
+                or (y == 2012 and 2 <= d <= 4 and m == Months.April) \
+                or (y == 2013 and 4 <= d <= 5 and m == Months.April) \
                 or (y == 2014 and d == 7 and m == Months.April) \
-                or (y == 2015 and d >= 5 and d <= 6 and m == Months.April) \
-                or (y <= 2007 and d >= 1 and d <= 7 and m == Months.May) \
-                or (y == 2008 and d >= 1 and d <= 2 and m == Months.May) \
+                or (y == 2015 and 5 <= d <= 6 and m == Months.April) \
+                or (y <= 2007 and 1 <= d <= 7 and m == Months.May) \
+                or (y == 2008 and 1 <= d <= 2 and m == Months.May) \
                 or (y == 2009 and d == 1 and m == Months.May) \
                 or (y == 2010 and d == 3 and m == Months.May) \
                 or (y == 2011 and d == 2 and m == Months.May) \
                 or (y == 2012 and ((d == 30 and m == Months.April) or (d == 1 and m == Months.May))) \
                 or (y == 2013 and ((d >= 29 and m == Months.April) or (d == 1 and m == Months.May))) \
-                or (y == 2014 and d >= 1 and d <= 3 and m == Months.May) \
+                or (y == 2014 and 1 <= d <= 3 and m == Months.May) \
                 or (y == 2015 and d == 1 and m == Months.May) \
                 or (y <= 2008 and d == 9 and m == Months.June) \
                 or (y == 2009 and (d == 28 or d == 29) and m == Months.May) \
-                or (y == 2010 and d >= 14 and d <= 16 and m == Months.June) \
-                or (y == 2011 and d >= 4 and d <= 6 and m == Months.June) \
-                or (y == 2012 and d >= 22 and d <= 24 and m == Months.June) \
-                or (y == 2013 and d >= 10 and d <= 12 and m == Months.June) \
+                or (y == 2010 and 14 <= d <= 16 and m == Months.June) \
+                or (y == 2011 and 4 <= d <= 6 and m == Months.June) \
+                or (y == 2012 and 22 <= d <= 24 and m == Months.June) \
+                or (y == 2013 and 10 <= d <= 12 and m == Months.June) \
                 or (y == 2014 and d == 2 and m == Months.June) \
                 or (y == 2015 and d == 22 and m == Months.June) \
                 or (y <= 2008 and d == 15 and m == Months.September) \
-                or (y == 2010 and d >= 22 and d <= 24 and m == Months.September) \
-                or (y == 2011 and d >= 10 and d <= 12 and m == Months.September) \
+                or (y == 2010 and 22 <= d <= 24 and m == Months.September) \
+                or (y == 2011 and 10 <= d <= 12 and m == Months.September) \
                 or (y == 2012 and d == 30 and m == Months.September) \
-                or (y == 2013 and d >= 19 and d <= 20 and m == Months.September) \
+                or (y == 2013 and 19 <= d <= 20 and m == Months.September) \
                 or (y == 2014 and d == 8 and m == Months.September) \
                 or (y == 2015 and d == 27 and m == Months.September) \
-                or (y <= 2007 and d >= 1 and d <= 7 and m == Months.October) \
+                or (y <= 2007 and 1 <= d <= 7 and m == Months.October) \
                 or (y == 2008 and ((d >= 29 and m == Months.September) or (d <= 3 and m == Months.October))) \
-                or (y == 2009 and d >= 1 and d <= 8 and m == Months.October) \
-                or (y == 2010 and d >= 1 and d <= 7 and m == Months.October) \
-                or (y == 2011 and d >= 1 and d <= 7 and m == Months.October) \
-                or (y == 2012 and d >= 1 and d <= 7 and m == Months.October) \
-                or (y == 2013 and d >= 1 and d <= 7 and m == Months.October) \
-                or (y == 2014 and d >= 1 and d <= 7 and m == Months.October) \
-                or (y == 2015 and d >= 1 and d <= 7 and m == Months.October) \
-                or (y == 2015 and d >= 3 and d <= 4 and m == Months.September):
+                or (y == 2009 and 1 <= d <= 8 and m == Months.October) \
+                or (y == 2010 and 1 <= d <= 7 and m == Months.October) \
+                or (y == 2011 and 1 <= d <= 7 and m == Months.October) \
+                or (y == 2012 and 1 <= d <= 7 and m == Months.October) \
+                or (y == 2013 and 1 <= d <= 7 and m == Months.October) \
+                or (y == 2014 and 1 <= d <= 7 and m == Months.October) \
+                or (y == 2015 and 1 <= d <= 7 and m == Months.October) \
+                or (y == 2015 and 3 <= d <= 4 and m == Months.September):
             return False
         return True
 
     def isWeekEnd(self, weekDay):
         return weekDay == Weekdays.Saturday or weekDay == Weekdays.Sunday
 
-class ChinaIBImpl(object):
 
-    _working_weekends = set([
-            # 2005
-            Date.westernStyle(5, Months.February, 2005),
-            Date.westernStyle(6, Months.February, 2005),
-            Date.westernStyle(30, Months.April, 2005),
-            Date.westernStyle(8, Months.May, 2005),
-            Date.westernStyle(8, Months.October, 2005),
-            Date.westernStyle(9, Months.October, 2005),
-            Date.westernStyle(31, Months.December, 2005),
-            #2006
-            Date.westernStyle(28, Months.January, 2006),
-            Date.westernStyle(29, Months.April, 2006),
-            Date.westernStyle(30, Months.April, 2006),
-            Date.westernStyle(30, Months.September, 2006),
-            Date.westernStyle(30, Months.December, 2006),
-            Date.westernStyle(31, Months.December, 2006),
-            # 2007
-            Date.westernStyle(17, Months.February, 2007),
-            Date.westernStyle(25, Months.February, 2007),
-            Date.westernStyle(28, Months.April, 2007),
-            Date.westernStyle(29, Months.April, 2007),
-            Date.westernStyle(29, Months.September, 2007),
-            Date.westernStyle(30, Months.September, 2007),
-            Date.westernStyle(29, Months.December, 2007),
-            # 2008
-            Date.westernStyle(2, Months.February, 2008),
-            Date.westernStyle(3, Months.February, 2008),
-            Date.westernStyle(4, Months.May, 2008),
-            Date.westernStyle(27, Months.September, 2008),
-            Date.westernStyle(28, Months.September, 2008),
-            # 2009
-            Date.westernStyle(4, Months.January, 2009),
-            Date.westernStyle(24, Months.January, 2009),
-            Date.westernStyle(1, Months.February, 2009),
-            Date.westernStyle(31, Months.May, 2009),
-            Date.westernStyle(27, Months.September, 2009),
-            Date.westernStyle(10, Months.October, 2009),
-            # 2010
-            Date.westernStyle(20, Months.February, 2010),
-            Date.westernStyle(21, Months.February, 2010),
-            Date.westernStyle(12, Months.June, 2010),
-            Date.westernStyle(13, Months.June, 2010),
-            Date.westernStyle(19, Months.September, 2010),
-            Date.westernStyle(25, Months.September, 2010),
-            Date.westernStyle(26, Months.September, 2010),
-            Date.westernStyle(9, Months.October, 2010),
-            # 2011
-            Date.westernStyle(30, Months.January, 2011),
-            Date.westernStyle(12, Months.February, 2011),
-            Date.westernStyle(2, Months.April, 2011),
-            Date.westernStyle(8, Months.October, 2011),
-            Date.westernStyle(9, Months.October, 2011),
-            Date.westernStyle(31, Months.December, 2011),
-            # 2012
-            Date.westernStyle(21, Months.January, 2012),
-            Date.westernStyle(29, Months.January, 2012),
-            Date.westernStyle(31, Months.March, 2012),
-            Date.westernStyle(1, Months.April, 2012),
-            Date.westernStyle(28, Months.April, 2012),
-            Date.westernStyle(29, Months.September, 2012),
-            # 2013
-            Date.westernStyle(5, Months.January,2013),
-            Date.westernStyle(6, Months.January,2013),
-            Date.westernStyle(16,Months.February,2013),
-            Date.westernStyle(17,Months.February,2013),
-            Date.westernStyle(7,Months.April,2013),
-            Date.westernStyle(27,Months.April,2013),
-            Date.westernStyle(28,Months.April,2013),
-            Date.westernStyle(8,Months.June,2013),
-            Date.westernStyle(9,Months.June,2013),
-            Date.westernStyle(22,Months.September,2013),
-            Date.westernStyle(29,Months.September,2013),
-            Date.westernStyle(12,Months.October,2013),
-            # 2014
-            Date.westernStyle(26,Months.January,2014),
-            Date.westernStyle(8,Months.February,2014),
-            Date.westernStyle(4,Months.May,2014),
-            Date.westernStyle(28,Months.September,2014),
-            Date.westernStyle(11,Months.October,2014),
-            # 2015
-            Date.westernStyle(4,Months.January,2015),
-            Date.westernStyle(15,Months.February,2015),
-            Date.westernStyle(28,Months.February,2015),
-			Date.westernStyle(6,Months.September,2015),
-            Date.westernStyle(10,Months.October,2015)])
+class ChinaIBImpl(object):
+    _working_weekends = {
+        # 2005
+        Date.westernStyle(5, Months.February, 2005),
+        Date.westernStyle(6, Months.February, 2005),
+        Date.westernStyle(30, Months.April, 2005),
+        Date.westernStyle(8, Months.May, 2005),
+        Date.westernStyle(8, Months.October, 2005),
+        Date.westernStyle(9, Months.October, 2005),
+        Date.westernStyle(31, Months.December, 2005),
+        # 2006
+        Date.westernStyle(28, Months.January, 2006),
+        Date.westernStyle(29, Months.April, 2006),
+        Date.westernStyle(30, Months.April, 2006),
+        Date.westernStyle(30, Months.September, 2006),
+        Date.westernStyle(30, Months.December, 2006),
+        Date.westernStyle(31, Months.December, 2006),
+        # 2007
+        Date.westernStyle(17, Months.February, 2007),
+        Date.westernStyle(25, Months.February, 2007),
+        Date.westernStyle(28, Months.April, 2007),
+        Date.westernStyle(29, Months.April, 2007),
+        Date.westernStyle(29, Months.September, 2007),
+        Date.westernStyle(30, Months.September, 2007),
+        Date.westernStyle(29, Months.December, 2007),
+        # 2008
+        Date.westernStyle(2, Months.February, 2008),
+        Date.westernStyle(3, Months.February, 2008),
+        Date.westernStyle(4, Months.May, 2008),
+        Date.westernStyle(27, Months.September, 2008),
+        Date.westernStyle(28, Months.September, 2008),
+        # 2009
+        Date.westernStyle(4, Months.January, 2009),
+        Date.westernStyle(24, Months.January, 2009),
+        Date.westernStyle(1, Months.February, 2009),
+        Date.westernStyle(31, Months.May, 2009),
+        Date.westernStyle(27, Months.September, 2009),
+        Date.westernStyle(10, Months.October, 2009),
+        # 2010
+        Date.westernStyle(20, Months.February, 2010),
+        Date.westernStyle(21, Months.February, 2010),
+        Date.westernStyle(12, Months.June, 2010),
+        Date.westernStyle(13, Months.June, 2010),
+        Date.westernStyle(19, Months.September, 2010),
+        Date.westernStyle(25, Months.September, 2010),
+        Date.westernStyle(26, Months.September, 2010),
+        Date.westernStyle(9, Months.October, 2010),
+        # 2011
+        Date.westernStyle(30, Months.January, 2011),
+        Date.westernStyle(12, Months.February, 2011),
+        Date.westernStyle(2, Months.April, 2011),
+        Date.westernStyle(8, Months.October, 2011),
+        Date.westernStyle(9, Months.October, 2011),
+        Date.westernStyle(31, Months.December, 2011),
+        # 2012
+        Date.westernStyle(21, Months.January, 2012),
+        Date.westernStyle(29, Months.January, 2012),
+        Date.westernStyle(31, Months.March, 2012),
+        Date.westernStyle(1, Months.April, 2012),
+        Date.westernStyle(28, Months.April, 2012),
+        Date.westernStyle(29, Months.September, 2012),
+        # 2013
+        Date.westernStyle(5, Months.January, 2013),
+        Date.westernStyle(6, Months.January, 2013),
+        Date.westernStyle(16, Months.February, 2013),
+        Date.westernStyle(17, Months.February, 2013),
+        Date.westernStyle(7, Months.April, 2013),
+        Date.westernStyle(27, Months.April, 2013),
+        Date.westernStyle(28, Months.April, 2013),
+        Date.westernStyle(8, Months.June, 2013),
+        Date.westernStyle(9, Months.June, 2013),
+        Date.westernStyle(22, Months.September, 2013),
+        Date.westernStyle(29, Months.September, 2013),
+        Date.westernStyle(12, Months.October, 2013),
+        # 2014
+        Date.westernStyle(26, Months.January, 2014),
+        Date.westernStyle(8, Months.February, 2014),
+        Date.westernStyle(4, Months.May, 2014),
+        Date.westernStyle(28, Months.September, 2014),
+        Date.westernStyle(11, Months.October, 2014),
+        # 2015
+        Date.westernStyle(4, Months.January, 2015),
+        Date.westernStyle(15, Months.February, 2015),
+        Date.westernStyle(28, Months.February, 2015),
+        Date.westernStyle(6, Months.September, 2015),
+        Date.westernStyle(10, Months.October, 2015)
+    }
 
     def __init__(self):
         self._sseImpl = ChinaSseImpl()
@@ -328,7 +330,6 @@ class ChinaIBImpl(object):
 
 
 class NullCalendar(object):
-
     def __init__(self):
         pass
 
@@ -338,39 +339,39 @@ class NullCalendar(object):
     def isWeekEnd(self, weekDay):
         return weekDay == Weekdays.Saturday or weekDay == Weekdays.Sunday
 
-class WestenImpl(object):
 
+class WestenImpl(object):
     EasterMonday = [
-                  98,  90, 103,  95, 114, 106,  91, 111, 102,   # 1901-1909
-             87, 107,  99,  83, 103,  95, 115,  99,  91, 111,   # 1910-1919
-             96,  87, 107,  92, 112, 103,  95, 108, 100,  91,   # 1920-1929
-            111,  96,  88, 107,  92, 112, 104,  88, 108, 100,   # 1930-1939
-             85, 104,  96, 116, 101,  92, 112,  97,  89, 108,   # 1940-1949
-            100,  85, 105,  96, 109, 101,  93, 112,  97,  89,   # 1950-1959
-            109,  93, 113, 105,  90, 109, 101,  86, 106,  97,   # 1960-1969
-             89, 102,  94, 113, 105,  90, 110, 101,  86, 106,   # 1970-1979
-             98, 110, 102,  94, 114,  98,  90, 110,  95,  86,   # 1980-1989
-            106,  91, 111, 102,  94, 107,  99,  90, 103,  95,   # 1990-1999
-            115, 106,  91, 111, 103,  87, 107,  99,  84, 103,   # 2000-2009
-             95, 115, 100,  91, 111,  96,  88, 107,  92, 112,   # 2010-2019
-            104,  95, 108, 100,  92, 111,  96,  88, 108,  92,   # 2020-2029
-            112, 104,  89, 108, 100,  85, 105,  96, 116, 101,   # 2030-2039
-             93, 112,  97,  89, 109, 100,  85, 105,  97, 109,   # 2040-2049
-            101,  93, 113,  97,  89, 109,  94, 113, 105,  90,   # 2050-2059
-            110, 101,  86, 106,  98,  89, 102,  94, 114, 105,   # 2060-2069
-             90, 110, 102,  86, 106,  98, 111, 102,  94, 114,   # 2070-2079
-             99,  90, 110,  95,  87, 106,  91, 111, 103,  94,   # 2080-2089
-            107,  99,  91, 103,  95, 115, 107,  91, 111, 103,   # 2090-2099
-             88, 108, 100,  85, 105,  96, 109, 101,  93, 112,   # 2100-2109
-             97,  89, 109,  93, 113, 105,  90, 109, 101,  86,   # 2110-2119
-            106,  97,  89, 102,  94, 113, 105,  90, 110, 101,   # 2120-2129
-             86, 106,  98, 110, 102,  94, 114,  98,  90, 110,   # 2130-2139
-             95,  86, 106,  91, 111, 102,  94, 107,  99,  90,   # 2140-2149
-            103,  95, 115, 106,  91, 111, 103,  87, 107,  99,   # 2150-2159
-             84, 103,  95, 115, 100,  91, 111,  96,  88, 107,   # 2160-2169
-             92, 112, 104,  95, 108, 100,  92, 111,  96,  88,   # 2170-2179
-            108,  92, 112, 104,  89, 108, 100,  85, 105,  96,   # 2180-2189
-            116, 101,  93, 112,  97,  89, 109, 100,  85, 105    # 2190-2199
+        98, 90, 103, 95, 114, 106, 91, 111, 102,  # 1901-1909
+        87, 107, 99, 83, 103, 95, 115, 99, 91, 111,  # 1910-1919
+        96, 87, 107, 92, 112, 103, 95, 108, 100, 91,  # 1920-1929
+        111, 96, 88, 107, 92, 112, 104, 88, 108, 100,  # 1930-1939
+        85, 104, 96, 116, 101, 92, 112, 97, 89, 108,  # 1940-1949
+        100, 85, 105, 96, 109, 101, 93, 112, 97, 89,  # 1950-1959
+        109, 93, 113, 105, 90, 109, 101, 86, 106, 97,  # 1960-1969
+        89, 102, 94, 113, 105, 90, 110, 101, 86, 106,  # 1970-1979
+        98, 110, 102, 94, 114, 98, 90, 110, 95, 86,  # 1980-1989
+        106, 91, 111, 102, 94, 107, 99, 90, 103, 95,  # 1990-1999
+        115, 106, 91, 111, 103, 87, 107, 99, 84, 103,  # 2000-2009
+        95, 115, 100, 91, 111, 96, 88, 107, 92, 112,  # 2010-2019
+        104, 95, 108, 100, 92, 111, 96, 88, 108, 92,  # 2020-2029
+        112, 104, 89, 108, 100, 85, 105, 96, 116, 101,  # 2030-2039
+        93, 112, 97, 89, 109, 100, 85, 105, 97, 109,  # 2040-2049
+        101, 93, 113, 97, 89, 109, 94, 113, 105, 90,  # 2050-2059
+        110, 101, 86, 106, 98, 89, 102, 94, 114, 105,  # 2060-2069
+        90, 110, 102, 86, 106, 98, 111, 102, 94, 114,  # 2070-2079
+        99, 90, 110, 95, 87, 106, 91, 111, 103, 94,  # 2080-2089
+        107, 99, 91, 103, 95, 115, 107, 91, 111, 103,  # 2090-2099
+        88, 108, 100, 85, 105, 96, 109, 101, 93, 112,  # 2100-2109
+        97, 89, 109, 93, 113, 105, 90, 109, 101, 86,  # 2110-2119
+        106, 97, 89, 102, 94, 113, 105, 90, 110, 101,  # 2120-2129
+        86, 106, 98, 110, 102, 94, 114, 98, 90, 110,  # 2130-2139
+        95, 86, 106, 91, 111, 102, 94, 107, 99, 90,  # 2140-2149
+        103, 95, 115, 106, 91, 111, 103, 87, 107, 99,  # 2150-2159
+        84, 103, 95, 115, 100, 91, 111, 96, 88, 107,  # 2160-2169
+        92, 112, 104, 95, 108, 100, 92, 111, 96, 88,  # 2170-2179
+        108, 92, 112, 104, 89, 108, 100, 85, 105, 96,  # 2180-2189
+        116, 101, 93, 112, 97, 89, 109, 100, 85, 105  # 2190-2199
     ]
 
     def isWeekEnd(self, weekDay):
@@ -380,8 +381,8 @@ class WestenImpl(object):
     def easterMonday(cls, year):
         return cls.EasterMonday[year - 1901]
 
-class TargetImpl(WestenImpl):
 
+class TargetImpl(WestenImpl):
     def __init__(self):
         pass
 
@@ -394,15 +395,16 @@ class TargetImpl(WestenImpl):
         em = self.easterMonday(y)
 
         if (self.isWeekEnd(w)
-           or (d == 1 and m == Months.January)
-           or (dd == em-3 and y >= 2000)
-           or (dd == em and y >= 2000)
-           or (d == 1 and m == Months.May and y >= 2000)
-           or (d == 25 and m == Months.December)
-           or (d == 26 and m == Months.December and y >= 2000)
-           or (d == 31 and m == Months.December and (y == 1998 or y == 1999 or y == 2001))):
+            or (d == 1 and m == Months.January)
+            or (dd == em - 3 and y >= 2000)
+            or (dd == em and y >= 2000)
+            or (d == 1 and m == Months.May and y >= 2000)
+            or (d == 25 and m == Months.December)
+            or (d == 26 and m == Months.December and y >= 2000)
+            or (d == 31 and m == Months.December and (y == 1998 or y == 1999 or y == 2001))):
             return False
         return True
+
 
 _holDict = {'china.sse': ChinaSseImpl,
             'china.ib': ChinaIBImpl,

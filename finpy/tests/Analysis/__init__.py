@@ -10,4 +10,3 @@ __all__ = ['TestSecurityValueHolders',
 
 from finpy.tests.Analysis.testSecurityValueHolders import TestSecurityValueHolders
 from finpy.tests.Analysis import TechnicalAnalysis
-

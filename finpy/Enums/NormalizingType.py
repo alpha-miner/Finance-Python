@@ -11,7 +11,6 @@ from enum import unique
 
 @unique
 class NormalizingType(IntEnum):
-
     Null = 0
     BizDay = 1
     CalendarDay = 2

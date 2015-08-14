@@ -10,7 +10,6 @@ from finpy.Math.ErrorFunction import errorFunction
 
 
 class TestErrorFunction(unittest.TestCase):
-
     def testErrorFunction(self):
         x = 1.7e-09
         self.assertAlmostEqual(errorFunction(x), 1.918245e-9, 15)
@@ -20,4 +19,3 @@ class TestErrorFunction(unittest.TestCase):
 
         x = -7
         self.assertAlmostEqual(errorFunction(x), -1.0, 12)
-

@@ -11,7 +11,6 @@ from finpy.Math.Accumulators.StatefulAccumulators import _checkParameterList
 
 
 class StatelessAccumulator(Accumulator):
-
     def __init__(self, dependency='x'):
         super(StatelessAccumulator, self).__init__(dependency)
         self._currentMax = None
@@ -153,7 +152,7 @@ class Correlation(StatelessAccumulator):
             n = self._currentCount
             nominator = n * self._runningSumCrossSquare - self._runningSumLeft * self._runningSumRight
             denominator = (n * self._runningSumSquareLeft - self._runningSumLeft * self._runningSumLeft) \
-                          *(n * self._runningSumSquareRight - self._runningSumRight * self._runningSumRight)
+                          * (n * self._runningSumSquareRight - self._runningSumRight * self._runningSumRight)
             denominator = math.sqrt(denominator)
             return nominator / denominator
         else:

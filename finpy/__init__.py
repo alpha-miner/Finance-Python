@@ -17,4 +17,3 @@ import finpy.Math as Math
 import finpy.PricingEngines as PricingEngines
 import finpy.Analysis as Analysis
 import finpy.AlgoTrading as AlgoTrading
-

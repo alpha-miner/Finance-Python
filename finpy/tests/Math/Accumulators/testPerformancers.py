@@ -17,7 +17,6 @@ from finpy.Math.Accumulators.Performancers import MovingMaxDrawdown
 
 
 class TestPerformancers(unittest.TestCase):
-
     def testMovingSharp(self):
         dirName = os.path.dirname(os.path.abspath(__file__))
         filePath = os.path.join(dirName, 'data/sharp.csv')
@@ -39,7 +38,8 @@ class TestPerformancers(unittest.TestCase):
                     expected = float(row[6])
                     self.assertAlmostEqual(calculated, expected, 7, "at index {0:d}\n"
                                                                     "Sharp expected:   {1:f}\n"
-                                                                    "Sharp calculated: {2:f}".format(i, expected, calculated))
+                                                                    "Sharp calculated: {2:f}".format(i, expected,
+                                                                                                     calculated))
 
     def testMovingSortino(self):
         dirName = os.path.dirname(os.path.abspath(__file__))
@@ -62,7 +62,8 @@ class TestPerformancers(unittest.TestCase):
                     expected = float(row[10])
                     self.assertAlmostEqual(calculated, expected, 7, "at index {0:d}\n"
                                                                     "Sortino expected:   {1:f}\n"
-                                                                    "Sortino calculated: {2:f}".format(i, expected, calculated))
+                                                                    "Sortino calculated: {2:f}".format(i, expected,
+                                                                                                       calculated))
 
     def testMovingAlphaBeta(self):
         dirName = os.path.dirname(os.path.abspath(__file__))
@@ -85,11 +86,15 @@ class TestPerformancers(unittest.TestCase):
                     expectedBeta = float(row[8])
                     self.assertAlmostEqual(calculatedBeta, expectedBeta, 8, "at index {0:d}\n"
                                                                             "Beta expected:   {1:f}\n"
-                                                                            "Beta calculated: {2:f}".format(i, expectedBeta, calculatedBeta))
+                                                                            "Beta calculated: {2:f}".format(i,
+                                                                                                            expectedBeta,
+                                                                                                            calculatedBeta))
                     expectedAlpha = float(row[9])
                     self.assertAlmostEqual(calculatedAlpha, expectedAlpha, 8, "at index {0:d}\n"
                                                                               "Alpha expected:   {1:f}\n"
-                                                                              "Alpha calculated: {2:f}".format(i, expectedAlpha, calculatedAlpha))
+                                                                              "Alpha calculated: {2:f}".format(i,
+                                                                                                               expectedAlpha,
+                                                                                                               calculatedAlpha))
 
     def testMovingDrawdownIncreasing(self):
         dirName = os.path.dirname(os.path.abspath(__file__))
@@ -108,7 +113,9 @@ class TestPerformancers(unittest.TestCase):
                 calculatedDrawdown = mv.result()[0]
                 self.assertAlmostEqual(calculatedDrawdown, expectedDrawdown, 10, "at index {0:d}\n"
                                                                                  "Drawdown expected:   {1:f}\n"
-                                                                                 "Drawdown calculated: {2:f}".format(i, expectedDrawdown, calculatedDrawdown))
+                                                                                 "Drawdown calculated: {2:f}".format(i,
+                                                                                                                     expectedDrawdown,
+                                                                                                                     calculatedDrawdown))
 
     def testMovingDrawdownDecreasing(self):
         dirName = os.path.dirname(os.path.abspath(__file__))
@@ -127,7 +134,9 @@ class TestPerformancers(unittest.TestCase):
                 calculatedDrawdown = mv.result()[0]
                 self.assertAlmostEqual(calculatedDrawdown, expectedDrawdown, 10, "at index {0:d}\n"
                                                                                  "Drawdown expected:   {1:f}\n"
-                                                                                 "Drawdown calculated: {2:f}".format(i, expectedDrawdown, calculatedDrawdown))
+                                                                                 "Drawdown calculated: {2:f}".format(i,
+                                                                                                                     expectedDrawdown,
+                                                                                                                     calculatedDrawdown))
 
     def testMovingDrawdownRandom(self):
         dirName = os.path.dirname(os.path.abspath(__file__))
@@ -146,7 +155,9 @@ class TestPerformancers(unittest.TestCase):
                 calculatedDrawdown = mv.result()[0]
                 self.assertAlmostEqual(calculatedDrawdown, expectedDrawdown, 7, "at index {0:d}\n"
                                                                                 "Drawdown expected:   {1:f}\n"
-                                                                                "Drawdown calculated: {2:f}".format(i, expectedDrawdown, calculatedDrawdown))
+                                                                                "Drawdown calculated: {2:f}".format(i,
+                                                                                                                    expectedDrawdown,
+                                                                                                                    calculatedDrawdown))
 
     def testMovingAverageDrawdownRandom(self):
         dirName = os.path.dirname(os.path.abspath(__file__))
@@ -165,7 +176,8 @@ class TestPerformancers(unittest.TestCase):
                 calculatedDrawdown = mv.result()[0]
                 self.assertAlmostEqual(calculatedDrawdown, expectedDrawdown, 7, "at index {0:d}\n"
                                                                                 "Average drawdown expected:   {1:f}\n"
-                                                                                "Average drawdown calculated: {2:f}".format(i, expectedDrawdown, calculatedDrawdown))
+                                                                                "Average drawdown calculated: {2:f}".format(
+                    i, expectedDrawdown, calculatedDrawdown))
 
     def testMovingMaxDrawdwonRandom(self):
         dirName = os.path.dirname(os.path.abspath(__file__))
@@ -184,5 +196,5 @@ class TestPerformancers(unittest.TestCase):
                 calculatedDrawdown = mv.result()[0]
                 self.assertAlmostEqual(calculatedDrawdown, expectedDrawdown, 7, "at index {0:d}\n"
                                                                                 "Max drawdown expected:   {1:f}\n"
-                                                                                "Max drawdown calculated: {2:f}".format(i, expectedDrawdown, calculatedDrawdown))
-
+                                                                                "Max drawdown calculated: {2:f}".format(
+                    i, expectedDrawdown, calculatedDrawdown))

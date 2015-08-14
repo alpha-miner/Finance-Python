@@ -10,8 +10,7 @@ from finpy.DateUtilities.Calendar import Calendar
 
 
 class Normalizer(object):
-
-    def __init__(self, type = NormalizingType.Null):
+    def __init__(self, type=NormalizingType.Null):
         self._previous = None
         self._current = None
         self._type = type

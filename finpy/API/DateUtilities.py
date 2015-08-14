@@ -11,11 +11,11 @@ from finpy.Enums import BizDayConventions
 
 
 def datesList(fromDate, toDate):
-
     fromDate = Date.fromDateTime(fromDate)
     toDate = Date.fromDateTime(toDate)
     assert fromDate <= toDate, "from date ({0} must be earlier than to date {1}".format(fromDate, toDate)
-    return [Date.fromExcelSerialNumber(serial).toDateTime() for serial in range(fromDate.serialNumber, toDate.serialNumber+1)]
+    return [Date.fromExcelSerialNumber(serial).toDateTime() for serial in
+            range(fromDate.serialNumber, toDate.serialNumber + 1)]
 
 
 def bizDatesList(holidayCenter, fromDate, toDate):

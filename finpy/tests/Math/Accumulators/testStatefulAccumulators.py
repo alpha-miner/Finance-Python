@@ -27,7 +27,6 @@ from finpy.Math.Accumulators import MovingCorrelationMatrix
 
 
 class TestStatefulAccumulators(unittest.TestCase):
-
     def setUp(self):
         np.random.seed(0)
         self.sample = np.random.randn(10000)
@@ -68,12 +67,13 @@ class TestStatefulAccumulators(unittest.TestCase):
                 runningSum -= con[0]
                 con = con[1:]
 
-            if i >= window-1:
+            if i >= window - 1:
                 expected = runningSum / window
                 calculated = mv.result()
                 self.assertAlmostEqual(calculated, expected, 15, "at index {0:d}\n"
                                                                  "Average expected:   {1:f}\n"
-                                                                 "Average calculated: {2:f}".format(i, expected, calculated))
+                                                                 "Average calculated: {2:f}".format(i, expected,
+                                                                                                    calculated))
 
     def testMovingPositiveAverager(self):
         dirName = os.path.dirname(os.path.abspath(__file__))
@@ -95,7 +95,9 @@ class TestStatefulAccumulators(unittest.TestCase):
                     calculated = mv.result()
                     self.assertAlmostEqual(calculated, expected, 8, "at index {0:d}\n"
                                                                     "Positive average expected:   {1:f}\n"
-                                                                    "positive average calculated: {2:f}".format(i, expected, calculated))
+                                                                    "positive average calculated: {2:f}".format(i,
+                                                                                                                expected,
+                                                                                                                calculated))
 
     def testMovingNegativeAverager(self):
         dirName = os.path.dirname(os.path.abspath(__file__))
@@ -117,7 +119,9 @@ class TestStatefulAccumulators(unittest.TestCase):
                     calculated = mv.result()
                     self.assertAlmostEqual(calculated, expected, 8, "at index {0:d}\n"
                                                                     "Positive average expected:   {1:f}\n"
-                                                                    "positive average calculated: {2:f}".format(i, expected, calculated))
+                                                                    "positive average calculated: {2:f}".format(i,
+                                                                                                                expected,
+                                                                                                                calculated))
 
     def testMovingSum(self):
         window = 120
@@ -141,7 +145,8 @@ class TestStatefulAccumulators(unittest.TestCase):
                 calculated = mv.result()
                 self.assertAlmostEqual(calculated, expected, 15, "at index {0:d}\n"
                                                                  "Sum expected:   {1:f}\n"
-                                                                 "Sum calculated: {2:f}".format(i, expected, calculated))
+                                                                 "Sum calculated: {2:f}".format(i, expected,
+                                                                                                calculated))
 
     def testMovingMax(self):
         window = 120
@@ -203,7 +208,9 @@ class TestStatefulAccumulators(unittest.TestCase):
                 calculated = mv.result()
                 self.assertAlmostEqual(calculated, expected, 15, "at index {0:d}\n"
                                                                  "Counted positive expected:   {1:f}\n"
-                                                                 "Counted positive calculated: {2:f}".format(i, expected, calculated))
+                                                                 "Counted positive calculated: {2:f}".format(i,
+                                                                                                             expected,
+                                                                                                             calculated))
 
     def testMovingCountedNegative(self):
         window = 120
@@ -229,7 +236,9 @@ class TestStatefulAccumulators(unittest.TestCase):
                 calculated = mv.result()
                 self.assertAlmostEqual(calculated, expected, 15, "at index {0:d}\n"
                                                                  "Counted negative expected:   {1:f}\n"
-                                                                 "Counted negative calculated: {2:f}".format(i, expected, calculated))
+                                                                 "Counted negative calculated: {2:f}".format(i,
+                                                                                                             expected,
+                                                                                                             calculated))
 
     def testMovingVariancer(self):
         window = 120
@@ -252,12 +261,13 @@ class TestStatefulAccumulators(unittest.TestCase):
                 runningSumSquare -= con[0] * con[0]
                 con = con[1:]
 
-            if i >= window-1:
+            if i >= window - 1:
                 expected = (runningSumSquare - runningSum * runningSum / window) / window
                 calculated = mv.result()
                 self.assertAlmostEqual(calculated, expected, 15, "at index {0:d}\n"
                                                                  "Var expected:   {1:f}\n"
-                                                                 "Var calculated: {2:f}".format(i, expected, calculated))
+                                                                 "Var calculated: {2:f}".format(i, expected,
+                                                                                                calculated))
 
         # Test moving sample variance
         mv = MovingVariance(window, dependency='z', isPopulation=False)
@@ -286,7 +296,8 @@ class TestStatefulAccumulators(unittest.TestCase):
                 calculated = mv.result()
                 self.assertAlmostEqual(calculated, expected, 15, "at index {0:d}\n"
                                                                  "Var expected:   {1:f}\n"
-                                                                 "Var calculated: {2:f}".format(i, expected, calculated))
+                                                                 "Var calculated: {2:f}".format(i, expected,
+                                                                                                calculated))
 
     def testMovingNegativeVariancer(self):
         # test without enough negative value
@@ -325,7 +336,9 @@ class TestStatefulAccumulators(unittest.TestCase):
                     calculated = mv.result()
                     self.assertAlmostEqual(calculated, expected, 7, "at index {0:d}\n"
                                                                     "Negative variance expected:   {1:f}\n"
-                                                                    "Negative variance calculated: {2:f}".format(i, expected, calculated))
+                                                                    "Negative variance calculated: {2:f}".format(i,
+                                                                                                                 expected,
+                                                                                                                 calculated))
 
     def testMovingHistoricalWindow(self):
         # test simple historical value holder
@@ -389,22 +402,22 @@ class TestStatefulAccumulators(unittest.TestCase):
                     calculated = mv.result()
                     self.assertAlmostEqual(calculated, expected, 8, "at index {0:d}\n"
                                                                     "Correlation expected:   {1:f}\n"
-                                                                    "Correlation calculated: {2:f}".format(i, expected, calculated))
+                                                                    "Correlation calculated: {2:f}".format(i, expected,
+                                                                                                           calculated))
 
     def testMovingCorrelationMatrix(self):
 
         first100Sample = [[1.00000000, -0.02300376, -0.05491407, -0.12810836, -0.16975843],
-                         [-0.02300376, 1.00000000, -0.15040039, 0.07712015, 0.05539850],
-                         [-0.05491407, -0.15040039, 1.00000000, -0.03660999, 0.20378756],
-                         [-0.12810836, 0.07712015, -0.03660999, 1.00000000, 0.08112261],
-                         [-0.16975843, 0.05539850, 0.20378756, 0.08112261, 1.00000000]]
+                          [-0.02300376, 1.00000000, -0.15040039, 0.07712015, 0.05539850],
+                          [-0.05491407, -0.15040039, 1.00000000, -0.03660999, 0.20378756],
+                          [-0.12810836, 0.07712015, -0.03660999, 1.00000000, 0.08112261],
+                          [-0.16975843, 0.05539850, 0.20378756, 0.08112261, 1.00000000]]
 
         last100Sample = [[1.000000000, 0.105645822, -0.084754465, 0.033285925, -0.064632300],
-                        [0.105645822, 1.000000000, -0.025033153, 0.094747896, 0.000483146],
-                        [-0.084754465, -0.025033153, 1.000000000, -0.010053933, -0.131093043],
-                        [0.033285925, 0.094747896, -0.010053933, 1.000000000, -0.043928037],
-                        [-0.064632300, 0.000483146, -0.131093043, -0.043928037, 1.000000000]]
-
+                         [0.105645822, 1.000000000, -0.025033153, 0.094747896, 0.000483146],
+                         [-0.084754465, -0.025033153, 1.000000000, -0.010053933, -0.131093043],
+                         [0.033285925, 0.094747896, -0.010053933, 1.000000000, -0.043928037],
+                         [-0.064632300, 0.000483146, -0.131093043, -0.043928037, 1.000000000]]
 
         dirName = os.path.dirname(os.path.abspath(__file__))
         filePath = os.path.join(dirName, 'data/correlationmatrix.csv')
@@ -422,21 +435,19 @@ class TestStatefulAccumulators(unittest.TestCase):
                 if i == 0:
                     with self.assertRaises(RuntimeError):
                         _ = mv.result()
-                if (i+1) == window:
+                if (i + 1) == window:
                     calculated = mv.result()
                     for k, row in enumerate(first100Sample):
                         for j, corr in enumerate(row):
-                            self.assertAlmostEqual(calculated[k][j], corr, 8, "First 100 sample correlation matrix different at ({0:d}, {1:d})\n"
-                                                                               "Expected: {2:f}\n"
-                                                                               "Calculated: {3:f}".format(k, j, corr, calculated[k][j]))
-                if (i+1) == 1000:
+                            self.assertAlmostEqual(calculated[k][j], corr, 8,
+                                                   "First 100 sample correlation matrix different at ({0:d}, {1:d})\n"
+                                                   "Expected: {2:f}\n"
+                                                   "Calculated: {3:f}".format(k, j, corr, calculated[k][j]))
+                if (i + 1) == 1000:
                     calculated = mv.result()
                     for k, row in enumerate(last100Sample):
                         for j, corr in enumerate(row):
-                            self.assertAlmostEqual(calculated[k][j], corr, 8, "Last 100 sample correlation matrix different at ({0:d}, {1:d})\n"
-                                                                               "Expected: {2:f}\n"
-                                                                               "Calculated: {3:f}".format(k, j, corr, calculated[k][j]))
-
-
-
-
+                            self.assertAlmostEqual(calculated[k][j], corr, 8,
+                                                   "Last 100 sample correlation matrix different at ({0:d}, {1:d})\n"
+                                                   "Expected: {2:f}\n"
+                                                   "Calculated: {3:f}".format(k, j, corr, calculated[k][j]))

@@ -19,7 +19,6 @@ from finpy.Math.Accumulators.IAccumulators import DividedValueHolder
 
 
 class SecuritiesValues(object):
-
     def __init__(self, values):
         self._values = copy.deepcopy(values)
 
@@ -28,8 +27,8 @@ class SecuritiesValues(object):
 
     def __neg__(self):
         return SecuritiesValues({
-            name: -self._values[name] for name in self._values
-        })
+                                    name: -self._values[name] for name in self._values
+                                    })
 
     def __iter__(self):
         return self._values.__iter__()
@@ -40,17 +39,17 @@ class SecuritiesValues(object):
     def __add__(self, right):
         if isinstance(right, SecuritiesValues):
             assert self._values.keys() == right._values.keys(), "left security names {0} is not equal to right {1}" \
-                                                                .format(self._values.keys(), right._values.keys())
+                .format(self._values.keys(), right._values.keys())
             return SecuritiesValues(
                 {
                     name: self._values[name] + right._values[name] for name in self._values
-                }
+                    }
             )
         else:
             return SecuritiesValues(
                 {
                     name: self._values[name] + right for name in self._values
-                }
+                    }
             )
 
     def __radd__(self, left):
@@ -59,40 +58,40 @@ class SecuritiesValues(object):
     def __sub__(self, right):
         if isinstance(right, SecuritiesValues):
             assert self._values.keys() == right._values.keys(), "left security names {0} is not equal to right {1}" \
-                                                                .format(self._values.keys(), right._values.keys())
+                .format(self._values.keys(), right._values.keys())
             return SecuritiesValues(
                 {
                     name: self._values[name] - right._values[name] for name in self._values
-                }
+                    }
             )
         else:
             return SecuritiesValues(
                 {
                     name: self._values[name] - right for name in self._values
-                }
+                    }
             )
 
     def __rsub__(self, left):
         return SecuritiesValues(
             {
                 name: left - self._values[name] for name in self._values
-            }
+                }
         )
 
     def __mul__(self, right):
         if isinstance(right, SecuritiesValues):
             assert self._values.keys() == right._values.keys(), "left security names {0} is not equal to right {1}" \
-                                                                .format(self._values.keys(), right._values.keys())
+                .format(self._values.keys(), right._values.keys())
             return SecuritiesValues(
                 {
                     name: self._values[name] * right._values[name] for name in self._values
-                }
+                    }
             )
         else:
             return SecuritiesValues(
                 {
                     name: self._values[name] * right for name in self._values
-                }
+                    }
             )
 
     def __rmul__(self, left):
@@ -101,24 +100,24 @@ class SecuritiesValues(object):
     def __div__(self, right):
         if isinstance(right, SecuritiesValues):
             assert self._values.keys() == right._values.keys(), "left security names {0} is not equal to right {1}" \
-                                                                .format(self._values.keys(), right._values.keys())
+                .format(self._values.keys(), right._values.keys())
             return SecuritiesValues(
                 {
                     name: self._values[name] / right._values[name] for name in self._values
-                }
+                    }
             )
         else:
             return SecuritiesValues(
                 {
                     name: self._values[name] / right for name in self._values
-                }
+                    }
             )
 
     def __rdiv__(self, left):
         return SecuritiesValues(
             {
                 name: left / self._values[name] for name in self._values
-            }
+                }
         )
 
     def __truediv__(self, right):
@@ -132,7 +131,6 @@ class SecuritiesValues(object):
 
 
 class SecurityValueHolder(object):
-
     __metaclass__ = ABCMeta
 
     def __init__(self, dependency='x', symbolList=None):
@@ -161,7 +159,7 @@ class SecurityValueHolder(object):
     def dependency(self):
         return {
             symbol: self._dependency for symbol in self._symbolList
-        }
+            }
 
     @property
     def valueSize(self):
@@ -194,7 +192,7 @@ class SecurityValueHolder(object):
             res._innerHolders = \
                 {
                     name: self._innerHolders[name] for name in res._symbolList
-                }
+                    }
             return res
         elif item.lower() in self._innerHolders:
             item = item.lower()
@@ -204,7 +202,7 @@ class SecurityValueHolder(object):
             res._innerHolders = \
                 {
                     name: self._innerHolders[name] for name in res._symbolList
-                }
+                    }
             return res
         else:
             raise TypeError("{0} is not a valid index".format(item))
@@ -241,7 +239,6 @@ class SecurityValueHolder(object):
 
 
 class IdentitySecurityValueHolder(SecurityValueHolder):
-
     def __init__(self, value, n=1):
         self._value = value
         self._symbolList = []
@@ -262,40 +259,42 @@ class IdentitySecurityValueHolder(SecurityValueHolder):
 
 
 class SecurityCombinedValueHolder(SecurityValueHolder):
-
     def __init__(self, left, right, HolderType):
         if isinstance(left, SecurityValueHolder):
             self._left = copy.deepcopy(left)
             if isinstance(right, SecurityValueHolder):
                 self._right = copy.deepcopy(right)
-                self._symbolList = set(self._left._symbolList).union(set(right._symbolList))
+                self._symbolList = set(self._left.symbolList).union(set(right.symbolList))
             else:
                 self._right = IdentitySecurityValueHolder(right)
-                self._symbolList = set(self._left._symbolList)
+                self._symbolList = set(self._left.symbolList)
         else:
             self._left = IdentitySecurityValueHolder(left)
             self._right = copy.deepcopy(right)
             if isinstance(right, SecurityValueHolder):
-                self._symbolList = set(self._left._symbolList).union(set(right._symbolList))
+                self._symbolList = set(self._left.symbolList).union(set(right.symbolList))
             else:
-                self._symbolList = set(self._left._symbolList)
+                self._symbolList = set(self._left.symbolList)
 
         self._window = max(self._left.window, self._right.window)
-        self._dependency = list(set(self._left._dependency).union(set(self._right._dependency)))
+        self._dependency = list(set(self._left.dependency).union(set(self._right.dependency)))
         self._returnSize = self._left.valueSize
 
         if len(self._right.symbolList) == 0:
             self._innerHolders = {
-                name: HolderType(self._left._innerHolders[name], self._right._innerHolders['blank']) for name in self._left.symbolList
-            }
+                name: HolderType(self._left._innerHolders[name], self._right._innerHolders['blank'])
+                for name in self._left.symbolList
+                }
         elif len(self._left.symbolList) == 0:
             self._innerHolders = {
-                name: HolderType(self._left._innerHolders['blank'], self._right._innerHolders[name]) for name in self._right.symbolList
-            }
+                name: HolderType(self._left._innerHolders['blank'], self._right._innerHolders[name])
+                for name in self._right.symbolList
+                }
         else:
             self._innerHolders = {
-                name: HolderType(self._left._innerHolders[name], self._right._innerHolders[name]) for name in self._left.symbolList
-            }
+                name: HolderType(self._left._innerHolders[name], self._right._innerHolders[name])
+                for name in self._left.symbolList
+                }
 
     @property
     def dependency(self):
@@ -315,25 +314,21 @@ class SecurityCombinedValueHolder(SecurityValueHolder):
 
 
 class SecurityAddedValueHolder(SecurityCombinedValueHolder):
-
     def __init__(self, left, right):
         super(SecurityAddedValueHolder, self).__init__(left, right, AddedValueHolder)
 
 
 class SecuritySubbedValueHolder(SecurityCombinedValueHolder):
-
     def __init__(self, left, right):
         super(SecuritySubbedValueHolder, self).__init__(left, right, MinusedValueHolder)
 
 
 class SecurityMultipliedValueHolder(SecurityCombinedValueHolder):
-
     def __init__(self, left, right):
         super(SecurityMultipliedValueHolder, self).__init__(left, right, MultipliedValueHolder)
 
 
 class SecurityDividedValueHolder(SecurityCombinedValueHolder):
-
     def __init__(self, left, right):
         super(SecurityDividedValueHolder, self).__init__(left, right, DividedValueHolder)
 
@@ -344,19 +339,18 @@ def SecurityShiftedValueHolder(secValueHolder, n):
     res._window = secValueHolder.window + n
     res._innerHolders = {
         name: Shift(secValueHolder._innerHolders[name], n) for name in secValueHolder._innerHolders
-    }
+        }
     return res
 
 
 class SecurityCompoundedValueHolder(SecurityValueHolder):
-
     def __init__(self, left, right):
-        self._returnSize =right.valueSize
+        self._returnSize = right.valueSize
         self._symbolList = left.symbolList
         self._window = left.window + right.window - 1
-        self._dependency = left._dependency
-        if not isinstance(right._dependency, str):
-            assert left.valueSize == len(right._pNames)
+        self._dependency = left.dependency
+        if not isinstance(right.dependency, str):
+            assert left.valueSize == len(right.dependency)
         else:
             assert left.valueSize == 1
 
@@ -364,12 +358,12 @@ class SecurityCompoundedValueHolder(SecurityValueHolder):
         self._left = copy.deepcopy(left._innerHolders[left._innerHolders.keys()[0]])
         self._innerHolders = {
             name: CompoundedValueHolder(self._left, self._right) for name in self._symbolList
-        }
+            }
 
     def push(self, data):
         names = set(self._symbolList).intersection(set(data.keys()))
         for name in names:
-            self._innerHolders[name].push(**data[name])
+            self._innerHolders[name].push(data[name])
 
     @property
     def value(self):
@@ -395,6 +389,7 @@ def dependencyCalculator(*args):
         else:
             res[tmp[name]].append(name)
     return res
+
 
 # detail implementation
 

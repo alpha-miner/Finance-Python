@@ -12,7 +12,6 @@ import math
 
 
 class Accumulator(object):
-
     __metaclass__ = ABCMeta
 
     def __init__(self, dependency):
@@ -22,16 +21,20 @@ class Accumulator(object):
             self._isValueHolderContained = False
         if hasattr(dependency, '__iter__') and len(dependency) >= 2:
             for name in dependency:
-                assert isinstance(name, str), '{0} in pNames should be a plain string. But it is {1}'.format(name, type(name))
+                assert isinstance(name, str), '{0} in pNames should be a plain string. But it is {1}'.format(name,
+                                                                                                             type(name))
             self._dependency = dependency
         elif hasattr(dependency, '__iter__') and len(dependency) == 1:
             for name in dependency:
-                assert isinstance(name, str), '{0} in pNames should be a plain string. But it is {1}'.format(name, type(name))
+                assert isinstance(name, str), '{0} in pNames should be a plain string. But it is {1}'.format(name,
+                                                                                                             type(name))
             self._dependency = dependency[0]
         elif hasattr(dependency, '__iter__'):
             raise RuntimeError("parameters' name list should not be empty")
         else:
-            assert isinstance(dependency, str) or isinstance(dependency, Accumulator), '{0} in pNames should be a plain string or an value holder. But it is {1}'.format(pNames, type(pNames))
+            assert isinstance(dependency, str) or isinstance(dependency,
+                                                             Accumulator), '{0} in pNames should be a plain string or an value holder. But it is {1}'.format(
+                pNames, type(pNames))
             self._dependency = deepcopy(dependency)
 
     def push(self, data):
@@ -183,7 +186,6 @@ class Accumulator(object):
 
 
 class NegativeValueHolder(Accumulator):
-
     def __init__(self, valueHolder):
         self._valueHolder = deepcopy(valueHolder)
         self._returnSize = valueHolder.valueSize
@@ -259,7 +261,6 @@ class TruncatedValueHolder(Accumulator):
 
 
 class CombinedValueHolder(Accumulator):
-
     def __init__(self, left, right):
         assert left._returnSize == right._returnSize
         self._returnSize = left._returnSize
@@ -275,7 +276,6 @@ class CombinedValueHolder(Accumulator):
 
 
 class AddedValueHolder(CombinedValueHolder):
-
     def __init__(self, left, right):
         super(AddedValueHolder, self).__init__(left, right)
 
@@ -288,7 +288,6 @@ class AddedValueHolder(CombinedValueHolder):
 
 
 class MinusedValueHolder(CombinedValueHolder):
-
     def __init__(self, left, right):
         super(MinusedValueHolder, self).__init__(left, right)
 
@@ -301,7 +300,6 @@ class MinusedValueHolder(CombinedValueHolder):
 
 
 class MultipliedValueHolder(CombinedValueHolder):
-
     def __init__(self, left, right):
         super(MultipliedValueHolder, self).__init__(left, right)
 
@@ -314,7 +312,6 @@ class MultipliedValueHolder(CombinedValueHolder):
 
 
 class DividedValueHolder(CombinedValueHolder):
-
     def __init__(self, left, right):
         super(DividedValueHolder, self).__init__(left, right)
 
@@ -327,7 +324,6 @@ class DividedValueHolder(CombinedValueHolder):
 
 
 class LtOperatorValueHolder(CombinedValueHolder):
-
     def __init__(self, left, right):
         super(LtOperatorValueHolder, self).__init__(left, right)
 
@@ -340,7 +336,6 @@ class LtOperatorValueHolder(CombinedValueHolder):
 
 
 class LeOperatorValueHolder(CombinedValueHolder):
-
     def __init__(self, left, right):
         super(LeOperatorValueHolder, self).__init__(left, right)
 
@@ -353,7 +348,6 @@ class LeOperatorValueHolder(CombinedValueHolder):
 
 
 class GtOperatorValueHolder(CombinedValueHolder):
-
     def __init__(self, left, right):
         super(GtOperatorValueHolder, self).__init__(left, right)
 
@@ -366,7 +360,6 @@ class GtOperatorValueHolder(CombinedValueHolder):
 
 
 class GeOperatorValueHolder(CombinedValueHolder):
-
     def __init__(self, left, right):
         super(GeOperatorValueHolder, self).__init__(left, right)
 
@@ -379,7 +372,6 @@ class GeOperatorValueHolder(CombinedValueHolder):
 
 
 class Identity(Accumulator):
-
     def __init__(self, value, n=1):
         if isinstance(value, Accumulator):
             assert value.valueSize == 1, "Identity can only be applied to single return value holder"
@@ -411,7 +403,6 @@ class Identity(Accumulator):
 
 
 class CompoundedValueHolder(Accumulator):
-
     def __init__(self, left, right):
         self._returnSize = right._returnSize
         self._left = deepcopy(left)
@@ -439,7 +430,6 @@ class CompoundedValueHolder(Accumulator):
 
 
 class BasicFunction(Accumulator):
-
     def __init__(self, valueHolder, func, *args, **kwargs):
         self._returnSize = valueHolder._returnSize
         self._valueHolder = deepcopy(valueHolder)

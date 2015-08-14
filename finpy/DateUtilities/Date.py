@@ -13,8 +13,7 @@ from finpy.Enums.Weekdays import Weekdays
 
 
 class Date(object):
-
-    def __init__(self, year = None, month = None, day = None, serialNumber = None):
+    def __init__(self, year=None, month=None, day=None, serialNumber=None):
 
         if serialNumber is not None:
             self.__serialNumber__ = serialNumber
@@ -29,7 +28,7 @@ class Date(object):
 
         assert 1 <= day <= length, 'day {0:d} is out of bound. It must be in [1, {1:d}]'.format(day, length)
 
-        self.__serialNumber__ = day + offset + _YearOffset[year-1900]
+        self.__serialNumber__ = day + offset + _YearOffset[year - 1900]
 
     def dayOfMonth(self):
         return self.dayOfYear() - self._monthOffset(self.month(), self.isLeap(self.year()))
@@ -39,7 +38,7 @@ class Date(object):
 
     def year(self):
         y = (int(self.__serialNumber__ / 365)) + 1900
-        if self.__serialNumber__ <= _YearOffset[y-1900]:
+        if self.__serialNumber__ <= _YearOffset[y - 1900]:
             return y - 1
         return y
 
@@ -147,7 +146,7 @@ class Date(object):
 
         first = Date(y, m, 1).weekday()
         skip = nth - (1 if dayOfWeek >= first else 0)
-        return Date(y, m, (1 + dayOfWeek + skip*7) - first)
+        return Date(y, m, (1 + dayOfWeek + skip * 7) - first)
 
     @classmethod
     def todaysDate(cls):
@@ -162,16 +161,16 @@ class Date(object):
     @staticmethod
     def _monthLength(month, isLeap):
         if isLeap:
-            return _MonthLeapLength[month-1]
+            return _MonthLeapLength[month - 1]
         else:
-            return _MonthLength[month-1]
+            return _MonthLength[month - 1]
 
     @staticmethod
     def _monthOffset(month, isLeap):
         if isLeap:
-            return _MonthLeapOffset[month-1]
+            return _MonthLeapOffset[month - 1]
         else:
-            return _MonthOffset[month-1]
+            return _MonthOffset[month - 1]
 
     @classmethod
     def fromExcelSerialNumber(cls, serialNumber):
@@ -187,7 +186,7 @@ class Date(object):
         return cls(int(dateStr[0:4]), int(dateStr[5:7]), int(dateStr[8:10]))
 
     @classmethod
-    def strptime(cls, dateStr, dateFormat = '%Y-%m-%d'):
+    def strptime(cls, dateStr, dateFormat='%Y-%m-%d'):
         pydt = dt.datetime.strptime(dateStr, dateFormat)
         return cls(pydt.year, pydt.month, pydt.day)
 
@@ -196,7 +195,7 @@ class Date(object):
         if units == TimeUnits.Days or units == TimeUnits.BDays:
             return cls.fromExcelSerialNumber(date.__serialNumber__ + n)
         elif units == TimeUnits.Weeks:
-            return cls.fromExcelSerialNumber(date.__serialNumber__ + 7*n)
+            return cls.fromExcelSerialNumber(date.__serialNumber__ + 7 * n)
         elif units == TimeUnits.Months:
             d = date.dayOfMonth()
             m = date.month() + n
@@ -224,76 +223,77 @@ class Date(object):
     def westernStyle(cls, day, month, year):
         return cls(year, month, day)
 
+
 _YearIsLeap = [
     # 1900 is leap in agreement with Excel's bug
     # 1900 is out of valid date range anyway
     # 1900-1909
-    True, False, False, False,  True, False, False, False,  True, False, 
+    True, False, False, False, True, False, False, False, True, False,
     # 1910-1919
-    False, False,  True, False, False, False,  True, False, False, False, 
+    False, False, True, False, False, False, True, False, False, False,
     # 1920-1929
-    True, False, False, False,  True, False, False, False,  True, False, 
+    True, False, False, False, True, False, False, False, True, False,
     # 1930-1939
-    False, False,  True, False, False, False,  True, False, False, False, 
+    False, False, True, False, False, False, True, False, False, False,
     # 1940-1949
-    True, False, False, False,  True, False, False, False,  True, False, 
+    True, False, False, False, True, False, False, False, True, False,
     # 1950-1959
-    False, False,  True, False, False, False,  True, False, False, False, 
+    False, False, True, False, False, False, True, False, False, False,
     # 1960-1969
-    True, False, False, False,  True, False, False, False,  True, False, 
+    True, False, False, False, True, False, False, False, True, False,
     # 1970-1979
-    False, False,  True, False, False, False,  True, False, False, False, 
+    False, False, True, False, False, False, True, False, False, False,
     # 1980-1989
-    True, False, False, False,  True, False, False, False,  True, False, 
+    True, False, False, False, True, False, False, False, True, False,
     # 1990-1999
-    False, False,  True, False, False, False,  True, False, False, False, 
+    False, False, True, False, False, False, True, False, False, False,
     # 2000-2009
-    True, False, False, False,  True, False, False, False,  True, False, 
+    True, False, False, False, True, False, False, False, True, False,
     # 2010-2019
-    False, False,  True, False, False, False,  True, False, False, False, 
+    False, False, True, False, False, False, True, False, False, False,
     # 2020-2029
-    True, False, False, False,  True, False, False, False,  True, False, 
+    True, False, False, False, True, False, False, False, True, False,
     # 2030-2039
-    False, False,  True, False, False, False,  True, False, False, False, 
+    False, False, True, False, False, False, True, False, False, False,
     # 2040-2049
-    True, False, False, False,  True, False, False, False,  True, False, 
+    True, False, False, False, True, False, False, False, True, False,
     # 2050-2059
-    False, False,  True, False, False, False,  True, False, False, False, 
+    False, False, True, False, False, False, True, False, False, False,
     # 2060-2069
-    True, False, False, False,  True, False, False, False,  True, False, 
+    True, False, False, False, True, False, False, False, True, False,
     # 2070-2079
-    False, False,  True, False, False, False,  True, False, False, False, 
+    False, False, True, False, False, False, True, False, False, False,
     # 2080-2089
-    True, False, False, False,  True, False, False, False,  True, False, 
+    True, False, False, False, True, False, False, False, True, False,
     # 2090-2099
-    False, False,  True, False, False, False,  True, False, False, False, 
+    False, False, True, False, False, False, True, False, False, False,
     # 2100-2109
-    False, False, False, False,  True, False, False, False,  True, False, 
+    False, False, False, False, True, False, False, False, True, False,
     # 2110-2119
-    False, False,  True, False, False, False,  True, False, False, False, 
+    False, False, True, False, False, False, True, False, False, False,
     # 2120-2129
-    True, False, False, False,  True, False, False, False,  True, False, 
+    True, False, False, False, True, False, False, False, True, False,
     # 2130-2139
-    False, False,  True, False, False, False,  True, False, False, False, 
+    False, False, True, False, False, False, True, False, False, False,
     # 2140-2149
-    True, False, False, False,  True, False, False, False,  True, False, 
+    True, False, False, False, True, False, False, False, True, False,
     # 2150-2159
-    False, False,  True, False, False, False,  True, False, False, False, 
+    False, False, True, False, False, False, True, False, False, False,
     # 2160-2169
-    True, False, False, False,  True, False, False, False,  True, False, 
+    True, False, False, False, True, False, False, False, True, False,
     # 2170-2179
-    False, False,  True, False, False, False,  True, False, False, False, 
+    False, False, True, False, False, False, True, False, False, False,
     # 2180-2189
-    True, False, False, False,  True, False, False, False,  True, False, 
+    True, False, False, False, True, False, False, False, True, False,
     # 2190-2199
-    False, False,  True, False, False, False,  True, False, False, False, 
+    False, False, True, False, False, False, True, False, False, False,
     # 2200
     False
 ]
 
 _YearOffset = [
     # 1900-1909
-    0,  366,  731, 1096, 1461, 1827, 2192, 2557, 2922, 3288,
+    0, 366, 731, 1096, 1461, 1827, 2192, 2557, 2922, 3288,
     # 1910-1919
     3653, 4018, 4383, 4749, 5114, 5479, 5844, 6210, 6575, 6940,
     # 1920-1929
@@ -359,9 +359,9 @@ _YearOffset = [
 _MonthLength = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
 _MonthLeapLength = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
 
-_MonthOffset = [0,  31,  59,  90, 120, 151,   # Jan - Jun
-                181, 212, 243, 273, 304, 334,   # Jun - Dec
+_MonthOffset = [0, 31, 59, 90, 120, 151,  # Jan - Jun
+                181, 212, 243, 273, 304, 334,  # Jun - Dec
                 365]
-_MonthLeapOffset = [0,  31,  60,  91, 121, 152,   # Jan - Jun
-                    182, 213, 244, 274, 305, 335,   # Jun - Dec
+_MonthLeapOffset = [0, 31, 60, 91, 121, 152,  # Jan - Jun
+                    182, 213, 244, 274, 305, 335,  # Jun - Dec
                     366]

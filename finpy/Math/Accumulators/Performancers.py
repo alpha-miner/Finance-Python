@@ -26,7 +26,7 @@ class MovingLogReturn(StatefulValueHolder):
             return
         popout = self._dumpOneValue(value)
         if popout != 0.0:
-            self._runningReturn = math.log(value/popout)
+            self._runningReturn = math.log(value / popout)
 
     def result(self):
         if self.size >= 2:
@@ -36,7 +36,6 @@ class MovingLogReturn(StatefulValueHolder):
 
 
 class MovingSharp(StatefulValueHolder):
-
     def __init__(self, window, dependency=('ret', 'riskFree')):
         super(MovingSharp, self).__init__(window, dependency)
         self._mean = MovingAverage(window, dependency='x')
@@ -62,7 +61,6 @@ class MovingSharp(StatefulValueHolder):
 
 
 class MovingSortino(StatefulValueHolder):
-
     def __init__(self, window, dependency=('ret', 'riskFree')):
         super(MovingSortino, self).__init__(window, dependency)
         self._mean = MovingAverage(window, dependency='x')
@@ -86,7 +84,6 @@ class MovingSortino(StatefulValueHolder):
 
 
 class MovingAlphaBeta(StatefulValueHolder):
-
     def __init__(self, window, dependency=('pRet', 'mRet', 'riskFree')):
         self._returnSize = 2
         super(MovingAlphaBeta, self).__init__(window, dependency)
@@ -123,11 +120,10 @@ class MovingAlphaBeta(StatefulValueHolder):
 
 
 class MovingDrawDown(StatefulValueHolder):
-
     def __init__(self, window, dependency='ret'):
         super(MovingDrawDown, self).__init__(window, dependency)
         self._returnSize = 3
-        self._maxer = MovingMax(window+1, dependency='x')
+        self._maxer = MovingMax(window + 1, dependency='x')
         self._maxer.push(dict(x=0.0))
         self._runningCum = 0.0
         self._highIndex = 0
@@ -156,7 +152,6 @@ class MovingDrawDown(StatefulValueHolder):
 
 
 class MovingAverageDrawdown(StatefulValueHolder):
-
     def __init__(self, window, dependency='ret'):
         super(MovingAverageDrawdown, self).__init__(window, dependency)
         self._returnSize = 2
@@ -178,7 +173,6 @@ class MovingAverageDrawdown(StatefulValueHolder):
 
 
 class MovingMaxDrawdown(StatefulValueHolder):
-
     def __init__(self, window, dependency='ret'):
         super(MovingMaxDrawdown, self).__init__(window, dependency)
         self._returnSize = 2
@@ -195,15 +189,3 @@ class MovingMaxDrawdown(StatefulValueHolder):
     def result(self):
         sortedValue = sorted(range(self.size), key=lambda x: self._con[x][0])
         return self._con[sortedValue[0]]
-
-
-
-
-
-
-
-
-
-
-
-

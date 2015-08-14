@@ -21,7 +21,6 @@ _unitsDict = {'d': TimeUnits.Days,
 
 
 class Period(object):
-
     def __init__(self, *args):
 
         if isinstance(args[0], str):
@@ -66,7 +65,7 @@ class Period(object):
     def __div__(self, n):
         assert n != 0, "cannot be divided by zero"
 
-        res = Period(self.length, self.units )
+        res = Period(self.length, self.units)
         if self.length % n == 0:
             res._length /= n
         else:
@@ -194,7 +193,7 @@ class Period(object):
 
         if self.units == TimeUnits.Days:
             if n >= 7:
-                m = int(math.floor(n/7))
+                m = int(math.floor(n / 7))
                 out += str(m) + "W"
                 n %= 7
             if n != 0 or m == 0:
@@ -205,7 +204,7 @@ class Period(object):
             return out + str(n) + "W"
         elif self.units == TimeUnits.Months:
             if n >= 12:
-                m = int(math.floor(n/12))
+                m = int(math.floor(n / 12))
                 out += str(m) + "Y"
                 n %= 12
             if n != 0 or m == 0:
@@ -217,7 +216,10 @@ class Period(object):
         elif self.units == TimeUnits.BDays:
             return out + str(n) + "B"
 
+
 # implementation detail
+
+
 def _daysMinMax(p):
     if p.units == TimeUnits.Days:
         return p.length, p.length

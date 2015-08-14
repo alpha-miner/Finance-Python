@@ -15,7 +15,6 @@ class StrEnum(str, Enum):
 
 @unique
 class Factors(StrEnum):
-
     CLOSE = 'close'
     PE = 'pe'
     OPEN = 'open'

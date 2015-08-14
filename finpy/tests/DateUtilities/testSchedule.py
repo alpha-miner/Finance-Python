@@ -15,7 +15,6 @@ from finpy.Enums import BizDayConventions
 
 
 class TestSchedule(unittest.TestCase):
-
     def checkDates(self, s, expected):
         if s.size() != len(expected):
             self.fail("expected {0:d} dates, found {1}".format(len(expected), s.size()))
@@ -50,5 +49,6 @@ class TestSchedule(unittest.TestCase):
                      Period(1, TimeUnits.Days),
                      Calendar("Target"),
                      BizDayConventions.Preceding)
-        expected = [Date(2012, 1, 17), Date(2012, 1, 18), Date(2012, 1, 19), Date(2012, 1, 20), Date(2012, 1, 23), Date(2012, 1, 24)]
+        expected = [Date(2012, 1, 17), Date(2012, 1, 18), Date(2012, 1, 19), Date(2012, 1, 20), Date(2012, 1, 23),
+                    Date(2012, 1, 24)]
         self.checkDates(s, expected)

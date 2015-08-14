@@ -6,4 +6,3 @@ Created on 2015-7-15
 """
 
 __all__ = ['Settings']
-

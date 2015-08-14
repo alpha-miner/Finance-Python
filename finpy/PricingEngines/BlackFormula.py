@@ -20,8 +20,10 @@ def _checkParameters(strike, forward, displacement):
     forward = float(forward)
     displacement = float(displacement)
     assert displacement >= 0, "displacement ({0:f}) must be non-negative".format(displacement)
-    assert strike + displacement >= 0, "strike + displacement ({0:f}) must be non-negative".format(strike + displacement)
-    assert forward + displacement >= 0, "forward + displacement ({0:f}) must be non-negative".format(forward + displacement)
+    assert strike + displacement >= 0, "strike + displacement ({0:f}) must be non-negative".format(
+        strike + displacement)
+    assert forward + displacement >= 0, "forward + displacement ({0:f}) must be non-negative".format(
+        forward + displacement)
     return strike, forward, displacement
 
 
@@ -91,7 +93,6 @@ def blackFormulaImpliedStdDev(optionType,
                               blackPrice,
                               discount=1.0,
                               displacement=0.0):
-
     otherOptionPrice = blackPrice - optionType * (forward - strike) * discount
     if optionType == OptionType.Put and strike > forward:
         optionType = OptionType.Call
@@ -128,12 +129,12 @@ def bachelierFormula(optionType,
     assert stdDev >= 0, "stdDev ({0:f}) must be non-negative".format(stdDev)
     assert discount > 0, "discount ({0:f}) must be positive".format(discount)
 
-    d = (forward-strike) * optionType
+    d = (forward - strike) * optionType
     if stdDev == 0:
         return discount * max(d, 0.0)
 
     h = d / stdDev
-    result = discount * (stdDev*_dist.derivative(h) + d*_dist(h))
+    result = discount * (stdDev * _dist.derivative(h) + d * _dist(h))
 
     assert result >= 0, "negative value ({0:f}) for " \
                         "stdDev:  {1:f}" \
@@ -173,11 +174,11 @@ def bachelierFormulaImpliedVol(optionType,
     impliedBpvol = math.sqrt(_M_PI / (2 * tte)) * straddlePremium * heta
     return impliedBpvol
 
+
 # detail implementation
 
 
 class HCalculator(object):
-
     _A0 = 3.994961687345134e-1
     _A1 = 2.100960795068497e+1
     _A2 = 4.980340217855084e+1
@@ -201,13 +202,11 @@ class HCalculator(object):
     @classmethod
     def calculate(cls, eta):
         num = cls._A0 + eta * (cls._A1 + eta * (cls._A2 + eta * (cls._A3 + eta
-              * (cls._A4 + eta * (cls._A5 + eta * (cls._A6 + eta * cls._A7))))))
+                                                                 * (cls._A4 + eta * (
+        cls._A5 + eta * (cls._A6 + eta * cls._A7))))))
 
         den = cls._B0 + eta * (cls._B1 + eta * (cls._B2 + eta * (cls._B3 + eta * (cls._B4 + eta
-              * (cls._B5 + eta * (cls._B6 + eta * (cls._B7 + eta * (cls._B8 + eta * cls._B9))))))))
+                                                                                  * (cls._B5 + eta * (
+        cls._B6 + eta * (cls._B7 + eta * (cls._B8 + eta * cls._B9))))))))
 
         return math.sqrt(eta) * (num / den)
-
-
-
-

@@ -11,6 +11,7 @@ import numpy as np
 from copy import deepcopy
 from finpy.Math.Accumulators.IAccumulators import Accumulator
 
+
 def _checkParameterList(dependency):
     if not isinstance(dependency, Accumulator) and len(dependency) > 1 and not isinstance(dependency, str):
         raise RuntimeError("This value holder (e.g. Max or Minimum) can't hold more than 2 parameter names ({0})"
@@ -18,7 +19,6 @@ def _checkParameterList(dependency):
 
 
 class StatefulValueHolder(Accumulator):
-
     def __init__(self, window, dependency):
         super(StatefulValueHolder, self).__init__(dependency)
         if not isinstance(window, int):
@@ -60,7 +60,6 @@ class StatefulValueHolder(Accumulator):
 
 
 class Shift(StatefulValueHolder):
-
     def __init__(self, valueHolder, N=1):
         super(Shift, self).__init__(N, valueHolder._dependency)
         assert N >= 1, "shift value should always not be less than 1"
@@ -79,7 +78,6 @@ class Shift(StatefulValueHolder):
 
 
 class SortedValueHolder(StatefulValueHolder):
-
     def __init__(self, window, dependency='x'):
         super(SortedValueHolder, self).__init__(window, dependency)
         _checkParameterList(dependency)
@@ -100,7 +98,6 @@ class SortedValueHolder(StatefulValueHolder):
 
 
 class MovingMax(SortedValueHolder):
-
     def __init__(self, window, dependency='x'):
         super(MovingMax, self).__init__(window, dependency)
 
@@ -109,7 +106,6 @@ class MovingMax(SortedValueHolder):
 
 
 class MovingMinimum(SortedValueHolder):
-
     def __init__(self, window, dependency='x'):
         super(MovingMinimum, self).__init__(window, dependency)
 
@@ -118,7 +114,6 @@ class MovingMinimum(SortedValueHolder):
 
 
 class MovingSum(StatefulValueHolder):
-
     def __init__(self, window, dependency='x'):
         super(MovingSum, self).__init__(window, dependency)
         _checkParameterList(dependency)
@@ -136,7 +131,6 @@ class MovingSum(StatefulValueHolder):
 
 
 class MovingAverage(StatefulValueHolder):
-
     def __init__(self, window, dependency='x'):
         super(MovingAverage, self).__init__(window, dependency)
         _checkParameterList(dependency)
@@ -157,7 +151,6 @@ class MovingAverage(StatefulValueHolder):
 
 
 class MovingPositiveAverage(StatefulValueHolder):
-
     def __init__(self, window, dependency='x'):
         super(MovingPositiveAverage, self).__init__(window, dependency)
         _checkParameterList(dependency)
@@ -185,7 +178,6 @@ class MovingPositiveAverage(StatefulValueHolder):
 
 
 class MovingNegativeAverage(StatefulValueHolder):
-
     def __init__(self, window, dependency='x'):
         super(MovingNegativeAverage, self).__init__(window, dependency)
         _checkParameterList(dependency)
@@ -213,7 +205,6 @@ class MovingNegativeAverage(StatefulValueHolder):
 
 
 class MovingVariance(StatefulValueHolder):
-
     def __init__(self, window, dependency='x', isPopulation=False):
         super(MovingVariance, self).__init__(window, dependency)
         _checkParameterList(dependency)
@@ -245,7 +236,6 @@ class MovingVariance(StatefulValueHolder):
 
 
 class MovingNegativeVariance(StatefulValueHolder):
-
     def __init__(self, window, dependency='x', isPopulation=False):
         super(MovingNegativeVariance, self).__init__(window, dependency)
         _checkParameterList(dependency)
@@ -286,7 +276,6 @@ class MovingNegativeVariance(StatefulValueHolder):
 
 
 class MovingCountedPositive(StatefulValueHolder):
-
     def __init__(self, window, dependency='x'):
         super(MovingCountedPositive, self).__init__(window, dependency)
         _checkParameterList(dependency)
@@ -308,7 +297,6 @@ class MovingCountedPositive(StatefulValueHolder):
 
 
 class MovingCountedNegative(StatefulValueHolder):
-
     def __init__(self, window, dependency='x'):
         super(MovingCountedNegative, self).__init__(window, dependency)
         _checkParameterList(dependency)
@@ -330,7 +318,6 @@ class MovingCountedNegative(StatefulValueHolder):
 
 
 class MovingHistoricalWindow(StatefulValueHolder):
-
     def __init__(self, window, dependency='x'):
         super(MovingHistoricalWindow, self).__init__(window, dependency)
         _checkParameterList(dependency)
@@ -360,7 +347,6 @@ class MovingHistoricalWindow(StatefulValueHolder):
 
 # Calculator for one pair of series
 class MovingCorrelation(StatefulValueHolder):
-
     def __init__(self, window, dependency=('x', 'y')):
         super(MovingCorrelation, self).__init__(window, dependency)
         self._runningSumLeft = 0.0
@@ -390,14 +376,14 @@ class MovingCorrelation(StatefulValueHolder):
             n = self._window
             nominator = n * self._runningSumCrossSquare - self._runningSumLeft * self._runningSumRight
             denominator = (n * self._runningSumSquareLeft - self._runningSumLeft * self._runningSumLeft) \
-                          *(n * self._runningSumSquareRight - self._runningSumRight * self._runningSumRight)
+                          * (n * self._runningSumSquareRight - self._runningSumRight * self._runningSumRight)
             denominator = math.sqrt(denominator)
             return nominator / denominator
         elif self.size >= 2:
             n = self.size
             nominator = n * self._runningSumCrossSquare - self._runningSumLeft * self._runningSumRight
             denominator = (n * self._runningSumSquareLeft - self._runningSumLeft * self._runningSumLeft) \
-                          *(n * self._runningSumSquareRight - self._runningSumRight * self._runningSumRight)
+                          * (n * self._runningSumSquareRight - self._runningSumRight * self._runningSumRight)
             denominator = math.sqrt(denominator)
             return nominator / denominator
         else:
@@ -406,7 +392,6 @@ class MovingCorrelation(StatefulValueHolder):
 
 # Calculator for several series
 class MovingCorrelationMatrix(StatefulValueHolder):
-
     def __init__(self, window, dependency='values'):
         super(MovingCorrelationMatrix, self).__init__(window, dependency)
         self._isFirst = True

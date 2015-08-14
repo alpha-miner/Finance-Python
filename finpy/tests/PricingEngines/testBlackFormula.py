@@ -15,7 +15,6 @@ from finpy.PricingEngines.BlackFormula import blackFormulaImpliedStdDev
 
 
 class TestBlackFormula(unittest.TestCase):
-
     def testBlackBasic(self):
         strike = 1.0
         forward = 1.2
@@ -68,11 +67,12 @@ class TestBlackFormula(unittest.TestCase):
 
         for d in dList:
             strike = forward + d * bpvol * math.sqrt(tte)
-            callPrem = bachelierFormula(OptionType.Call, strike, forward, bpvol * math.sqrt(tte), math.exp(-r*tte))
-            impliedBpVol = bachelierFormulaImpliedVol(OptionType.Call, strike, forward, tte, callPrem, math.exp(-r*tte))
+            callPrem = bachelierFormula(OptionType.Call, strike, forward, bpvol * math.sqrt(tte), math.exp(-r * tte))
+            impliedBpVol = bachelierFormulaImpliedVol(OptionType.Call, strike, forward, tte, callPrem,
+                                                      math.exp(-r * tte))
             self.assertAlmostEqual(impliedBpVol, bpvol, 12)
 
-            callPrem = bachelierFormula(OptionType.Put, strike, forward, bpvol * math.sqrt(tte), math.exp(-r*tte))
-            impliedBpVol = bachelierFormulaImpliedVol(OptionType.Put, strike, forward, tte, callPrem, math.exp(-r*tte))
+            callPrem = bachelierFormula(OptionType.Put, strike, forward, bpvol * math.sqrt(tte), math.exp(-r * tte))
+            impliedBpVol = bachelierFormulaImpliedVol(OptionType.Put, strike, forward, tte, callPrem,
+                                                      math.exp(-r * tte))
             self.assertAlmostEqual(impliedBpVol, bpvol, 12)
-

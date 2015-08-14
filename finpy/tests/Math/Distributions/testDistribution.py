@@ -19,17 +19,16 @@ sigma = 2.0
 def gaussian(x):
     normFact = sigma * math.sqrt(2.0 * _M_PI)
     dx = x - average
-    return math.exp(-dx*dx / (2.0 * sigma * sigma))/normFact
+    return math.exp(-dx * dx / (2.0 * sigma * sigma)) / normFact
 
 
 def gaussianDerivative(x):
-    normFact = sigma * sigma*sigma * math.sqrt(2.0 * _M_PI)
-    dx = x-average
-    return -dx*math.exp(-dx*dx/(2.0 * sigma*sigma))/normFact
+    normFact = sigma * sigma * sigma * math.sqrt(2.0 * _M_PI)
+    dx = x - average
+    return -dx * math.exp(-dx * dx / (2.0 * sigma * sigma)) / normFact
 
 
 class TestDistribution(unittest.TestCase):
-
     def testNormal(self):
         invCumStandardNormal = InverseCumulativeNormal()
 
@@ -43,11 +42,11 @@ class TestDistribution(unittest.TestCase):
         invCumAcc = InverseCumulativeNormal(average, sigma, fullAccuracy=True)
 
         numberOfStandardDeviation = 6
-        xMin = average - numberOfStandardDeviation*sigma
-        xMax = average + numberOfStandardDeviation*sigma
+        xMin = average - numberOfStandardDeviation * sigma
+        xMax = average + numberOfStandardDeviation * sigma
 
         N = 100001
-        h = (xMax-xMin)/(N-1)
+        h = (xMax - xMin) / (N - 1)
 
         x = [xMin + i * h for i in range(N)]
         y = [gaussian(v) for v in x]
@@ -65,7 +64,8 @@ class TestDistribution(unittest.TestCase):
         for i, (expected, calculated) in enumerate(zip(x, temp)):
             self.assertAlmostEqual(expected, calculated, 7, "at index {0:d}\n"
                                                             "Expected gaussian:  {1:f}\n"
-                                                            "Calculated Gaussian: {2:f}".format(i, expected, calculated))
+                                                            "Calculated Gaussian: {2:f}".format(i, expected,
+                                                                                                calculated))
 
         temp = [cum(v) for v in x]
         temp = [invCumAcc(v) for v in temp]
@@ -73,7 +73,8 @@ class TestDistribution(unittest.TestCase):
         for i, (expected, calculated) in enumerate(zip(x, temp)):
             self.assertAlmostEqual(expected, calculated, 7, "at index {0:d}\n"
                                                             "Expected gaussian:  {1:.9f}\n"
-                                                            "Calculated Gaussian: {2:.9f}".format(i, expected, calculated))
+                                                            "Calculated Gaussian: {2:.9f}".format(i, expected,
+                                                                                                  calculated))
 
         temp = [cum.derivative(v) for v in x]
         for i, (expected, calculated) in enumerate(zip(y, temp)):

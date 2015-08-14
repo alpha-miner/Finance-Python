@@ -8,7 +8,6 @@ import sys
 import subprocess
 import glob
 
-
 from finpy import __version__
 
 PACKAGE = "finpy"
@@ -38,7 +37,7 @@ class test(Command):
     user_options = [
         ('test-dir=', None,
          "directory that contains the test definitions"),
-        ]
+    ]
 
     def initialize_options(self):
         pass
@@ -52,6 +51,7 @@ class test(Command):
         else:
             command = "coverage run finpy/tests/testSuite.py; coverage report; coverage html"
         subprocess.Popen(command, shell=True)
+
 
 setup(
     name=NAME,

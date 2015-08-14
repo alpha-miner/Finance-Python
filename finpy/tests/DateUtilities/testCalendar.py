@@ -14,7 +14,6 @@ from finpy.Enums import Weekdays
 
 
 class TestCalendar(unittest.TestCase):
-
     def testBasicFunctions(self):
 
         testDate = Date(2015, 7, 11)
@@ -30,7 +29,8 @@ class TestCalendar(unittest.TestCase):
         testDate = Date(2015, 5, 1)
         cal = Calendar('China.SSE')
         endOfMonth = cal.endOfMonth(testDate)
-        self.assertEqual(endOfMonth, Date(2015, 5, 29), "The month end of 2015/5 is expected to be {0}".format(Date(2015, 5, 29)))
+        self.assertEqual(endOfMonth, Date(2015, 5, 29),
+                         "The month end of 2015/5 is expected to be {0}".format(Date(2015, 5, 29)))
 
         bizDates1 = cal.bizDaysBetween(Date(2015, 1, 1), Date(2015, 12, 31), True, False)
         bizDates2 = cal.bizDaysBetween(Date(2015, 12, 31), Date(2015, 1, 1), False, True)
@@ -49,27 +49,31 @@ class TestCalendar(unittest.TestCase):
     def testChinaSSE(self):
         # China Shhanghai Securities Exchange holiday list in the year 2014
         expectedHol = [Date(2014, 1, 1), Date(2014, 1, 31),
-                       Date(2014, 2, 1), Date(2014, 2, 2), Date(2014, 2, 3), Date(2014, 2, 4), Date(2014, 2, 5), Date(2014, 2, 6), Date(2014, 2, 8),
+                       Date(2014, 2, 1), Date(2014, 2, 2), Date(2014, 2, 3), Date(2014, 2, 4), Date(2014, 2, 5),
+                       Date(2014, 2, 6), Date(2014, 2, 8),
                        Date(2014, 4, 5), Date(2014, 4, 6), Date(2014, 4, 7),
                        Date(2014, 5, 1), Date(2014, 5, 2), Date(2014, 5, 3), Date(2014, 5, 4), Date(2014, 5, 31),
                        Date(2014, 6, 1), Date(2014, 6, 2),
                        Date(2014, 9, 6), Date(2014, 9, 7), Date(2014, 9, 8), Date(2014, 9, 28),
-                       Date(2014, 10, 1), Date(2014, 10, 2), Date(2014, 10, 3), Date(2014, 10, 4), Date(2014, 10, 5), Date(2014, 10, 6), Date(2014, 10, 7), Date(2014, 10, 11),
-        # China Shhanghai Securities Exchange holiday list in the year 2015
+                       Date(2014, 10, 1), Date(2014, 10, 2), Date(2014, 10, 3), Date(2014, 10, 4), Date(2014, 10, 5),
+                       Date(2014, 10, 6), Date(2014, 10, 7), Date(2014, 10, 11),
+                       # China Shhanghai Securities Exchange holiday list in the year 2015
                        Date(2015, 1, 1), Date(2015, 1, 2), Date(2015, 1, 3), Date(2015, 1, 4),
-                       Date(2015, 2, 15), Date(2015, 2, 18), Date(2015, 2, 19), Date(2015, 2, 20), Date(2015, 2, 21), Date(2015, 2, 22), Date(2015, 2, 23), Date(2015, 2, 24), Date(2015, 2, 28),
+                       Date(2015, 2, 15), Date(2015, 2, 18), Date(2015, 2, 19), Date(2015, 2, 20), Date(2015, 2, 21),
+                       Date(2015, 2, 22), Date(2015, 2, 23), Date(2015, 2, 24), Date(2015, 2, 28),
                        Date(2015, 4, 5), Date(2015, 4, 6),
                        Date(2015, 5, 1), Date(2015, 5, 2), Date(2015, 5, 3),
                        Date(2015, 6, 20), Date(2015, 6, 21), Date(2015, 6, 22),
                        Date(2015, 9, 3), Date(2015, 9, 4), Date(2015, 9, 27),
-                       Date(2015, 10, 1), Date(2015, 10, 2), Date(2015, 10, 3), Date(2015, 10, 4), Date(2015, 10, 5), Date(2015, 10, 6), Date(2015, 10, 7), Date(2015, 10, 10)]
+                       Date(2015, 10, 1), Date(2015, 10, 2), Date(2015, 10, 3), Date(2015, 10, 4), Date(2015, 10, 5),
+                       Date(2015, 10, 6), Date(2015, 10, 7), Date(2015, 10, 10)]
 
         cal = Calendar('China.SSE')
 
         for day in expectedHol:
             self.assertEqual(cal.isHoliday(day), True, "{0} is expected to be a holiday in {1}".format(day, cal))
-            self.assertEqual(cal.isBizDay(day), False, "{0} is expected not to be a working day in {1} ".format(day, cal))
-
+            self.assertEqual(cal.isBizDay(day), False,
+                             "{0} is expected not to be a working day in {1} ".format(day, cal))
 
     def testChinaIB(self):
 
@@ -79,7 +83,7 @@ class TestCalendar(unittest.TestCase):
                                   Date(2014, 5, 4),
                                   Date(2014, 9, 28),
                                   Date(2014, 10, 11),
-        # China Inter Bank working weekend list in the year 2015
+                                  # China Inter Bank working weekend list in the year 2015
                                   Date(2015, 1, 4),
                                   Date(2015, 2, 15),
                                   Date(2015, 2, 28),
@@ -97,7 +101,7 @@ class TestCalendar(unittest.TestCase):
         referenceDate = Date(2005, Months.April, 30)
 
         sseCal = Calendar('China.SSE')
-        ibCal  = Calendar('China.IB')
+        ibCal = Calendar('China.IB')
 
         bizDayConv = BizDayConventions.Unadjusted
         self.assertEqual(sseCal.adjustDate(referenceDate, bizDayConv), referenceDate)
@@ -114,7 +118,7 @@ class TestCalendar(unittest.TestCase):
     def testAdvanceDate(self):
         referenceDate = Date(2014, 1, 31)
         sseCal = Calendar('China.SSE')
-        ibCal  = Calendar('China.IB')
+        ibCal = Calendar('China.IB')
 
         bizDayConv = BizDayConventions.Following
 

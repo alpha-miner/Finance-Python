@@ -78,41 +78,40 @@ def errorFunction(x):
     if ax < 0.84375:
         if ax < 3.7252902984e-09:
             if ax < _DBL_MIN * 16:
-                return 0.125*(8.0*x + efx8*x)
-            return x + efx*x
-        z = x*x
-        r = pp0+z*(pp1+z*(pp2+z*(pp3+z*pp4)))
-        s = one+z*(qq1+z*(qq2+z*(qq3+z*(qq4+z*qq5))))
-        y = r/s
-        return x + x*y
+                return 0.125 * (8.0 * x + efx8 * x)
+            return x + efx * x
+        z = x * x
+        r = pp0 + z * (pp1 + z * (pp2 + z * (pp3 + z * pp4)))
+        s = one + z * (qq1 + z * (qq2 + z * (qq3 + z * (qq4 + z * qq5))))
+        y = r / s
+        return x + x * y
 
     if ax < 1.25:
-        s = ax-one
-        P = pa0+s*(pa1+s*(pa2+s*(pa3+s*(pa4+s*(pa5+s*pa6)))))
-        Q = one+s*(qa1+s*(qa2+s*(qa3+s*(qa4+s*(qa5+s*qa6)))))
+        s = ax - one
+        P = pa0 + s * (pa1 + s * (pa2 + s * (pa3 + s * (pa4 + s * (pa5 + s * pa6)))))
+        Q = one + s * (qa1 + s * (qa2 + s * (qa3 + s * (qa4 + s * (qa5 + s * qa6)))))
         if x >= 0:
-            return erx + P/Q
+            return erx + P / Q
         else:
-            return -erx - P/Q
+            return -erx - P / Q
 
     if ax >= 6:
         if x >= 0:
-            return one-tiny
+            return one - tiny
         else:
-            return tiny-one
+            return tiny - one
 
-    s = one/(ax*ax)
+    s = one / (ax * ax)
 
     if ax < 2.85714285714285:
-        R = ra0+s*(ra1+s*(ra2+s*(ra3+s*(ra4+s*(ra5+s*(ra6+s*ra7))))))
-        S = one+s*(sa1+s*(sa2+s*(sa3+s*(sa4+s*(sa5+s*(sa6+s*(sa7+s*sa8)))))))
+        R = ra0 + s * (ra1 + s * (ra2 + s * (ra3 + s * (ra4 + s * (ra5 + s * (ra6 + s * ra7))))))
+        S = one + s * (sa1 + s * (sa2 + s * (sa3 + s * (sa4 + s * (sa5 + s * (sa6 + s * (sa7 + s * sa8)))))))
     else:
-        R = rb0+s*(rb1+s*(rb2+s*(rb3+s*(rb4+s*(rb5+s*rb6)))))
-        S = one+s*(sb1+s*(sb2+s*(sb3+s*(sb4+s*(sb5+s*(sb6+s*sb7))))))
+        R = rb0 + s * (rb1 + s * (rb2 + s * (rb3 + s * (rb4 + s * (rb5 + s * rb6)))))
+        S = one + s * (sb1 + s * (sb2 + s * (sb3 + s * (sb4 + s * (sb5 + s * (sb6 + s * sb7))))))
 
-    r = math.exp(-ax*ax-0.5625 +R/S)
+    r = math.exp(-ax * ax - 0.5625 + R / S)
     if x >= 0:
-        return one-r/ax
+        return one - r / ax
     else:
-        return r/ax-one
-
+        return r / ax - one

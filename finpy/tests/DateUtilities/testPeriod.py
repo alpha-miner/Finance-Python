@@ -11,7 +11,6 @@ from finpy.Enums import TimeUnits
 
 
 class TestPeriod(unittest.TestCase):
-
     def testBasicArithmic(self):
         # test bad normalize
         testPriod = Period(1, TimeUnits.Years)

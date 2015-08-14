@@ -84,4 +84,3 @@ from finpy.Math.Accumulators.Performancers import MovingAverageDrawdown
 from finpy.Math.Accumulators.Performancers import MovingMaxDrawdown
 from finpy.Math.Accumulators.Performancers import MovingSharp
 from finpy.Math.Accumulators.Performancers import MovingSortino
-

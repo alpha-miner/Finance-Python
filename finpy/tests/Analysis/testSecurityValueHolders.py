@@ -17,7 +17,6 @@ from finpy.Analysis.TechnicalAnalysis import SecurityMovingSum
 
 
 class TestSecurityValueHolders(unittest.TestCase):
-
     def setUp(self):
         np.random.seed(0)
         sample1 = np.random.randn(1000, 2)
@@ -103,7 +102,7 @@ class TestSecurityValueHolders(unittest.TestCase):
         testValueHolder = SecurityMovingAverage(window, pNames, symbolList)
         dependency = {
             name: pNames[0] for name in symbolList
-        }
+            }
 
         self.assertEqual(set(testValueHolder.symbolList), set(symbolList))
         self.assertEqual(testValueHolder.dependency, dependency)
@@ -117,7 +116,7 @@ class TestSecurityValueHolders(unittest.TestCase):
         binaryValueHolder = testValueHolder + test2
         dependency2 = {
             name: pNames + pNames2 for name in symbolList
-        }
+            }
 
         self.assertEqual(set(binaryValueHolder.symbolList), set(symbolList))
         for name in dependency2:
@@ -170,7 +169,7 @@ class TestSecurityValueHolders(unittest.TestCase):
         test2 = test['IBM', 'GOOG']
         dependency = {
             name: pNames for name in ['ibm', 'goog']
-        }
+            }
         self.assertTrue(isinstance(test2, SecurityValueHolder))
         self.assertEqual(set(test2.symbolList), set(['ibm', 'goog']))
         self.assertEqual(test2.dependency, dependency)
@@ -187,8 +186,10 @@ class TestSecurityValueHolders(unittest.TestCase):
         combined = ma + mm
 
         for i in range(len(self.datas['aapl']['close'])):
-            data = {'aapl': {Factors.CLOSE: self.datas['aapl'][Factors.CLOSE][i], Factors.OPEN: self.datas['aapl'][Factors.OPEN][i]},
-                    'ibm': {Factors.CLOSE: self.datas['ibm'][Factors.CLOSE][i], Factors.OPEN: self.datas['ibm'][Factors.OPEN][i]}}
+            data = {'aapl': {Factors.CLOSE: self.datas['aapl'][Factors.CLOSE][i],
+                             Factors.OPEN: self.datas['aapl'][Factors.OPEN][i]},
+                    'ibm': {Factors.CLOSE: self.datas['ibm'][Factors.CLOSE][i],
+                            Factors.OPEN: self.datas['ibm'][Factors.OPEN][i]}}
             ma.push(data)
             mm.push(data)
             combined.push(data)
@@ -208,8 +209,10 @@ class TestSecurityValueHolders(unittest.TestCase):
         combined = ma - mm
 
         for i in range(len(self.datas['aapl']['close'])):
-            data = {'aapl': {Factors.CLOSE: self.datas['aapl'][Factors.CLOSE][i], Factors.OPEN: self.datas['aapl'][Factors.OPEN][i]},
-                    'ibm': {Factors.CLOSE: self.datas['ibm'][Factors.CLOSE][i], Factors.OPEN: self.datas['ibm'][Factors.OPEN][i]}}
+            data = {'aapl': {Factors.CLOSE: self.datas['aapl'][Factors.CLOSE][i],
+                             Factors.OPEN: self.datas['aapl'][Factors.OPEN][i]},
+                    'ibm': {Factors.CLOSE: self.datas['ibm'][Factors.CLOSE][i],
+                            Factors.OPEN: self.datas['ibm'][Factors.OPEN][i]}}
             ma.push(data)
             mm.push(data)
             combined.push(data)
@@ -218,9 +221,3 @@ class TestSecurityValueHolders(unittest.TestCase):
             calculated = combined.value
             for name in expected:
                 self.assertAlmostEqual(expected[name], calculated[name], 12)
-
-
-
-
-
-

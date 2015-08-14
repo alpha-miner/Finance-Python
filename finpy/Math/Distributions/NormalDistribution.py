@@ -15,7 +15,6 @@ from finpy.Math.ErrorFunction import errorFunction
 
 
 class NormalDistribution(object):
-
     def __init__(self, average=0.0, sigma=1.0):
         self._average = average
         self._sigma = sigma
@@ -33,7 +32,6 @@ class NormalDistribution(object):
 
 
 class CumulativeNormalDistribution(object):
-
     def __init__(self, average=0.0, sigma=1.0):
         self._average = average
         self._sigma = sigma
@@ -71,7 +69,6 @@ class CumulativeNormalDistribution(object):
 
 
 class InverseCumulativeNormal(object):
-
     _a1 = -3.969683028665376e+01
     _a2 = 2.209460984245205e+02
     _a3 = -2.759285104469687e+02
@@ -115,14 +112,14 @@ class InverseCumulativeNormal(object):
 
         if x < cls._x_low:
             # Rational approximation for the lower region 0<x<u_low
-            z = math.sqrt(-2.0*math.log(x))
-            z = (((((cls._c1*z+cls._c2)*z+cls._c3)*z+cls._c4)*z+cls._c5)*z+cls._c6) \
-                / ((((cls._d1*z+cls._d2)*z+cls._d3)*z+cls._d4)*z+1.0)
+            z = math.sqrt(-2.0 * math.log(x))
+            z = (((((cls._c1 * z + cls._c2) * z + cls._c3) * z + cls._c4) * z + cls._c5) * z + cls._c6) \
+                / ((((cls._d1 * z + cls._d2) * z + cls._d3) * z + cls._d4) * z + 1.0)
         else:
             # Rational approximation for the upper region u_high<x<1
-            z = math.sqrt(-2.0*math.log(1.0-x))
-            z = -(((((cls._c1*z+cls._c2)*z+cls._c3)*z+cls._c4)*z+cls._c5)*z+cls._c6) \
-                / ((((cls._d1*z+cls._d2)*z+cls._d3)*z+cls._d4)*z+1.0)
+            z = math.sqrt(-2.0 * math.log(1.0 - x))
+            z = -(((((cls._c1 * z + cls._c2) * z + cls._c3) * z + cls._c4) * z + cls._c5) * z + cls._c6) \
+                / ((((cls._d1 * z + cls._d2) * z + cls._d3) * z + cls._d4) * z + 1.0)
         return z
 
     def _standard_value(self, x):
@@ -130,14 +127,13 @@ class InverseCumulativeNormal(object):
             z = self._tail_value(x)
         else:
             z = x - 0.5
-            r = z*z
-            z = (((((self._a1*r+self._a2)*r+self._a3)*r+self._a4)*r+self._a5)*r+self._a6)*z  \
-                / (((((self._b1*r+self._b2)*r+self._b3)*r+self._b4)*r+self._b5)*r+1.0)
+            r = z * z
+            z = (((((self._a1 * r + self._a2) * r + self._a3) * r + self._a4) * r + self._a5) * r + self._a6) * z \
+                / (((((self._b1 * r + self._b2) * r + self._b3) * r + self._b4) * r + self._b5) * r + 1.0)
         if self._fullAcc:
-            r = (self._dist(z) - x) * _M_SQRT2 * _M_SQRTPI * math.exp(0.5 * z*z)
-            z -= r/(1+0.5*z*r)
+            r = (self._dist(z) - x) * _M_SQRT2 * _M_SQRTPI * math.exp(0.5 * z * z)
+            z -= r / (1 + 0.5 * z * r)
         return z
 
     def __call__(self, x):
         return self._average + self._sigma * self._standard_value(x)
-

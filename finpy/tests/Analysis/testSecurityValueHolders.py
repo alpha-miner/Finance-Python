@@ -176,6 +176,10 @@ class TestSecurityValueHolders(unittest.TestCase):
         self.assertEqual(test2.valueSize, 1)
         self.assertEqual(test2.window, window)
 
+        # wrong type of item
+        with self.assertRaises(TypeError):
+            _ = test[1]
+
     def testAddedSecurityValueHolders(self):
         window1 = 10
         window2 = 5
@@ -195,6 +199,42 @@ class TestSecurityValueHolders(unittest.TestCase):
             combined.push(data)
 
             expected = ma.value + mm.value
+            calculated = combined.value
+            for name in expected:
+                self.assertAlmostEqual(expected[name], calculated[name], 12)
+
+    def testAddedSecurityValueHoldersWithScalar(self):
+        window = 10
+        dependency = ['close']
+        mm = SecurityMovingSum(window, dependency, ['aapl', 'ibm'])
+        combined = 2.0 + mm
+        for i in range(len(self.datas['aapl']['close'])):
+            data = {'aapl': {Factors.CLOSE: self.datas['aapl'][Factors.CLOSE][i],
+                             Factors.OPEN: self.datas['aapl'][Factors.OPEN][i]},
+                    'ibm': {Factors.CLOSE: self.datas['ibm'][Factors.CLOSE][i],
+                            Factors.OPEN: self.datas['ibm'][Factors.OPEN][i]}}
+            mm.push(data)
+            combined.push(data)
+
+            expected = 2.0 + mm.value
+            calculated = combined.value
+            for name in expected:
+                self.assertAlmostEqual(expected[name], calculated[name], 12)
+
+    def testRAddedSecurityValueHoldersWithScalar(self):
+        window = 10
+        dependency = ['close']
+        ma = SecurityMovingAverage(window, dependency, ['aapl', 'ibm'])
+        combined = ma + 2.0
+        for i in range(len(self.datas['aapl']['close'])):
+            data = {'aapl': {Factors.CLOSE: self.datas['aapl'][Factors.CLOSE][i],
+                             Factors.OPEN: self.datas['aapl'][Factors.OPEN][i]},
+                    'ibm': {Factors.CLOSE: self.datas['ibm'][Factors.CLOSE][i],
+                            Factors.OPEN: self.datas['ibm'][Factors.OPEN][i]}}
+            ma.push(data)
+            combined.push(data)
+
+            expected = ma.value + 2.0
             calculated = combined.value
             for name in expected:
                 self.assertAlmostEqual(expected[name], calculated[name], 12)
@@ -221,3 +261,167 @@ class TestSecurityValueHolders(unittest.TestCase):
             calculated = combined.value
             for name in expected:
                 self.assertAlmostEqual(expected[name], calculated[name], 12)
+
+    def testSubbedSecurityValueHoldersWithScalar(self):
+        window = 10
+        dependency = ['close']
+        mm = SecurityMovingSum(window, dependency, ['aapl', 'ibm'])
+        combined = 2.0 - mm
+        for i in range(len(self.datas['aapl']['close'])):
+            data = {'aapl': {Factors.CLOSE: self.datas['aapl'][Factors.CLOSE][i],
+                             Factors.OPEN: self.datas['aapl'][Factors.OPEN][i]},
+                    'ibm': {Factors.CLOSE: self.datas['ibm'][Factors.CLOSE][i],
+                            Factors.OPEN: self.datas['ibm'][Factors.OPEN][i]}}
+            mm.push(data)
+            combined.push(data)
+
+            expected = 2.0 - mm.value
+            calculated = combined.value
+            for name in expected:
+                self.assertAlmostEqual(expected[name], calculated[name], 12)
+
+    def testRSubbedSecurityValueHoldersWithScalar(self):
+        window = 10
+        dependency = ['close']
+        ma = SecurityMovingAverage(window, dependency, ['aapl', 'ibm'])
+        combined = ma - 2.0
+        for i in range(len(self.datas['aapl']['close'])):
+            data = {'aapl': {Factors.CLOSE: self.datas['aapl'][Factors.CLOSE][i],
+                             Factors.OPEN: self.datas['aapl'][Factors.OPEN][i]},
+                    'ibm': {Factors.CLOSE: self.datas['ibm'][Factors.CLOSE][i],
+                            Factors.OPEN: self.datas['ibm'][Factors.OPEN][i]}}
+            ma.push(data)
+            combined.push(data)
+
+            expected = ma.value - 2.0
+            calculated = combined.value
+            for name in expected:
+                self.assertAlmostEqual(expected[name], calculated[name], 12)
+
+    def testMultipliedSecurityValueHolders(self):
+        window1 = 10
+        window2 = 5
+        dependency1 = Factors.CLOSE
+        dependency2 = Factors.OPEN
+        ma = SecurityMovingAverage(window1, dependency1, ['aapl', 'ibm'])
+        mm = SecurityMovingSum(window2, dependency2, ['aapl', 'ibm'])
+        combined = ma * mm
+
+        for i in range(len(self.datas['aapl']['close'])):
+            data = {'aapl': {Factors.CLOSE: self.datas['aapl'][Factors.CLOSE][i],
+                             Factors.OPEN: self.datas['aapl'][Factors.OPEN][i]},
+                    'ibm': {Factors.CLOSE: self.datas['ibm'][Factors.CLOSE][i],
+                            Factors.OPEN: self.datas['ibm'][Factors.OPEN][i]}}
+            ma.push(data)
+            mm.push(data)
+            combined.push(data)
+
+            expected = ma.value * mm.value
+            calculated = combined.value
+            for name in expected:
+                self.assertAlmostEqual(expected[name], calculated[name], 12)
+
+    def testMultipliedSecurityValueHoldersWithScalar(self):
+        window = 10
+        dependency = ['close']
+        mm = SecurityMovingSum(window, dependency, ['aapl', 'ibm'])
+        combined = 2.0 * mm
+        for i in range(len(self.datas['aapl']['close'])):
+            data = {'aapl': {Factors.CLOSE: self.datas['aapl'][Factors.CLOSE][i],
+                             Factors.OPEN: self.datas['aapl'][Factors.OPEN][i]},
+                    'ibm': {Factors.CLOSE: self.datas['ibm'][Factors.CLOSE][i],
+                            Factors.OPEN: self.datas['ibm'][Factors.OPEN][i]}}
+            mm.push(data)
+            combined.push(data)
+
+            expected = 2.0 * mm.value
+            calculated = combined.value
+            for name in expected:
+                self.assertAlmostEqual(expected[name], calculated[name], 12)
+
+    def testRMultipliedSecurityValueHoldersWithScalar(self):
+        window = 10
+        dependency = ['close']
+        ma = SecurityMovingAverage(window, dependency, ['aapl', 'ibm'])
+        combined = ma * 2.0
+        for i in range(len(self.datas['aapl']['close'])):
+            data = {'aapl': {Factors.CLOSE: self.datas['aapl'][Factors.CLOSE][i],
+                             Factors.OPEN: self.datas['aapl'][Factors.OPEN][i]},
+                    'ibm': {Factors.CLOSE: self.datas['ibm'][Factors.CLOSE][i],
+                            Factors.OPEN: self.datas['ibm'][Factors.OPEN][i]}}
+            ma.push(data)
+            combined.push(data)
+
+            expected = ma.value * 2.0
+            calculated = combined.value
+            for name in expected:
+                self.assertAlmostEqual(expected[name], calculated[name], 12)
+
+    def testDividedSecurityValueHolders(self):
+        window1 = 10
+        window2 = 5
+        dependency1 = Factors.CLOSE
+        dependency2 = Factors.OPEN
+        ma = SecurityMovingAverage(window1, dependency1, ['aapl', 'ibm'])
+        mm = SecurityMovingSum(window2, dependency2, ['aapl', 'ibm'])
+        combined = ma / mm
+
+        for i in range(len(self.datas['aapl']['close'])):
+            data = {'aapl': {Factors.CLOSE: self.datas['aapl'][Factors.CLOSE][i],
+                             Factors.OPEN: self.datas['aapl'][Factors.OPEN][i]},
+                    'ibm': {Factors.CLOSE: self.datas['ibm'][Factors.CLOSE][i],
+                            Factors.OPEN: self.datas['ibm'][Factors.OPEN][i]}}
+            ma.push(data)
+            mm.push(data)
+            combined.push(data)
+
+            expected = ma.value / mm.value
+            calculated = combined.value
+            for name in expected:
+                self.assertAlmostEqual(expected[name], calculated[name], 12)
+
+    def testDividedSecurityValueHoldersWithScalar(self):
+        window = 10
+        dependency = ['close']
+        mm = SecurityMovingSum(window, dependency, ['aapl', 'ibm'])
+        combined = 2.0 / mm
+        for i in range(len(self.datas['aapl']['close'])):
+            data = {'aapl': {Factors.CLOSE: self.datas['aapl'][Factors.CLOSE][i],
+                             Factors.OPEN: self.datas['aapl'][Factors.OPEN][i]},
+                    'ibm': {Factors.CLOSE: self.datas['ibm'][Factors.CLOSE][i],
+                            Factors.OPEN: self.datas['ibm'][Factors.OPEN][i]}}
+            mm.push(data)
+            combined.push(data)
+
+            expected = 2.0 / mm.value
+            calculated = combined.value
+            for name in expected:
+                self.assertAlmostEqual(expected[name], calculated[name], 12)
+
+    def testRDividedSecurityValueHoldersWithScalar(self):
+        window = 10
+        dependency = ['close']
+        ma = SecurityMovingAverage(window, dependency, ['aapl', 'ibm'])
+        combined = ma / 2.0
+        for i in range(len(self.datas['aapl']['close'])):
+            data = {'aapl': {Factors.CLOSE: self.datas['aapl'][Factors.CLOSE][i],
+                             Factors.OPEN: self.datas['aapl'][Factors.OPEN][i]},
+                    'ibm': {Factors.CLOSE: self.datas['ibm'][Factors.CLOSE][i],
+                            Factors.OPEN: self.datas['ibm'][Factors.OPEN][i]}}
+            ma.push(data)
+            combined.push(data)
+
+            expected = ma.value / 2.0
+            calculated = combined.value
+            for name in expected:
+                self.assertAlmostEqual(expected[name], calculated[name], 12)
+
+    def testCombinedSecurityValueHolderWithNoData(self):
+        ma = SecurityMovingAverage(10, 'close', ['aapl', 'ibm', 'goog'])
+        expected = {'aapl': np.nan,
+                    'ibm': np.nan,
+                    'goog': np.nan}
+        calculated = ma.value
+
+        for name in expected:
+            self.assertIs(expected[name], calculated[name])

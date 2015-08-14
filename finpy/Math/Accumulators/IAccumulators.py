@@ -34,7 +34,7 @@ class Accumulator(object):
         else:
             assert isinstance(dependency, str) or isinstance(dependency,
                                                              Accumulator), '{0} in pNames should be a plain string or an value holder. But it is {1}'.format(
-                pNames, type(pNames))
+                dependency, type(dependency))
             self._dependency = deepcopy(dependency)
 
     def push(self, data):
@@ -75,10 +75,10 @@ class Accumulator(object):
 
     def __add__(self, right):
         if isinstance(right, Accumulator):
-            if self._returnSize == right._returnSize:
+            if self._returnSize == right.valueSize:
                 return AddedValueHolder(self, right)
             elif self._returnSize == 1:
-                return AddedValueHolder(Identity(self, right._returnSize), right)
+                return AddedValueHolder(Identity(self, right.valueSize), right)
         return AddedValueHolder(self, Identity(right, self._returnSize))
 
     def __radd__(self, left):
@@ -86,10 +86,10 @@ class Accumulator(object):
 
     def __sub__(self, right):
         if isinstance(right, Accumulator):
-            if self._returnSize == right._returnSize:
+            if self._returnSize == right.valueSize:
                 return MinusedValueHolder(self, right)
             elif self._returnSize == 1:
-                return MinusedValueHolder(Identity(self, right._returnSize), right)
+                return MinusedValueHolder(Identity(self, right.valueSize), right)
         return MinusedValueHolder(self, Identity(right, self._returnSize))
 
     def __rsub__(self, left):
@@ -100,7 +100,7 @@ class Accumulator(object):
             if self._returnSize == right._returnSize:
                 return MultipliedValueHolder(self, right)
             elif self._returnSize == 1:
-                return MultipliedValueHolder(Identity(self, right._returnSize), right)
+                return MultipliedValueHolder(Identity(self, right.valueSize), right)
         return MultipliedValueHolder(self, Identity(right, self._returnSize))
 
     def __rmul__(self, left):
@@ -111,7 +111,7 @@ class Accumulator(object):
             if self._returnSize == right._returnSize:
                 return DividedValueHolder(self, right)
             elif self._returnSize == 1:
-                return DividedValueHolder(Identity(self, right._returnSize), right)
+                return DividedValueHolder(Identity(self, right.valueSize), right)
         return DividedValueHolder(self, Identity(right, self._returnSize))
 
     def __rdiv__(self, left):
@@ -127,34 +127,34 @@ class Accumulator(object):
 
     def __le__(self, right):
         if isinstance(right, Accumulator):
-            if self._returnSize == right._returnSize:
+            if self._returnSize == right.valueSize:
                 return LeOperatorValueHolder(self, right)
             elif self._returnSize == 1:
-                return LeOperatorValueHolder(Identity(self, right._returnSize), right)
+                return LeOperatorValueHolder(Identity(self, right.valueSize), right)
         return LeOperatorValueHolder(self, Identity(right, self._returnSize))
 
     def __lt__(self, right):
         if isinstance(right, Accumulator):
-            if self._returnSize == right._returnSize:
+            if self._returnSize == right.valueSize:
                 return LtOperatorValueHolder(self, right)
             elif self._returnSize == 1:
-                return LtOperatorValueHolder(Identity(self, right._returnSize), right)
+                return LtOperatorValueHolder(Identity(self, right.valueSize), right)
         return LtOperatorValueHolder(self, Identity(right, self._returnSize))
 
     def __ge__(self, right):
         if isinstance(right, Accumulator):
-            if self._returnSize == right._returnSize:
+            if self._returnSize == right.valueSize:
                 return GeOperatorValueHolder(self, right)
             elif self._returnSize == 1:
-                return GeOperatorValueHolder(Identity(self, right._returnSize), right)
+                return GeOperatorValueHolder(Identity(self, right.valueSize), right)
         return GeOperatorValueHolder(self, Identity(right, self._returnSize))
 
     def __gt__(self, right):
         if isinstance(right, Accumulator):
-            if self._returnSize == right._returnSize:
+            if self._returnSize == right.valueSize:
                 return GtOperatorValueHolder(self, right)
             elif self._returnSize == 1:
-                return GtOperatorValueHolder(Identity(self, right._returnSize), right)
+                return GtOperatorValueHolder(Identity(self, right.valueSize), right)
         return GtOperatorValueHolder(self, Identity(right, self._returnSize))
 
     def __xor__(self, right):
@@ -247,8 +247,8 @@ class TruncatedValueHolder(Accumulator):
             self._returnSize = 1
 
         self._valueHolder = deepcopy(valueHolder)
-        self._dependency = self._valueHolder._dependency
-        self._window = valueHolder._window
+        self._dependency = self._valueHolder.dependency
+        self._window = valueHolder.window
         self._containerSize = valueHolder._containerSize
 
     def push(self, data):
@@ -262,12 +262,12 @@ class TruncatedValueHolder(Accumulator):
 
 class CombinedValueHolder(Accumulator):
     def __init__(self, left, right):
-        assert left._returnSize == right._returnSize
-        self._returnSize = left._returnSize
+        assert left.valueSize == right.valueSize
+        self._returnSize = left.valueSize
         self._left = deepcopy(left)
         self._right = deepcopy(right)
-        self._dependency = list(set(left._dependency).union(set(right._dependency)))
-        self._window = max(self._left._window, self._right._window)
+        self._dependency = list(set(left.dependency).union(set(right.dependency)))
+        self._window = max(self._left.window, self._right.window)
         self._containerSize = max(self._left._containerSize, self._right._containerSize)
 
     def push(self, data):
@@ -404,14 +404,14 @@ class Identity(Accumulator):
 
 class CompoundedValueHolder(Accumulator):
     def __init__(self, left, right):
-        self._returnSize = right._returnSize
+        self._returnSize = right.valueSize
         self._left = deepcopy(left)
         self._right = deepcopy(right)
         self._window = self._left.window + self._right.window - 1
         self._containerSize = self._right._containerSize
-        self._dependency = deepcopy(left._dependency)
+        self._dependency = deepcopy(left.dependency)
 
-        if hasattr(self._right._dependency, '__iter__'):
+        if hasattr(self._right.dependency, '__iter__'):
             assert left.valueSize == len(self._right.dependency)
         else:
             assert left.valueSize == 1
@@ -420,9 +420,9 @@ class CompoundedValueHolder(Accumulator):
         self._left.push(data)
         values = self._left.result()
         if hasattr(values, '__iter__'):
-            parameters = dict((name, value) for name, value in zip(self._right._dependency, values))
+            parameters = dict((name, value) for name, value in zip(self._right.dependency, values))
         else:
-            parameters = {self._right._dependency: values}
+            parameters = {self._right.dependency: values}
         self._right.push(parameters)
 
     def result(self):
@@ -431,9 +431,9 @@ class CompoundedValueHolder(Accumulator):
 
 class BasicFunction(Accumulator):
     def __init__(self, valueHolder, func, *args, **kwargs):
-        self._returnSize = valueHolder._returnSize
+        self._returnSize = valueHolder.valueSize
         self._valueHolder = deepcopy(valueHolder)
-        self._dependency = deepcopy(valueHolder._dependency)
+        self._dependency = deepcopy(valueHolder.dependency)
         self._func = func
         self._args = args
         self._kwargs = kwargs
@@ -467,9 +467,9 @@ def Sqrt(valueHolder):
 # due to the fact that pow function is much slower than ** operator
 class Pow(Accumulator):
     def __init__(self, valueHolder, n):
-        self._returnSize = valueHolder._returnSize
+        self._returnSize = valueHolder.valueSize
         self._valueHolder = deepcopy(valueHolder)
-        self._dependency = deepcopy(valueHolder._dependency)
+        self._dependency = deepcopy(valueHolder.dependency)
         self._n = n
         self._window = valueHolder.window
 

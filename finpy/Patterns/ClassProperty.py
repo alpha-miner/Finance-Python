@@ -2,6 +2,9 @@
 u"""
 Created on 2015-8-14
 
+The implementation refer to this thread:
+http://stackoverflow.com/questions/5189699/how-can-i-make-a-class-property-in-python
+
 @author: cheng.li
 """
 
@@ -9,7 +12,6 @@ import inspect
 
 
 class ClassPropertyDescriptor(object):
-
     def __init__(self, fget, fset=None):
         self.fget = fget
         self.fset = fset

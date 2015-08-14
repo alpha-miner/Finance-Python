@@ -135,21 +135,21 @@ class SecurityValueHolder(object):
 
     __metaclass__ = ABCMeta
 
-    def __init__(self, pNames='x', symbolList=None):
+    def __init__(self, dependency='x', symbolList=None):
         if symbolList is None:
             # should do something to get a global value here
             self._symbolList = set(['600000.xshg', 'aapl', 'ibm', "msft"])
         else:
             self._symbolList = set(s.lower() for s in symbolList)
-        if isinstance(pNames, SecurityValueHolder):
-            self._pNames = pNames._pNames
+        if isinstance(dependency, SecurityValueHolder):
+            self._dependency = dependency._dependency
         else:
-            if not isinstance(pNames, str) and len(pNames) == 1:
-                self._pNames = pNames[0].lower()
-            elif not isinstance(pNames, str) and len(pNames) >= 1:
-                self._pNames = [name.lower() for name in pNames]
+            if not isinstance(dependency, str) and len(dependency) == 1:
+                self._dependency = dependency[0].lower()
+            elif not isinstance(dependency, str) and len(dependency) >= 1:
+                self._dependency = [name.lower() for name in dependency]
             else:
-                self._pNames = pNames.lower()
+                self._dependency = dependency.lower()
         self._window = 1
         self._returnSize = 1
 
@@ -160,7 +160,7 @@ class SecurityValueHolder(object):
     @property
     def dependency(self):
         return {
-            symbol: self._pNames for symbol in self._symbolList
+            symbol: self._dependency for symbol in self._symbolList
         }
 
     @property
@@ -247,7 +247,7 @@ class IdentitySecurityValueHolder(SecurityValueHolder):
         self._symbolList = []
         self._window = 1
         self._returnSize = n
-        self._pNames = []
+        self._dependency = []
         self._innerHolders = {
             'wildCard': Identity(value, n)
         }
@@ -281,7 +281,7 @@ class SecurityCombinedValueHolder(SecurityValueHolder):
                 self._symbolList = set(self._left._symbolList)
 
         self._window = max(self._left.window, self._right.window)
-        self._pNames = list(set(self._left._pNames).union(set(self._right._pNames)))
+        self._dependency = list(set(self._left._dependency).union(set(self._right._dependency)))
         self._returnSize = self._left.valueSize
 
         if len(self._right.symbolList) == 0:
@@ -354,14 +354,13 @@ class SecurityCompoundedValueHolder(SecurityValueHolder):
         self._returnSize =right.valueSize
         self._symbolList = left.symbolList
         self._window = left.window + right.window - 1
-        self._pNames = left._pNames
-        if not isinstance(right._pNames, str):
+        self._dependency = left._dependency
+        if not isinstance(right._dependency, str):
             assert left.valueSize == len(right._pNames)
         else:
             assert left.valueSize == 1
 
         self._right = copy.deepcopy(right._innerHolders[right._innerHolders.keys()[0]])
-        self._isNamed = False
         self._left = copy.deepcopy(left._innerHolders[left._innerHolders.keys()[0]])
         self._innerHolders = {
             name: CompoundedValueHolder(self._left, self._right) for name in self._symbolList

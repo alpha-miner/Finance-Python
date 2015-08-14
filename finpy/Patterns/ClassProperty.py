@@ -2,7 +2,7 @@
 u"""
 Created on 2015-8-14
 
-The implementation refer to this thread:
+The implementation refers to this thread:
 http://stackoverflow.com/questions/5189699/how-can-i-make-a-class-property-in-python
 
 @author: cheng.li

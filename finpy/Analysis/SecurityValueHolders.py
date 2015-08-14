@@ -194,7 +194,7 @@ class SecurityValueHolder(object):
                     name: self._innerHolders[name] for name in res._symbolList
                     }
             return res
-        elif item.lower() in self._innerHolders:
+        elif isinstance(item, str) and item.lower() in self._innerHolders:
             item = item.lower()
             res = copy.deepcopy(self)
             res._symbolList = set([item])
@@ -249,14 +249,6 @@ class IdentitySecurityValueHolder(SecurityValueHolder):
             'wildCard': Identity(value, n)
         }
 
-    def push(self, data):
-        if len(self._pNames) != 0:
-            self._innerHolders['wildCard'].push(**data)
-
-    @property
-    def value(self):
-        return self._innerHolders['wildCard'].value
-
 
 class SecurityCombinedValueHolder(SecurityValueHolder):
     def __init__(self, left, right, HolderType):
@@ -271,10 +263,7 @@ class SecurityCombinedValueHolder(SecurityValueHolder):
         else:
             self._left = IdentitySecurityValueHolder(left)
             self._right = copy.deepcopy(right)
-            if isinstance(right, SecurityValueHolder):
-                self._symbolList = set(self._left.symbolList).union(set(right.symbolList))
-            else:
-                self._symbolList = set(self._left.symbolList)
+            self._symbolList = set(right.symbolList)
 
         self._window = max(self._left.window, self._right.window)
         self._dependency = list(set(self._left.dependency).union(set(self._right.dependency)))
@@ -282,12 +271,12 @@ class SecurityCombinedValueHolder(SecurityValueHolder):
 
         if len(self._right.symbolList) == 0:
             self._innerHolders = {
-                name: HolderType(self._left._innerHolders[name], self._right._innerHolders['blank'])
+                name: HolderType(self._left._innerHolders[name], self._right._innerHolders['wildCard'])
                 for name in self._left.symbolList
                 }
         elif len(self._left.symbolList) == 0:
             self._innerHolders = {
-                name: HolderType(self._left._innerHolders['blank'], self._right._innerHolders[name])
+                name: HolderType(self._left._innerHolders['wildCard'], self._right._innerHolders[name])
                 for name in self._right.symbolList
                 }
         else:
@@ -301,16 +290,6 @@ class SecurityCombinedValueHolder(SecurityValueHolder):
         left = self._left.dependency
         right = self._right.dependency
         return _merge2dict(left, right)
-
-    @property
-    def value(self):
-        res = {}
-        for name in self._innerHolders:
-            try:
-                res[name] = self._innerHolders[name].value
-            except:
-                res[name] = np.nan
-        return SecuritiesValues(res)
 
 
 class SecurityAddedValueHolder(SecurityCombinedValueHolder):

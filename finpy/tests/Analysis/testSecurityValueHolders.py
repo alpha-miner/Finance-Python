@@ -416,7 +416,7 @@ class TestSecurityValueHolders(unittest.TestCase):
             for name in expected:
                 self.assertAlmostEqual(expected[name], calculated[name], 12)
 
-    def testCombinedSecurityValueHolderWithNoData(self):
+    def testCombinedSecurityValueHolderWithoutData(self):
         ma = SecurityMovingAverage(10, 'close', ['aapl', 'ibm', 'goog'])
         expected = {'aapl': np.nan,
                     'ibm': np.nan,

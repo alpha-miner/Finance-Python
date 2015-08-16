@@ -14,6 +14,23 @@ from finpy.Enums import Weekdays
 
 
 class TestCalendar(unittest.TestCase):
+    def testWrongInputOfHolidayCenter(self):
+        with self.assertRaises(ValueError):
+            _ = Calendar('NulCalendar')
+
+        with self.assertRaises(ValueError):
+            _ = Calendar(Date(2015, 1, 1))
+
+    def testCalendarConstructionIsInsensitiveOfCase(self):
+        cal1 = Calendar('NullCalendar')
+        cal2 = Calendar('nullcalendar')
+        shouldBeTrue = cal1 == cal2
+        self.assertTrue(shouldBeTrue)
+
+        caltoBeDifferent = Calendar('China.SSE')
+        shouldBeFalse = cal1 == caltoBeDifferent
+        self.assertFalse(shouldBeFalse)
+
     def testBasicFunctions(self):
 
         testDate = Date(2015, 7, 11)

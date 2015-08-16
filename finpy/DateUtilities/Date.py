@@ -14,10 +14,14 @@ from finpy.Enums.Weekdays import Weekdays
 
 class Date(object):
     def __init__(self, year=None, month=None, day=None, serialNumber=None):
-
-        if serialNumber is not None:
+        # do the input validation
+        if serialNumber is not None and year is None and month is None and day is None:
             self.__serialNumber__ = serialNumber
             return
+        elif serialNumber is not None and (year is not None or month is not None or day is not None):
+            raise ValueError("When serial number is offered, no year or month or day number should be entered")
+        elif year is None or month is None or day is None:
+            raise ValueError("year: {0}, month: {1}, day: {2} can't be null value included".format(year, month, day))
 
         isLeap = self.isLeap(year)
 

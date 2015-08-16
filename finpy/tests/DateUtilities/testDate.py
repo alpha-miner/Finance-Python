@@ -13,6 +13,23 @@ from finpy.Enums import Weekdays
 
 
 class TestDate(unittest.TestCase):
+    def testDateInputWithSerialNumber(self):
+        serialNumber = 45678
+        testDate = Date(serialNumber=serialNumber)
+        self.assertEqual(testDate.serialNumber, serialNumber)
+
+    def testDateInputWithSerialNumberAndNotNullYearMonthDay(self):
+        serialNumber = 45678
+        with self.assertRaises(ValueError):
+            _ = Date(year=2015, serialNumber=serialNumber)
+
+    def testDateInputWithoutCompleteInformationOnYearMonthDay(self):
+        year = 2015
+        month = None
+        day = 18
+        with self.assertRaises(ValueError):
+            _ = Date(year=year, month=month, day=day)
+
     def testBasicFunctions(self):
         year = 2015
         month = 7

@@ -15,8 +15,14 @@ from finpy.DateUtilities.Period import Period
 
 class Calendar(object):
     def __init__(self, holCenter):
-        holCenter = holCenter.lower()
-        self._impl = _holDict[holCenter]()
+        if isinstance(holCenter, str):
+            holCenter = holCenter.lower()
+            try:
+                self._impl = _holDict[holCenter]()
+            except KeyError:
+                raise ValueError("{0} is not a valid description of a holiday center")
+        else:
+            raise ValueError("{0} is not a valid description of a holiday center")
 
     def isBizDay(self, d):
         return self._impl.isBizDay(d)
@@ -146,6 +152,9 @@ class Calendar(object):
             d += 1
         return result
 
+    def __eq__(self, right):
+        return self._impl == right._impl
+
 
 class ChinaSseImpl(object):
     def __init__(self):
@@ -229,6 +238,12 @@ class ChinaSseImpl(object):
 
     def isWeekEnd(self, weekDay):
         return weekDay == Weekdays.Saturday or weekDay == Weekdays.Sunday
+
+    def __eq__(self, right):
+        if isinstance(right, ChinaSseImpl):
+            return True
+        else:
+            return False
 
 
 class ChinaIBImpl(object):
@@ -328,6 +343,12 @@ class ChinaIBImpl(object):
     def isWeekEnd(self, weekDay):
         return weekDay == Weekdays.Saturday or weekDay == Weekdays.Sunday
 
+    def __eq__(self, right):
+        if isinstance(right, ChinaIBImpl):
+            return True
+        else:
+            return False
+
 
 class NullCalendar(object):
     def __init__(self):
@@ -338,6 +359,12 @@ class NullCalendar(object):
 
     def isWeekEnd(self, weekDay):
         return weekDay == Weekdays.Saturday or weekDay == Weekdays.Sunday
+
+    def __eq__(self, right):
+        if isinstance(right, NullCalendar):
+            return True
+        else:
+            return False
 
 
 class WestenImpl(object):
@@ -404,6 +431,12 @@ class TargetImpl(WestenImpl):
             or (d == 31 and m == Months.December and (y == 1998 or y == 1999 or y == 2001))):
             return False
         return True
+
+    def __eq__(self, right):
+        if isinstance(right, TargetImpl):
+            return True
+        else:
+            return False
 
 
 _holDict = {'china.sse': ChinaSseImpl,

@@ -54,7 +54,7 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
                                                                  'expected:   {1:.12f}\n'
                                                                  'calculated: {2:.12f}'.format(i, expected, calculated))
 
-        with self.assertRaises(RuntimeError):
+        with self.assertRaises(ValueError):
             _ = SecurityMovingAverage(window, ['close', 'open'], ['aapl', 'ibm'])
 
     def testSecurityMovingMax(self):
@@ -78,7 +78,7 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
                                                                  'expected:   {1:.12f}\n'
                                                                  'calculated: {2:.12f}'.format(i, expected, calculated))
 
-        with self.assertRaises(RuntimeError):
+        with self.assertRaises(ValueError):
             _ = SecurityMovingMax(window, ['close', 'open'], ['aapl', 'ibm'])
 
     def testSecurityMovingMinimum(self):
@@ -102,7 +102,7 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
                                                                  'expected:   {1:.12f}\n'
                                                                  'calculated: {2:.12f}'.format(i, expected, calculated))
 
-        with self.assertRaises(RuntimeError):
+        with self.assertRaises(ValueError):
             _ = SecurityMovingMinimum(window, ['close', 'open'], ['aapl', 'ibm'])
 
     def testSecurityMovingSum(self):
@@ -147,7 +147,7 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
                                                                  'expected:   {1:.12f}\n'
                                                                  'calculated: {2:.12f}'.format(i, expected, calculated))
 
-        with self.assertRaises(RuntimeError):
+        with self.assertRaises(ValueError):
             _ = SecurityMovingCountedPositive(window, ['close', 'open'], ['aapl', 'ibm'])
 
     def testSecurityMovingPositiveAverage(self):
@@ -175,7 +175,7 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
                                                                  'expected:   {1:.12f}\n'
                                                                  'calculated: {2:.12f}'.format(i, expected, calculated))
 
-        with self.assertRaises(RuntimeError):
+        with self.assertRaises(ValueError):
             _ = SecurityMovingPositiveAverage(window, ['close', 'open'], ['aapl', 'ibm'])
 
     def testSecurityMovingLogReturn(self):
@@ -207,7 +207,7 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
                                                                      'calculated: {2:.12f}'.format(i, expected,
                                                                                                    calculated))
 
-        with self.assertRaises(RuntimeError):
+        with self.assertRaises(ValueError):
             _ = SecurityMovingLogReturn(window, ['close', 'open'], ['aapl', 'ibm'])
 
     def testSecurityMovingHistoricalWindow(self):

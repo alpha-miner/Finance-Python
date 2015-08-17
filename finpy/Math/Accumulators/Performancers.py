@@ -6,19 +6,20 @@ Created on 2015-7-17
 """
 
 import math
+import numpy as np
 from finpy.Math.Accumulators.StatefulAccumulators import StatefulValueHolder
 from finpy.Math.Accumulators.StatefulAccumulators import MovingMax
 from finpy.Math.Accumulators.StatefulAccumulators import MovingAverage
 from finpy.Math.Accumulators.StatefulAccumulators import MovingVariance
 from finpy.Math.Accumulators.StatefulAccumulators import MovingNegativeVariance
 from finpy.Math.Accumulators.StatefulAccumulators import MovingCorrelation
-from finpy.Math.Accumulators.StatefulAccumulators import _checkParameterList
+from finpy.Math.Accumulators.StatefulAccumulators import SingleValuedValueHolder
 
 
-class MovingLogReturn(StatefulValueHolder):
+class MovingLogReturn(SingleValuedValueHolder):
     def __init__(self, window=1, dependency='price'):
         super(MovingLogReturn, self).__init__(window, dependency)
-        _checkParameterList(dependency)
+        self._runningReturn = np.nan
 
     def push(self, data):
         value = super(MovingLogReturn, self).push(data)
@@ -29,7 +30,7 @@ class MovingLogReturn(StatefulValueHolder):
             self._runningReturn = math.log(value / popout)
 
     def result(self):
-        if self.size >= 2:
+        if self.size >= self.window:
             return self._runningReturn
         else:
             raise ArithmeticError("Container has less than 2 samples")

@@ -27,9 +27,7 @@ class SecuritiesValues(object):
         return self._values[item]
 
     def __neg__(self):
-        return SecuritiesValues({
-                                    name: -self._values[name] for name in self._values
-                                    })
+        return SecuritiesValues({name: -self._values[name] for name in self._values})
 
     def __iter__(self):
         return self._values.__iter__()
@@ -181,9 +179,13 @@ class SecurityValueHolder(object):
         for name in self._innerHolders:
             try:
                 res[name] = self._innerHolders[name].value
-            except:
+            except ArithmeticError:
                 res[name] = np.nan
         return SecuritiesValues(res)
+
+    @property
+    def holders(self):
+        return self._innerHolders
 
     def __getitem__(self, item):
         if isinstance(item, tuple):
@@ -272,17 +274,17 @@ class SecurityCombinedValueHolder(SecurityValueHolder):
 
         if len(self._right.symbolList) == 0:
             self._innerHolders = {
-                name: HolderType(self._left._innerHolders[name], self._right._innerHolders['wildCard'])
+                name: HolderType(self._left.holders[name], self._right.holders['wildCard'])
                 for name in self._left.symbolList
                 }
         elif len(self._left.symbolList) == 0:
             self._innerHolders = {
-                name: HolderType(self._left._innerHolders['wildCard'], self._right._innerHolders[name])
+                name: HolderType(self._left.holders['wildCard'], self._right.holders[name])
                 for name in self._right.symbolList
                 }
         else:
             self._innerHolders = {
-                name: HolderType(self._left._innerHolders[name], self._right._innerHolders[name])
+                name: HolderType(self._left.holders[name], self._right.holders[name])
                 for name in self._left.symbolList
                 }
 
@@ -318,7 +320,7 @@ def SecurityShiftedValueHolder(secValueHolder, n):
     res = copy.deepcopy(secValueHolder)
     res._window = secValueHolder.window + n
     res._innerHolders = {
-        name: Shift(secValueHolder._innerHolders[name], n) for name in secValueHolder._innerHolders
+        name: Shift(secValueHolder.holders[name], n) for name in secValueHolder.holders
         }
     return res
 
@@ -334,8 +336,8 @@ class SecurityCompoundedValueHolder(SecurityValueHolder):
         else:
             assert left.valueSize == 1
 
-        self._right = copy.deepcopy(right._innerHolders[right._innerHolders.keys()[0]])
-        self._left = copy.deepcopy(left._innerHolders[left._innerHolders.keys()[0]])
+        self._right = copy.deepcopy(right.holders[right.holders.keys()[0]])
+        self._left = copy.deepcopy(left.holders[left.holders.keys()[0]])
         self._innerHolders = {
             name: CompoundedValueHolder(self._left, self._right) for name in self._symbolList
             }

@@ -30,7 +30,7 @@ class SecuritySingleValueHolder(SecurityValueHolder):
             self._dependency = dependency._dependency
             self._innerHolders = \
                 {
-                    name: HolderType(window, copy.deepcopy(dependency._innerHolders[name])) for name in self._symbolList
+                    name: HolderType(window, copy.deepcopy(dependency.holders[name])) for name in self._symbolList
                     }
 
         else:

@@ -12,6 +12,7 @@ from finpy.Patterns.Singleton import Singleton
 class SettingsFactory(Singleton):
     def __init__(self, forcedBuild=False):
         self._evaluationDate = None
+        self._defaultSymbolList = set()
 
     @property
     def evaluationDate(self):
@@ -31,6 +32,14 @@ class SettingsFactory(Singleton):
     def anchorEvaluationDate(self):
         if self._evaluationDate is None:
             self._evaluationDate = Date.todaysDate()
+
+    @property
+    def defaultSymbolList(self):
+        return self._defaultSymbolList
+
+    @defaultSymbolList.setter
+    def defaultSymbolList(self, value):
+        self._defaultSymbolList = value
 
 
 Settings = SettingsFactory()

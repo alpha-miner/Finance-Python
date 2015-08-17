@@ -470,7 +470,7 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
                                                                  "expected:   {1:f}\n"
                                                                  "calculated: {2:f}".format(i, expected, calculated))
 
-        with self.assertRaises(RuntimeError):
+        with self.assertRaises(ValueError):
             _ = Max('close') >> math.sqrt
 
         with self.assertRaises(AssertionError):

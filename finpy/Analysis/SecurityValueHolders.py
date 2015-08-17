@@ -16,6 +16,7 @@ from finpy.Math.Accumulators.IAccumulators import AddedValueHolder
 from finpy.Math.Accumulators.IAccumulators import MinusedValueHolder
 from finpy.Math.Accumulators.IAccumulators import MultipliedValueHolder
 from finpy.Math.Accumulators.IAccumulators import DividedValueHolder
+from finpy.Env.Settings import Settings
 
 
 class SecuritiesValues(object):
@@ -136,7 +137,7 @@ class SecurityValueHolder(object):
     def __init__(self, dependency='x', symbolList=None):
         if symbolList is None:
             # should do something to get a global value here
-            self._symbolList = set(['600000.xshg', 'aapl', 'ibm', "msft"])
+            self._symbolList = Settings.defaultSymbolList
         else:
             self._symbolList = set(s.lower() for s in symbolList)
         if isinstance(dependency, SecurityValueHolder):
@@ -350,7 +351,7 @@ class SecurityCompoundedValueHolder(SecurityValueHolder):
         for name in self._innerHolders:
             try:
                 res[name] = self._innerHolders[name].value
-            except:
+            except ArithmeticError:
                 res[name] = np.nan
         return SecuritiesValues(res)
 

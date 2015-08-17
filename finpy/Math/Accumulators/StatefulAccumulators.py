@@ -77,10 +77,15 @@ class Shift(StatefulValueHolder):
         return self._popout
 
 
-class SortedValueHolder(StatefulValueHolder):
+class SingleValuedValueHolder(StatefulValueHolder):
+    def __init__(self, window, dependency):
+        super(SingleValuedValueHolder, self).__init__(window, dependency)
+        _checkParameterList(dependency)
+
+
+class SortedValueHolder(SingleValuedValueHolder):
     def __init__(self, window, dependency='x'):
         super(SortedValueHolder, self).__init__(window, dependency)
-        _checkParameterList(dependency)
         self._sortedArray = []
 
     def push(self, data):
@@ -113,10 +118,9 @@ class MovingMinimum(SortedValueHolder):
         return self._sortedArray[0]
 
 
-class MovingSum(StatefulValueHolder):
+class MovingSum(SingleValuedValueHolder):
     def __init__(self, window, dependency='x'):
         super(MovingSum, self).__init__(window, dependency)
-        _checkParameterList(dependency)
         self._runningSum = 0.0
 
     def push(self, data):
@@ -130,10 +134,9 @@ class MovingSum(StatefulValueHolder):
         return self._runningSum
 
 
-class MovingAverage(StatefulValueHolder):
+class MovingAverage(SingleValuedValueHolder):
     def __init__(self, window, dependency='x'):
         super(MovingAverage, self).__init__(window, dependency)
-        _checkParameterList(dependency)
         self._runningSum = 0.0
 
     def push(self, data):
@@ -144,16 +147,12 @@ class MovingAverage(StatefulValueHolder):
         self._runningSum = self._runningSum - popout + value
 
     def result(self):
-        if self.isFull:
-            return self._runningSum / self._window
-        else:
-            return self._runningSum / self.size
+        return self._runningSum / self.size
 
 
-class MovingPositiveAverage(StatefulValueHolder):
+class MovingPositiveAverage(SingleValuedValueHolder):
     def __init__(self, window, dependency='x'):
         super(MovingPositiveAverage, self).__init__(window, dependency)
-        _checkParameterList(dependency)
         self._runningPositiveSum = 0.0
         self._runningPositiveCount = 0
 
@@ -177,10 +176,9 @@ class MovingPositiveAverage(StatefulValueHolder):
             return self._runningPositiveSum / self._runningPositiveCount
 
 
-class MovingNegativeAverage(StatefulValueHolder):
+class MovingNegativeAverage(SingleValuedValueHolder):
     def __init__(self, window, dependency='x'):
         super(MovingNegativeAverage, self).__init__(window, dependency)
-        _checkParameterList(dependency)
         self._runningNegativeSum = 0.0
         self._runningNegativeCount = 0
 
@@ -204,10 +202,9 @@ class MovingNegativeAverage(StatefulValueHolder):
             return self._runningNegativeSum / self._runningNegativeCount
 
 
-class MovingVariance(StatefulValueHolder):
+class MovingVariance(SingleValuedValueHolder):
     def __init__(self, window, dependency='x', isPopulation=False):
         super(MovingVariance, self).__init__(window, dependency)
-        _checkParameterList(dependency)
         self._runningSum = 0.0
         self._runningSumSquare = 0.0
         self._isPop = isPopulation
@@ -232,13 +229,12 @@ class MovingVariance(StatefulValueHolder):
             if length >= 2:
                 return tmp / (length - 1)
             else:
-                raise RuntimeError("Container has too few samples: {0:d}".format(self.size))
+                raise ZeroDivisionError("Container has too few samples: {0:d}".format(self.size))
 
 
-class MovingNegativeVariance(StatefulValueHolder):
+class MovingNegativeVariance(SingleValuedValueHolder):
     def __init__(self, window, dependency='x', isPopulation=False):
         super(MovingNegativeVariance, self).__init__(window, dependency)
-        _checkParameterList(dependency)
         self._runningNegativeSum = 0.0
         self._runningNegativeSumSquare = 0.0
         self._runningNegativeCount = 0
@@ -265,20 +261,19 @@ class MovingNegativeVariance(StatefulValueHolder):
                 tmp = self._runningNegativeSumSquare - self._runningNegativeSum * self._runningNegativeSum / length
                 return tmp / length
             else:
-                raise RuntimeError("Negative population variance container has less than 1 samples")
+                raise ZeroDivisionError("Negative population variance container has less than 1 samples")
         else:
             if self._runningNegativeCount >= 2:
                 length = self._runningNegativeCount
                 tmp = self._runningNegativeSumSquare - self._runningNegativeSum * self._runningNegativeSum / length
                 return tmp / (length - 1)
             else:
-                raise RuntimeError("Negative sample variance container has less than 2 samples")
+                raise ZeroDivisionError("Negative sample variance container has less than 2 samples")
 
 
-class MovingCountedPositive(StatefulValueHolder):
+class MovingCountedPositive(SingleValuedValueHolder):
     def __init__(self, window, dependency='x'):
         super(MovingCountedPositive, self).__init__(window, dependency)
-        _checkParameterList(dependency)
         self._counts = 0
 
     def push(self, data):
@@ -296,10 +291,9 @@ class MovingCountedPositive(StatefulValueHolder):
         return self._counts
 
 
-class MovingCountedNegative(StatefulValueHolder):
+class MovingCountedNegative(SingleValuedValueHolder):
     def __init__(self, window, dependency='x'):
         super(MovingCountedNegative, self).__init__(window, dependency)
-        _checkParameterList(dependency)
         self._counts = 0
 
     def push(self, data):
@@ -320,7 +314,6 @@ class MovingCountedNegative(StatefulValueHolder):
 class MovingHistoricalWindow(StatefulValueHolder):
     def __init__(self, window, dependency='x'):
         super(MovingHistoricalWindow, self).__init__(window, dependency)
-        _checkParameterList(dependency)
         self._returnSize = window
 
     def push(self, data):
@@ -371,15 +364,8 @@ class MovingCorrelation(StatefulValueHolder):
         self._runningSumCrossSquare = self._runningSumCrossSquare - headLeft * headRight + value[0] * value[1]
 
     def result(self):
-
-        if self.isFull:
-            n = self._window
-            nominator = n * self._runningSumCrossSquare - self._runningSumLeft * self._runningSumRight
-            denominator = (n * self._runningSumSquareLeft - self._runningSumLeft * self._runningSumLeft) \
-                          * (n * self._runningSumSquareRight - self._runningSumRight * self._runningSumRight)
-            denominator = math.sqrt(denominator)
-            return nominator / denominator
-        elif self.size >= 2:
+        n = self.size
+        if n >= 2:
             n = self.size
             nominator = n * self._runningSumCrossSquare - self._runningSumLeft * self._runningSumRight
             denominator = (n * self._runningSumSquareLeft - self._runningSumLeft * self._runningSumLeft) \
@@ -387,7 +373,7 @@ class MovingCorrelation(StatefulValueHolder):
             denominator = math.sqrt(denominator)
             return nominator / denominator
         else:
-            raise RuntimeError("Container has less than 2 samples")
+            raise ZeroDivisionError("Container has less than 2 samples")
 
 
 # Calculator for several series
@@ -421,4 +407,4 @@ class MovingCorrelationMatrix(StatefulValueHolder):
             denominator = np.sqrt(denominator * denominator.T)
             return nominator / denominator
         else:
-            raise RuntimeError("Container has less than 2 samples")
+            raise ZeroDivisionError("Container has less than 2 samples")

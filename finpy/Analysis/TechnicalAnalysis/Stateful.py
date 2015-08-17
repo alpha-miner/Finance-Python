@@ -87,8 +87,8 @@ class SecurityMovingHistoricalWindow(SecuritySingleValueHolder):
             for name in self._innerHolders:
                 try:
                     res[name] = self._innerHolders[name].value[item]
-                except:
+                except ArithmeticError:
                     res[name] = np.nan
             return SecuritiesValues(res)
         else:
-            raise RuntimeError("{0} is not recognized as valid int or string".forma(item))
+            raise ValueError("{0} is not recognized as valid int or string".forma(item))

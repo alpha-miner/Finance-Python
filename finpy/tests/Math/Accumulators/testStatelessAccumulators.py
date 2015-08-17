@@ -17,8 +17,8 @@ from finpy.Math.Accumulators.StatelessAccumulators import Correlation
 class TestStatelessAccumulators(unittest.TestCase):
     def setUp(self):
         np.random.seed(0)
-        self.samplesOpen = np.random.randn(10000)
-        self.samplesClose = np.random.randn(10000)
+        self.samplesOpen = np.random.randn(1000)
+        self.samplesClose = np.random.randn(1000)
 
     def testMax(self):
         mm = Max(dependency='close')
@@ -68,7 +68,7 @@ class TestStatelessAccumulators(unittest.TestCase):
             calculated = mm.result()
 
             if i == 0:
-                with self.assertRaises(RuntimeError):
+                with self.assertRaises(ArithmeticError):
                     _ = mm2.result()
 
             self.assertAlmostEqual(expected, calculated, 10, "at index {0:d}\n"
@@ -88,7 +88,7 @@ class TestStatelessAccumulators(unittest.TestCase):
         for i, (openPrice, closePrice) in enumerate(zip(self.samplesOpen, self.samplesClose)):
             mm.push(dict(open=openPrice, close=closePrice))
             if i == 0:
-                with self.assertRaises(RuntimeError):
+                with self.assertRaises(ArithmeticError):
                     _ = mm.result()
             if i >= 1:
                 expected = np.corrcoef(self.samplesOpen[:i + 1], self.samplesClose[:i + 1])[0, 1]

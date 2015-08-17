@@ -122,7 +122,7 @@ class Variance(StatelessAccumulator):
             if self._currentCount >= 2:
                 return tmp / (self._currentCount - 1)
             else:
-                raise RuntimeError("Container has too few samples: {0:d}".format(self._currentCount))
+                raise ZeroDivisionError("Container has too few samples: {0:d}".format(self._currentCount))
 
 
 class Correlation(StatelessAccumulator):
@@ -156,4 +156,4 @@ class Correlation(StatelessAccumulator):
             denominator = math.sqrt(denominator)
             return nominator / denominator
         else:
-            raise RuntimeError("Container has less than 2 samples")
+            raise ZeroDivisionError("Container has less than 2 samples")

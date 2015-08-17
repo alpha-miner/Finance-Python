@@ -168,15 +168,16 @@ class Accumulator(object):
     def __rshift__(self, right):
         if isinstance(right, Accumulator):
             return CompoundedValueHolder(self, right)
+
         try:
             return CompoundedValueHolder(self, right())
-        except:
+        except TypeError:
             pass
 
         try:
             return right(self)
         except:
-            raise RuntimeError('{0} is not recogonized as a valid operator'.format(right))
+            raise ValueError('{0} is not recogonized as a valid operator'.format(right))
 
     def __neg__(self):
         return NegativeValueHolder(self)

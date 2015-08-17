@@ -32,7 +32,7 @@ class MovingLogReturn(StatefulValueHolder):
         if self.size >= 2:
             return self._runningReturn
         else:
-            raise RuntimeError("Container has less than 2 samples")
+            raise ArithmeticError("Container has less than 2 samples")
 
 
 class MovingSharp(StatefulValueHolder):
@@ -54,10 +54,7 @@ class MovingSharp(StatefulValueHolder):
         self._var.push(data)
 
     def result(self):
-        if self._var.size >= 2:
-            return self._mean.result() / math.sqrt(self._var.result())
-        else:
-            raise RuntimeError("Container has less than 2 samples")
+        return self._mean.result() / math.sqrt(self._var.result())
 
 
 class MovingSortino(StatefulValueHolder):
@@ -77,10 +74,7 @@ class MovingSortino(StatefulValueHolder):
         self._negativeVar.push(data)
 
     def result(self):
-        if self._mean.size >= 2:
-            return self._mean.result() / math.sqrt(self._negativeVar.result())
-        else:
-            raise RuntimeError("Container has less than 2 samples")
+        return self._mean.result() / math.sqrt(self._negativeVar.result())
 
 
 class MovingAlphaBeta(StatefulValueHolder):
@@ -108,15 +102,12 @@ class MovingAlphaBeta(StatefulValueHolder):
         self._correlationHolder.push(data)
 
     def result(self):
-        if self._pReturnMean.size >= 2:
-            corr = self._correlationHolder.result()
-            pStd = math.sqrt(self._pReturnVar.result())
-            mStd = math.sqrt(self._mReturnVar.result())
-            beta = corr * pStd / mStd
-            alpha = self._pReturnMean.result() - beta * self._mReturnMean.result()
-            return alpha, beta
-        else:
-            raise RuntimeError("Container has less than 2 samples")
+        corr = self._correlationHolder.result()
+        pStd = math.sqrt(self._pReturnVar.result())
+        mStd = math.sqrt(self._mReturnVar.result())
+        beta = corr * pStd / mStd
+        alpha = self._pReturnMean.result() - beta * self._mReturnMean.result()
+        return alpha, beta
 
 
 class MovingDrawDown(StatefulValueHolder):
@@ -145,9 +136,6 @@ class MovingDrawDown(StatefulValueHolder):
             self._highIndex = self._runningIndex
 
     def result(self):
-        '''
-        :return: (draw down, duration, high index)
-        '''
         return self._runningCum - self._currentMax, self._runningIndex - self._highIndex, self._highIndex
 
 

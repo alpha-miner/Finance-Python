@@ -6,11 +6,12 @@ Created on 2015-7-21
 """
 
 from collections import OrderedDict
+from finpy.Utilities import fpAssert
 
 
 class Timeseries(object):
     def __init__(self, dates, values):
-        assert len(dates) == len(values), "dates and values should have same length"
+        fpAssert(len(dates) == len(values), ValueError, "dates and values should have same length")
         self._values = OrderedDict()
 
         for date, value in zip(dates, values):

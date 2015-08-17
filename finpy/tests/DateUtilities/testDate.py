@@ -101,10 +101,10 @@ class TestDate(unittest.TestCase):
                                                                                                    Date.todaysDate()))
 
         # nth-week day
-        with self.assertRaises(AssertionError):
+        with self.assertRaises(ValueError):
             _ = Date.nthWeekday(0, Weekdays.Friday, 1, 2015)
 
-        with self.assertRaises(AssertionError):
+        with self.assertRaises(ValueError):
             _ = Date.nthWeekday(6, Weekdays.Friday, 1, 2015)
 
         self.assertEqual(Date.nthWeekday(3, Weekdays.Wednesday, 8, 2015), Date(2015, 8, 19))

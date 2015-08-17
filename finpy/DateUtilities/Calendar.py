@@ -11,6 +11,7 @@ from finpy.Enums.BizDayConventions import BizDayConventions
 from finpy.Enums.TimeUnits import TimeUnits
 from finpy.DateUtilities.Date import Date
 from finpy.DateUtilities.Period import Period
+from finpy.Utilities import fpAssert
 
 
 class Calendar(object):
@@ -95,7 +96,7 @@ class Calendar(object):
             else:
                 return d1
         else:
-            raise RuntimeError("unknown business-day convention")
+            raise ValueError("unknown business-day convention")
         return d1
 
     def advanceDate(self, d, period, c=BizDayConventions.Following, endOfMonth=False):
@@ -133,7 +134,8 @@ class Calendar(object):
             return self.adjustDate(d1, c)
 
     def holDatesList(self, fromDate, toDate, includeWeekEnds=True):
-        assert fromDate <= toDate, "from date ({0:s} must be earlier than to date {1:s}".format(fromDate, toDate)
+        fpAssert(fromDate <= toDate, ValueError, "from date ({0:s} must be earlier than to date {1:s}"
+                 .format(fromDate, toDate))
         result = []
         d = fromDate
         while d <= toDate:
@@ -143,7 +145,8 @@ class Calendar(object):
         return result
 
     def bizDatesList(self, fromDate, toDate):
-        assert fromDate <= toDate, "from date ({0:s} must be earlier than to date {1:s}".format(fromDate, toDate)
+        fpAssert(fromDate <= toDate, ValueError, "from date ({0:s} must be earlier than to date {1:s}"
+                 .format(fromDate, toDate))
         result = []
         d = fromDate
         while d <= toDate:

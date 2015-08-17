@@ -34,7 +34,7 @@ class TestStatefulAccumulators(unittest.TestCase):
     def testShiftValueHolder(self):
         ma = MovingAverage(10, 'close')
 
-        with self.assertRaises(AssertionError):
+        with self.assertRaises(ValueError):
             _ = Shift(ma, N=0)
 
         test = Shift(ma, N=1)

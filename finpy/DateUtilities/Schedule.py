@@ -12,6 +12,7 @@ from finpy.DateUtilities import Date
 from finpy.DateUtilities import Period
 from finpy.DateUtilities import Calendar
 from finpy.Env import Settings
+from finpy.Utilities import fpAssert
 
 
 class Schedule(object):
@@ -55,7 +56,7 @@ class Schedule(object):
         # really necessary. In these cases a decent placeholder is enough
         if effectiveDate is None and firstDate is None and dateGenerationRule == DateGeneration.Backward:
             evalDate = Settings.evaluationDate
-            assert evalDate < terminationDate, "null effective date"
+            fpAssert(evalDate < terminationDate, ValueError, "null effective date")
             if nextToLastDate is not None:
                 y = int((nextToLastDate - evalDate) / 366) + 1
                 effectiveDate = nextToLastDate - Period(y, TimeUnits.Years)
@@ -63,42 +64,40 @@ class Schedule(object):
                 y = int((terminationDate - evalDate) / 366) + 1
                 effectiveDate = terminationDate - Period(y, TimeUnits.Years)
         else:
-            assert effectiveDate is not None, "null effective date"
+            fpAssert(effectiveDate is not None, ValueError, "null effective date")
 
-        assert effectiveDate < terminationDate, "effective date ({0})" \
-                                                " later than or equal to termination date ({1}".format(effectiveDate,
-                                                                                                       terminationDate)
+        fpAssert(effectiveDate < terminationDate, ValueError, "effective date ({0}) "
+                                                              "later than or equal to termination date ({1}"
+                 .format(effectiveDate, terminationDate))
 
         if tenor.length == 0:
             self._rule = DateGeneration.Zero
         else:
-            assert tenor.length > 0, "non positive tenor ({0:d}) not allowed".format(tenor.length)
+            fpAssert(tenor.length > 0, ValueError, "non positive tenor ({0:d}) not allowed".format(tenor.length))
 
         if self._firstDate is not None:
             if self._rule == DateGeneration.Backward or self._rule == DateGeneration.Forward:
-                assert effectiveDate < self._firstDate < terminationDate, "first date ({0})" \
-                                                                          " out of effective-termination" \
-                                                                          " date range [{1}, {2})".format(
-                    self._firstDate, effectiveDate, terminationDate)
+                fpAssert(effectiveDate < self._firstDate < terminationDate, ValueError,
+                         "first date ({0}) out of effective-termination date range [{1}, {2})"
+                         .format(self._firstDate, effectiveDate, terminationDate))
                 # we should ensure that the above condition is still
                 # verified after adjustment
             elif self._rule == DateGeneration.Zero:
-                raise RuntimeError("first date incompatible with {0:d} date generation rule".format(self._rule))
+                raise ValueError("first date incompatible with {0:d} date generation rule".format(self._rule))
             else:
-                raise RuntimeError("unknown rule ({0:d})".format(self._rule))
+                raise ValueError("unknown rule ({0:d})".format(self._rule))
 
         if self._nextToLastDate is not None:
             if self._rule == DateGeneration.Backward or self._rule == DateGeneration.Forward:
-                assert effectiveDate < self._nextToLastDate < terminationDate, "next to last date ({0})" \
-                                                                               " out of effective-termination" \
-                                                                               " date range [{1}, {2})".format(
-                    self._nextToLastDate, effectiveDate, terminationDate)
+                fpAssert(effectiveDate < self._nextToLastDate < terminationDate, ValueError,
+                         "next to last date ({0}) out of effective-termination date range [{1}, {2})"
+                         .format(self._nextToLastDate, effectiveDate, terminationDate))
                 # we should ensure that the above condition is still
                 # verified after adjustment
             elif self._rule == DateGeneration.Zero:
-                raise RuntimeError("next to last date incompatible with {0:d} date generation rule".format(self._rule))
+                raise ValueError("next to last date incompatible with {0:d} date generation rule".format(self._rule))
             else:
-                raise RuntimeError("unknown rule ({0:d})".format(self._rule))
+                raise ValueError("unknown rule ({0:d})".format(self._rule))
 
         # calendar needed for endOfMonth adjustment
         nullCalendar = Calendar("Null")
@@ -189,7 +188,7 @@ class Schedule(object):
                 self._dates.append(terminationDate)
                 self._isRegular.append(False)
         else:
-            raise RuntimeError("unknown rule ({0:d})".format(self._rule))
+            raise ValueError("unknown rule ({0:d})".format(self._rule))
 
         # adjustments
         if self._endOfMonth and self._cal.isEndOfMonth(seed):
@@ -233,17 +232,22 @@ class Schedule(object):
             self._dates = self._dates[1:]
             self._isRegular = self._isRegular[1:]
 
-        assert len(self._dates) >= 1, "degenerate single date ({0}) schedule\n" \
-                                      "seed date: {1}\n" \
-                                      "exit date: {2}\n" \
-                                      "effective date: {3}\n" \
-                                      "first date: {4}\n" \
-                                      "next to last date: {5}\n" \
-                                      "termination date: {6}\n" \
-                                      "generation rule: {7}\n" \
-                                      "end of month: {8}\n".format(self._dates[0], seed, exitDate, effectiveDate,
-                                                                   firstDate, nextToLastDate, terminationDate,
-                                                                   self._rule, self._endOfMonth)
+        fpAssert(len(self._dates) >= 1, ValueError, "degenerate single date ({0}) schedule\n"
+                                                    "seed date: {1}\n"
+                                                    "exit date: {2}\n"
+                                                    "effective date: {3}\n"
+                                                    "first date: {4}\n"
+                                                    "next to last date: {5}\n"
+                                                    "termination date: {6}\n"
+                                                    "generation rule: {7}\n"
+                                                    "end of month: {8}\n"
+                 .format(self._dates[0],
+                         seed, exitDate,
+                         effectiveDate,
+                         firstDate,
+                         nextToLastDate,
+                         terminationDate,
+                         self._rule, self._endOfMonth))
 
     def size(self):
         return len(self._dates)

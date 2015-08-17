@@ -10,6 +10,7 @@ import math
 from finpy.Enums.TimeUnits import TimeUnits
 from finpy.DateUtilities.Period import Period
 from finpy.Enums.Weekdays import Weekdays
+from finpy.Utilities import fpAssert
 
 
 class Date(object):
@@ -25,12 +26,13 @@ class Date(object):
 
         isLeap = self.isLeap(year)
 
-        assert 1 <= month <= 12, 'month {0:d} is out of bound. It must be in [1, 12]'.format(month)
+        fpAssert(1 <= month <= 12, ValueError, 'month {0:d} is out of bound. It must be in [1, 12]'.format(month))
 
         length = self._monthLength(month, isLeap)
         offset = self._monthOffset(month, isLeap)
 
-        assert 1 <= day <= length, 'day {0:d} is out of bound. It must be in [1, {1:d}]'.format(day, length)
+        fpAssert(1 <= day <= length, ValueError, 'day {0:d} is out of bound. It must be in [1, {1:d}]'
+                 .format(day, length))
 
         self.__serialNumber__ = day + offset + _YearOffset[year - 1900]
 
@@ -145,8 +147,8 @@ class Date(object):
 
     @staticmethod
     def nthWeekday(nth, dayOfWeek, m, y):
-        assert nth > 0, "zeroth day of week in a given (month, year) is undefined"
-        assert nth < 6, "no more than 5 weekday in a given (month, year)"
+        fpAssert(nth > 0, ValueError, "zeroth day of week in a given (month, year) is undefined")
+        fpAssert(nth < 6, ValueError, "no more than 5 weekday in a given (month, year)")
 
         first = Date(y, m, 1).weekday()
         skip = nth - (1 if dayOfWeek >= first else 0)
@@ -159,7 +161,7 @@ class Date(object):
 
     @staticmethod
     def isLeap(year):
-        assert 1900 < year < 2200, 'year {0:d} is out of bound. It must be in [1901, 2199]'.format(year)
+        fpAssert(1900 < year < 2200, ValueError, 'year {0:d} is out of bound. It must be in [1901, 2199]'.format(year))
         return _YearIsLeap[year - 1900]
 
     @staticmethod
@@ -186,7 +188,8 @@ class Date(object):
 
     @classmethod
     def parseISO(cls, dateStr):
-        assert len(dateStr) == 10 and dateStr[4] == '-' and dateStr[7] == '-', "invalid format"
+        fpAssert(len(dateStr) == 10 and dateStr[4] == '-' and dateStr[7] == '-', ValueError,
+                 "invalid format {0}".format(dateStr))
         return cls(int(dateStr[0:4]), int(dateStr[5:7]), int(dateStr[8:10]))
 
     @classmethod
@@ -211,7 +214,7 @@ class Date(object):
                 addedYear -= 1
             y += addedYear
 
-            assert 1900 < y < 2200, 'year {0:d} is out of bound. It must be in [1901, 2199]'.format(y)
+            fpAssert(1900 < y < 2200, ValueError, 'year {0:d} is out of bound. It must be in [1901, 2199]'.format(y))
 
             return cls(y, monthLeft, d)
         elif units == TimeUnits.Years:
@@ -219,7 +222,7 @@ class Date(object):
             m = date.month()
             y = date.year() + n
 
-            assert 1900 < y < 2200, 'year {0:d} is out of bound. It must be in [1901, 2199]'.format(y)
+            fpAssert(1900 < y < 2200, ValueError, 'year {0:d} is out of bound. It must be in [1901, 2199]'.format(y))
 
             return cls(y, m, d)
 

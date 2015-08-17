@@ -11,6 +11,7 @@ from finpy.Enums.OptionType import OptionType
 from finpy.Math.Distributions.NormalDistribution import CumulativeNormalDistribution
 from finpy.Math.MathConstants import _M_PI
 from finpy.Math.MathConstants import _QL_EPSILON
+from finpy.Utilities import fpAssert
 
 _dist = CumulativeNormalDistribution()
 
@@ -19,11 +20,11 @@ def _checkParameters(strike, forward, displacement):
     strike = float(strike)
     forward = float(forward)
     displacement = float(displacement)
-    assert displacement >= 0, "displacement ({0:f}) must be non-negative".format(displacement)
-    assert strike + displacement >= 0, "strike + displacement ({0:f}) must be non-negative".format(
-        strike + displacement)
-    assert forward + displacement >= 0, "forward + displacement ({0:f}) must be non-negative".format(
-        forward + displacement)
+    fpAssert(displacement >= 0, ValueError, "displacement ({0:f}) must be non-negative".format(displacement))
+    fpAssert(strike + displacement >= 0, ValueError, "strike + displacement ({0:f}) must be non-negative"
+             .format(strike + displacement))
+    fpAssert(forward + displacement >= 0, ValueError, "forward + displacement ({0:f}) must be non-negative"
+             .format(forward + displacement))
     return strike, forward, displacement
 
 
@@ -112,7 +113,7 @@ def blackFormulaImpliedStdDev(optionType,
                                                       blackPrice,
                                                       discount,
                                                       displacement)
-    assert stdAppr >= 0.0, "stdDev ({0:f})) must be non-negative".format(stdAppr)
+    fpAssert(stdAppr >= 0.0, ValueError, "stdDev ({0:f})) must be non-negative".format(stdAppr))
     return newton(func, stdAppr, tol=1e-10)
 
 
@@ -126,8 +127,8 @@ def bachelierFormula(optionType,
     stdDev = float(stdDev)
     discount = float(discount)
 
-    assert stdDev >= 0, "stdDev ({0:f}) must be non-negative".format(stdDev)
-    assert discount > 0, "discount ({0:f}) must be positive".format(discount)
+    fpAssert(stdDev >= 0, ValueError, "stdDev ({0:f}) must be non-negative".format(stdDev))
+    fpAssert(discount > 0, ValueError, "discount ({0:f}) must be positive".format(discount))
 
     d = (forward - strike) * optionType
     if stdDev == 0:
@@ -136,11 +137,11 @@ def bachelierFormula(optionType,
     h = d / stdDev
     result = discount * (stdDev * _dist.derivative(h) + d * _dist(h))
 
-    assert result >= 0, "negative value ({0:f}) for " \
-                        "stdDev:  {1:f}" \
-                        "option:  {2}" \
-                        "strike:  {3:f}" \
-                        "forward: {4:f}".format(result, stdDev, optionType, strike, forward)
+    fpAssert(result >= 0, ValueError, "negative value ({0:f}) for "
+                                      "stdDev:  {1:f}"
+                                      "option:  {2}"
+                                      "strike:  {3:f}"
+                                      "forward: {4:f}".format(result, stdDev, optionType, strike, forward))
     return result
 
 
@@ -156,7 +157,7 @@ def bachelierFormulaImpliedVol(optionType,
     bachelierPrice = float(bachelierPrice)
     discount = float(discount)
 
-    assert tte > 0, "tte ({0:f) must be positive".format(tte)
+    fpAssert(tte > 0, ValueError, "tte ({0:f}) must be positive".format(tte))
     SQRT_QL_EPSILON = math.sqrt(_QL_EPSILON)
 
     forwardPremium = bachelierPrice / discount

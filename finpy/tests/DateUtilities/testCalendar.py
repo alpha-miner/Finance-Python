@@ -212,5 +212,5 @@ class TestCalendar(unittest.TestCase):
         testDate = sseCal.adjustDate(referenceDate, BizDayConventions.Nearest)
         self.assertEqual(testDate, Date(2014, 1, 30))
 
-        with self.assertRaises(RuntimeError):
+        with self.assertRaises(ValueError):
             _ = sseCal.adjustDate(referenceDate, -1)

@@ -31,19 +31,19 @@ class TestPeriod(unittest.TestCase):
         self.assertEqual(expected, calculated, "added value {0} should be equal to {1}".format(calculated, expected))
 
         p2 = Period(2, TimeUnits.Weeks)
-        with self.assertRaises(AssertionError):
+        with self.assertRaises(ValueError):
             _ = p1 + p2
 
         p2 = Period(2, TimeUnits.BDays)
-        with self.assertRaises(AssertionError):
+        with self.assertRaises(ValueError):
             _ = p1 + p2
 
         p2 = Period(2, TimeUnits.Days)
-        with self.assertRaises(AssertionError):
+        with self.assertRaises(ValueError):
             _ = p1 + p2
 
         p2._units = 10
-        with self.assertRaises(TypeError):
+        with self.assertRaises(ValueError):
             _ = p1 + p2
 
         p1 = Period(13, TimeUnits.Months)
@@ -53,19 +53,19 @@ class TestPeriod(unittest.TestCase):
         self.assertEqual(expected, calculated, "added value {0} should be equal to {1}".format(calculated, expected))
 
         p2 = Period(2, TimeUnits.Weeks)
-        with self.assertRaises(AssertionError):
+        with self.assertRaises(ValueError):
             _ = p1 + p2
 
         p2 = Period(2, TimeUnits.BDays)
-        with self.assertRaises(AssertionError):
+        with self.assertRaises(ValueError):
             _ = p1 + p2
 
         p2 = Period(2, TimeUnits.Days)
-        with self.assertRaises(AssertionError):
+        with self.assertRaises(ValueError):
             _ = p1 + p2
 
         p2._units = 10
-        with self.assertRaises(TypeError):
+        with self.assertRaises(ValueError):
             _ = p1 + p2
 
         p1 = Period(2, TimeUnits.Weeks)
@@ -75,19 +75,19 @@ class TestPeriod(unittest.TestCase):
         self.assertEqual(expected, calculated, "added value {0} should be equal to {1}".format(calculated, expected))
 
         p2 = Period(2, TimeUnits.Months)
-        with self.assertRaises(AssertionError):
+        with self.assertRaises(ValueError):
             _ = p1 + p2
 
         p2 = Period(2, TimeUnits.BDays)
-        with self.assertRaises(AssertionError):
+        with self.assertRaises(ValueError):
             _ = p1 + p2
 
         p2 = Period(2, TimeUnits.Years)
-        with self.assertRaises(AssertionError):
+        with self.assertRaises(ValueError):
             _ = p1 + p2
 
         p2._units = 10
-        with self.assertRaises(TypeError):
+        with self.assertRaises(ValueError):
             _ = p1 + p2
 
         p1 = Period(7, TimeUnits.Days)
@@ -97,41 +97,41 @@ class TestPeriod(unittest.TestCase):
         self.assertEqual(expected, calculated, "added value {0} should be equal to {1}".format(calculated, expected))
 
         p2 = Period(2, TimeUnits.Months)
-        with self.assertRaises(AssertionError):
+        with self.assertRaises(ValueError):
             _ = p1 + p2
 
         p2 = Period(2, TimeUnits.BDays)
-        with self.assertRaises(AssertionError):
+        with self.assertRaises(ValueError):
             _ = p1 + p2
 
         p2 = Period(2, TimeUnits.Years)
-        with self.assertRaises(AssertionError):
+        with self.assertRaises(ValueError):
             _ = p1 + p2
 
         p2._units = 10
-        with self.assertRaises(TypeError):
+        with self.assertRaises(ValueError):
             _ = p1 + p2
 
         p1 = Period(7, TimeUnits.BDays)
 
         p2 = Period(2, TimeUnits.Months)
-        with self.assertRaises(AssertionError):
+        with self.assertRaises(ValueError):
             _ = p1 + p2
 
         p2 = Period(2, TimeUnits.Days)
-        with self.assertRaises(AssertionError):
+        with self.assertRaises(ValueError):
             _ = p1 + p2
 
         p2 = Period(2, TimeUnits.Weeks)
-        with self.assertRaises(AssertionError):
+        with self.assertRaises(ValueError):
             _ = p1 + p2
 
         p2 = Period(2, TimeUnits.Years)
-        with self.assertRaises(AssertionError):
+        with self.assertRaises(ValueError):
             _ = p1 + p2
 
         p2._units = 10
-        with self.assertRaises(TypeError):
+        with self.assertRaises(ValueError):
             _ = p1 + p2
 
         p2 = Period(2, TimeUnits.BDays)
@@ -188,11 +188,11 @@ class TestPeriod(unittest.TestCase):
         p1 = Period(21, TimeUnits.Weeks)
         p2 = Period(5, TimeUnits.Months)
 
-        with self.assertRaises(RuntimeError):
+        with self.assertRaises(ValueError):
             _ = p1 < p2
 
         p1 = Period(21, TimeUnits.BDays)
-        with self.assertRaises(RuntimeError):
+        with self.assertRaises(ValueError):
             _ = p1 < p2
 
         # test not equal operator

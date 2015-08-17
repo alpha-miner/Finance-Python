@@ -74,6 +74,7 @@ setup(
               'finpy.PricingEngines',
               'finpy.Analysis',
               'finpy.Analysis.TechnicalAnalysis',
+              'finpy.Utilities',
               'finpy.tests',
               'finpy.tests.API',
               'finpy.tests.DateUtilities',

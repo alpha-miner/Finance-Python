@@ -10,6 +10,7 @@ import bisect
 import numpy as np
 from copy import deepcopy
 from finpy.Math.Accumulators.IAccumulators import Accumulator
+from finpy.Utilities import fpAssert
 
 
 def _checkParameterList(dependency):
@@ -24,7 +25,7 @@ class StatefulValueHolder(Accumulator):
         if not isinstance(window, int):
             raise ValueError("window parameter should be a positive int however {0} received"
                              .format(window))
-        assert window > 0, "window length should be greater than 0"
+        fpAssert(window > 0, ValueError, "window length should be greater than 0")
         self._returnSize = 1
         self._window = window
         self._containerSize = window
@@ -62,7 +63,7 @@ class StatefulValueHolder(Accumulator):
 class Shift(StatefulValueHolder):
     def __init__(self, valueHolder, N=1):
         super(Shift, self).__init__(N, valueHolder._dependency)
-        assert N >= 1, "shift value should always not be less than 1"
+        fpAssert(N >= 1, ValueError, "shift value should always not be less than 1")
         self._valueHolder = deepcopy(valueHolder)
         self._window = valueHolder.window + N
         self._containerSize = N
@@ -209,7 +210,7 @@ class MovingVariance(SingleValuedValueHolder):
         self._runningSumSquare = 0.0
         self._isPop = isPopulation
         if not self._isPop:
-            assert window >= 2, "sampling variance can't be calculated with window size < 2"
+            fpAssert(window >= 2, ValueError, "sampling variance can't be calculated with window size < 2")
 
     def push(self, data):
         value = super(MovingVariance, self).push(data)
@@ -395,7 +396,7 @@ class MovingCorrelationMatrix(StatefulValueHolder):
             self._isFirst = False
         reshapeValues = np.array(values).reshape((1, len(values)))
         popout = self._dumpOneValue(reshapeValues)
-        assert len(values) == self._runningSum.size, "size incompatiable"
+        fpAssert(len(values) == self._runningSum.size, ValueError, "size incompatiable")
         self._runningSum += reshapeValues - popout
         self._runningSumCrossSquare += reshapeValues * reshapeValues.T - popout * popout.T
 

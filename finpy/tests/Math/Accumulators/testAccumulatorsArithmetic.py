@@ -42,7 +42,7 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
     def testAccumulatorBasic(self):
 
         # check parameter list should not be empty
-        with self.assertRaises(RuntimeError):
+        with self.assertRaises(ValueError):
             Max(dependency=[])
 
         m = Max(dependency='x')
@@ -473,7 +473,7 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
         with self.assertRaises(ValueError):
             _ = Max('close') >> math.sqrt
 
-        with self.assertRaises(AssertionError):
+        with self.assertRaises(ValueError):
             _ = (Max('close') ^ Minimum('close')) >> MovingCorrelation(20, dependency=('x', 'y', 'z'))
 
         (Max('close') ^ Minimum('close')) >> MovingCorrelation(20, dependency=('x', 'y'))
@@ -517,7 +517,7 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
         ma20 = MovingAverage(20, 'close')
         max5 = MovingMax(5, 'open')
 
-        with self.assertRaises(RuntimeError):
+        with self.assertRaises(TypeError):
             _ = TruncatedValueHolder(ma20, 1)
 
         test = TruncatedValueHolder(ma20 ^ max5, 1)
@@ -540,7 +540,7 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
         test.push(dict(close=15.0, open=20.0))
         self.assertAlmostEqual(test.result(), (12.5,), 15)
 
-        with self.assertRaises(RuntimeError):
+        with self.assertRaises(ValueError):
             _ = TruncatedValueHolder(ma20 ^ max5, slice(1, -2))
 
     def testGetItemOperator(self):

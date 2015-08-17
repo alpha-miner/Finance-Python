@@ -9,6 +9,7 @@ import re
 import math
 from copy import deepcopy
 from finpy.Enums.TimeUnits import TimeUnits
+from finpy.Utilities import fpAssert
 
 _unitPattern = re.compile('[BbDdMmWwYy]{1}')
 _numberPattern = re.compile('[-+]*[0-9]+')
@@ -63,7 +64,7 @@ class Period(object):
                 raise TypeError("unknown time unit ({0:d})".format(self.units))
 
     def __div__(self, n):
-        assert n != 0, "cannot be divided by zero"
+        fpAssert(n != 0, ValueError, "cannot be divided by zero")
 
         res = Period(self.length, self.units)
         if self.length % n == 0:
@@ -79,7 +80,7 @@ class Period(object):
                 length *= 7
                 units = TimeUnits.Days
 
-            assert length % n == 0, "{0:s} cannot be divided by {1:d}".format(res, n)
+            fpAssert(length % n == 0, ValueError, "{0:s} cannot be divided by {1:d}".format(res, n))
 
             res._length = length / n
             res._units = units
@@ -104,40 +105,40 @@ class Period(object):
                     res._units = TimeUnits.Months
                     res._length = res.length * 12 + p2.length
                 elif p2.units == TimeUnits.Weeks or p2.units == TimeUnits.Days or p2.units == TimeUnits.BDays:
-                    assert p2.length == 0, "impossible addition between {0} and {1}".format(self, p2)
+                    fpAssert(p2.length == 0, ValueError, "impossible addition between {0} and {1}".format(self, p2))
                 else:
-                    raise TypeError("unknown time unit ({0:d})".format(p2.units))
+                    raise ValueError("unknown time unit ({0:d})".format(p2.units))
                 return res
             elif self.units == TimeUnits.Months:
                 if p2.units == TimeUnits.Years:
                     res._length += 12 * p2.length
                 elif p2.units == TimeUnits.Weeks or p2.units == TimeUnits.Days or p2.units == TimeUnits.BDays:
-                    assert p2.length == 0, "impossible addition between {0} and {1}".format(self, p2)
+                    fpAssert(p2.length == 0, ValueError, "impossible addition between {0} and {1}".format(self, p2))
                 else:
-                    raise TypeError("unknown time unit ({0:d})".format(p2.units))
+                    raise ValueError("unknown time unit ({0:d})".format(p2.units))
                 return res
             elif self.units == TimeUnits.Weeks:
                 if p2.units == TimeUnits.Days:
                     res._units = TimeUnits.Days
                     res._length = res.length * 7 + p2.length
                 elif p2.units == TimeUnits.Years or p2.units == TimeUnits.Months or p2.units == TimeUnits.BDays:
-                    assert p2.length == 0, "impossible addition between {0} and {1}".format(self, p2)
+                    fpAssert(p2.length == 0, ValueError, "impossible addition between {0} and {1}".format(self, p2))
                 else:
-                    raise TypeError("unknown time unit ({0:d})".format(p2.units))
+                    raise ValueError("unknown time unit ({0:d})".format(p2.units))
                 return res
             elif self.units == TimeUnits.Days:
                 if p2.units == TimeUnits.Weeks:
                     res._length += 7 * p2.length
                 elif p2.units == TimeUnits.Years or p2.units == TimeUnits.Months or p2.units == TimeUnits.BDays:
-                    assert p2.length == 0, "impossible addition between {0} and {1}".format(self, p2)
+                    fpAssert(p2.length == 0, ValueError, "impossible addition between {0} and {1}".format(self, p2))
                 else:
-                    raise TypeError("unknown time unit ({0:d})".format(p2.units))
+                    raise ValueError("unknown time unit ({0:d})".format(p2.units))
                 return res
             elif self.units == TimeUnits.BDays:
                 if p2.units == TimeUnits.Years or p2.units == TimeUnits.Months or p2.units == TimeUnits.Weeks or p2.units == TimeUnits.Days:
-                    assert p2.length == 0, "impossible addition between {0} and {1}".format(self, p2)
+                    fpAssert(p2.length == 0, ValueError, "impossible addition between {0} and {1}".format(self, p2))
                 else:
-                    raise TypeError("unknown time unit ({0:d})".format(p2.units))
+                    raise ValueError("unknown time unit ({0:d})".format(p2.units))
 
     def __neg__(self):
         return Period(-self.length, self.units)
@@ -175,7 +176,7 @@ class Period(object):
         elif p1lim[0] >= p2lim[1]:
             return False
         else:
-            raise RuntimeError("undecidable comparison between {0} and {1}".format(self, p2))
+            raise ValueError("undecidable comparison between {0} and {1}".format(self, p2))
 
     def __eq__(self, p2):
         return not (self < p2 or p2 < self)
@@ -230,4 +231,4 @@ def _daysMinMax(p):
     elif p.units == TimeUnits.Years:
         return 365 * p.length, 366 * p.length
     elif p.units == TimeUnits.BDays:
-        raise RuntimeError("Business days unit has not min max days")
+        raise ValueError("Business days unit has not min max days")

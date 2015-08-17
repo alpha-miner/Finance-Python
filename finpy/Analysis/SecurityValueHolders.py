@@ -17,6 +17,7 @@ from finpy.Math.Accumulators.IAccumulators import MinusedValueHolder
 from finpy.Math.Accumulators.IAccumulators import MultipliedValueHolder
 from finpy.Math.Accumulators.IAccumulators import DividedValueHolder
 from finpy.Env.Settings import Settings
+from finpy.Utilities import fpAssert
 
 
 class SecuritiesValues(object):
@@ -56,8 +57,9 @@ class SecuritiesValues(object):
 
     def __sub__(self, right):
         if isinstance(right, SecuritiesValues):
-            assert self._values.keys() == right._values.keys(), "left security names {0} is not equal to right {1}" \
-                .format(self._values.keys(), right._values.keys())
+            fpAssert(self._values.keys() == right._values.keys(), ValueError, "left security names {0} "
+                                                                              "is not equal to right {1}"
+                     .format(self._values.keys(), right._values.keys()))
             return SecuritiesValues(
                 {
                     name: self._values[name] - right._values[name] for name in self._values
@@ -79,8 +81,9 @@ class SecuritiesValues(object):
 
     def __mul__(self, right):
         if isinstance(right, SecuritiesValues):
-            assert self._values.keys() == right._values.keys(), "left security names {0} is not equal to right {1}" \
-                .format(self._values.keys(), right._values.keys())
+            fpAssert(self._values.keys() == right._values.keys(), ValueError, "left security names {0} "
+                                                                              "is not equal to right {1}"
+                     .format(self._values.keys(), right._values.keys()))
             return SecuritiesValues(
                 {
                     name: self._values[name] * right._values[name] for name in self._values
@@ -98,8 +101,9 @@ class SecuritiesValues(object):
 
     def __div__(self, right):
         if isinstance(right, SecuritiesValues):
-            assert self._values.keys() == right._values.keys(), "left security names {0} is not equal to right {1}" \
-                .format(self._values.keys(), right._values.keys())
+            fpAssert(self._values.keys() == right._values.keys(), ValueError, "left security names {0} "
+                                                                              "is not equal to right {1}"
+                     .format(self._values.keys(), right._values.keys()))
             return SecuritiesValues(
                 {
                     name: self._values[name] / right._values[name] for name in self._values
@@ -191,7 +195,7 @@ class SecurityValueHolder(object):
         if isinstance(item, tuple):
             res = copy.deepcopy(self)
             res._symbolList = set(i.lower() for i in item)
-            assert len(res._symbolList) == len(item), "security name can't be duplicated"
+            fpAssert(len(res._symbolList) == len(item), ValueError, "security name can't be duplicated")
             res._innerHolders = \
                 {
                     name: self._innerHolders[name] for name in res._symbolList
@@ -201,7 +205,7 @@ class SecurityValueHolder(object):
             item = item.lower()
             res = copy.deepcopy(self)
             res._symbolList = set([item])
-            assert len(res._symbolList) == len([item]), "security name can't be duplicated"
+            fpAssert(len(res._symbolList) == len([item]), ValueError, "security name can't be duplicated")
             res._innerHolders = \
                 {
                     name: self._innerHolders[name] for name in res._symbolList
@@ -316,7 +320,7 @@ class SecurityDividedValueHolder(SecurityCombinedValueHolder):
 
 
 def SecurityShiftedValueHolder(secValueHolder, n):
-    assert n >= 1, "shift value should always not be less than 1"
+    fpAssert(n >= 1, ValueError, "shift value should always not be less than 1")
     res = copy.deepcopy(secValueHolder)
     res._window = secValueHolder.window + n
     res._innerHolders = {
@@ -332,9 +336,12 @@ class SecurityCompoundedValueHolder(SecurityValueHolder):
         self._window = left.window + right.window - 1
         self._dependency = left.dependency
         if not isinstance(right.dependency, str):
-            assert left.valueSize == len(right.dependency)
+            fpAssert(left.valueSize == len(right.dependency), ValueError, "left value size {0} is "
+                                                                          "different from right dependency {1}"
+                                                                          .format(left.valueSize, right.dependency))
         else:
-            assert left.valueSize == 1
+            fpAssert(left.valueSize == 1, ValueError, "left value size {0} is different from right dependency 1"
+                     .format(left.valueSize))
 
         self._right = copy.deepcopy(right.holders[right.holders.keys()[0]])
         self._left = copy.deepcopy(left.holders[left.holders.keys()[0]])

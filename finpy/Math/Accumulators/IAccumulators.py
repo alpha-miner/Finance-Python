@@ -9,6 +9,7 @@ from abc import ABCMeta
 from abc import abstractmethod
 from copy import deepcopy
 import math
+from finpy.Utilities import fpAssert
 
 
 class Accumulator(object):
@@ -21,20 +22,20 @@ class Accumulator(object):
             self._isValueHolderContained = False
         if hasattr(dependency, '__iter__') and len(dependency) >= 2:
             for name in dependency:
-                assert isinstance(name, str), '{0} in pNames should be a plain string. But it is {1}'.format(name,
-                                                                                                             type(name))
+                fpAssert(isinstance(name, str), ValueError, '{0} in pNames should be a plain string. But it is {1}'
+                         .format(name,type(name)))
             self._dependency = dependency
         elif hasattr(dependency, '__iter__') and len(dependency) == 1:
             for name in dependency:
-                assert isinstance(name, str), '{0} in pNames should be a plain string. But it is {1}'.format(name,
-                                                                                                             type(name))
+                fpAssert(isinstance(name, str), ValueError, '{0} in pNames should be a plain string. But it is {1}'
+                         .format(name,type(name)))
             self._dependency = dependency[0]
         elif hasattr(dependency, '__iter__'):
-            raise RuntimeError("parameters' name list should not be empty")
+            raise ValueError("parameters' name list should not be empty")
         else:
-            assert isinstance(dependency, str) or isinstance(dependency,
-                                                             Accumulator), '{0} in pNames should be a plain string or an value holder. But it is {1}'.format(
-                dependency, type(dependency))
+            fpAssert(isinstance(dependency, str) or isinstance(dependency, Accumulator), ValueError,
+                     '{0} in pNames should be a plain string or an value holder. But it is {1}'
+                     .format(dependency, type(dependency)))
             self._dependency = deepcopy(dependency)
 
     def push(self, data):
@@ -169,14 +170,12 @@ class Accumulator(object):
         if isinstance(right, Accumulator):
             return CompoundedValueHolder(self, right)
 
-        try:
+        if type(right) == type(Accumulator) and issubclass(right, Accumulator):
             return CompoundedValueHolder(self, right())
-        except TypeError:
-            pass
 
         try:
             return right(self)
-        except:
+        except TypeError:
             raise ValueError('{0} is not recogonized as a valid operator'.format(right))
 
     def __neg__(self):
@@ -231,16 +230,16 @@ class ListedValueHolder(Accumulator):
 
 class TruncatedValueHolder(Accumulator):
     def __init__(self, valueHolder, item):
-        if valueHolder._returnSize == 1:
-            raise RuntimeError("scalar valued holder ({0}) can't be sliced".format(valueHolder))
+        if valueHolder.valueSize == 1:
+            raise TypeError("scalar valued holder ({0}) can't be sliced".format(valueHolder))
         if isinstance(item, slice):
             self._start = item.start
             self._stop = item.stop
             length = item.stop - item.start
             if length < 0:
-                length += valueHolder._returnSize
+                length += valueHolder.valueSize
             if length < 0:
-                raise RuntimeError('start {0:d} and end {0:d} are not compatible'.format(self._start, self._stop))
+                raise ValueError('start {0:d} and end {0:d} are not compatible'.format(item.start, item.stop))
             self._returnSize = length
         else:
             self._start = item
@@ -263,7 +262,9 @@ class TruncatedValueHolder(Accumulator):
 
 class CombinedValueHolder(Accumulator):
     def __init__(self, left, right):
-        assert left.valueSize == right.valueSize
+        fpAssert(left.valueSize == right.valueSize, ValueError, "left value size {0} should be equal "
+                                                                "to right value size"
+                 .format(left.valueSize, right.valueSize))
         self._returnSize = left.valueSize
         self._left = deepcopy(left)
         self._right = deepcopy(right)
@@ -375,7 +376,9 @@ class GeOperatorValueHolder(CombinedValueHolder):
 class Identity(Accumulator):
     def __init__(self, value, n=1):
         if isinstance(value, Accumulator):
-            assert value.valueSize == 1, "Identity can only be applied to single return value holder"
+            fpAssert(value.valueSize == 1, ValueError, "Identity can't applied "
+                                                       "to value holder with value size {0} bigger than 1"
+                     .format(value.valueSize))
             self._dependency = value._dependency
             self._isValueHolder = True
             self._window = value.window
@@ -412,10 +415,13 @@ class CompoundedValueHolder(Accumulator):
         self._containerSize = self._right._containerSize
         self._dependency = deepcopy(left.dependency)
 
-        if hasattr(self._right.dependency, '__iter__'):
-            assert left.valueSize == len(self._right.dependency)
+        if hasattr(right.dependency, '__iter__'):
+            fpAssert(left.valueSize == len(right.dependency), ValueError, "left value size {0} "
+                                                                          "should be equal to right dependency size {1}"
+                     .format(left.valueSize, len(right.dependency)))
         else:
-            assert left.valueSize == 1
+            fpAssert(left.valueSize == 1, ValueError, "left value size {0} should be equal to right dependency size 1"
+                     .format(left.valueSize))
 
     def push(self, data):
         self._left.push(data)

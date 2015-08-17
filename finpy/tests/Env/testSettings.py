@@ -8,6 +8,7 @@ Created on 2015-7-15
 import unittest
 from finpy.DateUtilities import Date
 from finpy.Env import Settings
+from finpy.Env.Settings import SettingsFactory
 
 
 class TestSettings(unittest.TestCase):
@@ -22,3 +23,11 @@ class TestSettings(unittest.TestCase):
         # check wrong input
         with self.assertRaises(ValueError):
             Settings.evaluationDate = 2
+
+        # settings should be a singleton
+        secondeSettings = SettingsFactory()
+        self.assertEqual(Settings.evaluationDate, secondeSettings.evaluationDate)
+
+        # test forced building
+        newSettings = SettingsFactory(forcedBuild=True)
+        self.assertEqual(newSettings.evaluationDate, Date.todaysDate())

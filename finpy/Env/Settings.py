@@ -6,10 +6,11 @@ Created on 2015-8-14
 """
 
 from finpy.DateUtilities import Date
+from finpy.Patterns.Singleton import Singleton
 
 
-class SettingsFactory(object):
-    def __init__(self):
+class SettingsFactory(Singleton):
+    def __init__(self, forcedBuild=False):
         self._evaluationDate = None
 
     @property
@@ -30,5 +31,6 @@ class SettingsFactory(object):
     def anchorEvaluationDate(self):
         if self._evaluationDate is None:
             self._evaluationDate = Date.todaysDate()
+
 
 Settings = SettingsFactory()

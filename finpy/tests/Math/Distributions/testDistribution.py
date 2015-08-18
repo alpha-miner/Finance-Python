@@ -7,7 +7,7 @@ Created on 2015-7-23
 
 import unittest
 import math
-from finpy.Math.MathConstants import _M_PI
+from finpy.Math.MathConstants import MathConstants
 from finpy.Math.Distributions import InverseCumulativeNormal
 from finpy.Math.Distributions import NormalDistribution
 from finpy.Math.Distributions import CumulativeNormalDistribution
@@ -17,13 +17,13 @@ sigma = 2.0
 
 
 def gaussian(x):
-    normFact = sigma * math.sqrt(2.0 * _M_PI)
+    normFact = sigma * math.sqrt(2.0 * MathConstants.M_PI)
     dx = x - average
     return math.exp(-dx * dx / (2.0 * sigma * sigma)) / normFact
 
 
 def gaussianDerivative(x):
-    normFact = sigma * sigma * sigma * math.sqrt(2.0 * _M_PI)
+    normFact = sigma * sigma * sigma * math.sqrt(2.0 * MathConstants.M_PI)
     dx = x - average
     return -dx * math.exp(-dx * dx / (2.0 * sigma * sigma)) / normFact
 

@@ -6,7 +6,7 @@ Created on 2015-7-23
 """
 
 import math
-from finpy.Math.MathConstants import _DBL_MIN
+from finpy.Math.MathConstants import MathConstants
 
 tiny = 0.0
 one = 1.0
@@ -77,7 +77,7 @@ def errorFunction(x):
 
     if ax < 0.84375:
         if ax < 3.7252902984e-09:
-            if ax < _DBL_MIN * 16:
+            if ax < MathConstants.DBL_MIN * 16:
                 return 0.125 * (8.0 * x + efx8 * x)
             return x + efx * x
         z = x * x

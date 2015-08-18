@@ -6,11 +6,7 @@ Created on 2015-7-23
 """
 
 import math
-from finpy.Math.MathConstants import _M_SQRT_2
-from finpy.Math.MathConstants import _M_SQRT2
-from finpy.Math.MathConstants import _M_SQRTPI
-from finpy.Math.MathConstants import _M_1_SQRTPI
-from finpy.Math.MathConstants import _QL_EPSILON
+from finpy.Math.MathConstants import MathConstants
 from finpy.Math.ErrorFunction import errorFunction
 
 
@@ -18,7 +14,7 @@ class NormalDistribution(object):
     def __init__(self, average=0.0, sigma=1.0):
         self._average = average
         self._sigma = sigma
-        self._normalizationFactor = _M_SQRT_2 * _M_1_SQRTPI / self._sigma
+        self._normalizationFactor = MathConstants.M_SQRT_2 * MathConstants.M_1_SQRTPI / self._sigma
         self._derNormalizationFactor = self._sigma * self._sigma
         self._denominator = 2.0 * self._derNormalizationFactor
 
@@ -40,7 +36,7 @@ class CumulativeNormalDistribution(object):
     def __call__(self, z):
 
         z = (z - self._average) / self._sigma
-        result = 0.5 * (1.0 + errorFunction(z * _M_SQRT_2))
+        result = 0.5 * (1.0 + errorFunction(z * MathConstants.M_SQRT_2))
         if result <= 1.0e-8:
             sumRes = 1.0
             zsqr = z * z
@@ -58,7 +54,7 @@ class CumulativeNormalDistribution(object):
                 if a < 0.0:
                     a = -a
 
-                if lasta <= a or a < abs(sumRes * _QL_EPSILON):
+                if lasta <= a or a < abs(sumRes * MathConstants.QL_EPSILON):
                     break
             return -self._gaussian(z) / z * sumRes
         return result
@@ -131,7 +127,7 @@ class InverseCumulativeNormal(object):
             z = (((((self._a1 * r + self._a2) * r + self._a3) * r + self._a4) * r + self._a5) * r + self._a6) * z \
                 / (((((self._b1 * r + self._b2) * r + self._b3) * r + self._b4) * r + self._b5) * r + 1.0)
         if self._fullAcc:
-            r = (self._dist(z) - x) * _M_SQRT2 * _M_SQRTPI * math.exp(0.5 * z * z)
+            r = (self._dist(z) - x) * MathConstants.M_SQRT2 * MathConstants.M_SQRTPI * math.exp(0.5 * z * z)
             z -= r / (1 + 0.5 * z * r)
         return z
 

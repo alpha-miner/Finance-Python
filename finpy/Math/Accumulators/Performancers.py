@@ -43,10 +43,6 @@ class MovingSharp(StatefulValueHolder):
         self._var = MovingVariance(window, dependency='x', isPopulation=False)
 
     def push(self, data):
-        '''
-        @value: annualized return value
-        @benchmark: annualized benchmark treasury bond yield
-        '''
         value = super(MovingSharp, self).push(data)
         ret = value[0]
         benchmark = value[1]
@@ -122,10 +118,6 @@ class MovingDrawDown(StatefulValueHolder):
         self._runningIndex = 0
 
     def push(self, data):
-        '''
-        :param value: expected to be exponential annualized return
-        :return:
-        '''
         value = super(MovingDrawDown, self).push(data)
         if value is None:
             return

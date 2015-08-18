@@ -9,8 +9,7 @@ import math
 from scipy.optimize import newton
 from finpy.Enums.OptionType import OptionType
 from finpy.Math.Distributions.NormalDistribution import CumulativeNormalDistribution
-from finpy.Math.MathConstants import _M_PI
-from finpy.Math.MathConstants import _QL_EPSILON
+from finpy.Math.MathConstants import MathConstants
 from finpy.Utilities import fpAssert
 
 _dist = CumulativeNormalDistribution()
@@ -62,12 +61,12 @@ def _blackFormulaImpliedStdDevApproximation(optionType,
     forward += displacement
     strike += displacement
 
-    result0 = blackPrice / discount * math.sqrt(2.0 * _M_PI) / forward
+    result0 = blackPrice / discount * math.sqrt(2.0 * MathConstants.M_PI) / forward
 
     moneynessDelta = optionType * (forward - strike)
     moneynessDelta_2 = moneynessDelta / 2.0
     temp = blackPrice / discount - moneynessDelta_2
-    moneynessDelta_PI = moneynessDelta * moneynessDelta / _M_PI
+    moneynessDelta_PI = moneynessDelta * moneynessDelta / MathConstants.M_PI
     temp2 = temp * temp - moneynessDelta_PI
 
     innerTmp = 0.0
@@ -78,7 +77,7 @@ def _blackFormulaImpliedStdDevApproximation(optionType,
 
     temp2 = math.sqrt(temp2)
     temp += temp2
-    temp *= math.sqrt(2.0 * _M_PI)
+    temp *= math.sqrt(2.0 * MathConstants.M_PI)
     result1 = temp / (forward + strike)
 
     if strike == forward:
@@ -158,7 +157,7 @@ def bachelierFormulaImpliedVol(optionType,
     discount = float(discount)
 
     fpAssert(tte > 0, ValueError, "tte ({0:f}) must be positive".format(tte))
-    SQRT_QL_EPSILON = math.sqrt(_QL_EPSILON)
+    SQRT_QL_EPSILON = math.sqrt(MathConstants.QL_EPSILON)
 
     forwardPremium = bachelierPrice / discount
 
@@ -168,11 +167,11 @@ def bachelierFormulaImpliedVol(optionType,
         straddlePremium = 2.0 * forwardPremium + (forward - strike)
 
     nu = (forward - strike) / straddlePremium
-    nu = max(-1.0 + _QL_EPSILON, min(nu, 1.0 - _QL_EPSILON))
+    nu = max(-1.0 + MathConstants.QL_EPSILON, min(nu, 1.0 - MathConstants.QL_EPSILON))
     eta = 1.0 if (abs(nu) < SQRT_QL_EPSILON) else (nu / math.atanh(nu))
 
     heta = HCalculator.calculate(eta)
-    impliedBpvol = math.sqrt(_M_PI / (2 * tte)) * straddlePremium * heta
+    impliedBpvol = math.sqrt(MathConstants.M_PI / (2 * tte)) * straddlePremium * heta
     return impliedBpvol
 
 
@@ -204,10 +203,10 @@ class HCalculator(object):
     def calculate(cls, eta):
         num = cls._A0 + eta * (cls._A1 + eta * (cls._A2 + eta * (cls._A3 + eta
                                                                  * (cls._A4 + eta * (
-        cls._A5 + eta * (cls._A6 + eta * cls._A7))))))
+            cls._A5 + eta * (cls._A6 + eta * cls._A7))))))
 
         den = cls._B0 + eta * (cls._B1 + eta * (cls._B2 + eta * (cls._B3 + eta * (cls._B4 + eta
                                                                                   * (cls._B5 + eta * (
-        cls._B6 + eta * (cls._B7 + eta * (cls._B8 + eta * cls._B9))))))))
+            cls._B6 + eta * (cls._B7 + eta * (cls._B8 + eta * cls._B9))))))))
 
         return math.sqrt(eta) * (num / den)

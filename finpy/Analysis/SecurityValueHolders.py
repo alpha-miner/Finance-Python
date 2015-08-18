@@ -36,98 +36,73 @@ class SecuritiesValues(object):
     def __len__(self):
         return self._values.__len__()
 
-    def __add__(self, right):
+    def _binary_operator(self, right, attr):
         if isinstance(right, SecuritiesValues):
             assert self._values.keys() == right._values.keys(), "left security names {0} is not equal to right {1}" \
                 .format(self._values.keys(), right._values.keys())
+            method = getattr(type(self._values[self._values.keys()[0]]), attr)
             return SecuritiesValues(
                 {
-                    name: self._values[name] + right._values[name] for name in self._values
+                    name: method(self._values[name], right._values[name]) for name in self._values
                     }
             )
         else:
+            method = getattr(type(self._values[self._values.keys()[0]]), attr)
             return SecuritiesValues(
                 {
-                    name: self._values[name] + right for name in self._values
+                    name: method(self._values[name], right) for name in self._values
                     }
             )
+
+    def _rbinary_operator(self, left, attr):
+        method = getattr(type(self._values[self._values.keys()[0]]), attr)
+        return SecuritiesValues(
+            {
+                name: method(self._values[name], left) for name in self._values
+                }
+        )
+
+    def __add__(self, right):
+        return self._binary_operator(right, '__add__')
 
     def __radd__(self, left):
-        return self.__add__(left)
+        return self._rbinary_operator(left, '__radd__')
 
     def __sub__(self, right):
-        if isinstance(right, SecuritiesValues):
-            fpAssert(self._values.keys() == right._values.keys(), ValueError, "left security names {0} "
-                                                                              "is not equal to right {1}"
-                     .format(self._values.keys(), right._values.keys()))
-            return SecuritiesValues(
-                {
-                    name: self._values[name] - right._values[name] for name in self._values
-                    }
-            )
-        else:
-            return SecuritiesValues(
-                {
-                    name: self._values[name] - right for name in self._values
-                    }
-            )
+        return self._binary_operator(right, '__sub__')
 
     def __rsub__(self, left):
-        return SecuritiesValues(
-            {
-                name: left - self._values[name] for name in self._values
-                }
-        )
+        return self._rbinary_operator(left, '__rsub__')
 
     def __mul__(self, right):
-        if isinstance(right, SecuritiesValues):
-            fpAssert(self._values.keys() == right._values.keys(), ValueError, "left security names {0} "
-                                                                              "is not equal to right {1}"
-                     .format(self._values.keys(), right._values.keys()))
-            return SecuritiesValues(
-                {
-                    name: self._values[name] * right._values[name] for name in self._values
-                    }
-            )
-        else:
-            return SecuritiesValues(
-                {
-                    name: self._values[name] * right for name in self._values
-                    }
-            )
+        return self._binary_operator(right, '__mul__')
 
     def __rmul__(self, left):
-        return self.__mul__(left)
+        return self._rbinary_operator(left, '__rmul__')
 
     def __div__(self, right):
-        if isinstance(right, SecuritiesValues):
-            fpAssert(self._values.keys() == right._values.keys(), ValueError, "left security names {0} "
-                                                                              "is not equal to right {1}"
-                     .format(self._values.keys(), right._values.keys()))
-            return SecuritiesValues(
-                {
-                    name: self._values[name] / right._values[name] for name in self._values
-                    }
-            )
-        else:
-            return SecuritiesValues(
-                {
-                    name: self._values[name] / right for name in self._values
-                    }
-            )
+        return self._binary_operator(right, '__div__')
 
     def __rdiv__(self, left):
-        return SecuritiesValues(
-            {
-                name: left / self._values[name] for name in self._values
-                }
-        )
+        return self._rbinary_operator(left, '__rdiv__')
 
     def __truediv__(self, right):
         return self.__div__(right)
 
     def __rtruediv__(self, left):
         return self.__rdiv__(left)
+
+    def __and__(self, right):
+        return self._binary_operator(right, '__and__')
+
+    def __rand__(self, left):
+        return self._rbinary_operator(left, '__rand__')
+
+    def __or__(self, right):
+        return self._binary_operator(right, '__or__')
+
+    def __ror__(self, left):
+        return self._rbinary_operator(left, '__ror__')
 
     def __str__(self):
         return self._values.__str__()

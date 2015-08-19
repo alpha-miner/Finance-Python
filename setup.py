@@ -8,11 +8,11 @@ import sys
 import subprocess
 import glob
 
-from finpy import __version__
+from fp import __version__
 
-PACKAGE = "finpy"
-NAME = "finpy"
-DESCRIPTION = "finpy 0.2.0"
+PACKAGE = "fp"
+NAME = "fp"
+DESCRIPTION = "fp 0.2.0"
 AUTHOR = "cheng li"
 AUTHOR_EMAIL = "cheng.li@datayes.com"
 URL = "www.datayes.com"
@@ -27,8 +27,8 @@ if os.name == "posix":
 else:
     packagePath = sysconfig.get_python_lib()
 
-files = glob.glob("finpy/tests/Math/Accumulators/data/*.csv")
-datafiles = [(os.path.join(packagePath, "finpy/tests/Math/Accumulators/data"), files)]
+files = glob.glob("fp/tests/Math/Accumulators/data/*.csv")
+datafiles = [(os.path.join(packagePath, "fp/tests/Math/Accumulators/data"), files)]
 
 
 class test(Command):
@@ -47,9 +47,9 @@ class test(Command):
 
     def run(self):
         if sys.platform == 'win32':
-            command = "coverage run finpy/tests/testSuite.py& coverage report& coverage html"
+            command = "coverage run fp/tests/testSuite.py& coverage report& coverage html"
         else:
-            command = "coverage run finpy/tests/testSuite.py; coverage report; coverage html"
+            command = "coverage run fp/tests/testSuite.py; coverage report; coverage html"
         subprocess.Popen(command, shell=True)
 
 
@@ -61,32 +61,32 @@ setup(
     author_email=AUTHOR_EMAIL,
     license="commercial",
     url=URL,
-    packages=['finpy.API',
-              'finpy.AlgoTrading',
-              'finpy.DateUtilities',
-              'finpy.Enums',
-              'finpy.Env',
-              'finpy.Math',
-              'finpy.Math.Accumulators',
-              'finpy.Math.Distributions',
-              'finpy.Math.Timeseries',
-              'finpy.Patterns',
-              'finpy.PricingEngines',
-              'finpy.Analysis',
-              'finpy.Analysis.TechnicalAnalysis',
-              'finpy.Utilities',
-              'finpy.tests',
-              'finpy.tests.API',
-              'finpy.tests.DateUtilities',
-              'finpy.tests.Env',
-              'finpy.tests.Math',
-              'finpy.tests.Math.Accumulators',
-              'finpy.tests.Math.Distributions',
-              'finpy.tests.Math.Timeseries',
-              'finpy.tests.Analysis',
-              'finpy.tests.Analysis.TechnicalAnalysis',
-              'finpy.tests.PricingEngines'],
-    py_modules=['finpy.__init__', 'finpy.tests.testSuite'],
+    packages=['fp.API',
+              'fp.AlgoTrading',
+              'fp.DateUtilities',
+              'fp.Enums',
+              'fp.Env',
+              'fp.Math',
+              'fp.Math.Accumulators',
+              'fp.Math.Distributions',
+              'fp.Math.Timeseries',
+              'fp.Patterns',
+              'fp.PricingEngines',
+              'fp.Analysis',
+              'fp.Analysis.TechnicalAnalysis',
+              'fp.Utilities',
+              'fp.tests',
+              'fp.tests.API',
+              'fp.tests.DateUtilities',
+              'fp.tests.Env',
+              'fp.tests.Math',
+              'fp.tests.Math.Accumulators',
+              'fp.tests.Math.Distributions',
+              'fp.tests.Math.Timeseries',
+              'fp.tests.Analysis',
+              'fp.tests.Analysis.TechnicalAnalysis',
+              'fp.tests.PricingEngines'],
+    py_modules=['fp.__init__', 'fp.tests.testSuite'],
     data_files=datafiles,
     classifiers=[
         "Development Status :: 3 - Alpha",

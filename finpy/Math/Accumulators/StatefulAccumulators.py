@@ -16,7 +16,7 @@ from finpy.Utilities import fpAssert
 def _checkParameterList(dependency):
     if not isinstance(dependency, Accumulator) and len(dependency) > 1 and not isinstance(dependency, str):
         raise ValueError("This value holder (e.g. Max or Minimum) can't hold more than 2 parameter names ({0})"
-                           " provided".format(dependency))
+                         " provided".format(dependency))
 
 
 class StatefulValueHolder(Accumulator):
@@ -43,9 +43,9 @@ class StatefulValueHolder(Accumulator):
 
     def _dumpOneValue(self, value):
         if not hasattr(value, '__iter__'):
-            popout = 0.0
+            popout = np.nan
         else:
-            popout = np.zeros(np.shape(value))
+            popout = np.array([np.nan] * len(value))
 
         if self.isFull:
             # use list as circular queue
@@ -129,7 +129,10 @@ class MovingSum(SingleValuedValueHolder):
         if value is None:
             return
         popout = self._dumpOneValue(value)
-        self._runningSum = self._runningSum - popout + value
+        if popout is not np.nan:
+            self._runningSum = self._runningSum - popout + value
+        else:
+            self._runningSum = self._runningSum + value
 
     def result(self):
         return self._runningSum
@@ -145,7 +148,10 @@ class MovingAverage(SingleValuedValueHolder):
         if value is None:
             return
         popout = self._dumpOneValue(value)
-        self._runningSum = self._runningSum - popout + value
+        if popout is not np.nan:
+            self._runningSum = self._runningSum - popout + value
+        else:
+            self._runningSum = self._runningSum + value
 
     def result(self):
         return self._runningSum / self.size
@@ -217,8 +223,12 @@ class MovingVariance(SingleValuedValueHolder):
         if value is None:
             return
         popout = self._dumpOneValue(value)
-        self._runningSum = self._runningSum - popout + value
-        self._runningSumSquare = self._runningSumSquare - popout * popout + value * value
+        if popout is not np.nan:
+            self._runningSum = self._runningSum - popout + value
+            self._runningSumSquare = self._runningSumSquare - popout * popout + value * value
+        else:
+            self._runningSum = self._runningSum + value
+            self._runningSumSquare = self._runningSumSquare + value * value
 
     def result(self):
         length = self.size
@@ -354,15 +364,23 @@ class MovingCorrelation(StatefulValueHolder):
         if value is None:
             return
         popout = self._dumpOneValue(value)
-        headLeft = popout[0]
-        headRight = popout[1]
+        if not np.isnan(popout[0]):
+            headLeft = popout[0]
+            headRight = popout[1]
 
-        # updating cached values
-        self._runningSumLeft = self._runningSumLeft - headLeft + value[0]
-        self._runningSumRight = self._runningSumRight - headRight + value[1]
-        self._runningSumSquareLeft = self._runningSumSquareLeft - headLeft * headLeft + value[0] * value[0]
-        self._runningSumSquareRight = self._runningSumSquareRight - headRight * headRight + value[1] * value[1]
-        self._runningSumCrossSquare = self._runningSumCrossSquare - headLeft * headRight + value[0] * value[1]
+            # updating cached values
+            self._runningSumLeft = self._runningSumLeft - headLeft + value[0]
+            self._runningSumRight = self._runningSumRight - headRight + value[1]
+            self._runningSumSquareLeft = self._runningSumSquareLeft - headLeft * headLeft + value[0] * value[0]
+            self._runningSumSquareRight = self._runningSumSquareRight - headRight * headRight + value[1] * value[1]
+            self._runningSumCrossSquare = self._runningSumCrossSquare - headLeft * headRight + value[0] * value[1]
+        else:
+            # updating cached values
+            self._runningSumLeft = self._runningSumLeft + value[0]
+            self._runningSumRight = self._runningSumRight + value[1]
+            self._runningSumSquareLeft = self._runningSumSquareLeft + value[0] * value[0]
+            self._runningSumSquareRight = self._runningSumSquareRight + value[1] * value[1]
+            self._runningSumCrossSquare = self._runningSumCrossSquare + value[0] * value[1]
 
     def result(self):
         n = self.size
@@ -396,9 +414,14 @@ class MovingCorrelationMatrix(StatefulValueHolder):
             self._isFirst = False
         reshapeValues = np.array(values).reshape((1, len(values)))
         popout = self._dumpOneValue(reshapeValues)
-        fpAssert(len(values) == self._runningSum.size, ValueError, "size incompatiable")
-        self._runningSum += reshapeValues - popout
-        self._runningSumCrossSquare += reshapeValues * reshapeValues.T - popout * popout.T
+        if not np.any(np.isnan(popout)):
+            fpAssert(len(values) == self._runningSum.size, ValueError, "size incompatiable")
+            self._runningSum += reshapeValues - popout
+            self._runningSumCrossSquare += reshapeValues * reshapeValues.T - popout * popout.T
+        else:
+            fpAssert(len(values) == self._runningSum.size, ValueError, "size incompatiable")
+            self._runningSum += reshapeValues
+            self._runningSumCrossSquare += reshapeValues * reshapeValues.T
 
     def result(self):
         if len(self._con) >= 2:

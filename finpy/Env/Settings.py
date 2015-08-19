@@ -7,12 +7,13 @@ Created on 2015-8-14
 
 from finpy.DateUtilities import Date
 from finpy.Patterns.Singleton import Singleton
+from finpy.Utilities import fpAssert
 
 
 class SettingsFactory(Singleton):
     def __init__(self, forcedBuild=False):
         self._evaluationDate = None
-        self._defaultSymbolList = set()
+        self._defaultSymbolList = set(['600000.xshg'])
 
     @property
     def evaluationDate(self):
@@ -39,6 +40,7 @@ class SettingsFactory(Singleton):
 
     @defaultSymbolList.setter
     def defaultSymbolList(self, value):
+        fpAssert(len(value) != 0, ValueError, "default symbol list can't be set to empty")
         self._defaultSymbolList = value
 
 

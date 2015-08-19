@@ -26,7 +26,7 @@ class MovingLogReturn(SingleValuedValueHolder):
         if value is None:
             return
         popout = self._dumpOneValue(value)
-        if popout != 0.0:
+        if popout is not np.nan and popout != 0.0:
             self._runningReturn = math.log(value / popout)
 
     def result(self):

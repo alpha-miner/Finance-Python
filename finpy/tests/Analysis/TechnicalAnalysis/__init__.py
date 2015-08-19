@@ -7,4 +7,4 @@ Created on 2015-8-12
 
 __all__ = ['TestStatefulTechnicalAnalysis']
 
-from finpy.tests.Analysis.TechnicalAnalysis.testStatefulTechnicalAanlysis import TestStatefulTechnicalAnalysis
+from finpy.tests.Analysis.TechnicalAnalysis.testStatefulTechnicalAnalysers import TestStatefulTechnicalAnalysis

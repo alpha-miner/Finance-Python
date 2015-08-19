@@ -14,11 +14,11 @@ __all__ = ['SecurityMovingAverage',
            'SecurityMovingHistoricalWindow',
            'SecurityMovingLogReturn']
 
-from finpy.Analysis.TechnicalAnalysis.Stateful import SecurityMovingAverage
-from finpy.Analysis.TechnicalAnalysis.Stateful import SecurityMovingMax
-from finpy.Analysis.TechnicalAnalysis.Stateful import SecurityMovingMinimum
-from finpy.Analysis.TechnicalAnalysis.Stateful import SecurityMovingSum
-from finpy.Analysis.TechnicalAnalysis.Stateful import SecurityMovingCountedPositive
-from finpy.Analysis.TechnicalAnalysis.Stateful import SecurityMovingPositiveAverage
-from finpy.Analysis.TechnicalAnalysis.Stateful import SecurityMovingHistoricalWindow
-from finpy.Analysis.TechnicalAnalysis.Stateful import SecurityMovingLogReturn
+from finpy.Analysis.TechnicalAnalysis.StatefulTechnicalAnalysers import SecurityMovingAverage
+from finpy.Analysis.TechnicalAnalysis.StatefulTechnicalAnalysers import SecurityMovingMax
+from finpy.Analysis.TechnicalAnalysis.StatefulTechnicalAnalysers import SecurityMovingMinimum
+from finpy.Analysis.TechnicalAnalysis.StatefulTechnicalAnalysers import SecurityMovingSum
+from finpy.Analysis.TechnicalAnalysis.StatefulTechnicalAnalysers import SecurityMovingCountedPositive
+from finpy.Analysis.TechnicalAnalysis.StatefulTechnicalAnalysers import SecurityMovingPositiveAverage
+from finpy.Analysis.TechnicalAnalysis.StatefulTechnicalAnalysers import SecurityMovingHistoricalWindow
+from finpy.Analysis.TechnicalAnalysis.StatefulTechnicalAnalysers import SecurityMovingLogReturn

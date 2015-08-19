@@ -86,9 +86,11 @@ class SecuritiesValues(object):
     def __rdiv__(self, left):
         return self._rbinary_operator(left, operator.div)
 
+    # only neede in python 3
     def __truediv__(self, right):
         return self.__div__(right)
 
+    # only neede in python 3
     def __rtruediv__(self, left):
         return self.__rdiv__(left)
 
@@ -156,6 +158,10 @@ class SecurityValueHolder(object):
         return {
             symbol: self._dependency for symbol in self._symbolList
             }
+
+    @property
+    def fields(self):
+        return self._dependency
 
     @property
     def valueSize(self):
@@ -236,6 +242,12 @@ class SecurityValueHolder(object):
 
     def __rtruediv__(self, left):
         return SecurityDividedValueHolder(left, self)
+
+    def __rshift__(self, right):
+        return SecurityCompoundedValueHolder(self, right)
+
+    def shift(self, n):
+        return SecurityShiftedValueHolder(self, n)
 
 
 class IdentitySecurityValueHolder(SecurityValueHolder):
@@ -328,10 +340,10 @@ class SecurityCompoundedValueHolder(SecurityValueHolder):
         self._symbolList = left.symbolList
         self._window = left.window + right.window - 1
         self._dependency = left.dependency
-        if not isinstance(right.dependency, str):
-            fpAssert(left.valueSize == len(right.dependency), ValueError, "left value size {0} is "
-                                                                          "different from right dependency {1}"
-                     .format(left.valueSize, right.dependency))
+        if not isinstance(right.fields, str):
+            fpAssert(left.valueSize == len(right.fields), ValueError, "left value size {0} is "
+                                                                      "different from right dependency {1}"
+                     .format(left.valueSize, right.fields))
         else:
             fpAssert(left.valueSize == 1, ValueError, "left value size {0} is different from right dependency 1"
                      .format(left.valueSize))
@@ -346,16 +358,6 @@ class SecurityCompoundedValueHolder(SecurityValueHolder):
         names = set(self._symbolList).intersection(set(data.keys()))
         for name in names:
             self._innerHolders[name].push(data[name])
-
-    @property
-    def value(self):
-        res = {}
-        for name in self._innerHolders:
-            try:
-                res[name] = self._innerHolders[name].value
-            except ArithmeticError:
-                res[name] = np.nan
-        return SecuritiesValues(res)
 
 
 def dependencyCalculator(*args):

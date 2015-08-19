@@ -6,6 +6,7 @@ Created on 2015-8-12
 """
 
 import unittest
+from collections import deque
 import numpy as np
 from finpy.Enums import Factors
 from finpy.Analysis.SecurityValueHolders import SecurityValueHolder
@@ -23,18 +24,68 @@ class TestSecurityValueHolders(unittest.TestCase):
         sample2 = np.random.randn(1000, 2)
 
         self.datas = {'aapl': {'close': sample1[:, 0], 'open': sample1[:, 1]},
-                      'ibm': {'close': sample1[:, 0], 'open': sample2[:, 1]}}
+                      'ibm': {'close': sample2[:, 0], 'open': sample2[:, 1]}}
+
+        def check_values(expected, calculated):
+            for name in calculated:
+                self.assertEqual(calculated[name], expected[name], "for the name {0}\n"
+                                                                   "expected:   {1}\n"
+                                                                   "calculated: {2}".format(name,
+                                                                                            expected[name],
+                                                                                            calculated[name]))
+        self.checker = check_values
+
+    def testSecuritiesValuesIncompatibleSymbolList(self):
+        values = SecuritiesValues({'AAPL': 3.0, 'IBM': 2.0, 'GOOG': 4.0})
+        benchmarkValues3 = {'AAPL': 3.0, 'IBM': 2.0}
+        with self.assertRaises(ValueError):
+            values3 = SecuritiesValues(benchmarkValues3)
+            _ = values + values3
 
     def testSecuritiesValuesComparison(self):
+
         benchmarkValues = SecuritiesValues({'AAPL': 1.0, 'IBM': 2.0, 'GOOG': 3.0})
         calculated = benchmarkValues > 1.5
         expected = SecuritiesValues({'AAPL': False, 'IBM': True, 'GOOG': True})
-        for name in calculated:
-            self.assertEqual(calculated[name], expected[name], "for the name {0}\n"
-                                                               "expected:   {1}\n"
-                                                               "calculated: {2}".format(name,
-                                                                                        expected[name],
-                                                                                        calculated[name]))
+        self.checker(expected, calculated)
+
+        calculated = benchmarkValues < 1.5
+        expected = SecuritiesValues({'AAPL': True, 'IBM': False, 'GOOG': False})
+        self.checker(expected, calculated)
+
+        calculated = benchmarkValues >= 1.0
+        expected = SecuritiesValues({'AAPL': True, 'IBM': True, 'GOOG': True})
+        self.checker(expected, calculated)
+
+        calculated = benchmarkValues <= 2.0
+        expected = SecuritiesValues({'AAPL': True, 'IBM': True, 'GOOG': False})
+        self.checker(expected, calculated)
+
+        benchmarkValues = SecuritiesValues({'AAPL': False, 'IBM': True, 'GOOG': False})
+        calculated = benchmarkValues & True
+        expected = SecuritiesValues({'AAPL': False, 'IBM': True, 'GOOG': False})
+        self.checker(expected, calculated)
+
+        calculated = True & benchmarkValues
+        expected = SecuritiesValues({'AAPL': False, 'IBM': True, 'GOOG': False})
+        self.checker(expected, calculated)
+
+        calculated = benchmarkValues | True
+        expected = SecuritiesValues({'AAPL': True, 'IBM': True, 'GOOG': True})
+        self.checker(expected, calculated)
+
+        calculated = True | benchmarkValues
+        expected = SecuritiesValues({'AAPL': True, 'IBM': True, 'GOOG': True})
+        self.checker(expected, calculated)
+
+        benchmarkValues = SecuritiesValues({'AAPL': 1.0, 'IBM': 2.0, 'GOOG': 3.0})
+        calculated = benchmarkValues == 2.0
+        expected = SecuritiesValues({'AAPL': False, 'IBM': True, 'GOOG': False})
+        self.checker(expected, calculated)
+
+        calculated = benchmarkValues != 2.0
+        expected = SecuritiesValues({'AAPL': True, 'IBM': False, 'GOOG': True})
+        self.checker(expected, calculated)
 
     def testSecuritiesValuesArithmetic(self):
         benchmarkValues = {'AAPL': 1.0, 'IBM': 2.0, 'GOOG': 3.0}
@@ -100,11 +151,6 @@ class TestSecurityValueHolders(unittest.TestCase):
         divValues = 2.0 / values
         for key in benchmarkValues:
             self.assertAlmostEqual(2.0 / benchmarkValues[key], divValues[key], 12)
-
-        benchmarkValues3 = {'AAPL': 3.0, 'IBM': 2.0}
-        with self.assertRaises(ValueError):
-            values3 = SecuritiesValues(benchmarkValues3)
-            _ = values + values3
 
     def testBasicFunctions(self):
         window = 10
@@ -436,3 +482,71 @@ class TestSecurityValueHolders(unittest.TestCase):
 
         for name in expected:
             self.assertIs(expected[name], calculated[name])
+
+    def testShiftedSecurityValueHolder(self):
+        mm = SecurityMovingAverage(2, 'close', ['aapl', 'ibm', 'goog'])
+        shifted1 = mm.shift(1)
+
+        data1 = {'aapl': {'close': 1.0},
+                 'ibm': {'close': 2.0},
+                 'goog': {'close': 3.0}}
+        shifted1.push(data1)
+        expected = {'aapl': np.nan,
+                    'ibm': np.nan,
+                    'goog': np.nan}
+        calculated = shifted1.value
+        for name in expected:
+            self.assertIs(expected[name], calculated[name])
+
+        data2 = {'aapl': {'close': 2.0},
+                 'ibm': {'close': 3.0},
+                 'goog': {'close': 4.0}}
+        shifted1.push(data2)
+        expected = {'aapl': 1.0,
+                   'ibm': 2.0,
+                   'goog': 3.0}
+        calculated = shifted1.value
+        for name in expected:
+            self.assertAlmostEqual(expected[name], calculated[name])
+
+        data3 = {'aapl': {'close': 3.0},
+                 'ibm': {'close': 4.0},
+                 'goog': {'close': 5.0}}
+        shifted1.push(data3)
+        expected = {'aapl': 1.5,
+                    'ibm': 2.5,
+                    'goog': 3.5}
+        calculated = shifted1.value
+        for name in expected:
+            self.assertAlmostEqual(expected[name], calculated[name])
+
+    def testShiftedSecurityValueHolderWithLengthZero(self):
+        mm = SecurityMovingAverage(2, 'close', ['aapl', 'ibm', 'goog'])
+        with self.assertRaises(ValueError):
+            _ = mm.shift(0)
+
+    def testCompoundedSecurityValueHolder(self):
+        ma = SecurityMovingAverage(2, 'close', ['aapl', 'ibm'])
+        compounded = ma >> SecurityMovingMax(3)
+
+        container = {'aapl': deque(maxlen=3), 'ibm': deque(maxlen=3)}
+        expected = {'aapl': 0.0, 'ibm': 0.0}
+        for i in range(len(self.datas['aapl']['close'])):
+            data = {'aapl': {Factors.CLOSE: self.datas['aapl'][Factors.CLOSE][i]},
+                    'ibm': {Factors.CLOSE: self.datas['ibm'][Factors.CLOSE][i]}}
+            ma.push(data)
+            maRes = ma.value
+            for name in maRes:
+                container[name].append(maRes[name])
+                expected[name] = max(container[name])
+
+            compounded.push(data)
+            calculated = compounded.value
+            for name in calculated:
+                self.assertAlmostEqual(expected[name], calculated[name], 12, "for {0} at index {1}\n"
+                                                                             "expected:   {2}\n"
+                                                                             "calculated: {3}"
+                                       .format(name, i, expected[name], calculated[name]))
+
+
+

@@ -14,7 +14,7 @@ PACKAGE = "PyFin"
 NAME = "PyFin"
 DESCRIPTION = "PyFin " + __version__
 AUTHOR = "cheng li"
-AUTHOR_EMAIL = "cheng.li@datayes.com"
+AUTHOR_EMAIL = "wegamekinglc@hotmail.com"
 URL = 'https://code.csdn.net/wegamekinglc/finance-python'
 DOWNLOAD_URL = 'https://code.csdn.net/wegamekinglc/finance-python/tree/0.3.1'
 VERSION = __version__
@@ -56,6 +56,7 @@ class test(Command):
 
 setup(
     name=NAME,
+    packages=[NAME],
     version=VERSION,
     description=DESCRIPTION,
     author=AUTHOR,

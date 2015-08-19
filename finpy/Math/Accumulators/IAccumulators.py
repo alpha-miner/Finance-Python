@@ -7,6 +7,7 @@ Created on 2015-7-26
 
 from abc import ABCMeta
 from abc import abstractmethod
+import operator
 from copy import deepcopy
 import math
 from finpy.Utilities import fpAssert
@@ -74,46 +75,34 @@ class Accumulator(object):
     def dependency(self):
         return self._dependency
 
-    def __add__(self, right):
+    def _binary_operator(self, right, operatorHolder):
         if isinstance(right, Accumulator):
             if self._returnSize == right.valueSize:
-                return AddedValueHolder(self, right)
+                return operatorHolder(self, right)
             elif self._returnSize == 1:
-                return AddedValueHolder(Identity(self, right.valueSize), right)
-        return AddedValueHolder(self, Identity(right, self._returnSize))
+                return operatorHolder(Identity(self, right.valueSize), right)
+        return operatorHolder(self, Identity(right, self._returnSize))
+
+    def __add__(self, right):
+        return self._binary_operator(right, AddedValueHolder)
 
     def __radd__(self, left):
         return AddedValueHolder(self, Identity(left, self._returnSize))
 
     def __sub__(self, right):
-        if isinstance(right, Accumulator):
-            if self._returnSize == right.valueSize:
-                return MinusedValueHolder(self, right)
-            elif self._returnSize == 1:
-                return MinusedValueHolder(Identity(self, right.valueSize), right)
-        return MinusedValueHolder(self, Identity(right, self._returnSize))
+        return self._binary_operator(right, MinusedValueHolder)
 
     def __rsub__(self, left):
         return MinusedValueHolder(Identity(left, self._returnSize), self)
 
     def __mul__(self, right):
-        if isinstance(right, Accumulator):
-            if self._returnSize == right._returnSize:
-                return MultipliedValueHolder(self, right)
-            elif self._returnSize == 1:
-                return MultipliedValueHolder(Identity(self, right.valueSize), right)
-        return MultipliedValueHolder(self, Identity(right, self._returnSize))
+        return self._binary_operator(right, MultipliedValueHolder)
 
     def __rmul__(self, left):
         return MultipliedValueHolder(self, Identity(left, self._returnSize))
 
     def __div__(self, right):
-        if isinstance(right, Accumulator):
-            if self._returnSize == right._returnSize:
-                return DividedValueHolder(self, right)
-            elif self._returnSize == 1:
-                return DividedValueHolder(Identity(self, right.valueSize), right)
-        return DividedValueHolder(self, Identity(right, self._returnSize))
+        return self._binary_operator(right, DividedValueHolder)
 
     def __rdiv__(self, left):
         return DividedValueHolder(Identity(left, self._returnSize), self)
@@ -127,36 +116,16 @@ class Accumulator(object):
         return self.__rdiv__(left)
 
     def __le__(self, right):
-        if isinstance(right, Accumulator):
-            if self._returnSize == right.valueSize:
-                return LeOperatorValueHolder(self, right)
-            elif self._returnSize == 1:
-                return LeOperatorValueHolder(Identity(self, right.valueSize), right)
-        return LeOperatorValueHolder(self, Identity(right, self._returnSize))
+        return self._binary_operator(right, LeOperatorValueHolder)
 
     def __lt__(self, right):
-        if isinstance(right, Accumulator):
-            if self._returnSize == right.valueSize:
-                return LtOperatorValueHolder(self, right)
-            elif self._returnSize == 1:
-                return LtOperatorValueHolder(Identity(self, right.valueSize), right)
-        return LtOperatorValueHolder(self, Identity(right, self._returnSize))
+        return self._binary_operator(right, LtOperatorValueHolder)
 
     def __ge__(self, right):
-        if isinstance(right, Accumulator):
-            if self._returnSize == right.valueSize:
-                return GeOperatorValueHolder(self, right)
-            elif self._returnSize == 1:
-                return GeOperatorValueHolder(Identity(self, right.valueSize), right)
-        return GeOperatorValueHolder(self, Identity(right, self._returnSize))
+        return self._binary_operator(right, GeOperatorValueHolder)
 
     def __gt__(self, right):
-        if isinstance(right, Accumulator):
-            if self._returnSize == right.valueSize:
-                return GtOperatorValueHolder(self, right)
-            elif self._returnSize == 1:
-                return GtOperatorValueHolder(Identity(self, right.valueSize), right)
-        return GtOperatorValueHolder(self, Identity(right, self._returnSize))
+        return self._binary_operator(right, GtOperatorValueHolder)
 
     def __xor__(self, right):
         if isinstance(right, Accumulator):
@@ -176,7 +145,7 @@ class Accumulator(object):
         try:
             return right(self)
         except TypeError:
-            raise ValueError('{0} is not recogonized as a valid operator'.format(right))
+            raise ValueError('{0} is not recognized as a valid operator'.format(right))
 
     def __neg__(self):
         return NegativeValueHolder(self)
@@ -277,100 +246,57 @@ class CombinedValueHolder(Accumulator):
         self._right.push(data)
 
 
-class AddedValueHolder(CombinedValueHolder):
-    def __init__(self, left, right):
-        super(AddedValueHolder, self).__init__(left, right)
+class ArithmeticValueHolder(CombinedValueHolder):
+    def __init__(self, left, right, op):
+        super(ArithmeticValueHolder, self).__init__(left, right)
+        self._op = op
 
     def result(self):
         res1 = self._left.result()
         res2 = self._right.result()
         if self._returnSize > 1:
-            return tuple(r1 + r2 for r1, r2 in zip(res1, res2))
-        return res1 + res2
+            return tuple(self._op(r1, r2) for r1, r2 in zip(res1, res2))
+        return self._op(res1, res2)
 
 
-class MinusedValueHolder(CombinedValueHolder):
+class AddedValueHolder(ArithmeticValueHolder):
     def __init__(self, left, right):
-        super(MinusedValueHolder, self).__init__(left, right)
-
-    def result(self):
-        res1 = self._left.result()
-        res2 = self._right.result()
-        if self._returnSize > 1:
-            return tuple(r1 - r2 for r1, r2 in zip(res1, res2))
-        return res1 - res2
+        super(AddedValueHolder, self).__init__(left, right, operator.add)
 
 
-class MultipliedValueHolder(CombinedValueHolder):
+class MinusedValueHolder(ArithmeticValueHolder):
     def __init__(self, left, right):
-        super(MultipliedValueHolder, self).__init__(left, right)
-
-    def result(self):
-        res1 = self._left.result()
-        res2 = self._right.result()
-        if self._returnSize > 1:
-            return tuple(r1 * r2 for r1, r2 in zip(res1, res2))
-        return res1 * res2
+        super(MinusedValueHolder, self).__init__(left, right, operator.sub)
 
 
-class DividedValueHolder(CombinedValueHolder):
+class MultipliedValueHolder(ArithmeticValueHolder):
     def __init__(self, left, right):
-        super(DividedValueHolder, self).__init__(left, right)
-
-    def result(self):
-        res1 = self._left.result()
-        res2 = self._right.result()
-        if self._returnSize > 1:
-            return tuple(r1 / r2 for r1, r2 in zip(res1, res2))
-        return res1 / res2
+        super(MultipliedValueHolder, self).__init__(left, right, operator.mul)
 
 
-class LtOperatorValueHolder(CombinedValueHolder):
+class DividedValueHolder(ArithmeticValueHolder):
     def __init__(self, left, right):
-        super(LtOperatorValueHolder, self).__init__(left, right)
-
-    def result(self):
-        res1 = self._left.result()
-        res2 = self._right.result()
-        if self._returnSize > 1:
-            return tuple(r1 < r2 for r1, r2 in zip(res1, res2))
-        return res1 < res2
+        super(DividedValueHolder, self).__init__(left, right, operator.div)
 
 
-class LeOperatorValueHolder(CombinedValueHolder):
+class LtOperatorValueHolder(ArithmeticValueHolder):
     def __init__(self, left, right):
-        super(LeOperatorValueHolder, self).__init__(left, right)
-
-    def result(self):
-        res1 = self._left.result()
-        res2 = self._right.result()
-        if self._returnSize > 1:
-            return tuple(r1 <= r2 for r1, r2 in zip(res1, res2))
-        return res1 <= res2
+        super(LtOperatorValueHolder, self).__init__(left, right, operator.lt)
 
 
-class GtOperatorValueHolder(CombinedValueHolder):
+class LeOperatorValueHolder(ArithmeticValueHolder):
     def __init__(self, left, right):
-        super(GtOperatorValueHolder, self).__init__(left, right)
-
-    def result(self):
-        res1 = self._left.result()
-        res2 = self._right.result()
-        if self._returnSize > 1:
-            return tuple(r1 > r2 for r1, r2 in zip(res1, res2))
-        return res1 > res2
+        super(LeOperatorValueHolder, self).__init__(left, right, operator.le)
 
 
-class GeOperatorValueHolder(CombinedValueHolder):
+class GtOperatorValueHolder(ArithmeticValueHolder):
     def __init__(self, left, right):
-        super(GeOperatorValueHolder, self).__init__(left, right)
+        super(GtOperatorValueHolder, self).__init__(left, right, operator.gt)
 
-    def result(self):
-        res1 = self._left.result()
-        res2 = self._right.result()
-        if self._returnSize > 1:
-            return tuple(r1 >= r2 for r1, r2 in zip(res1, res2))
-        return res1 >= res2
+
+class GeOperatorValueHolder(ArithmeticValueHolder):
+    def __init__(self, left, right):
+        super(GeOperatorValueHolder, self).__init__(left, right, operator.ge)
 
 
 class Identity(Accumulator):

@@ -7,6 +7,7 @@ Created on 2015-8-7
 
 from abc import ABCMeta
 import copy
+import operator
 from collections import defaultdict
 import numpy as np
 from finpy.Math.Accumulators.StatefulAccumulators import Shift
@@ -23,6 +24,7 @@ from finpy.Utilities import fpAssert
 class SecuritiesValues(object):
     def __init__(self, values):
         self._values = copy.deepcopy(values)
+        self._dtype = type(self._values[self._values.keys()[0]])
 
     def __getitem__(self, item):
         return self._values[item]
@@ -36,55 +38,53 @@ class SecuritiesValues(object):
     def __len__(self):
         return self._values.__len__()
 
-    def _binary_operator(self, right, attr):
+    def _binary_operator(self, right, op):
         if isinstance(right, SecuritiesValues):
-            assert self._values.keys() == right._values.keys(), "left security names {0} is not equal to right {1}" \
-                .format(self._values.keys(), right._values.keys())
-            method = getattr(type(self._values[self._values.keys()[0]]), attr)
+            fpAssert(self._values.keys() == right._values.keys(), ValueError, "left security names {0} "
+                                                                              "is not equal to right {1}"
+                     .format(self._values.keys(), right._values.keys()))
             return SecuritiesValues(
                 {
-                    name: method(self._values[name], right._values[name]) for name in self._values
+                    name: op(self._values[name], right._values[name]) for name in self._values
                     }
             )
         else:
-            method = getattr(type(self._values[self._values.keys()[0]]), attr)
             return SecuritiesValues(
                 {
-                    name: method(self._values[name], right) for name in self._values
+                    name: op(self._values[name], right) for name in self._values
                     }
             )
 
-    def _rbinary_operator(self, left, attr):
-        method = getattr(type(self._values[self._values.keys()[0]]), attr)
+    def _rbinary_operator(self, left, op):
         return SecuritiesValues(
             {
-                name: method(self._values[name], left) for name in self._values
+                name: op(left, self._values[name]) for name in self._values
                 }
         )
 
     def __add__(self, right):
-        return self._binary_operator(right, '__add__')
+        return self._binary_operator(right, operator.add)
 
     def __radd__(self, left):
-        return self._rbinary_operator(left, '__radd__')
+        return self._rbinary_operator(left, operator.add)
 
     def __sub__(self, right):
-        return self._binary_operator(right, '__sub__')
+        return self._binary_operator(right, operator.sub)
 
     def __rsub__(self, left):
-        return self._rbinary_operator(left, '__rsub__')
+        return self._rbinary_operator(left, operator.sub)
 
     def __mul__(self, right):
-        return self._binary_operator(right, '__mul__')
+        return self._binary_operator(right, operator.mul)
 
     def __rmul__(self, left):
-        return self._rbinary_operator(left, '__rmul__')
+        return self._rbinary_operator(left, operator.mul)
 
     def __div__(self, right):
-        return self._binary_operator(right, '__div__')
+        return self._binary_operator(right, operator.div)
 
     def __rdiv__(self, left):
-        return self._rbinary_operator(left, '__rdiv__')
+        return self._rbinary_operator(left, operator.div)
 
     def __truediv__(self, right):
         return self.__div__(right)
@@ -93,19 +93,37 @@ class SecuritiesValues(object):
         return self.__rdiv__(left)
 
     def __and__(self, right):
-        return self._binary_operator(right, '__and__')
+        return self._binary_operator(right, operator.__and__)
 
     def __rand__(self, left):
-        return self._rbinary_operator(left, '__rand__')
+        return self._rbinary_operator(left, operator.__and__)
 
     def __or__(self, right):
-        return self._binary_operator(right, '__or__')
+        return self._binary_operator(right, operator.__or__)
 
     def __ror__(self, left):
-        return self._rbinary_operator(left, '__ror__')
+        return self._rbinary_operator(left, operator.__or__)
 
     def __str__(self):
         return self._values.__str__()
+
+    def __lt__(self, right):
+        return self._binary_operator(right, operator.lt)
+
+    def __le__(self, right):
+        return self._binary_operator(right, operator.le)
+
+    def __gt__(self, right):
+        return self._binary_operator(right, operator.gt)
+
+    def __ge__(self, right):
+        return self._binary_operator(right, operator.ge)
+
+    def __ne__(self, right):
+        return self._binary_operator(right, operator.ne)
+
+    def __eq__(self, right):
+        return self._binary_operator(right, operator.eq)
 
 
 class SecurityValueHolder(object):
@@ -313,7 +331,7 @@ class SecurityCompoundedValueHolder(SecurityValueHolder):
         if not isinstance(right.dependency, str):
             fpAssert(left.valueSize == len(right.dependency), ValueError, "left value size {0} is "
                                                                           "different from right dependency {1}"
-                                                                          .format(left.valueSize, right.dependency))
+                     .format(left.valueSize, right.dependency))
         else:
             fpAssert(left.valueSize == 1, ValueError, "left value size {0} is different from right dependency 1"
                      .format(left.valueSize))

@@ -25,7 +25,18 @@ class TestSecurityValueHolders(unittest.TestCase):
         self.datas = {'aapl': {'close': sample1[:, 0], 'open': sample1[:, 1]},
                       'ibm': {'close': sample1[:, 0], 'open': sample2[:, 1]}}
 
-    def testSecuritiesValues(self):
+    def testSecuritiesValuesComparison(self):
+        benchmarkValues = SecuritiesValues({'AAPL': 1.0, 'IBM': 2.0, 'GOOG': 3.0})
+        calculated = benchmarkValues > 1.5
+        expected = SecuritiesValues({'AAPL': False, 'IBM': True, 'GOOG': True})
+        for name in calculated:
+            self.assertEqual(calculated[name], expected[name], "for the name {0}\n"
+                                                               "expected:   {1}\n"
+                                                               "calculated: {2}".format(name,
+                                                                                        expected[name],
+                                                                                        calculated[name]))
+
+    def testSecuritiesValuesArithmetic(self):
         benchmarkValues = {'AAPL': 1.0, 'IBM': 2.0, 'GOOG': 3.0}
         values = SecuritiesValues(benchmarkValues)
 
@@ -91,7 +102,7 @@ class TestSecurityValueHolders(unittest.TestCase):
             self.assertAlmostEqual(2.0 / benchmarkValues[key], divValues[key], 12)
 
         benchmarkValues3 = {'AAPL': 3.0, 'IBM': 2.0}
-        with self.assertRaises(AssertionError):
+        with self.assertRaises(ValueError):
             values3 = SecuritiesValues(benchmarkValues3)
             _ = values + values3
 

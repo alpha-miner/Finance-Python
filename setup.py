@@ -12,10 +12,11 @@ from PyFin import __version__
 
 PACKAGE = "PyFin"
 NAME = "PyFin"
-DESCRIPTION = "PyFin 0.2.0"
+DESCRIPTION = "PyFin " + __version__
 AUTHOR = "cheng li"
 AUTHOR_EMAIL = "cheng.li@datayes.com"
-URL = "www.datayes.com"
+URL = 'https://code.csdn.net/wegamekinglc/finance-python'
+DOWNLOAD_URL = 'https://code.csdn.net/wegamekinglc/finance-python/tree/0.3.1'
 VERSION = __version__
 
 if os.name == "posix":
@@ -61,6 +62,7 @@ setup(
     author_email=AUTHOR_EMAIL,
     license="commercial",
     url=URL,
+    download_url=DOWNLOAD_URL,
     packages=['PyFin.API',
               'PyFin.AlgoTrading',
               'PyFin.DateUtilities',

@@ -8,11 +8,11 @@ import sys
 import subprocess
 import glob
 
-from fp import __version__
+from PyFin import __version__
 
-PACKAGE = "fp"
-NAME = "fp"
-DESCRIPTION = "fp 0.2.0"
+PACKAGE = "PyFin"
+NAME = "PyFin"
+DESCRIPTION = "PyFin 0.2.0"
 AUTHOR = "cheng li"
 AUTHOR_EMAIL = "cheng.li@datayes.com"
 URL = "www.datayes.com"
@@ -27,8 +27,8 @@ if os.name == "posix":
 else:
     packagePath = sysconfig.get_python_lib()
 
-files = glob.glob("fp/tests/Math/Accumulators/data/*.csv")
-datafiles = [(os.path.join(packagePath, "fp/tests/Math/Accumulators/data"), files)]
+files = glob.glob("PyFin/tests/Math/Accumulators/data/*.csv")
+datafiles = [(os.path.join(packagePath, "PyFin/tests/Math/Accumulators/data"), files)]
 
 
 class test(Command):
@@ -47,9 +47,9 @@ class test(Command):
 
     def run(self):
         if sys.platform == 'win32':
-            command = "coverage run fp/tests/testSuite.py& coverage report& coverage html"
+            command = "coverage run PyFin/tests/testSuite.py& coverage report& coverage html"
         else:
-            command = "coverage run fp/tests/testSuite.py; coverage report; coverage html"
+            command = "coverage run PyFin/tests/testSuite.py; coverage report; coverage html"
         subprocess.Popen(command, shell=True)
 
 
@@ -61,32 +61,32 @@ setup(
     author_email=AUTHOR_EMAIL,
     license="commercial",
     url=URL,
-    packages=['fp.API',
-              'fp.AlgoTrading',
-              'fp.DateUtilities',
-              'fp.Enums',
-              'fp.Env',
-              'fp.Math',
-              'fp.Math.Accumulators',
-              'fp.Math.Distributions',
-              'fp.Math.Timeseries',
-              'fp.Patterns',
-              'fp.PricingEngines',
-              'fp.Analysis',
-              'fp.Analysis.TechnicalAnalysis',
-              'fp.Utilities',
-              'fp.tests',
-              'fp.tests.API',
-              'fp.tests.DateUtilities',
-              'fp.tests.Env',
-              'fp.tests.Math',
-              'fp.tests.Math.Accumulators',
-              'fp.tests.Math.Distributions',
-              'fp.tests.Math.Timeseries',
-              'fp.tests.Analysis',
-              'fp.tests.Analysis.TechnicalAnalysis',
-              'fp.tests.PricingEngines'],
-    py_modules=['fp.__init__', 'fp.tests.testSuite'],
+    packages=['PyFin.API',
+              'PyFin.AlgoTrading',
+              'PyFin.DateUtilities',
+              'PyFin.Enums',
+              'PyFin.Env',
+              'PyFin.Math',
+              'PyFin.Math.Accumulators',
+              'PyFin.Math.Distributions',
+              'PyFin.Math.Timeseries',
+              'PyFin.Patterns',
+              'PyFin.PricingEngines',
+              'PyFin.Analysis',
+              'PyFin.Analysis.TechnicalAnalysis',
+              'PyFin.Utilities',
+              'PyFin.tests',
+              'PyFin.tests.API',
+              'PyFin.tests.DateUtilities',
+              'PyFin.tests.Env',
+              'PyFin.tests.Math',
+              'PyFin.tests.Math.Accumulators',
+              'PyFin.tests.Math.Distributions',
+              'PyFin.tests.Math.Timeseries',
+              'PyFin.tests.Analysis',
+              'PyFin.tests.Analysis.TechnicalAnalysis',
+              'PyFin.tests.PricingEngines'],
+    py_modules=['PyFin.__init__', 'PyFin.tests.testSuite'],
     data_files=datafiles,
     classifiers=[
         "Development Status :: 3 - Alpha",

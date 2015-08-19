@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# fp documentation build configuration file, created by
+# PyFin documentation build configuration file, created by
 # sphinx-quickstart on Mon Jul 27 12:36:19 2015.
 #
 # This file is execfile()d with the current directory set to its
@@ -73,7 +73,7 @@ source_suffix = '.rst'
 master_doc = 'tablecontent'
 
 # General information about the project.
-project = u'fp'
+project = u'PyFin'
 copyright = u'2015, Cheng.li'
 author = u'Cheng.li'
 
@@ -272,7 +272,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-  (master_doc, 'fp.tex', u'fp Documentation',
+  (master_doc, 'PyFin.tex', u'PyFin Documentation',
    u'Cheng.li', 'manual'),
 ]
 
@@ -302,7 +302,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'fp', u'fp Documentation',
+    (master_doc, 'PyFin', u'PyFin Documentation',
      [author], 1)
 ]
 
@@ -316,8 +316,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  (master_doc, 'fp', u'fp Documentation',
-   author, 'fp', 'One line description of project.',
+  (master_doc, 'PyFin', u'PyFin Documentation',
+   author, 'PyFin', 'One line description of project.',
    'Miscellaneous'),
 ]
 

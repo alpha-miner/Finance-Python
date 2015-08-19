@@ -11,7 +11,7 @@ import glob
 from PyFin import __version__
 
 PACKAGE = "PyFin"
-NAME = "PyFin"
+NAME = "Finance-Python"
 DESCRIPTION = "PyFin " + __version__
 AUTHOR = "cheng li"
 AUTHOR_EMAIL = "wegamekinglc@hotmail.com"
@@ -56,12 +56,10 @@ class test(Command):
 
 setup(
     name=NAME,
-    packages=[NAME],
     version=VERSION,
     description=DESCRIPTION,
     author=AUTHOR,
     author_email=AUTHOR_EMAIL,
-    license="commercial",
     url=URL,
     download_url=DOWNLOAD_URL,
     packages=['PyFin.API',
@@ -91,14 +89,6 @@ setup(
               'PyFin.tests.PricingEngines'],
     py_modules=['PyFin.__init__', 'PyFin.tests.testSuite'],
     data_files=datafiles,
-    classifiers=[
-        "Development Status :: 3 - Alpha",
-        "Environment :: PC test",
-        "Intended Audience :: Developers",
-        "License :: OSI Approved :: BSD License",
-        "Operating System :: OS Independent",
-        "Programming Language :: Python 2.7/3.4",
-        "Framework :: none",
-    ],
+    classifiers=[],
     cmdclass={"test": test},
 )

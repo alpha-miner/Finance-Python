@@ -1,4 +1,5 @@
 numpy
 scipy
 pandas
+coverage
 

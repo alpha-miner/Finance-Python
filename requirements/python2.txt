@@ -2,3 +2,4 @@ enum34
 numpy
 scipy
 pandas
+coverage

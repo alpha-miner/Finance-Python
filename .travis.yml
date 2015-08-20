@@ -4,6 +4,7 @@ python:
 before_install:
   - sudo apt-get update -qq
   - sudo apt-get install -qq libblas-dev liblapack-dev
+  - sudo apt-get install -qq gcc
 # command to install dependencies
 install: "pip install -r requirements/python2.txt"
 # command to run tests

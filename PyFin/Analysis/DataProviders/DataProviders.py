@@ -24,3 +24,6 @@ class DataProvider(object):
     @property
     def data(self):
         return copy.deepcopy(self._data)
+
+    def clear(self):
+        self._data = {}

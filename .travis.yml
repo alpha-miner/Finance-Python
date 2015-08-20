@@ -14,4 +14,4 @@ install:
   - "pip install --upgrade pip" 
   - "pip install -r requirements/python2.txt"
 # command to run tests
-script: python setup.py test
+script: python PyFin/tests/testSuite.py

@@ -2,6 +2,6 @@ language: python
 python:
   - "2.7"
 # command to install dependencies
-install: "pip install -r requirments/pyhon2.txt"
+install: "pip install -r requirements/pyhon2.txt"
 # command to run tests
 script: python setup.py test

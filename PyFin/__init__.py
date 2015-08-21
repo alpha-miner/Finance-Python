@@ -7,7 +7,7 @@ Created on 2015-7-9
 
 __all__ = ['__version__', 'API', 'DateUtilities', 'Enums', 'Env', 'Math', 'PricingEngines', 'Risk', 'AlgoTrading']
 
-__version__ = "0.3.1"
+__version__ = "0.3.2"
 
 import PyFin.API as API
 import PyFin.DateUtilities as DateUtilities

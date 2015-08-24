@@ -12,7 +12,7 @@ from PyFin import __version__
 
 PACKAGE = "PyFin"
 NAME = "Finance-Python"
-DESCRIPTION = "PyFin " + __version__
+DESCRIPTION = "PyFin " + __version__.split('-')[0]
 AUTHOR = "cheng li"
 AUTHOR_EMAIL = "wegamekinglc@hotmail.com"
 URL = 'https://code.csdn.net/wegamekinglc/finance-python'
@@ -30,6 +30,13 @@ else:
 
 files = glob.glob("PyFin/tests/Math/Accumulators/data/*.csv")
 datafiles = [(os.path.join(packagePath, "PyFin/tests/Math/Accumulators/data"), files)]
+
+
+def git_version():
+    from subprocess import Popen, PIPE
+    gitproc = Popen(['git', 'rev-parse','HEAD'], stdout = PIPE)
+    (stdout, _) = gitproc.communicate()
+    return stdout.strip()
 
 
 class test(Command):
@@ -52,6 +59,43 @@ class test(Command):
         else:
             command = "coverage run PyFin/tests/testSuite.py; coverage report; coverage html"
         subprocess.Popen(command, shell=True)
+
+
+class build(Command):
+
+    description = "test the distribution prior to install"
+
+    user_options = [
+        ('test-dir=', None,
+         "directory that contains the test definitions"),
+    ]
+
+
+    def initialize_options(self):
+        pass
+
+    def finalize_options(self):
+        pass
+
+    def run(self):
+        git_ver = git_version()[:10]
+        configFile = 'PyFin/__init__.py'
+
+        file_handle = open(configFile, 'r')
+        lines = file_handle.readlines()
+        newFiles = []
+        finds = 0
+        for line in lines:
+            if line.startswith('__version__'):
+                line = line.split('+')[0].rstrip()
+                line = line + " + \"-" + git_ver + "\"\n"
+            newFiles.append(line)
+        file_handle.close()
+        os.remove(configFile)
+        file_handle = open(configFile, 'w')
+        file_handle.writelines(newFiles)
+        file_handle.close()
+
 
 
 setup(
@@ -92,5 +136,6 @@ setup(
     py_modules=['PyFin.__init__', 'PyFin.tests.testSuite'],
     data_files=datafiles,
     classifiers=[],
-    cmdclass={"test": test},
+    cmdclass={"test": test,
+              "build": build},
 )

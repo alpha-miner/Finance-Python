@@ -61,7 +61,7 @@ class test(Command):
         subprocess.Popen(command, shell=True)
 
 
-class build(Command):
+class version_build(Command):
 
     description = "test the distribution prior to install"
 
@@ -69,7 +69,6 @@ class build(Command):
         ('test-dir=', None,
          "directory that contains the test definitions"),
     ]
-
 
     def initialize_options(self):
         pass
@@ -84,7 +83,6 @@ class build(Command):
         file_handle = open(configFile, 'r')
         lines = file_handle.readlines()
         newFiles = []
-        finds = 0
         for line in lines:
             if line.startswith('__version__'):
                 line = line.split('+')[0].rstrip()
@@ -137,5 +135,5 @@ setup(
     data_files=datafiles,
     classifiers=[],
     cmdclass={"test": test,
-              "build": build},
+              "version_build": version_build},
 )

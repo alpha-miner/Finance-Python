@@ -17,7 +17,7 @@ AUTHOR = "cheng li"
 AUTHOR_EMAIL = "wegamekinglc@hotmail.com"
 URL = 'https://code.csdn.net/wegamekinglc/finance-python'
 DOWNLOAD_URL = 'https://code.csdn.net/wegamekinglc/finance-python/tree/0.3.1'
-VERSION = __version__
+VERSION = __version__.split('-')[0]
 
 if os.name == "posix":
     exePath = sys.path

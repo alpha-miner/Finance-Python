@@ -108,7 +108,10 @@ class MovingMax(SortedValueHolder):
         super(MovingMax, self).__init__(window, dependency)
 
     def result(self):
-        return self._sortedArray[-1]
+        if self._sortedArray:
+            return self._sortedArray[-1]
+        else:
+            return np.nan
 
 
 class MovingMinimum(SortedValueHolder):
@@ -116,8 +119,10 @@ class MovingMinimum(SortedValueHolder):
         super(MovingMinimum, self).__init__(window, dependency)
 
     def result(self):
-        return self._sortedArray[0]
-
+        if self._sortedArray:
+            return self._sortedArray[0]
+        else:
+            return np.nan
 
 class MovingSum(SingleValuedValueHolder):
     def __init__(self, window, dependency='x'):

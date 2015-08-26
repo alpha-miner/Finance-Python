@@ -5,7 +5,7 @@ Created on 2015-7-9
 @author: cheng.li
 """
 
-__all__ = ['__version__', 'API', 'DateUtilities', 'Enums', 'Env', 'Math', 'PricingEngines', 'Risk', 'AlgoTrading']
+__all__ = ['__version__', 'API', 'DateUtilities', 'Enums', 'Env', 'Math', 'PricingEngines', 'AlgoTrading']
 
 __version__ = "0.3.4"
 

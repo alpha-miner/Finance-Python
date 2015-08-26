@@ -41,7 +41,7 @@ class SettingsFactory(Singleton):
     @defaultSymbolList.setter
     def defaultSymbolList(self, value):
         pyFinAssert(len(value) != 0, ValueError, "default symbol list can't be set to empty")
-        self._defaultSymbolList = value
+        self._defaultSymbolList = [v.lower() for v in value]
 
 
 Settings = SettingsFactory()

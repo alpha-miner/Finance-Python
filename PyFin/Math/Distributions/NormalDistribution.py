@@ -12,6 +12,8 @@ from PyFin.Math.ErrorFunction import errorFunction
 _M_SQRT_2 = MathConstants.M_SQRT_2
 _M_1_SQRTPI = MathConstants.M_1_SQRTPI
 _QL_EPSILON = MathConstants.QL_EPSILON
+_M_SQRT2 = MathConstants.M_SQRT2
+_M_SQRTPI = MathConstants.M_SQRTPI
 
 
 class NormalDistribution(object):
@@ -130,7 +132,7 @@ class InverseCumulativeNormal(object):
             z = (((((self._a1 * r + self._a2) * r + self._a3) * r + self._a4) * r + self._a5) * r + self._a6) * z \
                 / (((((self._b1 * r + self._b2) * r + self._b3) * r + self._b4) * r + self._b5) * r + 1.0)
         if self._fullAcc:
-            r = (self._dist(z) - x) * MathConstants.M_SQRT2 * MathConstants.M_SQRTPI * math.exp(0.5 * z * z)
+            r = (self._dist(z) - x) * _M_SQRT2 * _M_SQRTPI * math.exp(0.5 * z * z)
             z -= r / (1 + 0.5 * z * r)
         return z
 

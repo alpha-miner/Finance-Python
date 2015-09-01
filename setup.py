@@ -7,17 +7,18 @@ import os
 import sys
 import subprocess
 import glob
+from Cython.Build import cythonize
 
-from PyFin import __version__
+#from PyFin import __version__
 
 PACKAGE = "PyFin"
 NAME = "Finance-Python"
-DESCRIPTION = "PyFin " + __version__.split('-')[0]
+DESCRIPTION = "PyFin 0.3.4"
 AUTHOR = "cheng li"
 AUTHOR_EMAIL = "wegamekinglc@hotmail.com"
 URL = 'https://code.csdn.net/wegamekinglc/finance-python'
 DOWNLOAD_URL = 'https://code.csdn.net/wegamekinglc/finance-python/tree/0.3.1'
-VERSION = __version__.split('-')[0]
+VERSION = "0.3.4"
 
 if os.name == "posix":
     exePath = sys.path
@@ -136,4 +137,5 @@ setup(
     classifiers=[],
     cmdclass={"test": test,
               "version_build": version_build},
+    ext_modules=cythonize("PyFin/Math/ErrorFunction.pyx"),
 )

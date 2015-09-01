@@ -8,5 +8,7 @@ doc/_build/*
 *.png
 *.dat
 *.css
+*.c
+*.pyd
 
 

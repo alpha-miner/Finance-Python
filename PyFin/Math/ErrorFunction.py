@@ -7,6 +7,9 @@ Created on 2015-7-23
 
 import math
 from PyFin.Math.MathConstants import MathConstants
+from numba import jit, float64
+
+_DBL_MIN = MathConstants.DBL_MIN
 
 tiny = 0.0
 one = 1.0
@@ -72,12 +75,14 @@ sb6 = 4.74528541206955367215e+02
 sb7 = -2.24409524465858183362e+01
 
 
+@jit(float64(float64))
 def errorFunction(x):
+
     ax = abs(x)
 
     if ax < 0.84375:
         if ax < 3.7252902984e-09:
-            if ax < MathConstants.DBL_MIN * 16:
+            if ax < _DBL_MIN * 16:
                 return 0.125 * (8.0 * x + efx8 * x)
             return x + efx * x
         z = x * x
@@ -115,3 +120,4 @@ def errorFunction(x):
         return one - r / ax
     else:
         return r / ax - one
+

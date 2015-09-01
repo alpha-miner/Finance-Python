@@ -9,12 +9,16 @@ import math
 from PyFin.Math.MathConstants import MathConstants
 from PyFin.Math.ErrorFunction import errorFunction
 
+_M_SQRT_2 = MathConstants.M_SQRT_2
+_M_1_SQRTPI = MathConstants.M_1_SQRTPI
+_QL_EPSILON = MathConstants.QL_EPSILON
+
 
 class NormalDistribution(object):
     def __init__(self, average=0.0, sigma=1.0):
         self._average = average
         self._sigma = sigma
-        self._normalizationFactor = MathConstants.M_SQRT_2 * MathConstants.M_1_SQRTPI / self._sigma
+        self._normalizationFactor = _M_SQRT_2 * _M_1_SQRTPI / self._sigma
         self._derNormalizationFactor = self._sigma * self._sigma
         self._denominator = 2.0 * self._derNormalizationFactor
 
@@ -34,9 +38,8 @@ class CumulativeNormalDistribution(object):
         self._gaussian = NormalDistribution()
 
     def __call__(self, z):
-
         z = (z - self._average) / self._sigma
-        result = 0.5 * (1.0 + errorFunction(z * MathConstants.M_SQRT_2))
+        result = 0.5 * (1.0 + errorFunction(z * _M_SQRT_2))
         if result <= 1.0e-8:
             sumRes = 1.0
             zsqr = z * z
@@ -54,7 +57,7 @@ class CumulativeNormalDistribution(object):
                 if a < 0.0:
                     a = -a
 
-                if lasta <= a or a < abs(sumRes * MathConstants.QL_EPSILON):
+                if lasta <= a or a < math.fabs(sumRes * _QL_EPSILON):
                     break
             return -self._gaussian(z) / z * sumRes
         return result

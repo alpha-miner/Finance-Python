@@ -15,4 +15,6 @@ install:
   - "travis_wait pip install --upgrade pip"
   - "travis_wait pip install -r requirements/python2.txt"
 # command to run tests
-script: python PyFin/tests/testSuite.py
+script: 
+  - "python setup.py build_ext --inplace"
+  - "python PyFin/tests/testSuite.py"

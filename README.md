@@ -19,7 +19,7 @@ pandas
 首先将代码保存至本地：
 
 ~~~
-git clone https://git.coding.net/wegamekinglc/finance-Python.git
+git clone https://github.com/ChinaQuants/Finance-Python.git (如果你是从github获取)
 cd finance-Python
 ~~~
 

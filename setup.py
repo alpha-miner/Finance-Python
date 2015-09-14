@@ -9,7 +9,6 @@ import subprocess
 import glob
 from Cython.Build import cythonize
 
-#from PyFin import __version__
 
 PACKAGE = "PyFin"
 NAME = "Finance-Python"

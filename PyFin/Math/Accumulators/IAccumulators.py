@@ -42,8 +42,8 @@ class Accumulator(object):
             raise ValueError("parameters' name list should not be empty")
         else:
             pyFinAssert(isinstance(dependency, str) or isinstance(dependency, Accumulator), ValueError,
-                     '{0} in pNames should be a plain string or an value holder. But it is {1}'
-                     .format(dependency, type(dependency)))
+                        '{0} in pNames should be a plain string or an value holder. But it is {1}'
+                        .format(dependency, type(dependency)))
             self._dependency = deepcopy(dependency)
 
     def push(self, data):

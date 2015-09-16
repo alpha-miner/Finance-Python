@@ -105,7 +105,6 @@ setup(
     url=URL,
     download_url=DOWNLOAD_URL,
     packages=['PyFin.API',
-              'PyFin.AlgoTrading',
               'PyFin.DateUtilities',
               'PyFin.Enums',
               'PyFin.Env',

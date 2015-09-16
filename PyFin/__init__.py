@@ -16,4 +16,3 @@ import PyFin.Env as Env
 import PyFin.Math as Math
 import PyFin.PricingEngines as PricingEngines
 import PyFin.Analysis as Analysis
-import PyFin.AlgoTrading as AlgoTrading

@@ -20,4 +20,4 @@ __all__ = ['__version__',
            'Math',
            'PricingEngines']
 
-__version__ = "0.3.4"
+__version__ = "0.3.5"

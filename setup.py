@@ -14,9 +14,8 @@ NAME = "Finance-Python"
 DESCRIPTION = "PyFin 0.3.4"
 AUTHOR = "cheng li"
 AUTHOR_EMAIL = "wegamekinglc@hotmail.com"
-URL = 'https://code.csdn.net/wegamekinglc/finance-python'
-DOWNLOAD_URL = 'https://code.csdn.net/wegamekinglc/finance-python/tree/0.3.1'
-VERSION = "0.3.4"
+URL = 'https://github.com/ChinaQuants/Finance-Python'
+VERSION = "0.3.5"
 
 if os.name == "posix":
     exePath = sys.path
@@ -102,7 +101,6 @@ setup(
     author=AUTHOR,
     author_email=AUTHOR_EMAIL,
     url=URL,
-    download_url=DOWNLOAD_URL,
     packages=['PyFin.API',
               'PyFin.DateUtilities',
               'PyFin.Enums',

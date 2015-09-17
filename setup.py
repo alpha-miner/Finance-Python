@@ -11,11 +11,11 @@ from Cython.Build import cythonize
 
 PACKAGE = "PyFin"
 NAME = "Finance-Python"
-DESCRIPTION = "PyFin 0.3.4"
+VERSION = "0.3.5"
+DESCRIPTION = "PyFin " + VERSION
 AUTHOR = "cheng li"
 AUTHOR_EMAIL = "wegamekinglc@hotmail.com"
 URL = 'https://github.com/ChinaQuants/Finance-Python'
-VERSION = "0.3.5"
 
 if os.name == "posix":
     exePath = sys.path
@@ -32,7 +32,7 @@ datafiles = [(os.path.join(packagePath, "PyFin/tests/Math/Accumulators/data"), f
 
 def git_version():
     from subprocess import Popen, PIPE
-    gitproc = Popen(['git', 'rev-parse','HEAD'], stdout = PIPE)
+    gitproc = Popen(['git', 'rev-parse','HEAD'], stdout=PIPE)
     (stdout, _) = gitproc.communicate()
     return stdout.strip()
 

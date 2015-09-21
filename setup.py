@@ -11,7 +11,7 @@ from Cython.Build import cythonize
 
 PACKAGE = "PyFin"
 NAME = "Finance-Python"
-VERSION = "0.3.6"
+VERSION = "0.3.7"
 DESCRIPTION = "PyFin " + VERSION
 AUTHOR = "cheng li"
 AUTHOR_EMAIL = "wegamekinglc@hotmail.com"

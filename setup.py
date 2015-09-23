@@ -7,7 +7,6 @@ import os
 import sys
 import subprocess
 import glob
-from Cython.Build import cythonize
 
 PACKAGE = "PyFin"
 NAME = "Finance-Python"
@@ -132,5 +131,4 @@ setup(
     classifiers=[],
     cmdclass={"test": test,
               "version_build": version_build},
-    ext_modules=cythonize("PyFin/Math/ErrorFunction.pyx"),
 )

@@ -7,10 +7,11 @@ import os
 import sys
 import subprocess
 import glob
+from PyFin import __version__
 
 PACKAGE = "PyFin"
 NAME = "Finance-Python"
-VERSION = "0.3.7"
+VERSION = __version__
 DESCRIPTION = "PyFin " + VERSION
 AUTHOR = "cheng li"
 AUTHOR_EMAIL = "wegamekinglc@hotmail.com"

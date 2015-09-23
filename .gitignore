@@ -1,4 +1,5 @@
 build/*
+htmlcov/*
 *.pyc
 .idea/*
 doc/_build/*

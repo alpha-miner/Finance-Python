@@ -12,9 +12,20 @@ from PyFin.API.DateUtilities import advanceDate
 from PyFin.API.DateUtilities import adjustDateByCalendar
 from PyFin.API.DateUtilities import advanceDateByCalendar
 
+from PyFin.API.Analysis import MA
+from PyFIn.API.Analysis import MAX
+from PyFIn.API.Analysis import MIN
+from PyFIn.API.Analysis import NPOSITIVE
+from PyFIn.API.Analysis import MAPOSITIVE
+
 __all__ = ["datesList",
            "bizDatesList",
            "holDatesList",
            "advanceDate",
            "adjustDateByCalendar",
-           "advanceDateByCalendar"]
+           "advanceDateByCalendar",
+           "MA",
+           "MAX",
+           "MIN",
+           "NPOSITIVE",
+           "MAPOSITIVE"]

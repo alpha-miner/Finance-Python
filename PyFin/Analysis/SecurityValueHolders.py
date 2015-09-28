@@ -28,8 +28,11 @@ else:
 
 
 class SecuritiesValues(object):
-    def __init__(self, values):
-        self._values = copy.deepcopy(values)
+    def __init__(self, values, deepcopy=True):
+        if deepcopy:
+            self._values = copy.deepcopy(values)
+        else:
+            self._values = values
 
     def __getitem__(self, item):
         return self._values[item]
@@ -46,8 +49,8 @@ class SecuritiesValues(object):
     def _binary_operator(self, right, op):
         if isinstance(right, SecuritiesValues):
             pyFinAssert(self._values.keys() == right._values.keys(), ValueError, "left security names {0} "
-                                                                              "is not equal to right {1}"
-                     .format(self._values.keys(), right._values.keys()))
+                                                                                 "is not equal to right {1}"
+                        .format(self._values.keys(), right._values.keys()))
             return SecuritiesValues(
                 {
                     name: op(self._values[name], right._values[name]) for name in self._values
@@ -189,7 +192,7 @@ class SecurityValueHolder(object):
                 res[name] = self._innerHolders[name].value
             except ArithmeticError:
                 res[name] = np.nan
-        return SecuritiesValues(res)
+        return SecuritiesValues(res, False)
 
     @property
     def holders(self):

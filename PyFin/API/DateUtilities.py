@@ -10,6 +10,12 @@ from PyFin.DateUtilities import Calendar
 from PyFin.Enums import BizDayConventions
 
 
+def isBizDay(holidayCenter, ref):
+    cal = Calendar(holidayCenter)
+    ref = Date.fromDateTime(ref)
+    return cal.isBizDay(ref)
+
+
 def datesList(fromDate, toDate):
     fromDate = Date.fromDateTime(fromDate)
     toDate = Date.fromDateTime(toDate)

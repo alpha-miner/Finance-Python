@@ -209,6 +209,11 @@ class TestSecurityValueHolders(unittest.TestCase):
         for name in expected:
             self.assertEqual(set(expected[name]), set(calculated[name]))
 
+    def testDependencyCalculationOnCompoundedValueHolder(self):
+        h = SecurityMovingMax(5, SecurityMovingAverage(10, 'close', ['aapl']) + SecurityMovingAverage(20, 'open', ['aapl']))
+        expected = {'aapl': ['close', 'open']}
+        self.assertEqual(h.dependency, expected)
+
     def testItemizedValueHolder(self):
         window = 10
         pNames = 'close'

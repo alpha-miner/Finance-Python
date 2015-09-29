@@ -11,6 +11,7 @@ from PyFin.DateUtilities.Date import Date
 from PyFin.DateUtilities.Calendar import Calendar
 from PyFin.Enums.BizDayConventions import BizDayConventions
 from PyFin.API.DateUtilities import datesList
+from PyFin.API.DateUtilities import isBizDay
 from PyFin.API.DateUtilities import bizDatesList
 from PyFin.API.DateUtilities import holDatesList
 from PyFin.API.DateUtilities import advanceDate
@@ -20,9 +21,20 @@ from PyFin.API.DateUtilities import adjustDateByCalendar
 
 class TestDateUtilities(unittest.TestCase):
     def setUp(self):
-
         self.fromDate = dt.date(2010, 1, 1)
         self.toDate = dt.date.today()
+
+    def testIsBizDay(self):
+        bizDates = bizDatesList('China.SSE', self.fromDate, self.toDate)
+
+        for i, date in enumerate(bizDates):
+            isBizFlag = isBizDay('China.SSE', date)
+            self.assertTrue(isBizFlag, "at index {0:d} {1} is expected to be business day.".format(i, date))
+
+        holDates = holDatesList('China.SSE', self.fromDate, self.toDate)
+        for i, date in enumerate(holDates):
+            isBizFlag = isBizDay('China.SSE', date)
+            self.assertTrue(isBizFlag is False, "at index {0:d} {1} is expected to be business day.".format(i, date))
 
     def testDatesList(self):
         dtList = datesList(self.fromDate, self.toDate)

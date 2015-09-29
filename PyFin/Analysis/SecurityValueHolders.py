@@ -286,7 +286,7 @@ class SecurityCombinedValueHolder(SecurityValueHolder):
             self._symbolList = set(right.symbolList)
 
         self._window = max(self._left.window, self._right.window)
-        self._dependency = list(set(self._left.dependency).union(set(self._right.dependency)))
+        self._dependency = _merge2set(self._left._dependency, self._right._dependency)
         self._returnSize = self._left.valueSize
 
         if len(self._right.symbolList) == 0:
@@ -406,4 +406,20 @@ def _merge2dict(left, right):
     for name in right:
         if name not in left:
             res[name] = right[name]
+    return res
+
+
+def _merge2set(left, right):
+    res = []
+    if isinstance(left, list):
+        if isinstance(right, list):
+            res = list(set(left + right))
+        else:
+            res = list(set(left + [right]))
+    else:
+        if isinstance(right, list):
+            res = list(set([left] + right))
+        else:
+            res = list(set([left] + [right]))
+
     return res

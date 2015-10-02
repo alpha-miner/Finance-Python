@@ -13,8 +13,11 @@ from PyFin.Math.Accumulators.StatefulAccumulators import MovingAverage
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingMax
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingMinimum
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingSum
+from PyFin.Math.Accumulators.StatefulAccumulators import MovingVariance
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingCountedPositive
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingPositiveAverage
+from PyFin.Math.Accumulators.StatefulAccumulators import MovingCountedNegative
+from PyFin.Math.Accumulators.StatefulAccumulators import MovingNegativeAverage
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingHistoricalWindow
 from PyFin.Math.Accumulators.Performancers import MovingLogReturn
 
@@ -60,6 +63,11 @@ class SecurityMovingSum(SecuritySingleValueHolder):
         super(SecurityMovingSum, self).__init__(window, MovingSum, dependency, symbolList)
 
 
+class SecurityMovingVariance(SecuritySingleValueHolder):
+    def __init__(self, window, dependency='x', symbolList=None):
+        super(SecurityMovingVariance, self).__init__(window, MovingVariance, dependency, symbolList)
+
+
 class SecurityMovingCountedPositive(SecuritySingleValueHolder):
     def __init__(self, window, dependency='x', symbolList=None):
         super(SecurityMovingCountedPositive, self).__init__(window, MovingCountedPositive, dependency, symbolList)
@@ -68,6 +76,16 @@ class SecurityMovingCountedPositive(SecuritySingleValueHolder):
 class SecurityMovingPositiveAverage(SecuritySingleValueHolder):
     def __init__(self, window, dependency='x', symbolList=None):
         super(SecurityMovingPositiveAverage, self).__init__(window, MovingPositiveAverage, dependency, symbolList)
+
+
+class SecurityMovingCountedNegative(SecuritySingleValueHolder):
+    def __init__(self, window, dependency='x', symbolList=None):
+        super(SecurityMovingCountedNegative, self).__init__(window, MovingCountedNegative, dependency, symbolList)
+
+
+class SecurityMovingNegativeAverage(SecuritySingleValueHolder):
+    def __init__(self, window, dependency='x', symbolList=None):
+        super(SecurityMovingNegativeAverage, self).__init__(window, MovingNegativeAverage, dependency, symbolList)
 
 
 class SecurityMovingLogReturn(SecuritySingleValueHolder):
@@ -91,4 +109,4 @@ class SecurityMovingHistoricalWindow(SecuritySingleValueHolder):
                     res[name] = np.nan
             return SecuritiesValues(res)
         else:
-            raise ValueError("{0} is not recognized as valid int or string".forma(item))
+            raise ValueError("{0} is not recognized as valid int or string".format(item))

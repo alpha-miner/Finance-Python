@@ -9,8 +9,11 @@ from PyFin.Analysis.TechnicalAnalysis.StatefulTechnicalAnalysers import Security
 from PyFin.Analysis.TechnicalAnalysis.StatefulTechnicalAnalysers import SecurityMovingMax
 from PyFin.Analysis.TechnicalAnalysis.StatefulTechnicalAnalysers import SecurityMovingMinimum
 from PyFin.Analysis.TechnicalAnalysis.StatefulTechnicalAnalysers import SecurityMovingSum
+from PyFin.Analysis.TechnicalAnalysis.StatefulTechnicalAnalysers import SecurityMovingVariance
 from PyFin.Analysis.TechnicalAnalysis.StatefulTechnicalAnalysers import SecurityMovingCountedPositive
 from PyFin.Analysis.TechnicalAnalysis.StatefulTechnicalAnalysers import SecurityMovingPositiveAverage
+from PyFin.Analysis.TechnicalAnalysis.StatefulTechnicalAnalysers import SecurityMovingCountedNegative
+from PyFin.Analysis.TechnicalAnalysis.StatefulTechnicalAnalysers import SecurityMovingNegativeAverage
 from PyFin.Analysis.TechnicalAnalysis.StatefulTechnicalAnalysers import SecurityMovingHistoricalWindow
 from PyFin.Analysis.TechnicalAnalysis.StatefulTechnicalAnalysers import SecurityMovingLogReturn
 
@@ -18,7 +21,10 @@ __all__ = ['SecurityMovingAverage',
            'SecurityMovingMax',
            'SecurityMovingMinimum',
            'SecurityMovingSum',
+           'SecurityMovingVariance',
            'SecurityMovingCountedPositive',
            'SecurityMovingPositiveAverage',
+           'SecurityMovingCountedNegative',
+           'SecurityMovingNegativeAverage',
            'SecurityMovingHistoricalWindow',
            'SecurityMovingLogReturn']

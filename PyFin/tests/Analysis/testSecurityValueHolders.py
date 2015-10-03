@@ -219,24 +219,17 @@ class TestSecurityValueHolders(unittest.TestCase):
         pNames = 'close'
         symbolList = ['AAPL', 'IBM', 'GOOG']
         test = SecurityMovingAverage(window, pNames, symbolList)
+        test.push({'aapl': {'close': 10.0}, 'ibm': {'close': 15.0}, 'goog': {'close': 17.0}})
+        test.push({'aapl': {'close': 12.0}, 'ibm': {'close': 10.0}, 'goog': {'close': 13.0}})
 
         # single named value holder
         test1 = test['IBM']
-        self.assertEqual(set(test1.symbolList), set(['ibm']))
-        self.assertEqual(test1.dependency, {'ibm': pNames})
-        self.assertEqual(test1.valueSize, 1)
-        self.assertEqual(test1.window, window)
+        self.assertAlmostEqual(test1, 12.5, 15)
 
         # multi-valued named value holder
         test2 = test['IBM', 'GOOG']
-        dependency = {
-            name: pNames for name in ['ibm', 'goog']
-            }
-        self.assertTrue(isinstance(test2, SecurityValueHolder))
-        self.assertEqual(set(test2.symbolList), set(['ibm', 'goog']))
-        self.assertEqual(test2.dependency, dependency)
-        self.assertEqual(test2.valueSize, 1)
-        self.assertEqual(test2.window, window)
+        expected = SecuritiesValues({'ibm': 12.5, 'goog':15.0})
+        self.assertAlmostEqual(test2, expected)
 
         # wrong type of item
         with self.assertRaises(TypeError):

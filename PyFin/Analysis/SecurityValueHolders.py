@@ -200,24 +200,15 @@ class SecurityValueHolder(object):
 
     def __getitem__(self, item):
         if isinstance(item, tuple):
-            res = copy.deepcopy(self)
-            res._symbolList = set(i.lower() for i in item)
-            pyFinAssert(len(res._symbolList) == len(item), ValueError, "security name can't be duplicated")
-            res._innerHolders = \
-                {
-                    name: self._innerHolders[name] for name in res._symbolList
-                    }
+            symbolList = set(i.lower() for i in item)
+            pyFinAssert(len(symbolList) == len(item), ValueError, "security name can't be duplicated")
+            res = SecuritiesValues(
+                {s: self._innerHolders[s].value for s in symbolList}
+            )
             return res
         elif isinstance(item, str) and item.lower() in self._innerHolders:
             item = item.lower()
-            res = copy.deepcopy(self)
-            res._symbolList = set([item])
-            pyFinAssert(len(res._symbolList) == len([item]), ValueError, "security name can't be duplicated")
-            res._innerHolders = \
-                {
-                    name: self._innerHolders[name] for name in res._symbolList
-                    }
-            return res
+            return self._innerHolders[item].value
         else:
             raise TypeError("{0} is not a valid index".format(item))
 
@@ -410,7 +401,6 @@ def _merge2dict(left, right):
 
 
 def _merge2set(left, right):
-    res = []
     if isinstance(left, list):
         if isinstance(right, list):
             res = list(set(left + right))
@@ -421,5 +411,4 @@ def _merge2set(left, right):
             res = list(set([left] + right))
         else:
             res = list(set([left] + [right]))
-
     return res

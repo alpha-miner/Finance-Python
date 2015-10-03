@@ -547,6 +547,3 @@ class TestSecurityValueHolders(unittest.TestCase):
                                                                              "expected:   {2}\n"
                                                                              "calculated: {3}"
                                        .format(name, i, expected[name], calculated[name]))
-
-
-

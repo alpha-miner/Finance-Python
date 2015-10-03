@@ -11,5 +11,8 @@ doc/_build/*
 *.css
 *.c
 *.pyd
+*.pyproj
+*.sln
+.vs/*
 
 

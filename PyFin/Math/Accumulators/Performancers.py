@@ -115,7 +115,7 @@ class MovingDrawDown(StatefulValueHolder):
         self._maxer.push(dict(x=0.0))
         self._runningCum = 0.0
         self._highIndex = 0
-        self._runningIndex = 0
+        self._runningIndex = -1
 
     def push(self, data):
         value = super(MovingDrawDown, self).push(data)

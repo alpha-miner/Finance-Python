@@ -11,3 +11,4 @@ from PyFin.Analysis.TechnicalAnalysis import SecurityMovingMinimum as MIN
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingSum as SUM
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingCountedPositive as NPOSITIVE
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingPositiveAverage as MAPOSITIVE
+from PyFin.Analysis.TechnicalAnalysis import SecurityMovingHistoricalWindow as HIST

@@ -18,6 +18,8 @@ from PyFin.API.Analysis import MAX
 from PyFin.API.Analysis import MIN
 from PyFin.API.Analysis import NPOSITIVE
 from PyFin.API.Analysis import MAPOSITIVE
+from PyFin.API.Analysis import HIST
+
 
 __all__ = ["datesList",
            "bizDatesList",

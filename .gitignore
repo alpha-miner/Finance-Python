@@ -2,6 +2,7 @@ build/*
 htmlcov/*
 *.pyc
 .idea/*
+pyfin/.idea/*
 doc/_build/*
 *.coverage
 *.html

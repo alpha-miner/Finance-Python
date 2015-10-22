@@ -6,12 +6,7 @@
 ## 依赖
 -------------
 
-~~~
-enum34 (python2)
-numpy
-scipy
-pandas
-~~~
+见requirements目录
 
 ## 安装
 -------------

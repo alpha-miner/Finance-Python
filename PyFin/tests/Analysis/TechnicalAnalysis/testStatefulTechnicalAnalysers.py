@@ -47,7 +47,7 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
                 start = i + 1 - window
 
             value = ma1.value
-            for name in value:
+            for name in value.index:
                 expected = np.mean(self.dataSet[name]['close'][start:(i + 1)])
                 calculated = value[name]
                 self.assertAlmostEqual(expected, calculated, 12, 'at index {0}\n'
@@ -71,7 +71,7 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
                 start = i + 1 - window
 
             value = ma1.value
-            for name in value:
+            for name in value.index:
                 expected = np.max(self.dataSet[name]['close'][start:(i + 1)])
                 calculated = value[name]
                 self.assertAlmostEqual(expected, calculated, 12, 'at index {0}\n'
@@ -95,7 +95,7 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
                 start = i + 1 - window
 
             value = ma1.value
-            for name in value:
+            for name in value.index:
                 expected = np.min(self.dataSet[name]['close'][start:(i + 1)])
                 calculated = value[name]
                 self.assertAlmostEqual(expected, calculated, 12, 'at index {0}\n'
@@ -119,7 +119,7 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
                 start = i + 1 - window
 
             value = ma1.value
-            for name in value:
+            for name in value.index:
                 expected = np.sum(self.dataSet[name]['close'][start:(i + 1)])
                 calculated = value[name]
                 self.assertAlmostEqual(expected, calculated, 12, 'at index {0}\n'
@@ -140,7 +140,7 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
                 start = i + 1 - window
 
             value = ma1.value
-            for name in value:
+            for name in value.index:
                 expected = np.sum(self.dataSet[name]['close'][start:(i + 1)] > 0.0)
                 calculated = value[name]
                 self.assertAlmostEqual(expected, calculated, 12, 'at index {0}\n'
@@ -164,7 +164,7 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
                 start = i + 1 - window
 
             value = ma1.value
-            for name in value:
+            for name in value.index:
                 sampled = list(filter(lambda x: x > 0, self.dataSet[name]['close'][start:(i + 1)]))
                 if len(sampled) > 0:
                     expected = np.mean(sampled)
@@ -197,7 +197,7 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
                 start = i - window
 
             value = ma1.value
-            for name in value:
+            for name in value.index:
                 sampled = self.newDataSet[name]['close'][start:(i + 1)]
                 if i >= 10:
                     expected = math.log(sampled[-1] / sampled[0])
@@ -229,7 +229,7 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
                 container = mh.value
                 for k in range(min(i + 1, window)):
                     calculated = mh[k]
-                    for name in calculated:
+                    for name in calculated.index:
                         self.assertAlmostEqual(calculated[name], benchmark[name][-1 - k],
                                                "at index {0} positon {1} and symbol {2}\n"
                                                "expected:   {3}\n"
@@ -238,7 +238,7 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
                                                                         calculated[name]))
                 # check by value method
                 for k in range(min(i + 1, window)):
-                    for name in calculated:
+                    for name in calculated.index:
                         self.assertAlmostEqual(container[name][k], benchmark[name][-1 - k],
                                                "at index {0} positon {1} and symbol {2}\n"
                                                "expected:   {3}\n"

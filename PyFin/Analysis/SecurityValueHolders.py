@@ -7,10 +7,10 @@ Created on 2015-8-7
 
 from abc import ABCMeta
 import copy
-import operator
 from collections import defaultdict
 import sys
 import numpy as np
+from pandas import Series as SecuritiesValues
 from PyFin.Math.Accumulators.StatefulAccumulators import Shift
 from PyFin.Math.Accumulators.IAccumulators import CompoundedValueHolder
 from PyFin.Math.Accumulators.IAccumulators import Identity
@@ -25,115 +25,6 @@ if sys.version_info > (3, 0, 0):
     div_attr = "truediv"
 else:
     div_attr = "div"
-
-
-class SecuritiesValues(object):
-    def __init__(self, values, deepcopy=True):
-        if deepcopy:
-            self._values = copy.deepcopy(values)
-        else:
-            self._values = values
-
-    def __getitem__(self, item):
-        return self._values[item]
-
-    def __neg__(self):
-        return SecuritiesValues({name: -self._values[name] for name in self._values})
-
-    def __iter__(self):
-        return self._values.__iter__()
-
-    def __len__(self):
-        return self._values.__len__()
-
-    def _binary_operator(self, right, op):
-        if isinstance(right, SecuritiesValues):
-            pyFinAssert(self._values.keys() == right._values.keys(), ValueError, "left security names {0} "
-                                                                                 "is not equal to right {1}"
-                        .format(self._values.keys(), right._values.keys()))
-            return SecuritiesValues(
-                {
-                    name: op(self._values[name], right._values[name]) for name in self._values
-                    }
-            )
-        else:
-            return SecuritiesValues(
-                {
-                    name: op(self._values[name], right) for name in self._values
-                    }
-            )
-
-    def _rbinary_operator(self, left, op):
-        return SecuritiesValues(
-            {
-                name: op(left, self._values[name]) for name in self._values
-                }
-        )
-
-    def __add__(self, right):
-        return self._binary_operator(right, operator.add)
-
-    def __radd__(self, left):
-        return self._rbinary_operator(left, operator.add)
-
-    def __sub__(self, right):
-        return self._binary_operator(right, operator.sub)
-
-    def __rsub__(self, left):
-        return self._rbinary_operator(left, operator.sub)
-
-    def __mul__(self, right):
-        return self._binary_operator(right, operator.mul)
-
-    def __rmul__(self, left):
-        return self._rbinary_operator(left, operator.mul)
-
-    def __div__(self, right):
-        return self._binary_operator(right, getattr(operator, div_attr))
-
-    def __rdiv__(self, left):
-        return self._rbinary_operator(left, getattr(operator, div_attr))
-
-    # only neede in python 3
-    def __truediv__(self, right):
-        return self.__div__(right)
-
-    # only neede in python 3
-    def __rtruediv__(self, left):
-        return self.__rdiv__(left)
-
-    def __and__(self, right):
-        return self._binary_operator(right, operator.__and__)
-
-    def __rand__(self, left):
-        return self._rbinary_operator(left, operator.__and__)
-
-    def __or__(self, right):
-        return self._binary_operator(right, operator.__or__)
-
-    def __ror__(self, left):
-        return self._rbinary_operator(left, operator.__or__)
-
-    def __str__(self):
-        return self._values.__str__()
-
-    def __lt__(self, right):
-        return self._binary_operator(right, operator.lt)
-
-    def __le__(self, right):
-        return self._binary_operator(right, operator.le)
-
-    def __gt__(self, right):
-        return self._binary_operator(right, operator.gt)
-
-    def __ge__(self, right):
-        return self._binary_operator(right, operator.ge)
-
-    def __ne__(self, right):
-        return self._binary_operator(right, operator.ne)
-
-    def __eq__(self, right):
-        return self._binary_operator(right, operator.eq)
 
 
 class SecurityValueHolder(object):
@@ -164,7 +55,7 @@ class SecurityValueHolder(object):
     @property
     def dependency(self):
         return {
-            symbol: self._dependency for symbol in self._symbolList
+            symbol: self._dependency for symbol in self.symbolList
             }
 
     @property
@@ -180,19 +71,19 @@ class SecurityValueHolder(object):
         return self._window
 
     def push(self, data):
-        names = set(self._symbolList).intersection(set(data.keys()))
+        names = set(self.symbolList).intersection(set(data.keys()))
         for name in names:
-            self._innerHolders[name].push(data[name])
+            self.holders[name].push(data[name])
 
     @property
     def value(self):
         res = {}
-        for name in self._innerHolders:
+        for name in self.holders:
             try:
-                res[name] = self._innerHolders[name].value
+                res[name] = self.holders[name].value
             except ArithmeticError:
                 res[name] = np.nan
-        return SecuritiesValues(res, False)
+        return SecuritiesValues(res)
 
     @property
     def holders(self):
@@ -203,12 +94,13 @@ class SecurityValueHolder(object):
             symbolList = set(i.lower() for i in item)
             pyFinAssert(len(symbolList) == len(item), ValueError, "security name can't be duplicated")
             res = SecuritiesValues(
-                {s: self._innerHolders[s].value for s in symbolList}
+                {s: self.holders[s].value for s in symbolList}
             )
             return res
-        elif isinstance(item, str) and item.lower() in self._innerHolders:
+
+        elif isinstance(item, str) and item.lower() in self.holders:
             item = item.lower()
-            return self._innerHolders[item].value
+            return self.holders[item].value
         else:
             raise TypeError("{0} is not a valid index".format(item))
 
@@ -247,6 +139,25 @@ class SecurityValueHolder(object):
 
     def shift(self, n):
         return SecurityShiftedValueHolder(self, n)
+
+
+# class FilteredSecurityValueHolder(SecurityValueHolder):
+#     def __init__(self, computer, filter):
+#         self._filter = filter
+#         self._computer = computer
+#         self._window = max(computer.window, filter.window)
+#         self._returnSize = computer.valueSize
+#         self._dependency = _merge2set(self.computer._dependency, self.filter._dependency)
+#         self._symbolList = computer.symbolList
+#
+#     def _calcFilter(self):
+#         return self._filter.value
+#
+#     @property
+#     def value(self):
+#         v = self._calcFilter()
+#         for s in v.symbols:
+#             if v[s]:
 
 
 class IdentitySecurityValueHolder(SecurityValueHolder):
@@ -356,7 +267,7 @@ class SecurityCompoundedValueHolder(SecurityValueHolder):
     def push(self, data):
         names = set(self._symbolList).intersection(set(data.keys()))
         for name in names:
-            self._innerHolders[name].push(data[name])
+            self.holders[name].push(data[name])
 
 
 def dependencyCalculator(*args):

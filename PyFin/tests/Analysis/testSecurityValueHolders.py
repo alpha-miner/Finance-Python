@@ -9,7 +9,6 @@ import unittest
 from collections import deque
 import numpy as np
 from PyFin.Enums import Factors
-from PyFin.Analysis.SecurityValueHolders import SecurityValueHolder
 from PyFin.Analysis.SecurityValueHolders import SecuritiesValues
 from PyFin.Analysis.SecurityValueHolders import dependencyCalculator
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingAverage
@@ -34,13 +33,6 @@ class TestSecurityValueHolders(unittest.TestCase):
                                                                                             expected[name],
                                                                                             calculated[name]))
         self.checker = check_values
-
-    def testSecuritiesValuesIncompatibleSymbolList(self):
-        values = SecuritiesValues({'AAPL': 3.0, 'IBM': 2.0, 'GOOG': 4.0})
-        benchmarkValues3 = {'AAPL': 3.0, 'IBM': 2.0}
-        with self.assertRaises(ValueError):
-            values3 = SecuritiesValues(benchmarkValues3)
-            _ = values + values3
 
     def testSecuritiesValuesComparison(self):
 
@@ -231,7 +223,8 @@ class TestSecurityValueHolders(unittest.TestCase):
         # multi-valued named value holder
         test2 = test['IBM', 'GOOG']
         expected = SecuritiesValues({'ibm': 12.5, 'goog':15.0})
-        self.assertAlmostEqual(test2, expected)
+        for s in test2.index:
+            self.assertAlmostEqual(test2[s], expected[s])
 
         # wrong type of item
         with self.assertRaises(TypeError):
@@ -257,7 +250,7 @@ class TestSecurityValueHolders(unittest.TestCase):
 
             expected = ma.value + mm.value
             calculated = combined.value
-            for name in expected:
+            for name in expected.index:
                 self.assertAlmostEqual(expected[name], calculated[name], 12)
 
     def testAddedSecurityValueHoldersWithScalar(self):
@@ -275,7 +268,7 @@ class TestSecurityValueHolders(unittest.TestCase):
 
             expected = 2.0 + mm.value
             calculated = combined.value
-            for name in expected:
+            for name in expected.index:
                 self.assertAlmostEqual(expected[name], calculated[name], 12)
 
     def testRAddedSecurityValueHoldersWithScalar(self):
@@ -293,7 +286,7 @@ class TestSecurityValueHolders(unittest.TestCase):
 
             expected = ma.value + 2.0
             calculated = combined.value
-            for name in expected:
+            for name in expected.index:
                 self.assertAlmostEqual(expected[name], calculated[name], 12)
 
     def testSubbedSecurityValueHolder(self):
@@ -316,7 +309,7 @@ class TestSecurityValueHolders(unittest.TestCase):
 
             expected = ma.value - mm.value
             calculated = combined.value
-            for name in expected:
+            for name in expected.index:
                 self.assertAlmostEqual(expected[name], calculated[name], 12)
 
     def testSubbedSecurityValueHoldersWithScalar(self):
@@ -334,7 +327,7 @@ class TestSecurityValueHolders(unittest.TestCase):
 
             expected = 2.0 - mm.value
             calculated = combined.value
-            for name in expected:
+            for name in expected.index:
                 self.assertAlmostEqual(expected[name], calculated[name], 12)
 
     def testRSubbedSecurityValueHoldersWithScalar(self):
@@ -352,7 +345,7 @@ class TestSecurityValueHolders(unittest.TestCase):
 
             expected = ma.value - 2.0
             calculated = combined.value
-            for name in expected:
+            for name in expected.index:
                 self.assertAlmostEqual(expected[name], calculated[name], 12)
 
     def testMultipliedSecurityValueHolders(self):
@@ -375,7 +368,7 @@ class TestSecurityValueHolders(unittest.TestCase):
 
             expected = ma.value * mm.value
             calculated = combined.value
-            for name in expected:
+            for name in expected.index:
                 self.assertAlmostEqual(expected[name], calculated[name], 12)
 
     def testMultipliedSecurityValueHoldersWithScalar(self):
@@ -393,7 +386,7 @@ class TestSecurityValueHolders(unittest.TestCase):
 
             expected = 2.0 * mm.value
             calculated = combined.value
-            for name in expected:
+            for name in expected.index:
                 self.assertAlmostEqual(expected[name], calculated[name], 12)
 
     def testRMultipliedSecurityValueHoldersWithScalar(self):
@@ -411,7 +404,7 @@ class TestSecurityValueHolders(unittest.TestCase):
 
             expected = ma.value * 2.0
             calculated = combined.value
-            for name in expected:
+            for name in expected.index:
                 self.assertAlmostEqual(expected[name], calculated[name], 12)
 
     def testDividedSecurityValueHolders(self):
@@ -434,7 +427,7 @@ class TestSecurityValueHolders(unittest.TestCase):
 
             expected = ma.value / mm.value
             calculated = combined.value
-            for name in expected:
+            for name in expected.index:
                 self.assertAlmostEqual(expected[name], calculated[name], 12)
 
     def testDividedSecurityValueHoldersWithScalar(self):
@@ -452,7 +445,7 @@ class TestSecurityValueHolders(unittest.TestCase):
 
             expected = 2.0 / mm.value
             calculated = combined.value
-            for name in expected:
+            for name in expected.index:
                 self.assertAlmostEqual(expected[name], calculated[name], 12)
 
     def testRDividedSecurityValueHoldersWithScalar(self):
@@ -470,18 +463,15 @@ class TestSecurityValueHolders(unittest.TestCase):
 
             expected = ma.value / 2.0
             calculated = combined.value
-            for name in expected:
+            for name in expected.index:
                 self.assertAlmostEqual(expected[name], calculated[name], 12)
 
     def testCombinedSecurityValueHolderWithoutData(self):
         ma = SecurityMovingAverage(10, 'close', ['aapl', 'ibm', 'goog'])
-        expected = {'aapl': np.nan,
-                    'ibm': np.nan,
-                    'goog': np.nan}
         calculated = ma.value
 
-        for name in expected:
-            self.assertIs(expected[name], calculated[name])
+        for name in calculated.index:
+            self.assertTrue(np.isnan(calculated[name]))
 
     def testShiftedSecurityValueHolder(self):
         mm = SecurityMovingAverage(2, 'close', ['aapl', 'ibm', 'goog'])
@@ -491,33 +481,32 @@ class TestSecurityValueHolders(unittest.TestCase):
                  'ibm': {'close': 2.0},
                  'goog': {'close': 3.0}}
         shifted1.push(data1)
-        expected = {'aapl': np.nan,
-                    'ibm': np.nan,
-                    'goog': np.nan}
         calculated = shifted1.value
-        for name in expected:
-            self.assertIs(expected[name], calculated[name])
+        for name in calculated.index:
+            self.assertTrue(np.isnan(calculated[name]))
 
         data2 = {'aapl': {'close': 2.0},
                  'ibm': {'close': 3.0},
                  'goog': {'close': 4.0}}
+
         shifted1.push(data2)
-        expected = {'aapl': 1.0,
+        expected = SecuritiesValues({'aapl': 1.0,
                    'ibm': 2.0,
-                   'goog': 3.0}
+                   'goog': 3.0})
         calculated = shifted1.value
-        for name in expected:
+        for name in expected.index:
             self.assertAlmostEqual(expected[name], calculated[name])
 
-        data3 = {'aapl': {'close': 3.0},
+        data3 = SecuritiesValues({'aapl': {'close': 3.0},
                  'ibm': {'close': 4.0},
-                 'goog': {'close': 5.0}}
+                 'goog': {'close': 5.0}})
+
         shifted1.push(data3)
-        expected = {'aapl': 1.5,
+        expected = SecuritiesValues({'aapl': 1.5,
                     'ibm': 2.5,
-                    'goog': 3.5}
+                    'goog': 3.5})
         calculated = shifted1.value
-        for name in expected:
+        for name in expected.index:
             self.assertAlmostEqual(expected[name], calculated[name])
 
     def testShiftedSecurityValueHolderWithLengthZero(self):
@@ -536,13 +525,13 @@ class TestSecurityValueHolders(unittest.TestCase):
                     'ibm': {Factors.CLOSE: self.datas['ibm'][Factors.CLOSE][i]}}
             ma.push(data)
             maRes = ma.value
-            for name in maRes:
+            for name in maRes.index:
                 container[name].append(maRes[name])
                 expected[name] = max(container[name])
 
             compounded.push(data)
             calculated = compounded.value
-            for name in calculated:
+            for name in calculated.index:
                 self.assertAlmostEqual(expected[name], calculated[name], 12, "for {0} at index {1}\n"
                                                                              "expected:   {2}\n"
                                                                              "calculated: {3}"

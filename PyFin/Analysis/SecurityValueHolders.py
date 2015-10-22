@@ -18,6 +18,12 @@ from PyFin.Math.Accumulators.IAccumulators import AddedValueHolder
 from PyFin.Math.Accumulators.IAccumulators import MinusedValueHolder
 from PyFin.Math.Accumulators.IAccumulators import MultipliedValueHolder
 from PyFin.Math.Accumulators.IAccumulators import DividedValueHolder
+from PyFin.Math.Accumulators.IAccumulators import LtOperatorValueHolder
+from PyFin.Math.Accumulators.IAccumulators import LeOperatorValueHolder
+from PyFin.Math.Accumulators.IAccumulators import GtOperatorValueHolder
+from PyFin.Math.Accumulators.IAccumulators import GeOperatorValueHolder
+from PyFin.Math.Accumulators.IAccumulators import EqOperatorValueHolder
+from PyFin.Math.Accumulators.IAccumulators import NeOperatorValueHolder
 from PyFin.Env.Settings import Settings
 from PyFin.Utilities import pyFinAssert
 
@@ -97,7 +103,8 @@ class SecurityValueHolder(object):
                 {s: self.holders[s].value for s in symbolList}
             )
             return res
-
+        elif isinstance(item, SecurityValueHolder):
+            return FilteredSecurityValueHolder(self, item)
         elif isinstance(item, str) and item.lower() in self.holders:
             item = item.lower()
             return self.holders[item].value
@@ -137,27 +144,59 @@ class SecurityValueHolder(object):
     def __rshift__(self, right):
         return SecurityCompoundedValueHolder(self, right)
 
+    def __lt__(self, right):
+        return SecurityLtOperatorValueHolder(self, right)
+
+    def __le__(self, right):
+        return SecurityLeOperatorValueHolder(self, right)
+
+    def __gt__(self, right):
+        return SecurityGtOperatorValueHolder(self, right)
+
+    def __ge__(self, right):
+        return SecurityGeOperatorValueHolder(self, right)
+
+    def __eq__(self, right):
+        return SecurityEqOperatorValueHolder(self, right)
+
+    def __ne__(self, right):
+        return SecurityNeOperatorValueHolder(self, right)
+
     def shift(self, n):
         return SecurityShiftedValueHolder(self, n)
 
 
-# class FilteredSecurityValueHolder(SecurityValueHolder):
-#     def __init__(self, computer, filter):
-#         self._filter = filter
-#         self._computer = computer
-#         self._window = max(computer.window, filter.window)
-#         self._returnSize = computer.valueSize
-#         self._dependency = _merge2set(self.computer._dependency, self.filter._dependency)
-#         self._symbolList = computer.symbolList
-#
-#     def _calcFilter(self):
-#         return self._filter.value
-#
-#     @property
-#     def value(self):
-#         v = self._calcFilter()
-#         for s in v.symbols:
-#             if v[s]:
+class FilteredSecurityValueHolder(SecurityValueHolder):
+    def __init__(self, computer, filter):
+        self._filter = filter
+        self._computer = computer
+        self._window = max(computer.window, filter.window)
+        self._returnSize = computer.valueSize
+        self._dependency = _merge2set(self._computer._dependency, self._filter._dependency)
+        self._symbolList = computer.symbolList
+
+    def _calcFilter(self):
+        return self._filter.value
+
+    @property
+    def holders(self):
+        return self._computer.holders
+
+    @property
+    def value(self):
+        filter_flags = self._calcFilter()
+        res = {}
+        for name in filter_flags.index:
+            if filter_flags[name]:
+                try:
+                    res[name] = self.holders[name].value
+                except ArithmeticError:
+                    res[name] = np.nan
+        return SecuritiesValues(res)
+
+    def push(self, data):
+        self._computer.push(data)
+        self._filter.push(data)
 
 
 class IdentitySecurityValueHolder(SecurityValueHolder):
@@ -232,6 +271,36 @@ class SecurityMultipliedValueHolder(SecurityCombinedValueHolder):
 class SecurityDividedValueHolder(SecurityCombinedValueHolder):
     def __init__(self, left, right):
         super(SecurityDividedValueHolder, self).__init__(left, right, DividedValueHolder)
+
+
+class SecurityLtOperatorValueHolder(SecurityCombinedValueHolder):
+    def __init__(self, left, right):
+        super(SecurityLtOperatorValueHolder, self).__init__(left, right, LtOperatorValueHolder)
+
+
+class SecurityLeOperatorValueHolder(SecurityCombinedValueHolder):
+    def __init__(self, left, right):
+        super(SecurityLeOperatorValueHolder, self).__init__(left, right, LeOperatorValueHolder)
+
+
+class SecurityGtOperatorValueHolder(SecurityCombinedValueHolder):
+    def __init__(self, left, right):
+        super(SecurityGtOperatorValueHolder, self).__init__(left, right, GtOperatorValueHolder)
+
+
+class SecurityGeOperatorValueHolder(SecurityCombinedValueHolder):
+    def __init__(self, left, right):
+        super(SecurityGeOperatorValueHolder, self).__init__(left, right, GeOperatorValueHolder)
+
+
+class SecurityEqOperatorValueHolder(SecurityCombinedValueHolder):
+    def __init__(self, left, right):
+        super(SecurityEqOperatorValueHolder, self).__init__(left, right, EqOperatorValueHolder)
+
+
+class SecurityNeOperatorValueHolder(SecurityCombinedValueHolder):
+    def __init__(self, left, right):
+        super(SecurityNeOperatorValueHolder, self).__init__(left, right, NeOperatorValueHolder)
 
 
 def SecurityShiftedValueHolder(secValueHolder, n):

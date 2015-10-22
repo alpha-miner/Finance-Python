@@ -13,10 +13,26 @@ from PyFin.Math.Accumulators.StatefulAccumulators import _checkParameterList
 class StatelessAccumulator(Accumulator):
     def __init__(self, dependency='x'):
         super(StatelessAccumulator, self).__init__(dependency)
-        self._currentMax = None
         self._returnSize = 1
         self._window = 1
         self._containerSize = 1
+
+
+class Latest(StatelessAccumulator):
+    def __init__(self, dependency='x'):
+        super(Latest, self).__init__(dependency)
+        _checkParameterList(dependency)
+        self._returnSize = 1
+        self._latest = None
+
+    def push(self, data):
+        value = super(Latest, self).push(data)
+        if value is None:
+            return
+        self._latest = value
+
+    def result(self):
+        return self._latest
 
 
 class Max(StatelessAccumulator):

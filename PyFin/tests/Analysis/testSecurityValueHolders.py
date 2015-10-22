@@ -11,6 +11,7 @@ import numpy as np
 from PyFin.Enums import Factors
 from PyFin.Analysis.SecurityValueHolders import SecuritiesValues
 from PyFin.Analysis.SecurityValueHolders import dependencyCalculator
+from PyFin.Analysis.TechnicalAnalysis import SecurityLatestValueHolder
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingAverage
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingMax
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingSum
@@ -536,3 +537,99 @@ class TestSecurityValueHolders(unittest.TestCase):
                                                                              "expected:   {2}\n"
                                                                              "calculated: {3}"
                                        .format(name, i, expected[name], calculated[name]))
+
+    def testLtSecurityValueHolder(self):
+        filter = SecurityLatestValueHolder('close', ['aapl', 'ibm', 'goog']) < 10.0
+        ma = SecurityMovingAverage(10, 'close', ['aapl', 'ibm', 'goog'])[filter]
+
+        data = {'aapl': {'close': 15.},
+                'ibm': {'close': 8.},
+                'goog': {'close': 7.}}
+
+        ma.push(data)
+        expected = {'ibm': 8.0, 'goog': 7.0}
+        calculated = ma.value
+        for name in expected:
+            self.assertAlmostEqual(expected[name], calculated[name], 15)
+
+        data = {'aapl': {'close': 9.},
+                'ibm': {'close': 11.},
+                'goog': {'close': 8.}}
+
+        ma.push(data)
+        expected = {'aapl': 12.0, 'goog': 7.5}
+        calculated = ma.value
+        for name in expected:
+            self.assertAlmostEqual(expected[name], calculated[name], 15)
+
+    def testLeSecurityValueHolder(self):
+        filter = SecurityLatestValueHolder('close', ['aapl', 'ibm', 'goog']) <= 10.0
+        ma = SecurityMovingAverage(10, 'close', ['aapl', 'ibm', 'goog'])[filter]
+
+        data = {'aapl': {'close': 15.},
+                'ibm': {'close': 10.},
+                'goog': {'close': 7.}}
+
+        ma.push(data)
+        expected = {'ibm': 10.0, 'goog': 7.0}
+        calculated = ma.value
+        for name in expected:
+            self.assertAlmostEqual(expected[name], calculated[name], 15)
+
+        data = {'aapl': {'close': 10.},
+                'ibm': {'close': 11.},
+                'goog': {'close': 8.}}
+
+        ma.push(data)
+        expected = {'aapl': 12.5, 'goog': 7.5}
+        calculated = ma.value
+        for name in expected:
+            self.assertAlmostEqual(expected[name], calculated[name], 15)
+
+    def testGtSecurityValueHolder(self):
+        filter = SecurityLatestValueHolder('close', ['aapl', 'ibm', 'goog']) > 10.0
+        ma = SecurityMovingAverage(10, 'close', ['aapl', 'ibm', 'goog'])[filter]
+
+        data = {'aapl': {'close': 15.},
+                'ibm': {'close': 8.},
+                'goog': {'close': 7.}}
+
+        ma.push(data)
+        expected = {'aapl': 15.}
+        calculated = ma.value
+        for name in expected:
+            self.assertAlmostEqual(expected[name], calculated[name], 15)
+
+        data = {'aapl': {'close': 9.},
+                'ibm': {'close': 11.},
+                'goog': {'close': 8.}}
+
+        ma.push(data)
+        expected = {'ibm': 9.5}
+        calculated = ma.value
+        for name in expected:
+            self.assertAlmostEqual(expected[name], calculated[name], 15)
+
+    def testGeSecurityValueHolder(self):
+        filter = SecurityMovingAverage(1, 'close', ['aapl', 'ibm', 'goog']) >= 10.0
+        ma = SecurityMovingAverage(10, 'close', ['aapl', 'ibm', 'goog'])[filter]
+
+        data = {'aapl': {'close': 15.},
+                'ibm': {'close': 10.},
+                'goog': {'close': 7.}}
+
+        ma.push(data)
+        expected = {'aapl': 15., 'ibm': 10.}
+        calculated = ma.value
+        for name in expected:
+            self.assertAlmostEqual(expected[name], calculated[name], 15)
+
+        data = {'aapl': {'close': 10.},
+                'ibm': {'close': 11.},
+                'goog': {'close': 8.}}
+
+        ma.push(data)
+        expected = {'aapl': 12.5, 'ibm': 10.5}
+        calculated = ma.value
+        for name in expected:
+            self.assertAlmostEqual(expected[name], calculated[name], 15)

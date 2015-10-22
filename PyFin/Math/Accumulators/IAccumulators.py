@@ -306,6 +306,16 @@ class GeOperatorValueHolder(ArithmeticValueHolder):
         super(GeOperatorValueHolder, self).__init__(left, right, operator.ge)
 
 
+class EqOperatorValueHolder(ArithmeticValueHolder):
+    def __init__(self, left, right):
+        super(EqOperatorValueHolder, self).__init__(left, right, operator.eq)
+
+
+class NeOperatorValueHolder(ArithmeticValueHolder):
+    def __init__(self, left, right):
+        super(NeOperatorValueHolder, self).__init__(left, right, operator.ne)
+
+
 class Identity(Accumulator):
     def __init__(self, value, n=1):
         if isinstance(value, Accumulator):

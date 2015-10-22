@@ -5,6 +5,8 @@ Created on 2015-8-8
 @author: cheng.li
 """
 
+from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import SecurityLatestValueHolder
+
 from PyFin.Analysis.TechnicalAnalysis.StatefulTechnicalAnalysers import SecurityMovingAverage
 from PyFin.Analysis.TechnicalAnalysis.StatefulTechnicalAnalysers import SecurityMovingMax
 from PyFin.Analysis.TechnicalAnalysis.StatefulTechnicalAnalysers import SecurityMovingMinimum
@@ -17,7 +19,8 @@ from PyFin.Analysis.TechnicalAnalysis.StatefulTechnicalAnalysers import Security
 from PyFin.Analysis.TechnicalAnalysis.StatefulTechnicalAnalysers import SecurityMovingHistoricalWindow
 from PyFin.Analysis.TechnicalAnalysis.StatefulTechnicalAnalysers import SecurityMovingLogReturn
 
-__all__ = ['SecurityMovingAverage',
+__all__ = ['SecurityLatestValueHolder',
+           'SecurityMovingAverage',
            'SecurityMovingMax',
            'SecurityMovingMinimum',
            'SecurityMovingSum',

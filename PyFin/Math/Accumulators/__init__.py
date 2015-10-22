@@ -16,6 +16,7 @@ from PyFin.Math.Accumulators.IAccumulators import Acosh
 from PyFin.Math.Accumulators.IAccumulators import Asin
 from PyFin.Math.Accumulators.IAccumulators import Asinh
 
+from PyFin.Math.Accumulators.StatelessAccumulators import Latest
 from PyFin.Math.Accumulators.StatelessAccumulators import Max
 from PyFin.Math.Accumulators.StatelessAccumulators import Minimum
 from PyFin.Math.Accumulators.StatelessAccumulators import Sum
@@ -55,6 +56,7 @@ __all__ = ["Exp",
            "Acosh",
            "Asin",
            "Asinh",
+           "Latest",
            "Max",
            "Minimum",
            "Sum",

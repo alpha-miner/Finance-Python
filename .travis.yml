@@ -13,7 +13,7 @@ addons:
 # command to install dependencies
 install: 
   - "travis_wait pip install --upgrade pip"
-  - "travis_wait pip install -r requirements/python2.txt"
+  - "travis_wait pip install -r requirements.txt"
 # command to run tests
 script: 
   - "python setup.py build_ext --inplace"

@@ -151,7 +151,7 @@ class TestSecurityValueHolders(unittest.TestCase):
         symbolList = ['aapl', 'ibm']
         testValueHolder = SecurityMovingAverage(window, pNames, symbolList)
         dependency = {
-            name: pNames[0] for name in symbolList
+            name: pNames for name in symbolList
             }
 
         self.assertEqual(set(testValueHolder.symbolList), set(symbolList))

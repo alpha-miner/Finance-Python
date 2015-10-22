@@ -61,12 +61,15 @@ class SecurityValueHolder(object):
     @property
     def dependency(self):
         return {
-            symbol: self._dependency for symbol in self.symbolList
+            symbol: self.fields for symbol in self.symbolList
             }
 
     @property
     def fields(self):
-        return self._dependency
+        if isinstance(self._dependency, list):
+            return self._dependency
+        else:
+            return [self._dependency]
 
     @property
     def valueSize(self):
@@ -167,16 +170,20 @@ class SecurityValueHolder(object):
 
 
 class FilteredSecurityValueHolder(SecurityValueHolder):
-    def __init__(self, computer, filter):
-        self._filter = filter
-        self._computer = computer
-        self._window = max(computer.window, filter.window)
+    def __init__(self, computer, filtering):
+        self._filter = copy.deepcopy(filtering)
+        self._computer = copy.deepcopy(computer)
+        self._window = max(computer.window, filtering.window)
         self._returnSize = computer.valueSize
         self._dependency = _merge2set(self._computer._dependency, self._filter._dependency)
         self._symbolList = computer.symbolList
+        self._updated = False
+        self._cachedFlag = None
 
     def _calcFilter(self):
-        return self._filter.value
+        if not self._updated:
+            self._cachedFlag = self._filter.value
+        return self._cachedFlag
 
     @property
     def holders(self):
@@ -194,9 +201,31 @@ class FilteredSecurityValueHolder(SecurityValueHolder):
                     res[name] = np.nan
         return SecuritiesValues(res)
 
+    def __getitem__(self, item):
+        filter_flags = self._calcFilter()
+
+        if isinstance(item, tuple):
+            symbolList = set(i.lower() for i in item).intersection(set(filter_flags.index))
+            pyFinAssert(len(symbolList) == len(item), ValueError, "security name can't be duplicated")
+            res = SecuritiesValues(
+                {s: self.holders[s].value for s in symbolList}
+            )
+            return res
+        elif isinstance(item, SecurityValueHolder):
+            return FilteredSecurityValueHolder(self, item)
+        elif isinstance(item, str):
+            item = item.lower()
+            if filter_flags[item]:
+                return self.holders[item].value
+            else:
+                return np.nan
+        else:
+            raise TypeError("{0} is not a valid index".format(item))
+
     def push(self, data):
         self._computer.push(data)
         self._filter.push(data)
+        self._updated = False
 
 
 class IdentitySecurityValueHolder(SecurityValueHolder):

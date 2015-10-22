@@ -180,10 +180,6 @@ class FilteredSecurityValueHolder(SecurityValueHolder):
         self._updated = False
         self._cachedFlag = None
 
-    def _calcFilter(self):
-        if not self._updated:
-            self._cachedFlag = self._filter.value
-        return self._cachedFlag
 
     @property
     def holders(self):
@@ -191,10 +187,9 @@ class FilteredSecurityValueHolder(SecurityValueHolder):
 
     @property
     def value(self):
-        filter_flags = self._calcFilter()
         res = {}
-        for name in filter_flags.index:
-            if filter_flags[name]:
+        for name in self.symbolList:
+            if self._filter[name]:
                 try:
                     res[name] = self.holders[name].value
                 except ArithmeticError:
@@ -202,10 +197,9 @@ class FilteredSecurityValueHolder(SecurityValueHolder):
         return SecuritiesValues(res)
 
     def __getitem__(self, item):
-        filter_flags = self._calcFilter()
 
         if isinstance(item, tuple):
-            symbolList = set(i.lower() for i in item).intersection(set(filter_flags.index))
+            symbolList = set(i.lower() for i in item).intersection(set(filter_flags.index))  # to be corrected
             pyFinAssert(len(symbolList) == len(item), ValueError, "security name can't be duplicated")
             res = SecuritiesValues(
                 {s: self.holders[s].value for s in symbolList}
@@ -215,7 +209,7 @@ class FilteredSecurityValueHolder(SecurityValueHolder):
             return FilteredSecurityValueHolder(self, item)
         elif isinstance(item, str):
             item = item.lower()
-            if filter_flags[item]:
+            if self._filter[item]:
                 return self.holders[item].value
             else:
                 return np.nan
@@ -225,7 +219,6 @@ class FilteredSecurityValueHolder(SecurityValueHolder):
     def push(self, data):
         self._computer.push(data)
         self._filter.push(data)
-        self._updated = False
 
 
 class IdentitySecurityValueHolder(SecurityValueHolder):

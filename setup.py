@@ -56,7 +56,8 @@ class test(Command):
             command = "coverage run PyFin/tests/testSuite.py& coverage report& coverage html"
         else:
             command = "coverage run PyFin/tests/testSuite.py; coverage report; coverage html"
-        subprocess.Popen(command, shell=True)
+        process = subprocess.Popen(command, shell=True)
+        process.wait()
 
 
 class version_build(Command):

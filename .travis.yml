@@ -34,8 +34,7 @@ install:
     else
       conda install --file requirements/linux_py35.txt;
     fi
-  - pip install -e . --use-mirrors
-  - pip install coveralls --use-mirrors
+  - pip install coveralls
 # command to run tests
 script:
   - python setup.py build_ext --inplace

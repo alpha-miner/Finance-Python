@@ -1,6 +1,7 @@
 # This file may be used to create an environment using:
 # $ conda create --name <env> --file <this file>
 # platform: linux-64
+coverage=4.0=py35_0
 libgfortran=1.0=0
 numpy=1.10.1=py35_0
 openblas=0.2.14=3

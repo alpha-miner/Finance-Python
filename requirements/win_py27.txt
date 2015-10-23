@@ -1,6 +1,7 @@
 # This file may be used to create an environment using:
 # $ conda create --name <env> --file <this file>
 # platform: win-64
+coverage=4.0=py27_0
 enum34=1.0.4=py27_0
 numpy=1.10.1=py27_0
 pandas=0.17.0=np110py27_0

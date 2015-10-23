@@ -35,8 +35,9 @@ install:
       conda install --file requirements/linux_py35.txt;
     fi
 # command to run tests
-script: 
-  - "python setup.py build_ext --inplace"
-  - "python setup.py test"
+script:
+  - pip install coveralls --use-mirrors
+  - python setup.py build_ext --inplace
+  - python setup.py test
 after_success:
   - coveralls

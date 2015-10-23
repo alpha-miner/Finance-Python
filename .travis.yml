@@ -37,4 +37,6 @@ install:
 # command to run tests
 script: 
   - "python setup.py build_ext --inplace"
-  - "python PyFin/tests/testSuite.py"
+  - "python setup.py test"
+after_success:
+  - coveralls

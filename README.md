@@ -1,3 +1,9 @@
+-------------
+
+[![build status](https://travis-ci.org/ChinaQuants/Finance-Python.svg?branch=master)](https://travis-ci.org/ChinaQuants/Finance-Python)
+
+-------------
+
 ## finpy
 -------------
 

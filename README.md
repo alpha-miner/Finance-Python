@@ -1,6 +1,6 @@
 -------------
 
-[![build status](https://travis-ci.org/ChinaQuants/Finance-Python.svg?branch=master)](https://travis-ci.org/ChinaQuants/Finance-Python)
+[![build status](https://travis-ci.org/ChinaQuants/Finance-Python.svg?branch=master)](https://travis-ci.org/ChinaQuants/Finance-Python) [![coverage](https://coveralls.io/repos/ChinaQuants/Finance-Python/badge.svg?branch=master&service=github)](https://coveralls.io/r/ChinaQuants/Finance-Python)
 
 -------------
 

@@ -34,10 +34,10 @@ install:
     else
       conda install --file requirements/linux_py35.txt;
     fi
-# command to run tests
-script:
   - pip install -e . --use-mirrors
   - pip install coveralls --use-mirrors
+# command to run tests
+script:
   - python setup.py build_ext --inplace
   - python setup.py test
 after_success:

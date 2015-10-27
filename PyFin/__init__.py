@@ -12,12 +12,15 @@ import PyFin.Env as Env
 import PyFin.Math as Math
 import PyFin.PricingEngines as PricingEngines
 import PyFin.Analysis as Analysis
+import PyFin.Utilities as Utilities
 
 __all__ = ['__version__',
            'API',
            'DateUtilities',
            'Enums', 'Env',
            'Math',
-           'PricingEngines']
+           'PricingEngines',
+           'Analysis',
+           'Utilities']
 
 __version__ = "0.3.10"

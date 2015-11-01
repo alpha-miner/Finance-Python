@@ -42,21 +42,23 @@ class StatefulValueHolder(Accumulator):
         return len(self._con)
 
     def _dumpOneValue(self, value):
-        if not hasattr(value, '__iter__'):
-            popout = np.nan
-        else:
-            popout = np.array([np.nan] * len(value))
 
         if self.isFull:
             # use list as circular queue
             popout = self._con[self._start]
             self._con[self._start] = value
             self._start = (self._start + 1) % self._containerSize
-        elif len(self._con) + 1 == self._containerSize:
-            self._con.append(value)
-            self._isFull = 1
         else:
-            self._con.append(value)
+            try:
+                popout = np.array([np.nan] * len(value))
+            except TypeError:
+                popout = np.nan
+
+            if len(self._con) + 1 == self._containerSize:
+                self._con.append(value)
+                self._isFull = 1
+            else:
+                self._con.append(value)
         return popout
 
 
@@ -99,7 +101,7 @@ class SortedValueHolder(SingleValuedValueHolder):
             del self._sortedArray[delPos]
             bisect.insort_left(self._sortedArray, value)
         else:
-            _ = self._dumpOneValue(value)
+            self._dumpOneValue(value)
             bisect.insort_left(self._sortedArray, value)
 
 
@@ -123,6 +125,7 @@ class MovingMinimum(SortedValueHolder):
             return self._sortedArray[0]
         else:
             return np.nan
+
 
 class MovingSum(SingleValuedValueHolder):
     def __init__(self, window, dependency='x'):

@@ -48,12 +48,9 @@ class Accumulator(object):
 
     def push(self, data):
         if not self._isValueHolderContained:
-            if isinstance(self._dependency, str):
-                if self._dependency in data:
-                    return data[self._dependency]
-                else:
-                    return None
-            elif hasattr(self._dependency, '__iter__'):
+            try:
+                return data[self._dependency]
+            except Exception:
                 try:
                     return tuple(data[p] for p in self._dependency)
                 except KeyError:

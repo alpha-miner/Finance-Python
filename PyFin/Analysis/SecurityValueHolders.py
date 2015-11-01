@@ -99,20 +99,21 @@ class SecurityValueHolder(object):
         return self._innerHolders
 
     def __getitem__(self, item):
-        if isinstance(item, tuple):
-            symbolList = set(i.lower() for i in item)
-            pyFinAssert(len(symbolList) == len(item), ValueError, "security name can't be duplicated")
-            res = SecuritiesValues(
-                {s: self.holders[s].value for s in symbolList}
-            )
-            return res
-        elif isinstance(item, SecurityValueHolder):
-            return FilteredSecurityValueHolder(self, item)
-        elif isinstance(item, str) and item.lower() in self.holders:
-            item = item.lower()
+        try:
             return self.holders[item].value
-        else:
-            raise TypeError("{0} is not a valid index".format(item))
+        except KeyError:
+
+            if isinstance(item, tuple):
+                symbolList = set(i.lower() for i in item)
+                pyFinAssert(len(symbolList) == len(item), ValueError, "security name can't be duplicated")
+                res = SecuritiesValues(
+                    {s: self.holders[s].value for s in symbolList}
+                )
+                return res
+            elif isinstance(item, SecurityValueHolder):
+                return FilteredSecurityValueHolder(self, item)
+            else:
+                raise TypeError("{0} is not a valid index".format(item))
 
     def __add__(self, right):
         return SecurityAddedValueHolder(self, right)
@@ -197,24 +198,24 @@ class FilteredSecurityValueHolder(SecurityValueHolder):
         return SecuritiesValues(res)
 
     def __getitem__(self, item):
-
-        if isinstance(item, tuple):
-            symbolList = set(i.lower() for i in item).intersection(set(filter_flags.index))  # to be corrected
-            pyFinAssert(len(symbolList) == len(item), ValueError, "security name can't be duplicated")
-            res = SecuritiesValues(
-                {s: self.holders[s].value for s in symbolList}
-            )
-            return res
-        elif isinstance(item, SecurityValueHolder):
-            return FilteredSecurityValueHolder(self, item)
-        elif isinstance(item, str):
-            item = item.lower()
+        try:
             if self._filter[item]:
                 return self.holders[item].value
             else:
                 return np.nan
-        else:
-            raise TypeError("{0} is not a valid index".format(item))
+        except KeyError:
+
+            if isinstance(item, tuple):
+                symbolList = set(i.lower() for i in item).intersection(set(filter_flags.index))  # to be corrected
+                pyFinAssert(len(symbolList) == len(item), ValueError, "security name can't be duplicated")
+                res = SecuritiesValues(
+                    {s: self.holders[s].value for s in symbolList}
+                )
+                return res
+            elif isinstance(item, SecurityValueHolder):
+                return FilteredSecurityValueHolder(self, item)
+            else:
+                raise TypeError("{0} is not a valid index".format(item))
 
     def push(self, data):
         self._computer.push(data)

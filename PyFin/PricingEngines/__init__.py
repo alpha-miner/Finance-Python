@@ -8,9 +8,13 @@ Created on 2015-7-23
 from PyFin.PricingEngines.BlackFormula import bachelierFormula
 from PyFin.PricingEngines.BlackFormula import bachelierFormulaImpliedVol
 from PyFin.PricingEngines.BlackFormula import blackFormula
+from PyFin.PricingEngines.BlackFormula import blackFormula2
 from PyFin.PricingEngines.BlackFormula import blackFormulaImpliedStdDev
+from PyFin.PricingEngines.BlackFormula import blackFormulaImpliedVol
 
 __all__ = ['bachelierFormula',
            'bachelierFormulaImpliedVol',
            'blackFormula',
-           'blackFormulaImpliedStdDev']
+           'blackFormula2',
+           'blackFormulaImpliedStdDev',
+           'blackFormulaImpliedVol']

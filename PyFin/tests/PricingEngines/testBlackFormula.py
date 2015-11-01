@@ -11,7 +11,9 @@ from PyFin.Enums.OptionType import OptionType
 from PyFin.PricingEngines.BlackFormula import bachelierFormula
 from PyFin.PricingEngines.BlackFormula import bachelierFormulaImpliedVol
 from PyFin.PricingEngines.BlackFormula import blackFormula
+from PyFin.PricingEngines.BlackFormula import blackFormula2
 from PyFin.PricingEngines.BlackFormula import blackFormulaImpliedStdDev
+from PyFin.PricingEngines.BlackFormula import blackFormulaImpliedVol
 
 
 class TestBlackFormula(unittest.TestCase):
@@ -38,7 +40,7 @@ class TestBlackFormula(unittest.TestCase):
         calculated = bachelierFormula(OptionType.Call, strike, forward, 0.0, discount)
         self.assertAlmostEqual(expected, calculated, 15)
 
-    def testBlackImpliedVol(self):
+    def testBlackImpliedStdDev(self):
         forward = 1.0
         bpvol = 0.25
         tte = 10.0
@@ -56,6 +58,24 @@ class TestBlackFormula(unittest.TestCase):
             putPrem = blackFormula(OptionType.Put, strike, forward, stdDev, discount)
             impliedStdDev = blackFormulaImpliedStdDev(OptionType.Put, strike, forward, putPrem, discount)
             self.assertAlmostEqual(impliedStdDev, stdDev, 10)
+
+    def testBlackImpliedVol(self):
+        forward = 1.0
+        bpvol = 0.25
+        tte = 10.0
+        riskFree = 0.05
+
+        dList = [-3.0, -2.0, -1.0, -0.5, 0.0, 0.5, 1.0, 2.0, 3.0]
+
+        for d in dList:
+            strike = forward * math.exp(d * bpvol * math.sqrt(tte))
+            callPrem = blackFormula2(OptionType.Call, strike, forward, tte, bpvol, riskFree)
+            impliedVol = blackFormulaImpliedVol(OptionType.Call, strike, forward, tte, callPrem, riskFree)
+            self.assertAlmostEqual(impliedVol, bpvol, 10)
+
+            putPrem = blackFormula2(OptionType.Put, strike, forward, tte, bpvol, riskFree)
+            impliedVol = blackFormulaImpliedVol(OptionType.Put, strike, forward, tte, putPrem, riskFree)
+            self.assertAlmostEqual(impliedVol, bpvol, 10)
 
     def testBachelierImpliedVol(self):
         forward = 1.0

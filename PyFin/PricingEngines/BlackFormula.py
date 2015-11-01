@@ -52,6 +52,28 @@ def blackFormula(optionType,
     return discount * optionType * (forward * nd1 - strike * nd2)
 
 
+def blackFormula2(optionType,
+                  strike,
+                  forward,
+                  tte,
+                  vol,
+                  riskFree=0.0,
+                  displacement=0.0):
+    pyFinAssert(tte >= 0.0, ValueError, "time to maturity ({0:f})) must be non negative".format(tte))
+
+    if tte == 0.0:
+        return max((forward - strike) * optionType, 0.0)
+
+    discount = math.exp(-riskFree * tte)
+    stdDev = math.sqrt(tte) * vol
+    return blackFormula(optionType,
+                        strike,
+                        forward,
+                        stdDev,
+                        discount,
+                        displacement)
+
+
 def _blackFormulaImpliedStdDevApproximation(optionType,
                                             strike,
                                             forward,
@@ -114,6 +136,24 @@ def blackFormulaImpliedStdDev(optionType,
                                                       displacement)
     pyFinAssert(stdAppr >= 0.0, ValueError, "stdDev ({0:f})) must be non-negative".format(stdAppr))
     return newton(func, stdAppr, tol=1e-10)
+
+
+def blackFormulaImpliedVol(optionType,
+                           strike,
+                           forward,
+                           tte,
+                           blackPrice,
+                           riskFree=0.0,
+                           displacement=0.0):
+    pyFinAssert(tte > 0.0, ValueError, "time to maturity ({0:f})) must be positive".format(tte))
+    discount = math.exp(-riskFree * tte)
+    stdDev = blackFormulaImpliedStdDev(optionType,
+                                       strike,
+                                       forward,
+                                       blackPrice,
+                                       discount,
+                                       displacement)
+    return stdDev / math.sqrt(tte)
 
 
 def bachelierFormula(optionType,

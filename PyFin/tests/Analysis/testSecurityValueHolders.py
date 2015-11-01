@@ -218,11 +218,11 @@ class TestSecurityValueHolders(unittest.TestCase):
         test.push({'aapl': {'close': 12.0}, 'ibm': {'close': 10.0}, 'goog': {'close': 13.0}})
 
         # single named value holder
-        test1 = test['IBM']
+        test1 = test['ibm']
         self.assertAlmostEqual(test1, 12.5, 15)
 
         # multi-valued named value holder
-        test2 = test['IBM', 'GOOG']
+        test2 = test['ibm', 'goog']
         expected = SecuritiesValues({'ibm': 12.5, 'goog':15.0})
         for s in test2.index:
             self.assertAlmostEqual(test2[s], expected[s])

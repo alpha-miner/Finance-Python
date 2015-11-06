@@ -20,13 +20,6 @@ from distutils import sysconfig
 packagePath = sysconfig.get_python_lib()
 
 sys.path.append(os.path.abspath('sphinxext'))
-sys.path.append(os.path.join(packagePath, 'CAL/Enum'))
-sys.path.append(os.path.join(packagePath, 'CAL'))
-sys.path.append(os.path.join(packagePath, 'CAL/DateUtilities'))
-sys.path.append(os.path.join(packagePath, 'CAL/Instruments'))
-sys.path.append(os.path.join(packagePath, 'CAL/OptionUtilities'))
-sys.path.append(os.path.join(packagePath, 'CAL/BondUtilities'))
-sys.path.append(os.path.join(packagePath, 'CAL/DataAPI'))
 
 extensions = ['matplotlib.sphinxext.mathmpl',
               'matplotlib.sphinxext.only_directives',

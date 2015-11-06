@@ -101,7 +101,7 @@ class SecurityValueHolder(object):
     def __getitem__(self, item):
         try:
             return self.holders[item].value
-        except KeyError:
+        except (TypeError, KeyError) as _:
 
             if isinstance(item, tuple):
                 symbolList = set(i.lower() for i in item)

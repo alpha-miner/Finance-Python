@@ -30,7 +30,7 @@ install:
   - conda create -q -n test-environment python
   - source activate test-environment
   - if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then
-      conda install enum34
+      conda install enum34;
     fi
   - conda install coverage
   - conda install numpy

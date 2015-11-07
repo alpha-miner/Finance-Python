@@ -61,7 +61,7 @@ class Accumulator(object):
 
     @abstractmethod
     def result(self):
-        raise NotImplementedError("result method is not implemented for Accumulator class")
+        raise NotImplementedError("result method is not implemented for Accumulator interface class")
 
     @property
     def value(self):

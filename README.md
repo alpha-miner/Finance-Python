@@ -18,7 +18,6 @@ enum34 (for python2 only)
 numpy
 pandas
 scipy
-setuptools
 ~~~
 
 ## 安装

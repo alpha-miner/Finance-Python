@@ -12,7 +12,14 @@
 ## 依赖
 -------------
 
-见requirements目录
+~~~
+coverage ( for test only)
+enum34 (for python2 only)
+numpy
+pandas
+scipy
+setuptools
+~~~
 
 ## 安装
 -------------
@@ -22,25 +29,11 @@
 ~~~
 git clone https://github.com/ChinaQuants/Finance-Python.git (如果你是从github获取)
 cd finance-Python
-~~~
-
-根据使用的python版本不同，例如Python2:
-
-~~~
-conda install --file requirements/win_py27.txt
-python setpy.py install
-~~~
-
-对于python3：
-
-~~~
-conda install --file requirements/win_py34.txt
 python setpy.py install
 ~~~
 
 安装之后，可以直先接运行测试：
 ~~~
-conda install -r requirements/test.txt
 python setup.py test
 ~~~
 

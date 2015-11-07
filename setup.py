@@ -1,17 +1,16 @@
 # -*- coding: utf-8 -*-
 
-from setuptools import setup
+from distutils.core import setup
 from distutils.cmd import Command
 from distutils import sysconfig
 import os
 import sys
 import subprocess
 import glob
-from PyFin import __version__
 
 PACKAGE = "PyFin"
 NAME = "Finance-Python"
-VERSION = __version__
+VERSION = "0.3.0"
 DESCRIPTION = "PyFin " + VERSION
 AUTHOR = "cheng li"
 AUTHOR_EMAIL = "wegamekinglc@hotmail.com"
@@ -28,16 +27,6 @@ else:
 
 files = glob.glob("PyFin/tests/Math/Accumulators/data/*.csv")
 datafiles = [(os.path.join(packagePath, "PyFin/tests/Math/Accumulators/data"), files)]
-
-install_reqs = [
-    'coverage>=4.0',
-    'enum34>=1.0.4',
-    'numpy>=1.10.1',
-    'pandas>=0.17.0',
-    'python-dateutil>=2.4.2',
-    'pytz>=2015.6',
-    'scipy>=0.16.0',
-    'setuptools>=18.4']
 
 
 def git_version():
@@ -140,7 +129,6 @@ setup(
               'PyFin.tests.PricingEngines'],
     py_modules=['PyFin.__init__', 'PyFin.tests.testSuite'],
     data_files=datafiles,
-    install_requires=install_reqs,
     classifiers=[],
     cmdclass={"test": test,
               "version_build": version_build},

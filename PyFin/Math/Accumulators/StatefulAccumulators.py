@@ -7,6 +7,7 @@ Created on 2015-7-16
 
 import math
 import bisect
+from collections import deque
 import numpy as np
 from copy import deepcopy
 from PyFin.Math.Accumulators.IAccumulators import Accumulator
@@ -29,7 +30,7 @@ class StatefulValueHolder(Accumulator):
         self._returnSize = 1
         self._window = window
         self._containerSize = window
-        self._con = []
+        self._con = deque()
         self._isFull = 0
         self._start = 0
 
@@ -43,22 +44,18 @@ class StatefulValueHolder(Accumulator):
 
     def _dumpOneValue(self, value):
 
-        if self.isFull:
-            # use list as circular queue
-            popout = self._con[self._start]
-            self._con[self._start] = value
-            self._start = (self._start + 1) % self._containerSize
+        if self._isFull:
+            self._con.append(value)
+            popout = self._con.popleft()
         else:
             try:
                 popout = np.array([np.nan] * len(value))
             except TypeError:
                 popout = np.nan
 
-            if len(self._con) + 1 == self._containerSize:
-                self._con.append(value)
+            self._con.append(value)
+            if len(self._con) == self._containerSize:
                 self._isFull = 1
-            else:
-                self._con.append(value)
         return popout
 
 

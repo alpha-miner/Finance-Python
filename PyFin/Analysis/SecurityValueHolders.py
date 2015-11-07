@@ -100,14 +100,14 @@ class SecurityValueHolder(object):
 
     def __getitem__(self, item):
         try:
-            return self.holders[item].value
+            return self.holders[item].result()
         except (TypeError, KeyError) as _:
 
             if isinstance(item, tuple):
                 symbolList = set(i.lower() for i in item)
                 pyFinAssert(len(symbolList) == len(item), ValueError, "security name can't be duplicated")
                 res = SecuritiesValues(
-                    {s: self.holders[s].value for s in symbolList}
+                    {s: self.holders[s].result() for s in symbolList}
                 )
                 return res
             elif isinstance(item, SecurityValueHolder):
@@ -200,7 +200,7 @@ class FilteredSecurityValueHolder(SecurityValueHolder):
     def __getitem__(self, item):
         try:
             if self._filter[item]:
-                return self.holders[item].value
+                return self.holders[item].result()
             else:
                 return np.nan
         except KeyError:
@@ -209,7 +209,7 @@ class FilteredSecurityValueHolder(SecurityValueHolder):
                 symbolList = set(i.lower() for i in item).intersection(set(filter_flags.index))  # to be corrected
                 pyFinAssert(len(symbolList) == len(item), ValueError, "security name can't be duplicated")
                 res = SecuritiesValues(
-                    {s: self.holders[s].value for s in symbolList}
+                    {s: self.holders[s].result() for s in symbolList}
                 )
                 return res
             elif isinstance(item, SecurityValueHolder):

@@ -50,7 +50,7 @@ class Accumulator(object):
         if not self._isValueHolderContained:
             try:
                 return data[self._dependency]
-            except Exception:
+            except (TypeError, KeyError) as _:
                 try:
                     return tuple(data[p] for p in self._dependency)
                 except KeyError:

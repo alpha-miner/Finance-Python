@@ -32,7 +32,6 @@ class StatefulValueHolder(Accumulator):
         self._containerSize = window
         self._con = deque()
         self._isFull = 0
-        self._start = 0
 
     @property
     def isFull(self):
@@ -92,7 +91,7 @@ class SortedValueHolder(SingleValuedValueHolder):
         value = super(SortedValueHolder, self).push(data)
         if value is None:
             return
-        if self.isFull:
+        if self._isFull:
             popout = self._dumpOneValue(value)
             delPos = bisect.bisect_left(self._sortedArray, popout)
             del self._sortedArray[delPos]
@@ -342,13 +341,8 @@ class MovingHistoricalWindow(StatefulValueHolder):
         length = self.size
         if item >= length:
             raise ValueError("index {0} is out of the bound of the historical current length {1}".format(item, length))
-        if self._start:
-            recentPoint = self._start - 1
-        else:
-            recentPoint = self._start + length - 1
 
-        offsetPoint = (recentPoint - item + length) % length
-        return self._con[offsetPoint]
+        return self._con[length - 1 - item]
 
     def result(self):
         return [self.__getitem__(i) for i in range(self.size)]

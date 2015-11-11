@@ -1,16 +1,17 @@
 # -*- coding: utf-8 -*-
 
-from distutils.core import setup
+from setuptools import setup
 from distutils.cmd import Command
 from distutils import sysconfig
 import os
 import sys
+import io
 import subprocess
 import glob
 
 PACKAGE = "PyFin"
 NAME = "Finance-Python"
-VERSION = "0.3.0"
+VERSION = "0.3.11"
 DESCRIPTION = "PyFin " + VERSION
 AUTHOR = "cheng li"
 AUTHOR_EMAIL = "wegamekinglc@hotmail.com"
@@ -92,7 +93,10 @@ class version_build(Command):
         file_handle.writelines(newFiles)
         file_handle.close()
 
-
+if sys.version_info > (3, 0, 0):
+    requirements = "requirements/py3.txt"
+else:
+    requirements = "requirements/py2.txt"
 
 setup(
     name=NAME,
@@ -128,6 +132,7 @@ setup(
               'PyFin.tests.Analysis.TechnicalAnalysis',
               'PyFin.tests.PricingEngines'],
     py_modules=['PyFin.__init__', 'PyFin.tests.testSuite'],
+    install_requires=io.open(requirements, encoding='utf8').read(),
     data_files=datafiles,
     classifiers=[],
     cmdclass={"test": test,

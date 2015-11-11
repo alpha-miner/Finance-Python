@@ -1,0 +1,4 @@
+coverage>=4.0
+numpy>=1.10.1
+pandas>=0.17.0
+scipy>=0.16.0

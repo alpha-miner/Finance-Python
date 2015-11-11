@@ -1,0 +1,5 @@
+coverage>=4.0
+enum34>=1.0.4
+numpy>=1.10.1
+pandas>=0.17.0
+scipy>=0.16.0

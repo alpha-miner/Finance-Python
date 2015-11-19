@@ -7,8 +7,10 @@ Created on 2015-8-17
 
 import time
 from PyFin.Utilities.Asserts import pyFinAssert
+from PyFin.Utilities.Asserts import isClose
 
-__all__ = ['pyFinAssert']
+__all__ = ['pyFinAssert',
+           'isClose']
 
 
 def print_timing(func):

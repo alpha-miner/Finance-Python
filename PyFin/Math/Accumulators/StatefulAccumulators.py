@@ -12,6 +12,7 @@ import numpy as np
 from copy import deepcopy
 from PyFin.Math.Accumulators.IAccumulators import Accumulator
 from PyFin.Utilities import pyFinAssert
+from PyFin.Utilities import isClose
 
 
 def _checkParameterList(dependency):
@@ -388,8 +389,11 @@ class MovingCorrelation(StatefulValueHolder):
             nominator = n * self._runningSumCrossSquare - self._runningSumLeft * self._runningSumRight
             denominator = (n * self._runningSumSquareLeft - self._runningSumLeft * self._runningSumLeft) \
                           * (n * self._runningSumSquareRight - self._runningSumRight * self._runningSumRight)
-            denominator = math.sqrt(denominator)
-            return nominator / denominator
+            if not isClose(denominator, 0.):
+                denominator = math.sqrt(denominator)
+                return nominator / denominator
+            else:
+                return 0.0
         else:
             raise ZeroDivisionError("Container has less than 2 samples")
 

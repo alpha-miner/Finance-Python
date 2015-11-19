@@ -14,6 +14,7 @@ from PyFin.Math.Accumulators.StatefulAccumulators import MovingVariance
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingNegativeVariance
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingCorrelation
 from PyFin.Math.Accumulators.StatefulAccumulators import SingleValuedValueHolder
+from PyFin.Utilities import isClose
 
 
 class MovingLogReturn(SingleValuedValueHolder):
@@ -51,7 +52,11 @@ class MovingSharp(StatefulValueHolder):
         self._var.push(data)
 
     def result(self):
-        return self._mean.result() / math.sqrt(self._var.result())
+        tmp = self._var.result()
+        if not isClose(tmp, 0.):
+            return self._mean.result() / math.sqrt(self._var.result())
+        else:
+            return np.nan
 
 
 class MovingSortino(StatefulValueHolder):
@@ -100,9 +105,21 @@ class MovingAlphaBeta(StatefulValueHolder):
 
     def result(self):
         corr = self._correlationHolder.result()
-        pStd = math.sqrt(self._pReturnVar.result())
-        mStd = math.sqrt(self._mReturnVar.result())
-        beta = corr * pStd / mStd
+        tmp = self._pReturnVar.result()
+        if not isClose(tmp, 0.):
+            pStd = math.sqrt(tmp)
+        else:
+            pStd = 0.
+        tmp = self._mReturnVar.result()
+        if not isClose(tmp, 0.):
+            mStd = math.sqrt(tmp)
+        else:
+            mStd = 0.
+
+        if not isClose(tmp, 0.):
+            beta = corr * pStd / mStd
+        else:
+            beta = 0.
         alpha = self._pReturnMean.result() - beta * self._mReturnMean.result()
         return alpha, beta
 

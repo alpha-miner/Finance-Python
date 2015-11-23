@@ -21,9 +21,9 @@ class Calendar(object):
             try:
                 self._impl = _holDict[holCenter]()
             except KeyError:
-                raise ValueError("{0} is not a valid description of a holiday center")
+                raise ValueError("{0} is not a valid description of a holiday center".format(holCenter))
         else:
-            raise ValueError("{0} is not a valid description of a holiday center")
+            raise ValueError("{0} is not a valid description of a holiday center".format(holCenter))
 
     def isBizDay(self, d):
         return self._impl.isBizDay(d)

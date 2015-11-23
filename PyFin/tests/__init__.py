@@ -5,7 +5,7 @@ Created on 2015-7-13
 @author: cheng.li
 """
 
-from PyFin.tests import API
+from PyFin.tests import api
 from PyFin.tests import DateUtilities
 from PyFin.tests import Env
 from PyFin.tests import Math

@@ -5,7 +5,7 @@ Created on 2015-7-9
 @author: cheng.li
 """
 
-import PyFin.API as API
+import PyFin.api as api
 import PyFin.DateUtilities as DateUtilities
 import PyFin.Enums as Enums
 import PyFin.Env as Env
@@ -15,7 +15,7 @@ import PyFin.Analysis as Analysis
 import PyFin.Utilities as Utilities
 
 __all__ = ['__version__',
-           'API',
+           'api',
            'DateUtilities',
            'Enums', 'Env',
            'Math',
@@ -23,4 +23,4 @@ __all__ = ['__version__',
            'Analysis',
            'Utilities']
 
-__version__ = "0.3.11"
+__version__ = "0.3.13"

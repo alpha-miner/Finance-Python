@@ -11,7 +11,7 @@ import glob
 
 PACKAGE = "PyFin"
 NAME = "Finance-Python"
-VERSION = "0.3.11"
+VERSION = "0.3.13"
 DESCRIPTION = "PyFin " + VERSION
 AUTHOR = "cheng li"
 AUTHOR_EMAIL = "wegamekinglc@hotmail.com"
@@ -105,7 +105,7 @@ setup(
     author=AUTHOR,
     author_email=AUTHOR_EMAIL,
     url=URL,
-    packages=['PyFin.API',
+    packages=['PyFin.api',
               'PyFin.DateUtilities',
               'PyFin.Enums',
               'PyFin.Env',
@@ -120,7 +120,7 @@ setup(
               'PyFin.Analysis.TechnicalAnalysis',
               'PyFin.Utilities',
               'PyFin.tests',
-              'PyFin.tests.API',
+              'PyFin.tests.api',
               'PyFin.tests.DateUtilities',
               'PyFin.tests.Env',
               'PyFin.tests.Math',

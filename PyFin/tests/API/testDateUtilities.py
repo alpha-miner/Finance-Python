@@ -10,13 +10,13 @@ import datetime as dt
 from PyFin.DateUtilities.Date import Date
 from PyFin.DateUtilities.Calendar import Calendar
 from PyFin.Enums.BizDayConventions import BizDayConventions
-from PyFin.API.DateUtilities import datesList
-from PyFin.API.DateUtilities import isBizDay
-from PyFin.API.DateUtilities import bizDatesList
-from PyFin.API.DateUtilities import holDatesList
-from PyFin.API.DateUtilities import advanceDate
-from PyFin.API.DateUtilities import advanceDateByCalendar
-from PyFin.API.DateUtilities import adjustDateByCalendar
+from PyFin.api.DateUtilities import datesList
+from PyFin.api.DateUtilities import isBizDay
+from PyFin.api.DateUtilities import bizDatesList
+from PyFin.api.DateUtilities import holDatesList
+from PyFin.api.DateUtilities import advanceDate
+from PyFin.api.DateUtilities import advanceDateByCalendar
+from PyFin.api.DateUtilities import adjustDateByCalendar
 
 
 class TestDateUtilities(unittest.TestCase):

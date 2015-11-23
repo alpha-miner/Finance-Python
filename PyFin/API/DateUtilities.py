@@ -56,3 +56,8 @@ def advanceDateByCalendar(holidayCenter, referenceDate, period, convention=BizDa
     refer = Date.fromDateTime(referenceDate)
     return cal.advanceDate(refer, period, convention).toDateTime()
 
+
+def nthWeekDay(nth, dayOfWeek, month, year):
+    date = Date.nthWeekday(nth, dayOfWeek, month, year)
+    return date.toDateTime()
+

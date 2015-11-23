@@ -13,7 +13,7 @@ thisFilePath = os.path.abspath(__file__)
 sys.path.append(os.path.sep.join(thisFilePath.split(os.path.sep)[:-3]))
 
 import unittest
-import PyFin.tests.API as API
+import PyFin.tests.api as api
 import PyFin.tests.Analysis as Analysis
 import PyFin.tests.DateUtilities as DateUtilities
 import PyFin.tests.Env as Env
@@ -25,7 +25,7 @@ def test():
     print('Python ' + sys.version)
     suite = unittest.TestSuite()
 
-    tests = unittest.TestLoader().loadTestsFromTestCase(API.TestDateUtilities)
+    tests = unittest.TestLoader().loadTestsFromTestCase(api.TestDateUtilities)
     suite.addTests(tests)
     tests = unittest.TestLoader().loadTestsFromTestCase(Analysis.TestDataProviders)
     suite.addTests(tests)

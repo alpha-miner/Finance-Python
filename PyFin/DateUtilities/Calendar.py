@@ -135,7 +135,7 @@ class Calendar(object):
 
     def holDatesList(self, fromDate, toDate, includeWeekEnds=True):
         pyFinAssert(fromDate <= toDate, ValueError, "from date ({0} must be earlier than to date {1}"
-                 .format(fromDate, toDate))
+                   .format(fromDate, toDate))
         result = []
         d = fromDate
         while d <= toDate:

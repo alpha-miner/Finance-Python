@@ -18,6 +18,22 @@ class Date(object):
         # do the input validation
         if serialNumber is not None and year is None and month is None and day is None:
             self.__serialNumber__ = serialNumber
+
+            y = (int(self.__serialNumber__ / 365)) + 1900
+            if self.__serialNumber__ <= _YearOffset[y - 1900]:
+                self._year = y - 1
+            else:
+                self._year = y
+
+            d = self.__serialNumber__ - _YearOffset[self._year - 1900]
+            m = int(d / 30) + 1
+            leap = self.isLeap(self._year)
+            while d <= self._monthOffset(m, leap):
+                m -= 1
+            self._month = m
+
+            self._day = d - self._monthOffset(self._month, leap)
+
             return
         elif serialNumber is not None and (year is not None or month is not None or day is not None):
             raise ValueError("When serial number is offered, no year or month or day number should be entered")
@@ -35,26 +51,21 @@ class Date(object):
                  .format(day, length))
 
         self.__serialNumber__ = day + offset + _YearOffset[year - 1900]
+        self._day = day
+        self._month = month
+        self._year = year
 
     def dayOfMonth(self):
-        return self.dayOfYear() - self._monthOffset(self.month(), self.isLeap(self.year()))
+        return self._day
 
     def dayOfYear(self):
         return self.__serialNumber__ - _YearOffset[self.year() - 1900]
 
     def year(self):
-        y = (int(self.__serialNumber__ / 365)) + 1900
-        if self.__serialNumber__ <= _YearOffset[y - 1900]:
-            return y - 1
-        return y
+        return self._year
 
     def month(self):
-        d = self.dayOfYear()
-        m = int(d / 30) + 1
-        leap = self.isLeap(self.year())
-        while d <= self._monthOffset(m, leap):
-            m -= 1
-        return m
+        return self._month
 
     def weekday(self):
         w = self.__serialNumber__ % 7

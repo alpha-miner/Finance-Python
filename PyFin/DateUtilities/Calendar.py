@@ -135,7 +135,7 @@ class Calendar(object):
 
     def holDatesList(self, fromDate, toDate, includeWeekEnds=True):
         pyFinAssert(fromDate <= toDate, ValueError, "from date ({0} must be earlier than to date {1}"
-                   .format(fromDate, toDate))
+                    .format(fromDate, toDate))
         result = []
         d = fromDate
         while d <= toDate:
@@ -146,7 +146,7 @@ class Calendar(object):
 
     def bizDatesList(self, fromDate, toDate):
         pyFinAssert(fromDate <= toDate, ValueError, "from date ({0} must be earlier than to date {1}"
-                 .format(fromDate, toDate))
+                    .format(fromDate, toDate))
         result = []
         d = fromDate
         while d <= toDate:
@@ -160,82 +160,217 @@ class Calendar(object):
 
 
 class ChinaSseImpl(object):
+    _holDays = {Date(2005, 1, 3),
+                Date(2005, 2, 7),
+                Date(2005, 2, 8),
+                Date(2005, 2, 9),
+                Date(2005, 2, 10),
+                Date(2005, 2, 11),
+                Date(2005, 2, 14),
+                Date(2005, 2, 15),
+                Date(2005, 4, 4),
+                Date(2005, 5, 2),
+                Date(2005, 5, 3),
+                Date(2005, 5, 4),
+                Date(2005, 5, 5),
+                Date(2005, 5, 6),
+                Date(2005, 6, 9),
+                Date(2005, 9, 15),
+                Date(2005, 10, 3),
+                Date(2005, 10, 4),
+                Date(2005, 10, 5),
+                Date(2005, 10, 6),
+                Date(2005, 10, 7),
+                Date(2006, 1, 2),
+                Date(2006, 1, 3),
+                Date(2006, 1, 26),
+                Date(2006, 1, 27),
+                Date(2006, 1, 30),
+                Date(2006, 1, 31),
+                Date(2006, 2, 1),
+                Date(2006, 2, 2),
+                Date(2006, 2, 3),
+                Date(2006, 4, 4),
+                Date(2006, 5, 1),
+                Date(2006, 5, 2),
+                Date(2006, 5, 3),
+                Date(2006, 5, 4),
+                Date(2006, 5, 5),
+                Date(2006, 6, 9),
+                Date(2006, 9, 15),
+                Date(2006, 10, 2),
+                Date(2006, 10, 3),
+                Date(2006, 10, 4),
+                Date(2006, 10, 5),
+                Date(2006, 10, 6),
+                Date(2007, 1, 1),
+                Date(2007, 1, 2),
+                Date(2007, 1, 3),
+                Date(2007, 2, 19),
+                Date(2007, 2, 20),
+                Date(2007, 2, 21),
+                Date(2007, 2, 22),
+                Date(2007, 2, 23),
+                Date(2007, 4, 4),
+                Date(2007, 5, 1),
+                Date(2007, 5, 2),
+                Date(2007, 5, 3),
+                Date(2007, 5, 4),
+                Date(2007, 5, 7),
+                Date(2007, 10, 1),
+                Date(2007, 10, 2),
+                Date(2007, 10, 3),
+                Date(2007, 10, 4),
+                Date(2007, 10, 5),
+                Date(2007, 12, 31),
+                Date(2008, 1, 1),
+                Date(2008, 2, 6),
+                Date(2008, 2, 7),
+                Date(2008, 2, 8),
+                Date(2008, 2, 11),
+                Date(2008, 2, 12),
+                Date(2008, 4, 4),
+                Date(2008, 5, 1),
+                Date(2008, 5, 2),
+                Date(2008, 6, 9),
+                Date(2008, 9, 15),
+                Date(2008, 9, 29),
+                Date(2008, 9, 30),
+                Date(2008, 10, 1),
+                Date(2008, 10, 2),
+                Date(2008, 10, 3),
+                Date(2009, 1, 1),
+                Date(2009, 1, 2),
+                Date(2009, 1, 26),
+                Date(2009, 1, 27),
+                Date(2009, 1, 28),
+                Date(2009, 1, 29),
+                Date(2009, 1, 30),
+                Date(2009, 4, 6),
+                Date(2009, 5, 1),
+                Date(2009, 5, 28),
+                Date(2009, 5, 29),
+                Date(2009, 10, 1),
+                Date(2009, 10, 2),
+                Date(2009, 10, 5),
+                Date(2009, 10, 6),
+                Date(2009, 10, 7),
+                Date(2009, 10, 8),
+                Date(2010, 1, 1),
+                Date(2010, 2, 15),
+                Date(2010, 2, 16),
+                Date(2010, 2, 17),
+                Date(2010, 2, 18),
+                Date(2010, 2, 19),
+                Date(2010, 4, 5),
+                Date(2010, 5, 3),
+                Date(2010, 6, 14),
+                Date(2010, 6, 15),
+                Date(2010, 6, 16),
+                Date(2010, 9, 22),
+                Date(2010, 9, 23),
+                Date(2010, 9, 24),
+                Date(2010, 10, 1),
+                Date(2010, 10, 4),
+                Date(2010, 10, 5),
+                Date(2010, 10, 6),
+                Date(2010, 10, 7),
+                Date(2011, 1, 3),
+                Date(2011, 2, 2),
+                Date(2011, 2, 3),
+                Date(2011, 2, 4),
+                Date(2011, 2, 7),
+                Date(2011, 2, 8),
+                Date(2011, 4, 4),
+                Date(2011, 4, 5),
+                Date(2011, 5, 2),
+                Date(2011, 6, 6),
+                Date(2011, 9, 12),
+                Date(2011, 10, 3),
+                Date(2011, 10, 4),
+                Date(2011, 10, 5),
+                Date(2011, 10, 6),
+                Date(2011, 10, 7),
+                Date(2012, 1, 2),
+                Date(2012, 1, 3),                Date(2012, 1, 23),
+                Date(2012, 1, 24),
+                Date(2012, 1, 25),
+                Date(2012, 1, 26),
+                Date(2012, 1, 27),
+                Date(2012, 4, 2),
+                Date(2012, 4, 3),
+                Date(2012, 4, 4),
+                Date(2012, 4, 30),
+                Date(2012, 5, 1),
+                Date(2012, 6, 22),
+                Date(2012, 10, 1),
+                Date(2012, 10, 2),
+                Date(2012, 10, 3),
+                Date(2012, 10, 4),
+                Date(2012, 10, 5),
+                Date(2013, 1, 1),
+                Date(2013, 1, 2),
+                Date(2013, 1, 3),
+                Date(2013, 2, 11),
+                Date(2013, 2, 12),
+                Date(2013, 2, 13),
+                Date(2013, 2, 14),
+                Date(2013, 2, 15),
+                Date(2013, 4, 4),
+                Date(2013, 4, 5),
+                Date(2013, 4, 29),
+                Date(2013, 4, 30),
+                Date(2013, 5, 1),
+                Date(2013, 6, 10),
+                Date(2013, 6, 11),
+                Date(2013, 6, 12),
+                Date(2013, 9, 19),
+                Date(2013, 9, 20),
+                Date(2013, 10, 1),
+                Date(2013, 10, 2),
+                Date(2013, 10, 3),
+                Date(2013, 10, 4),
+                Date(2013, 10, 7),
+                Date(2014, 1, 1),
+                Date(2014, 1, 31),
+                Date(2014, 2, 3),
+                Date(2014, 2, 4),
+                Date(2014, 2, 5),
+                Date(2014, 2, 6),
+                Date(2014, 4, 7),
+                Date(2014, 5, 1),
+                Date(2014, 5, 2),
+                Date(2014, 6, 2),
+                Date(2014, 9, 8),
+                Date(2014, 10, 1),
+                Date(2014, 10, 2),
+                Date(2014, 10, 3),
+                Date(2014, 10, 6),
+                Date(2014, 10, 7),
+                Date(2015, 1, 1),
+                Date(2015, 1, 2),
+                Date(2015, 2, 18),
+                Date(2015, 2, 19),
+                Date(2015, 2, 20),
+                Date(2015, 2, 23),
+                Date(2015, 2, 24),
+                Date(2015, 4, 6),
+                Date(2015, 5, 1),
+                Date(2015, 6, 22),
+                Date(2015, 9, 3),
+                Date(2015, 9, 4),
+                Date(2015, 10, 1),
+                Date(2015, 10, 2),
+                Date(2015, 10, 5),
+                Date(2015, 10, 6),
+                Date(2015, 10, 7)}
+
     def __init__(self):
         pass
 
     def isBizDay(self, date):
         w = date.weekday()
-        d = date.dayOfMonth()
-        m = date.month()
-        y = date.year()
-
-        if self.isWeekEnd(w) \
-                or (d == 1 and m == Months.January) \
-                or (y == 2005 and d == 3 and m == Months.January) \
-                or (y == 2006 and (d == 2 or d == 3) and m == Months.January) \
-                or (y == 2007 and d <= 3 and m == Months.January) \
-                or (y == 2007 and d == 31 and m == Months.December) \
-                or (y == 2009 and d == 2 and m == Months.January) \
-                or (y == 2011 and d == 3 and m == Months.January) \
-                or (y == 2012 and (d == 2 or d == 3) and m == Months.January) \
-                or (y == 2013 and d <= 3 and m == Months.January) \
-                or (y == 2014 and d == 1 and m == Months.January) \
-                or (y == 2015 and d <= 3 and m == Months.January) \
-                or (y == 2004 and 19 <= d <= 28 and m == Months.January) \
-                or (y == 2005 and 7 <= d <= 15 and m == Months.February) \
-                or (y == 2006 and ((d >= 26 and m == Months.January) or (d <= 3 and m == Months.February))) \
-                or (y == 2007 and 17 <= d <= 25 and m == Months.February) \
-                or (y == 2008 and 6 <= d <= 12 and m == Months.February) \
-                or (y == 2009 and 26 <= d <= 30 and m == Months.January) \
-                or (y == 2010 and 15 <= d <= 19 and m == Months.February) \
-                or (y == 2011 and 2 <= d <= 8 and m == Months.February) \
-                or (y == 2012 and 23 <= d <= 28 and m == Months.January) \
-                or (y == 2013 and 11 <= d <= 15 and m == Months.February) \
-                or (y == 2014 and d >= 31 and m == Months.January) \
-                or (y == 2014 and d <= 6 and m == Months.February) \
-                or (y == 2015 and 18 <= d <= 24 and m == Months.February) \
-                or (y <= 2008 and d == 4 and m == Months.April) \
-                or (y == 2009 and d == 6 and m == Months.April) \
-                or (y == 2010 and d == 5 and m == Months.April) \
-                or (y == 2011 and 3 <= d <= 5 and m == Months.April) \
-                or (y == 2012 and 2 <= d <= 4 and m == Months.April) \
-                or (y == 2013 and 4 <= d <= 5 and m == Months.April) \
-                or (y == 2014 and d == 7 and m == Months.April) \
-                or (y == 2015 and 5 <= d <= 6 and m == Months.April) \
-                or (y <= 2007 and 1 <= d <= 7 and m == Months.May) \
-                or (y == 2008 and 1 <= d <= 2 and m == Months.May) \
-                or (y == 2009 and d == 1 and m == Months.May) \
-                or (y == 2010 and d == 3 and m == Months.May) \
-                or (y == 2011 and d == 2 and m == Months.May) \
-                or (y == 2012 and ((d == 30 and m == Months.April) or (d == 1 and m == Months.May))) \
-                or (y == 2013 and ((d >= 29 and m == Months.April) or (d == 1 and m == Months.May))) \
-                or (y == 2014 and 1 <= d <= 3 and m == Months.May) \
-                or (y == 2015 and d == 1 and m == Months.May) \
-                or (y <= 2008 and d == 9 and m == Months.June) \
-                or (y == 2009 and (d == 28 or d == 29) and m == Months.May) \
-                or (y == 2010 and 14 <= d <= 16 and m == Months.June) \
-                or (y == 2011 and 4 <= d <= 6 and m == Months.June) \
-                or (y == 2012 and 22 <= d <= 24 and m == Months.June) \
-                or (y == 2013 and 10 <= d <= 12 and m == Months.June) \
-                or (y == 2014 and d == 2 and m == Months.June) \
-                or (y == 2015 and d == 22 and m == Months.June) \
-                or (y <= 2008 and d == 15 and m == Months.September) \
-                or (y == 2010 and 22 <= d <= 24 and m == Months.September) \
-                or (y == 2011 and 10 <= d <= 12 and m == Months.September) \
-                or (y == 2012 and d == 30 and m == Months.September) \
-                or (y == 2013 and 19 <= d <= 20 and m == Months.September) \
-                or (y == 2014 and d == 8 and m == Months.September) \
-                or (y == 2015 and d == 27 and m == Months.September) \
-                or (y <= 2007 and 1 <= d <= 7 and m == Months.October) \
-                or (y == 2008 and ((d >= 29 and m == Months.September) or (d <= 3 and m == Months.October))) \
-                or (y == 2009 and 1 <= d <= 8 and m == Months.October) \
-                or (y == 2010 and 1 <= d <= 7 and m == Months.October) \
-                or (y == 2011 and 1 <= d <= 7 and m == Months.October) \
-                or (y == 2012 and 1 <= d <= 7 and m == Months.October) \
-                or (y == 2013 and 1 <= d <= 7 and m == Months.October) \
-                or (y == 2014 and 1 <= d <= 7 and m == Months.October) \
-                or (y == 2015 and 1 <= d <= 7 and m == Months.October) \
-                or (y == 2015 and 3 <= d <= 4 and m == Months.September):
+        if self.isWeekEnd(w) or date in self._holDays:
             return False
         return True
 
@@ -370,6 +505,23 @@ class NullCalendar(object):
             return False
 
 
+class ChinaCFFEXImpl(object):
+    def __init__(self):
+        self._sseImpl = ChinaSseImpl()
+
+    def isBizDay(self, date):
+        return self.isBizDay(date)
+
+    def isWeekEnd(self, weekDay):
+        return self._sseImpl.isWeekEnd(weekDay)
+
+    def __eq__(self, right):
+        if isinstance(right, ChinaCFFEXImpl):
+            return True
+        else:
+            return False
+
+
 class WestenImpl(object):
     EasterMonday = [
         98, 90, 103, 95, 114, 106, 91, 111, 102,  # 1901-1909
@@ -444,6 +596,7 @@ class TargetImpl(WestenImpl):
 
 _holDict = {'china.sse': ChinaSseImpl,
             'china.ib': ChinaIBImpl,
+            'china.cffex': ChinaCFFEXImpl,
             'target': TargetImpl,
             'null': NullCalendar,
             'nullcalendar': NullCalendar}

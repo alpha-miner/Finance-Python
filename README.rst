@@ -13,11 +13,11 @@ finpy
 -------------
 
 ::
-  coverage ( for test only)
-  enum34 (for python2 only)
-  numpy
-  pandas
-  scipy
+  | coverage ( for test only)
+  | enum34 (for python2 only)
+  | numpy
+  | pandas
+  | scipy
 
 安装
 -------------

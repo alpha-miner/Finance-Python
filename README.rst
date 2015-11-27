@@ -12,7 +12,7 @@ finpy
 依赖
 -------------
 
-.. code:block::
+::
   coverage ( for test only)
   enum34 (for python2 only)
   numpy

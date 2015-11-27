@@ -52,7 +52,7 @@ finpy
 
 基本的日期相关函数的实现。
 
-.. |Build Status| image:: https://travis-ci.org/chinaquants/Finance-Python.svg?branch=master
+.. |Build Status| image:: https://travis-ci.org/ChinaQuants/Finance-Python.svg?branch=master
    :target: https://travis-ci.org/ChinaQuants/Finance-Python
 .. |Coverage Status| image:: https://coveralls.io/repos/ChinaQuants/Finance-Python/badge.svg?branch=master&service=github
    :target: https://coveralls.io/r/chinaquants/Finance-Python

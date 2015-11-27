@@ -1,2 +1,3 @@
+include README.*
 include requirements/*.txt
 include PyFin/tests/Math/Accumulators/data/*.csv

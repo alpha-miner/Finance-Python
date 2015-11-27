@@ -12,13 +12,12 @@ finpy
 依赖
 -------------
 
-```
-coverage ( for test only)
-enum34 (for python2 only)
-numpy
-pandas
-scipy
-```
+.. code:block::
+  coverage ( for test only)
+  enum34 (for python2 only)
+  numpy
+  pandas
+  scipy
 
 安装
 -------------

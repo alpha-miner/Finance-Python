@@ -12,29 +12,29 @@ finpy
 依赖
 -------------
 
-~~~
+```
 coverage ( for test only)
 enum34 (for python2 only)
 numpy
 pandas
 scipy
-~~~
+```
 
 安装
 -------------
 
 首先将代码保存至本地：
 
-~~~
+```
 git clone https://github.com/ChinaQuants/Finance-Python.git (如果你是从github获取)
 cd finance-Python
 python setpy.py install
-~~~
+```
 
 安装之后，可以直先接运行测试：
-~~~
+```
 python setup.py test
-~~~
+```
 
 版本历史
 -------------

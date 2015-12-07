@@ -23,7 +23,7 @@ import re
 
 # Functions and classes
 class ApiDocWriter(object):
-    ''' Class for automatic detection and parsing of API docs
+    ''' Class for automatic detection and parsing of api docs
     to Sphinx-parsable reST format'''
 
     # only separating first two levels
@@ -201,7 +201,7 @@ class ApiDocWriter(object):
         Returns
         -------
         S : string
-            Contents of API doc
+            Contents of api doc
         '''
         # get the names of all classes and functions
         functions, classes = self._parse_module(uri)
@@ -369,7 +369,7 @@ class ApiDocWriter(object):
         self.written_modules = written_modules
 
     def write_api_docs(self, outdir):
-        """Generate API reST files.
+        """Generate api reST files.
 
         Parameters
         ----------
@@ -392,7 +392,7 @@ class ApiDocWriter(object):
         self.write_modules_api(modules,outdir)
         
     def write_index(self, outdir, froot='gen', relative_to=None):
-        """Make a reST API index file from written files
+        """Make a reST api index file from written files
 
         Parameters
         ----------

@@ -104,7 +104,7 @@ def setup(app):
     """Setup as a sphinx extension."""
 
     # This is only a lexer, so adding it below to pygments appears sufficient.
-    # But if somebody knows that the right API usage should be to do that via
+    # But if somebody knows that the right api usage should be to do that via
     # sphinx, by all means fix it here.  At least having this setup.py
     # suppresses the sphinx warning we'd get without it.
     pass

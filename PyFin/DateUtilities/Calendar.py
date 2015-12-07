@@ -78,7 +78,7 @@ class Calendar(object):
                 if d1.month() != d.month():
                     return self.adjustDate(d, BizDayConventions.Preceding)
                 if c == BizDayConventions.HalfMonthModifiedFollowing:
-                    if d.dayOfMonth() <= 15 and d1.dayOfMonth() > 15:
+                    if d.dayOfMonth() <= 15 < d1.dayOfMonth():
                         return self.adjustDate(d, BizDayConventions.Preceding)
         elif c == BizDayConventions.Preceding or c == BizDayConventions.ModifiedPreceding:
             while self.isHoliday(d1):
@@ -292,7 +292,8 @@ class ChinaSseImpl(object):
                 Date(2011, 10, 6),
                 Date(2011, 10, 7),
                 Date(2012, 1, 2),
-                Date(2012, 1, 3),                Date(2012, 1, 23),
+                Date(2012, 1, 3),
+                Date(2012, 1, 23),
                 Date(2012, 1, 24),
                 Date(2012, 1, 25),
                 Date(2012, 1, 26),

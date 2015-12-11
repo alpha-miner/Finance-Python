@@ -364,7 +364,24 @@ class ChinaSseImpl(object):
                 Date(2015, 10, 2),
                 Date(2015, 10, 5),
                 Date(2015, 10, 6),
-                Date(2015, 10, 7)}
+                Date(2015, 10, 7),
+                Date(2016, 1, 1),
+                Date(2016, 2, 8),
+                Date(2016, 2, 9),
+                Date(2016, 2, 10),
+                Date(2016, 2, 11),
+                Date(2016, 2, 12),
+                Date(2016, 4, 4),
+                Date(2016, 5, 1),
+                Date(2016, 6, 9),
+                Date(2016, 6, 10),
+                Date(2016, 9, 15),
+                Date(2016, 9, 16),
+                Date(2016, 10, 3),
+                Date(2016, 10, 4),
+                Date(2016, 10, 5),
+                Date(2016, 10, 6),
+                Date(2016, 10, 7)}
 
     def __init__(self):
         pass
@@ -470,7 +487,14 @@ class ChinaIBImpl(object):
         Date.westernStyle(15, Months.February, 2015),
         Date.westernStyle(28, Months.February, 2015),
         Date.westernStyle(6, Months.September, 2015),
-        Date.westernStyle(10, Months.October, 2015)
+        Date.westernStyle(10, Months.October, 2015),
+        # 2016
+        Date.westernStyle(6, Months.February, 2016),
+        Date.westernStyle(14, Months.February, 2016),
+        Date.westernStyle(12, Months.June, 2016),
+        Date.westernStyle(18, Months.September, 2016),
+        Date.westernStyle(8, Months.October, 2016),
+        Date.westernStyle(9, Months.October, 2016),
     }
 
     def __init__(self):
@@ -601,3 +625,4 @@ _holDict = {'china.sse': ChinaSseImpl,
             'target': TargetImpl,
             'null': NullCalendar,
             'nullcalendar': NullCalendar}
+

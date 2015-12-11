@@ -625,4 +625,3 @@ _holDict = {'china.sse': ChinaSseImpl,
             'target': TargetImpl,
             'null': NullCalendar,
             'nullcalendar': NullCalendar}
-

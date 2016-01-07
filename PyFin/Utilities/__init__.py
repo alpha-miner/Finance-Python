@@ -20,3 +20,11 @@ def print_timing(func):
         t2 = time.time()
         return t2 - t1, res
     return wrapper
+
+
+def check_date(date):
+    from PyFin.DateUtilities import Date
+    if isinstance(date, str):
+        return Date.strptime(date, format='%Y-%m-%d')
+    else:
+        return Date.fromDateTime(date)

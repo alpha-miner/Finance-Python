@@ -74,7 +74,10 @@ class Shift(StatefulValueHolder):
         self._popout = super(Shift, self)._dumpOneValue(self._valueHolder.result())
 
     def result(self):
-        return self._popout
+        try:
+            return self._popout
+        except AttributeError:
+            return np.nan
 
 
 class SingleValuedValueHolder(StatefulValueHolder):

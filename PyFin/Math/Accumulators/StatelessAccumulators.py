@@ -6,6 +6,7 @@ Created on 2015-7-25
 """
 
 import math
+import numpy as np
 from PyFin.Math.Accumulators.IAccumulators import Accumulator
 from PyFin.Math.Accumulators.StatefulAccumulators import _checkParameterList
 
@@ -23,7 +24,7 @@ class Latest(StatelessAccumulator):
         super(Latest, self).__init__(dependency)
         _checkParameterList(dependency)
         self._returnSize = 1
-        self._latest = None
+        self._latest = np.nan
 
     def push(self, data):
         value = super(Latest, self).push(data)
@@ -60,14 +61,14 @@ class Minimum(StatelessAccumulator):
     def __init__(self, dependency='x'):
         super(Minimum, self).__init__(dependency)
         _checkParameterList(dependency)
-        self._currentMin = None
+        self._currentMin = np.nan
         self._returnSize = 1
 
     def push(self, data):
         value = super(Minimum, self).push(data)
         if value is None:
             return
-        if self._currentMin is None:
+        if np.isnan(self._currentMin):
             self._currentMin = value
         else:
             if self._currentMin > value:
@@ -108,7 +109,10 @@ class Average(StatelessAccumulator):
         self._currentCount += 1
 
     def result(self):
-        return self._currentSum / self._currentCount
+        try:
+            return self._currentSum / self._currentCount
+        except ZeroDivisionError:
+            return np.nan
 
 
 class Variance(StatelessAccumulator):
@@ -135,10 +139,10 @@ class Variance(StatelessAccumulator):
         if self._isPop:
             return tmp / self._currentCount
         else:
-            if self._currentCount >= 2:
+            try:
                 return tmp / (self._currentCount - 1)
-            else:
-                raise ZeroDivisionError("Container has too few samples: {0:d}".format(self._currentCount))
+            except ZeroDivisionError:
+                return np.nan
 
 
 class Correlation(StatelessAccumulator):
@@ -164,12 +168,12 @@ class Correlation(StatelessAccumulator):
         self._currentCount += 1
 
     def result(self):
-        if self._currentCount >= 2:
+        try:
             n = self._currentCount
             nominator = n * self._runningSumCrossSquare - self._runningSumLeft * self._runningSumRight
             denominator = (n * self._runningSumSquareLeft - self._runningSumLeft * self._runningSumLeft) \
                           * (n * self._runningSumSquareRight - self._runningSumRight * self._runningSumRight)
             denominator = math.sqrt(denominator)
             return nominator / denominator
-        else:
-            raise ZeroDivisionError("Container has less than 2 samples")
+        except ZeroDivisionError:
+                return np.nan

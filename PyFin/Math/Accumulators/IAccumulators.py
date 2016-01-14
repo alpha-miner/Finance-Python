@@ -77,7 +77,10 @@ class Accumulator(object):
 
     @property
     def dependency(self):
-        return self._dependency
+        if isinstance(self._dependency, str) or hasattr(self._dependency, '__iter__'):
+            return self._dependency
+        else:
+            return self._dependency.dependency
 
     def _binary_operator(self, right, operatorHolder):
         if isinstance(right, Accumulator):

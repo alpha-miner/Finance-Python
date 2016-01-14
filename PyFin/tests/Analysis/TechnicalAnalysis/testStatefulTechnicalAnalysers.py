@@ -16,6 +16,9 @@ from PyFin.Analysis.TechnicalAnalysis import SecurityMovingMinimum
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingSum
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingCountedPositive
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingPositiveAverage
+from PyFin.Analysis.TechnicalAnalysis import SecurityMovingPositiveDifferenceAverage
+from PyFin.Analysis.TechnicalAnalysis import SecurityMovingNegativeDifferenceAverage
+from PyFin.Analysis.TechnicalAnalysis import SecurityMovingRSI
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingLogReturn
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingHistoricalWindow
 
@@ -177,6 +180,30 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
 
         with self.assertRaises(ValueError):
             _ = SecurityMovingPositiveAverage(window, ['close', 'open'], ['aapl', 'ibm'])
+
+    def testSecurityMovingRSI(self):
+        window = 10
+        rsi = SecurityMovingRSI(window, ['close'], ['aapl', 'ibm'])
+        pos_avg = SecurityMovingPositiveDifferenceAverage(window, ['close'], ['aapl', 'ibm'])
+        neg_avg = SecurityMovingNegativeDifferenceAverage(window, ['close'], ['aapl', 'ibm'])
+
+        for i in range(len(self.aapl['close'])):
+            data = {'aapl': {'close': self.aapl['close'][i], 'open': self.aapl['open'][i]}}
+            data['ibm'] = {'close': self.ibm['close'][i], 'open': self.ibm['open'][i]}
+            rsi.push(data)
+            pos_avg.push(data)
+            neg_avg.push(data)
+
+            value = rsi.value
+            if i > 0:
+                for name in value.index:
+                    expected = pos_avg.value[name] / (pos_avg.value[name] - neg_avg.value[name]) * 100
+                    calculated = value[name]
+                    self.assertAlmostEqual(expected, calculated, 12, 'at index {0}\n'
+                                                                         'expected:   {1:.12f}\n'
+                                                                         'calculated: {2:.12f}'.format(i,
+                                                                                                       expected,
+                                                                                                       calculated))
 
     def testSecurityMovingLogReturn(self):
         window = 10

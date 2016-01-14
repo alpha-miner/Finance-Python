@@ -11,6 +11,9 @@ from collections import deque
 import numpy as np
 from copy import deepcopy
 from PyFin.Math.Accumulators.IAccumulators import Accumulator
+from PyFin.Math.Accumulators.StatelessAccumulators import Latest
+from PyFin.Math.Accumulators.StatelessAccumulators import Positive
+from PyFin.Math.Accumulators.StatelessAccumulators import Negative
 from PyFin.Utilities import pyFinAssert
 from PyFin.Utilities import isClose
 
@@ -153,7 +156,7 @@ class MovingAverage(SingleValuedValueHolder):
 
     def push(self, data):
         value = super(MovingAverage, self).push(data)
-        if value is None:
+        if value is None or np.isnan(value):
             return
         popout = self._dumpOneValue(value)
         if popout is not np.nan:
@@ -162,7 +165,10 @@ class MovingAverage(SingleValuedValueHolder):
             self._runningSum = self._runningSum + value
 
     def result(self):
-        return self._runningSum / self.size
+        try:
+            return self._runningSum / self.size
+        except ZeroDivisionError:
+            return np.nan
 
 
 class MovingPositiveAverage(SingleValuedValueHolder):
@@ -173,7 +179,7 @@ class MovingPositiveAverage(SingleValuedValueHolder):
 
     def push(self, data):
         value = super(MovingPositiveAverage, self).push(data)
-        if value is None:
+        if value is None or np.isnan(value):
             return
         popout = self._dumpOneValue(value)
         if value > 0.0:
@@ -189,6 +195,51 @@ class MovingPositiveAverage(SingleValuedValueHolder):
             return 0.0
         else:
             return self._runningPositiveSum / self._runningPositiveCount
+
+
+class MovingPositiveDifferenceAverage(SingleValuedValueHolder):
+    def __init__(self, window, dependency='x'):
+        super(MovingPositiveDifferenceAverage, self).__init__(window, dependency)
+        runningPositive = Positive(Latest(dependency) - Shift(Latest(dependency), 1))
+        self._runningAverage = MovingAverage(window, dependency=runningPositive)
+
+    def push(self, data):
+        self._runningAverage.push(data)
+
+    def result(self):
+        return self._runningAverage.result()
+
+
+class MovingNegativeDifferenceAverage(SingleValuedValueHolder):
+    def __init__(self, window, dependency='x'):
+        super(MovingNegativeDifferenceAverage, self).__init__(window, dependency)
+        runningNegative = Negative(Latest(dependency) - Shift(Latest(dependency), 1))
+        self._runningAverage = MovingAverage(window, dependency=runningNegative)
+
+    def push(self, data):
+        self._runningAverage.push(data)
+
+    def result(self):
+        return self._runningAverage.result()
+
+
+class MovingRSI(SingleValuedValueHolder):
+    def __init__(self, window, dependency='x'):
+        super(MovingRSI, self).__init__(window, dependency)
+        self._posDiffAvg = MovingPositiveDifferenceAverage(window, dependency)
+        self._negDiffAvg = MovingNegativeDifferenceAverage(window, dependency)
+
+    def push(self, data):
+        self._posDiffAvg.push(data)
+        self._negDiffAvg.push(data)
+
+    def result(self):
+        nominator = self._posDiffAvg.result()
+        denominator = nominator - self._negDiffAvg.result()
+        if denominator != 0.:
+            return 100. * nominator / denominator
+        else:
+            return 50.
 
 
 class MovingNegativeAverage(SingleValuedValueHolder):

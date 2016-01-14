@@ -16,6 +16,9 @@ from PyFin.Math.Accumulators import MovingMinimum
 from PyFin.Math.Accumulators import MovingAverage
 from PyFin.Math.Accumulators import MovingPositiveAverage
 from PyFin.Math.Accumulators import MovingNegativeAverage
+from PyFin.Math.Accumulators import MovingPositiveDifferenceAverage
+from PyFin.Math.Accumulators import MovingNegativeDifferenceAverage
+from PyFin.Math.Accumulators import MovingRSI
 from PyFin.Math.Accumulators import MovingSum
 from PyFin.Math.Accumulators import MovingCountedPositive
 from PyFin.Math.Accumulators import MovingCountedNegative
@@ -98,6 +101,71 @@ class TestStatefulAccumulators(unittest.TestCase):
                                                                     "positive average calculated: {2:f}".format(i,
                                                                                                                 expected,
                                                                                                                 calculated))
+
+    def testMovingPositiveDifferenceAverage(self):
+        window = 10
+        mv = MovingPositiveDifferenceAverage(window=window, dependency='x')
+
+        last = self.sample[0]
+        diff_list = []
+        for i, value in enumerate(self.sample):
+            mv.push(dict(x=value))
+            diff = value - last
+            if i > 0:
+                diff_list.append(diff)
+            last = value
+            pos_list = np.maximum(diff_list[-window:], 0.)
+
+            expected = 0. if np.isnan(np.mean(pos_list)) else np.mean(pos_list)
+            calculated = mv.result()
+            if i > 0:
+                self.assertAlmostEqual(calculated, expected, 8, "at index {0:d}\n"
+                                                                "Positive average expected:   {1:f}\n"
+                                                                "positive average calculated: {2:f}".format(i,
+                                                                                                            expected,
+                                                                                                            calculated))
+
+    def testMovingNegativeDifferenceAverage(self):
+        window = 10
+        mv = MovingNegativeDifferenceAverage(window=window, dependency='x')
+
+        last = self.sample[0]
+        diff_list = []
+        for i, value in enumerate(self.sample):
+            mv.push(dict(x=value))
+            diff = value - last
+            if i > 0:
+                diff_list.append(diff)
+            last = value
+            neg_list = np.minimum(diff_list[-window:], 0.)
+
+            expected = 0. if np.isnan(np.mean(neg_list)) else np.mean(neg_list)
+            calculated = mv.result()
+            if i > 0:
+                self.assertAlmostEqual(calculated, expected, 8, "at index {0:d}\n"
+                                                                "negative average expected:   {1:f}\n"
+                                                                "negative average calculated: {2:f}".format(i,
+                                                                                                            expected,
+                                                                                                            calculated))
+
+    def testMovingRSI(self):
+        window = 10
+        rsi = MovingRSI(window=window, dependency='x')
+        pos_avg = MovingPositiveDifferenceAverage(window=window, dependency='x')
+        neg_avg = MovingNegativeDifferenceAverage(window=window, dependency='x')
+        for i, value in enumerate(self.sample):
+            rsi.push(dict(x=value))
+            pos_avg.push(dict(x=value))
+            neg_avg.push(dict(x=value))
+
+            calculated = rsi.value
+            expected = pos_avg.value / (pos_avg.value - neg_avg.value) * 100
+            if i > 0:
+                self.assertAlmostEqual(calculated, expected, 8, "at index {0:d}\n"
+                                                                "negative average expected:   {1:f}\n"
+                                                                "negative average calculated: {2:f}".format(i,
+                                                                                                            expected,
+                                                                                                            calculated))
 
     def testMovingNegativeAverager(self):
         dirName = os.path.dirname(os.path.abspath(__file__))

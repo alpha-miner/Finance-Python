@@ -15,6 +15,9 @@ from PyFin.api.DateUtilities import adjustDateByCalendar
 from PyFin.api.DateUtilities import advanceDateByCalendar
 from PyFin.api.DateUtilities import nthWeekDay
 
+from PyFin.api.Analysis import EMA
+from PyFin.api.Analysis import MACD
+from PyFin.api.Analysis import RSI
 from PyFin.api.Analysis import MA
 from PyFin.api.Analysis import MAX
 from PyFin.api.Analysis import MIN
@@ -37,6 +40,9 @@ __all__ = ["datesList",
            "adjustDateByCalendar",
            "advanceDateByCalendar",
            "nthWeekDay",
+           "EMA",
+           "MACD",
+           "RSI",
            "MA",
            "MAX",
            "MIN",

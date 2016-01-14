@@ -17,10 +17,14 @@ from PyFin.Math.Accumulators.IAccumulators import Asin
 from PyFin.Math.Accumulators.IAccumulators import Asinh
 
 from PyFin.Math.Accumulators.StatelessAccumulators import Latest
+from PyFin.Math.Accumulators.StatelessAccumulators import Positive
+from PyFin.Math.Accumulators.StatelessAccumulators import Negative
 from PyFin.Math.Accumulators.StatelessAccumulators import Max
 from PyFin.Math.Accumulators.StatelessAccumulators import Minimum
 from PyFin.Math.Accumulators.StatelessAccumulators import Sum
 from PyFin.Math.Accumulators.StatelessAccumulators import Average
+from PyFin.Math.Accumulators.StatelessAccumulators import XAverage
+from PyFin.Math.Accumulators.StatelessAccumulators import MACD
 from PyFin.Math.Accumulators.StatelessAccumulators import Variance
 from PyFin.Math.Accumulators.StatelessAccumulators import Correlation
 
@@ -28,6 +32,9 @@ from PyFin.Math.Accumulators.StatefulAccumulators import Shift
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingAverage
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingPositiveAverage
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingNegativeAverage
+from PyFin.Math.Accumulators.StatefulAccumulators import MovingPositiveDifferenceAverage
+from PyFin.Math.Accumulators.StatefulAccumulators import MovingNegativeDifferenceAverage
+from PyFin.Math.Accumulators.StatefulAccumulators import MovingRSI
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingSum
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingCountedPositive
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingCountedNegative
@@ -57,17 +64,24 @@ __all__ = ["Exp",
            "Asin",
            "Asinh",
            "Latest",
+           "Positive",
+           "Negative",
            "Max",
            "Minimum",
            "Sum",
            "TruncatedValueHolder",
            "Average",
+           "XAverage",
+           "MACD",
            "Variance",
            "Correlation",
            "Shift",
            "MovingAverage",
            "MovingPositiveAverage",
            "MovingNegativeAverage",
+           "MovingPositiveDifferenceAverage",
+           "MovingNegativeDifferenceAverage",
+           "MovingRSI",
            "MovingSum",
            "MovingCountedPositive",
            "MovingCountedNegative",

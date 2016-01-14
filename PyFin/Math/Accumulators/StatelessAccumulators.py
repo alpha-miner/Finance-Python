@@ -8,7 +8,12 @@ Created on 2015-7-25
 import math
 import numpy as np
 from PyFin.Math.Accumulators.IAccumulators import Accumulator
-from PyFin.Math.Accumulators.StatefulAccumulators import _checkParameterList
+
+
+def _checkParameterList(dependency):
+    if not isinstance(dependency, Accumulator) and len(dependency) > 1 and not isinstance(dependency, str):
+        raise ValueError("This value holder (e.g. Max or Minimum) can't hold more than 2 parameter names ({0})"
+                         " provided".format(dependency))
 
 
 class StatelessAccumulator(Accumulator):
@@ -28,12 +33,58 @@ class Latest(StatelessAccumulator):
 
     def push(self, data):
         value = super(Latest, self).push(data)
-        if value is None:
+        if value is None or np.isnan(value):
             return
         self._latest = value
 
     def result(self):
         return self._latest
+
+
+class Positive(StatelessAccumulator):
+    def __init__(self, dependency='x'):
+        super(Positive, self).__init__(dependency)
+        _checkParameterList(dependency)
+        self._returnSize = 1
+        self._pos = np.nan
+
+    def push(self, data):
+        value = super(Positive, self).push(data)
+        if value is None or np.isnan(value):
+            return
+
+        if value > 0.:
+            self._pos = value
+        elif value <= 0.:
+            self._pos = 0.
+        else:
+            self._pos = np.nan
+
+    def result(self):
+        return self._pos
+
+
+class Negative(StatelessAccumulator):
+    def __init__(self, dependency='x'):
+        super(Negative, self).__init__(dependency)
+        _checkParameterList(dependency)
+        self._returnSize = 1
+        self._neg = np.nan
+
+    def push(self, data):
+        value = super(Negative, self).push(data)
+        if value is None or np.isnan(value):
+            return
+
+        if value < 0.:
+            self._neg = value
+        elif value >= 0.:
+            self._neg = 0.
+        else:
+            self._neg = np.nan
+
+    def result(self):
+        return self._neg
 
 
 class Max(StatelessAccumulator):
@@ -113,6 +164,39 @@ class Average(StatelessAccumulator):
             return self._currentSum / self._currentCount
         except ZeroDivisionError:
             return np.nan
+
+
+class XAverage(StatelessAccumulator):
+    def __init__(self, window, dependency='x'):
+        super(XAverage, self).__init__(dependency)
+        self._average = 0.0
+        self._exp = 2.0 / (window + 1.)
+        self._count = 0
+
+    def push(self, data):
+        value = super(XAverage, self).push(data)
+        if self._count == 0:
+            self._average = value
+        else:
+            self._average += self._exp * (value - self._average)
+        self._count += 1
+
+    def result(self):
+        return self._average
+
+
+class MACD(StatelessAccumulator):
+    def __init__(self, short, long, dependency='x'):
+        super(MACD, self).__init__(dependency)
+        self._short_average = XAverage(window=short, dependency=dependency)
+        self._long_average = XAverage(window=long, dependency=dependency)
+
+    def push(self, data):
+        self._short_average.push(data)
+        self._long_average.push(data)
+
+    def result(self):
+        return self._short_average.result() - self._long_average.result()
 
 
 class Variance(StatelessAccumulator):

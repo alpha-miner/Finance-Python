@@ -13,8 +13,23 @@ from PyFin.Analysis.TechnicalAnalysis import SecurityMovingMinimum
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingSum
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingCountedPositive
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingPositiveAverage
+from PyFin.Analysis.TechnicalAnalysis import SecurityMovingRSI
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingHistoricalWindow
 from PyFin.Analysis.TechnicalAnalysis import SecurityLatestValueHolder
+from PyFin.Analysis.TechnicalAnalysis import SecurityXAverageValueHolder
+from PyFin.Analysis.TechnicalAnalysis import SecurityMACDValueHolder
+
+
+def EMA(window, dependency='x', symbolList=None):
+    return SecurityXAverageValueHolder(window, dependency, symbolList)
+
+
+def MACD(short, long, dependency='x', symbolList=None):
+    return SecurityMACDValueHolder(short, long, dependency, symbolList)
+
+
+def RSI(window, dependency='x', symbolList=None):
+    return SecurityMovingRSI(window, dependency, symbolList)
 
 
 def MA(window, dependency='x', symbolList=None):

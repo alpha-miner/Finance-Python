@@ -6,6 +6,8 @@ Created on 2015-8-8
 """
 
 from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import SecurityLatestValueHolder
+from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import SecurityXAverageValueHolder
+from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import SecurityMACDValueHolder
 
 from PyFin.Analysis.TechnicalAnalysis.StatefulTechnicalAnalysers import SecurityMovingAverage
 from PyFin.Analysis.TechnicalAnalysis.StatefulTechnicalAnalysers import SecurityMovingMax
@@ -16,10 +18,15 @@ from PyFin.Analysis.TechnicalAnalysis.StatefulTechnicalAnalysers import Security
 from PyFin.Analysis.TechnicalAnalysis.StatefulTechnicalAnalysers import SecurityMovingPositiveAverage
 from PyFin.Analysis.TechnicalAnalysis.StatefulTechnicalAnalysers import SecurityMovingCountedNegative
 from PyFin.Analysis.TechnicalAnalysis.StatefulTechnicalAnalysers import SecurityMovingNegativeAverage
+from PyFin.Analysis.TechnicalAnalysis.StatefulTechnicalAnalysers import SecurityMovingPositiveDifferenceAverage
+from PyFin.Analysis.TechnicalAnalysis.StatefulTechnicalAnalysers import SecurityMovingNegativeDifferenceAverage
+from PyFin.Analysis.TechnicalAnalysis.StatefulTechnicalAnalysers import SecurityMovingRSI
 from PyFin.Analysis.TechnicalAnalysis.StatefulTechnicalAnalysers import SecurityMovingHistoricalWindow
 from PyFin.Analysis.TechnicalAnalysis.StatefulTechnicalAnalysers import SecurityMovingLogReturn
 
 __all__ = ['SecurityLatestValueHolder',
+           'SecurityXAverageValueHolder',
+           'SecurityMACDValueHolder',
            'SecurityMovingAverage',
            'SecurityMovingMax',
            'SecurityMovingMinimum',
@@ -29,5 +36,8 @@ __all__ = ['SecurityLatestValueHolder',
            'SecurityMovingPositiveAverage',
            'SecurityMovingCountedNegative',
            'SecurityMovingNegativeAverage',
+           'SecurityMovingPositiveDifferenceAverage',
+           'SecurityMovingNegativeDifferenceAverage',
+           'SecurityMovingRSI',
            'SecurityMovingHistoricalWindow',
            'SecurityMovingLogReturn']

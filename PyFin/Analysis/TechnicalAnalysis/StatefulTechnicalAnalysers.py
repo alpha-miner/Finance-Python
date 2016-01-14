@@ -18,6 +18,9 @@ from PyFin.Math.Accumulators.StatefulAccumulators import MovingCountedPositive
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingPositiveAverage
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingCountedNegative
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingNegativeAverage
+from PyFin.Math.Accumulators.StatefulAccumulators import MovingPositiveDifferenceAverage
+from PyFin.Math.Accumulators.StatefulAccumulators import MovingNegativeDifferenceAverage
+from PyFin.Math.Accumulators.StatefulAccumulators import MovingRSI
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingHistoricalWindow
 from PyFin.Math.Accumulators.Performancers import MovingLogReturn
 
@@ -86,6 +89,21 @@ class SecurityMovingCountedNegative(SecuritySingleValueHolder):
 class SecurityMovingNegativeAverage(SecuritySingleValueHolder):
     def __init__(self, window, dependency='x', symbolList=None):
         super(SecurityMovingNegativeAverage, self).__init__(window, MovingNegativeAverage, dependency, symbolList)
+
+
+class SecurityMovingPositiveDifferenceAverage(SecuritySingleValueHolder):
+    def __init__(self, window, dependency='x', symbolList=None):
+        super(SecurityMovingPositiveDifferenceAverage, self).__init__(window, MovingPositiveDifferenceAverage, dependency, symbolList)
+
+
+class SecurityMovingNegativeDifferenceAverage(SecuritySingleValueHolder):
+    def __init__(self, window, dependency='x', symbolList=None):
+        super(SecurityMovingNegativeDifferenceAverage, self).__init__(window, MovingNegativeDifferenceAverage, dependency, symbolList)
+
+
+class SecurityMovingRSI(SecuritySingleValueHolder):
+    def __init__(self, window, dependency='x', symbolList=None):
+        super(SecurityMovingRSI, self).__init__(window, MovingRSI, dependency, symbolList)
 
 
 class SecurityMovingLogReturn(SecuritySingleValueHolder):

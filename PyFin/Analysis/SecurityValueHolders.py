@@ -215,7 +215,7 @@ class FilteredSecurityValueHolder(SecurityValueHolder):
             elif isinstance(item, SecurityValueHolder):
                 return FilteredSecurityValueHolder(self, item)
             else:
-                raise TypeError("{0} is not a valid index".format(item))
+                raise TypeError("{0} is not a valid id".format(item))
 
     def push(self, data):
         self._computer.push(data)

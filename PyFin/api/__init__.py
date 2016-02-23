@@ -21,6 +21,7 @@ from PyFin.api.Analysis import RSI
 from PyFin.api.Analysis import MA
 from PyFin.api.Analysis import MAX
 from PyFin.api.Analysis import MIN
+from PyFin.api.Analysis import VARIANCE
 from PyFin.api.Analysis import NPOSITIVE
 from PyFin.api.Analysis import MAPOSITIVE
 from PyFin.api.Analysis import HIST
@@ -46,6 +47,7 @@ __all__ = ["datesList",
            "MA",
            "MAX",
            "MIN",
+           "VARIANCE",
            "NPOSITIVE",
            "MAPOSITIVE",
            "HIST",

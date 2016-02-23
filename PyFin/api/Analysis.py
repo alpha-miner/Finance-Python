@@ -11,6 +11,7 @@ from PyFin.Analysis.TechnicalAnalysis import SecurityMovingAverage
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingMax
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingMinimum
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingSum
+from PyFin.Analysis.TechnicalAnalysis import SecurityMovingVariance
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingCountedPositive
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingPositiveAverage
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingRSI
@@ -46,6 +47,10 @@ def MIN(window, dependency='x', symbolList=None):
 
 def SUM(window, dependency='x', symbolList=None):
     return SecurityMovingSum(window, dependency, symbolList)
+
+
+def VARIANCE(window, dependency='x', symbolList=None):
+    return SecurityMovingVariance(window, dependency, symbolList)
 
 
 def NPOSITIVE(window, dependency='x', symbolList=None):

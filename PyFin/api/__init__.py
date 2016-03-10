@@ -14,6 +14,7 @@ from PyFin.api.DateUtilities import isBizDay
 from PyFin.api.DateUtilities import adjustDateByCalendar
 from PyFin.api.DateUtilities import advanceDateByCalendar
 from PyFin.api.DateUtilities import nthWeekDay
+from PyFin.api.DateUtilities import makeSchedule
 
 from PyFin.api.Analysis import EMA
 from PyFin.api.Analysis import MACD
@@ -41,6 +42,7 @@ __all__ = ["datesList",
            "adjustDateByCalendar",
            "advanceDateByCalendar",
            "nthWeekDay",
+           "makeSchedule",
            "EMA",
            "MACD",
            "RSI",

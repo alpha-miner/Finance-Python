@@ -35,11 +35,6 @@ class StatefulValueHolder(Accumulator):
         self._window = window
         self._containerSize = window
         self._con = deque()
-        self._isFull = 0
-
-    @property
-    def isFull(self):
-        return self._isFull == 1
 
     @property
     def size(self):
@@ -205,6 +200,8 @@ class MovingPositiveDifferenceAverage(SingleValuedValueHolder):
 
     def push(self, data):
         self._runningAverage.push(data)
+        if self._isFull == 0 and self._runningAverage.isFull == 1:
+            self._isFull = 1
 
     def result(self):
         return self._runningAverage.result()
@@ -218,6 +215,8 @@ class MovingNegativeDifferenceAverage(SingleValuedValueHolder):
 
     def push(self, data):
         self._runningAverage.push(data)
+        if self._isFull == 0 and self._runningAverage.isFull:
+            self._isFull = 1
 
     def result(self):
         return self._runningAverage.result()
@@ -232,6 +231,9 @@ class MovingRSI(SingleValuedValueHolder):
     def push(self, data):
         self._posDiffAvg.push(data)
         self._negDiffAvg.push(data)
+
+        if self._isFull == 0 and self._posDiffAvg.isFull and self._negDiffAvg.isFull:
+            self._isFull = 1
 
     def result(self):
         nominator = self._posDiffAvg.result()

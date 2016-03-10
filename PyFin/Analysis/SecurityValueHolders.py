@@ -98,6 +98,19 @@ class SecurityValueHolder(object):
     def holders(self):
         return self._innerHolders
 
+    def isFullByName(self, name):
+        return self.holders[name].isFull
+
+    @property
+    def isFull(self):
+        res = {}
+        for name in self.holders:
+            try:
+                res[name] = self.holders[name].isFull
+            except ArithmeticError:
+                res[name] = np.nan
+        return SecuritiesValues(res)
+
     def __getitem__(self, item):
         try:
             return self.holders[item].result()

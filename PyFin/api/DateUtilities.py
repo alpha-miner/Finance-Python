@@ -7,6 +7,8 @@ Created on 2015-7-13
 
 from PyFin.DateUtilities import Date
 from PyFin.DateUtilities import Calendar
+from PyFin.DateUtilities import Period
+from PyFin.DateUtilities import Schedule
 from PyFin.Enums import BizDayConventions
 from PyFin.Utilities import check_date
 
@@ -62,3 +64,11 @@ def nthWeekDay(nth, dayOfWeek, month, year):
     date = Date.nthWeekday(nth, dayOfWeek, month, year)
     return date.toDateTime()
 
+
+def makeSchedule(firstDate, endDate, tenor):
+    cal = Calendar('NullCalendar')
+    firstDate = check_date(firstDate)
+    endDate = check_date(endDate)
+    tenor = Period(tenor)
+    schedule = Schedule(firstDate, endDate, tenor, cal)
+    return [d.toDateTime() for d in schedule]

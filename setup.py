@@ -11,7 +11,7 @@ import glob
 
 PACKAGE = "PyFin"
 NAME = "Finance-Python"
-VERSION = "0.3.16"
+VERSION = "0.3.17"
 DESCRIPTION = "PyFin " + VERSION
 AUTHOR = "cheng li"
 AUTHOR_EMAIL = "wegamekinglc@hotmail.com"

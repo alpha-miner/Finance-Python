@@ -25,6 +25,6 @@ def print_timing(func):
 def check_date(date):
     from PyFin.DateUtilities import Date
     if isinstance(date, str):
-        return Date.strptime(date, format='%Y-%m-%d')
+        return Date.strptime(date, dateFormat='%Y-%m-%d')
     else:
         return Date.fromDateTime(date)

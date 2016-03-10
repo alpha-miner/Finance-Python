@@ -24,6 +24,7 @@ class Accumulator(object):
     __metaclass__ = ABCMeta
 
     def __init__(self, dependency):
+        self._isFull = 0
         if isinstance(dependency, Accumulator):
             self._isValueHolderContained = True
         else:
@@ -66,6 +67,10 @@ class Accumulator(object):
     @property
     def value(self):
         return self.result()
+
+    @property
+    def isFull(self):
+        return self._isFull == 1
 
     @property
     def window(self):
@@ -168,9 +173,12 @@ class NegativeValueHolder(Accumulator):
         self._window = valueHolder.window
         self._containerSize = valueHolder._containerSize
         self._dependency = deepcopy(valueHolder.dependency)
+        self._isFull = 0
 
     def push(self, data):
         self._valueHolder.push(data)
+        if self._valueHolder.isFull:
+            self._isFull = 1
 
     def result(self):
         res = self._valueHolder.result()
@@ -188,10 +196,13 @@ class ListedValueHolder(Accumulator):
         self._dependency = list(set(left.dependency).union(set(right.dependency)))
         self._window = max(self._left.window, self._right.window)
         self._containerSize = max(self._left._containerSize, self._right._containerSize)
+        self._isFull = 0
 
     def push(self, data):
         self._left.push(data)
         self._right.push(data)
+        if self._isFull == 0 and self._left.isFull and self._right.isFull:
+            self._isFull = 1
 
     def result(self):
         resLeft = self._left.result()
@@ -226,9 +237,12 @@ class TruncatedValueHolder(Accumulator):
         self._dependency = self._valueHolder.dependency
         self._window = valueHolder.window
         self._containerSize = valueHolder._containerSize
+        self._isFull = 0
 
     def push(self, data):
         self._valueHolder.push(data)
+        if self._valueHolder.isFull:
+            self._isFull = 1
 
     def result(self):
         if self._stop is None:
@@ -247,10 +261,13 @@ class CombinedValueHolder(Accumulator):
         self._dependency = list(set(left.dependency).union(set(right.dependency)))
         self._window = max(self._left.window, self._right.window)
         self._containerSize = max(self._left._containerSize, self._right._containerSize)
+        self._isFull = 0
 
     def push(self, data):
         self._left.push(data)
         self._right.push(data)
+        if self._isFull == 0 and self._left.isFull and self._right.isFull:
+            self._isFull = 1
 
 
 class ArithmeticValueHolder(CombinedValueHolder):
@@ -264,6 +281,13 @@ class ArithmeticValueHolder(CombinedValueHolder):
         if self._returnSize > 1:
             return tuple(self._op(r1, r2) for r1, r2 in zip(res1, res2))
         return self._op(res1, res2)
+
+    @property
+    def isFull(self):
+        if self._left.isFull and self._right.isFull:
+            return True
+        else:
+            return False
 
 
 class AddedValueHolder(ArithmeticValueHolder):
@@ -333,6 +357,7 @@ class Identity(Accumulator):
             self._containerSize = 1
         self._value = value
         self._returnSize = n
+        self._isFull = 0
 
     def push(self, data):
         if self._isValueHolder:
@@ -378,6 +403,13 @@ class CompoundedValueHolder(Accumulator):
     def result(self):
         return self._right.result()
 
+    @property
+    def isFull(self):
+        if self._left.isFull and self._right.isFull:
+            return True
+        else:
+            return False
+
 
 class BasicFunction(Accumulator):
     def __init__(self, valueHolder, func, *args, **kwargs):
@@ -400,6 +432,10 @@ class BasicFunction(Accumulator):
             return tuple(self._func(v, *self._args, **self._kwargs) for v in origValue)
         else:
             return self._func(origValue, *self._args, **self._kwargs)
+
+    @property
+    def isFull(self):
+        return self._returnSize.isFull
 
 
 def Exp(valueHolder):

@@ -11,7 +11,7 @@ import glob
 
 PACKAGE = "PyFin"
 NAME = "Finance-Python"
-VERSION = "0.3.17"
+VERSION = "0.3.18"
 DESCRIPTION = "PyFin " + VERSION
 AUTHOR = "cheng li"
 AUTHOR_EMAIL = "wegamekinglc@hotmail.com"
@@ -114,6 +114,7 @@ setup(
               'PyFin.Math.Distributions',
               'PyFin.Math.Timeseries',
               'PyFin.Patterns',
+              'PyFin.POpt',
               'PyFin.PricingEngines',
               'PyFin.Analysis',
               'PyFin.Analysis.DataProviders',

@@ -63,7 +63,7 @@ def portfolio_optimization(weights, nav_table, opt_type, rebalance=False):
              or opt_type == OptTarget.RETURN_D_MAX_DRAWDOWN
              or opt_type == OptTarget.MAX_DRAWDOWN):
         raise ValueError("Portfolio optimization target can't be set as "
-                         "maximize sortino ratio "
+                         "maximize sortino ratio"
                          "or minimize max draw down "
                          "or maximuze return to max draw down.")
 

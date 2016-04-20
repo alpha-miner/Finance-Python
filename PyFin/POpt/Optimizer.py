@@ -10,12 +10,12 @@ from enum import unique
 import numpy as np
 import pandas as pd
 import scipy.optimize as opt
-from PyFin.POpt.calculators import calculate_annualized_return
-from PyFin.POpt.calculators import calculate_volatility
-from PyFin.POpt.calculators import calculate_sharp
-from PyFin.POpt.calculators import calculate_sortino
-from PyFin.POpt.calculators import calculate_max_drawdown
-from PyFin.POpt.calculators import calculate_mean_drawdown
+from PyFin.POpt.Calculators import calculate_annualized_return
+from PyFin.POpt.Calculators import calculate_volatility
+from PyFin.POpt.Calculators import calculate_sharp
+from PyFin.POpt.Calculators import calculate_sortino
+from PyFin.POpt.Calculators import calculate_max_drawdown
+from PyFin.POpt.Calculators import calculate_mean_drawdown
 
 
 def portfolio_returns(weights, nav_table, rebalance):

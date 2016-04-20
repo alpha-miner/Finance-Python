@@ -29,6 +29,9 @@ else:
 files = glob.glob("PyFin/tests/Math/Accumulators/data/*.csv")
 datafiles = [(os.path.join(packagePath, "PyFin/tests/Math/Accumulators/data"), files)]
 
+files = glob.glob("PyFin/tests/POpt/data/*.csv")
+datafiles.append((os.path.join(packagePath, "PyFin/tests/POpt/data"), files))
+
 
 def git_version():
     from subprocess import Popen, PIPE
@@ -128,6 +131,7 @@ setup(
               'PyFin.tests.Math.Accumulators',
               'PyFin.tests.Math.Distributions',
               'PyFin.tests.Math.Timeseries',
+              'PyFin.tests.POpt',
               'PyFin.tests.Analysis',
               'PyFin.tests.Analysis.DataProviders',
               'PyFin.tests.Analysis.TechnicalAnalysis',

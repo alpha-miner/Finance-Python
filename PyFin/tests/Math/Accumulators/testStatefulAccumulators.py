@@ -116,9 +116,9 @@ class TestStatefulAccumulators(unittest.TestCase):
             last = value
             pos_list = np.maximum(diff_list[-window:], 0.)
 
-            expected = 0. if np.isnan(np.mean(pos_list)) else np.mean(pos_list)
-            calculated = mv.result()
-            if i > 0:
+            if i > 1:
+                expected = 0. if np.isnan(np.mean(pos_list)) else np.mean(pos_list)
+                calculated = mv.result()
                 self.assertAlmostEqual(calculated, expected, 8, "at index {0:d}\n"
                                                                 "Positive average expected:   {1:f}\n"
                                                                 "positive average calculated: {2:f}".format(i,

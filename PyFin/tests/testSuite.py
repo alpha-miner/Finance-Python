@@ -18,6 +18,7 @@ import PyFin.tests.Analysis as Analysis
 import PyFin.tests.DateUtilities as DateUtilities
 import PyFin.tests.Env as Env
 import PyFin.tests.Math as Math
+import PyFin.tests.POpt as POpt
 import PyFin.tests.PricingEngines as PricingEngines
 
 
@@ -60,6 +61,8 @@ def test():
     tests = unittest.TestLoader().loadTestsFromTestCase(Math.Accumulators.TestPerformancers)
     suite.addTests(tests)
     tests = unittest.TestLoader().loadTestsFromTestCase(Math.Timeseries.TestTimeseries)
+    suite.addTests(tests)
+    tests = unittest.TestLoader().loadTestsFromTestCase(POpt.TestOptimizer)
     suite.addTests(tests)
 
     res = unittest.TextTestRunner(verbosity=3).run(suite)

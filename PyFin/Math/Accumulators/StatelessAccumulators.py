@@ -25,11 +25,18 @@ class StatelessAccumulator(Accumulator):
 
     def push(self, data):
         value = super(StatelessAccumulator, self).push(data)
-        if value is None or np.all(np.isnan(value)):
+        if value is None:
             return None
-        else:
-            self._isFull = 1
-            return value
+
+        try:
+            bool_flag = np.all(np.isnan(value))
+            if bool_flag:
+                return None
+        except TypeError:
+            pass
+
+        self._isFull = 1
+        return value
 
 
 class Latest(StatelessAccumulator):

@@ -32,7 +32,6 @@ datafiles = [(os.path.join(packagePath, "PyFin/tests/Math/Accumulators/data"), f
 files = glob.glob("PyFin/tests/POpt/data/*.csv")
 datafiles.append((os.path.join(packagePath, "PyFin/tests/POpt/data"), files))
 
-
 def git_version():
     from subprocess import Popen, PIPE
     gitproc = Popen(['git', 'rev-parse','HEAD'], stdout=PIPE)

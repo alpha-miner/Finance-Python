@@ -181,8 +181,8 @@ class MovingMaxDrawdown(StatefulValueHolder):
         if value is None:
             return
         self._drawdownCalculator.push(dict(x=value))
-        drawdown, duration, _ = self._drawdownCalculator.result()
-        self._dumpOneValue((drawdown, duration))
+        drawdown, duration, lastHighIndex = self._drawdownCalculator.result()
+        self._dumpOneValue((drawdown, duration, lastHighIndex))
 
     def result(self):
         sortedValue = sorted(range(self.size), key=lambda x: self._con[x][0])

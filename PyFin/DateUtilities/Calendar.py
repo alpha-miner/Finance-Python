@@ -373,6 +373,7 @@ class ChinaSseImpl(object):
                 Date(2016, 2, 12),
                 Date(2016, 4, 4),
                 Date(2016, 5, 1),
+                Date(2016, 5, 2),
                 Date(2016, 6, 9),
                 Date(2016, 6, 10),
                 Date(2016, 9, 15),

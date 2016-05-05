@@ -55,9 +55,9 @@ finpy
 
 基本的日期相关函数的实现。
 
-.. |Build Status| image:: https://travis-ci.org/ChinaQuants/Finance-Python.svg?branch=master
-   :target: https://travis-ci.org/ChinaQuants/Finance-Python
-.. |Coverage Status| image:: https://coveralls.io/repos/ChinaQuants/Finance-Python/badge.svg?branch=master&service=github
-   :target: https://coveralls.io/r/chinaquants/Finance-Python
+.. |Build Status| image:: https://travis-ci.org/wegamekinglc/Finance-Python.svg?branch=master
+   :target: https://travis-ci.org/wegamekinglc/Finance-Python
+.. |Coverage Status| image:: https://coveralls.io/repos/wegamekinglc/Finance-Python/badge.svg?branch=master&service=github
+   :target: https://coveralls.io/r/wegamekinglc/Finance-Python
 .. |Join the chat at https://gitter.im/chinaquants/algotrading| image:: https://badges.gitter.im/Join%20Chat.svg
    :target: https://gitter.im/chinaquants/algotrading?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge

@@ -1,6 +1,6 @@
 -------------
 
-|Build Status| |Coverage Status| |Join the chat at https://gitter.im/chinaquants/algotrading|
+|Build Status| |Coverage Status| |Join the chat at https://gitter.im/wegamekinglc/algotrading|
 
 -------------
 
@@ -59,5 +59,5 @@ finpy
    :target: https://travis-ci.org/wegamekinglc/Finance-Python
 .. |Coverage Status| image:: https://coveralls.io/repos/wegamekinglc/Finance-Python/badge.svg?branch=master&service=github
    :target: https://coveralls.io/r/wegamekinglc/Finance-Python
-.. |Join the chat at https://gitter.im/chinaquants/algotrading| image:: https://badges.gitter.im/Join%20Chat.svg
-   :target: https://gitter.im/chinaquants/algotrading?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
+.. |Join the chat at https://gitter.im/wegamekinglc/algotrading| image:: https://badges.gitter.im/Join%20Chat.svg
+   :target: https://gitter.im/wegamekinglc/algotrading?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge

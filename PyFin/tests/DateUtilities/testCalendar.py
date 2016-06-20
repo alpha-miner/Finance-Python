@@ -64,26 +64,30 @@ class TestCalendar(unittest.TestCase):
         self.assertTrue(not cal.isWeekEnd(Weekdays.Friday))
 
     def testChinaSSE(self):
-        # China Shhanghai Securities Exchange holiday list in the year 2014
+        # China Shanghai Securities Exchange holiday list in the year 2014
         expectedHol = [Date(2014, 1, 1), Date(2014, 1, 31),
-                       Date(2014, 2, 1), Date(2014, 2, 2), Date(2014, 2, 3), Date(2014, 2, 4), Date(2014, 2, 5),
-                       Date(2014, 2, 6), Date(2014, 2, 8),
-                       Date(2014, 4, 5), Date(2014, 4, 6), Date(2014, 4, 7),
-                       Date(2014, 5, 1), Date(2014, 5, 2), Date(2014, 5, 3), Date(2014, 5, 4), Date(2014, 5, 31),
-                       Date(2014, 6, 1), Date(2014, 6, 2),
-                       Date(2014, 9, 6), Date(2014, 9, 7), Date(2014, 9, 8), Date(2014, 9, 28),
-                       Date(2014, 10, 1), Date(2014, 10, 2), Date(2014, 10, 3), Date(2014, 10, 4), Date(2014, 10, 5),
-                       Date(2014, 10, 6), Date(2014, 10, 7), Date(2014, 10, 11),
-                       # China Shhanghai Securities Exchange holiday list in the year 2015
-                       Date(2015, 1, 1), Date(2015, 1, 2), Date(2015, 1, 3), Date(2015, 1, 4),
-                       Date(2015, 2, 15), Date(2015, 2, 18), Date(2015, 2, 19), Date(2015, 2, 20), Date(2015, 2, 21),
-                       Date(2015, 2, 22), Date(2015, 2, 23), Date(2015, 2, 24), Date(2015, 2, 28),
-                       Date(2015, 4, 5), Date(2015, 4, 6),
-                       Date(2015, 5, 1), Date(2015, 5, 2), Date(2015, 5, 3),
-                       Date(2015, 6, 20), Date(2015, 6, 21), Date(2015, 6, 22),
-                       Date(2015, 9, 3), Date(2015, 9, 4), Date(2015, 9, 27),
-                       Date(2015, 10, 1), Date(2015, 10, 2), Date(2015, 10, 3), Date(2015, 10, 4), Date(2015, 10, 5),
-                       Date(2015, 10, 6), Date(2015, 10, 7), Date(2015, 10, 10)]
+                       Date(2014, 2, 3), Date(2014, 2, 4), Date(2014, 2, 5), Date(2014, 2, 6),
+                       Date(2014, 4, 7),
+                       Date(2014, 5, 1), Date(2014, 5, 2),
+                       Date(2014, 6, 2),
+                       Date(2014, 9, 8),
+                       Date(2014, 10, 1), Date(2014, 10, 2), Date(2014, 10, 3), Date(2014, 10, 6), Date(2014, 10, 7),
+        # China Shanghai Securities Exchange holiday list in the year 2015
+                       Date(2015, 1, 1), Date(2015, 1, 2),
+                       Date(2015, 2, 18), Date(2015, 2, 19), Date(2015, 2, 20), Date(2015, 2, 23), Date(2015, 2, 24),
+                       Date(2015, 4, 6),
+                       Date(2015, 5, 1),
+                       Date(2015, 6, 22),
+                       Date(2015, 9, 3), Date(2015, 9, 4),
+                       Date(2015, 10, 1), Date(2015, 10, 2), Date(2015, 10, 5), Date(2015, 10, 6), Date(2015, 10, 7),
+        # China Shanghai Securities Exchange holiday list in the year 2016
+                       Date(2016, 1, 1),
+                       Date(2016, 2, 8), Date(2016, 2, 9), Date(2016, 2, 10), Date(2016, 2, 11), Date(2016, 2, 12),
+                       Date(2016, 4, 4),
+                       Date(2016, 5, 2),
+                       Date(2016, 6, 9), Date(2016, 6, 10),
+                       Date(2016, 9, 15), Date(2016, 9, 16),
+                       Date(2016, 10, 3), Date(2016, 10, 4), Date(2016, 10, 5), Date(2016, 10, 6), Date(2016, 10, 7)]
 
         cal = Calendar('China.SSE')
 
@@ -100,12 +104,19 @@ class TestCalendar(unittest.TestCase):
                                   Date(2014, 5, 4),
                                   Date(2014, 9, 28),
                                   Date(2014, 10, 11),
-                                  # China Inter Bank working weekend list in the year 2015
+        # China Inter Bank working weekend list in the year 2015
                                   Date(2015, 1, 4),
                                   Date(2015, 2, 15),
                                   Date(2015, 2, 28),
                                   Date(2015, 9, 6),
-                                  Date(2015, 10, 10)]
+                                  Date(2015, 10, 10),
+        # China Inter Bank working weekend list in the year 2016
+                                  Date(2016, 2, 6),
+                                  Date(2016, 2, 14),
+                                  Date(2016, 6, 12),
+                                  Date(2016, 9, 18),
+                                  Date(2016, 10, 8),
+                                  Date(2016, 10, 9)]
 
         cal = Calendar('China.IB')
 

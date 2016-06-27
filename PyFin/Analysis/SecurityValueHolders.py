@@ -62,7 +62,7 @@ class SecurityValueHolder(object):
     def dependency(self):
         return {
             symbol: self.fields for symbol in self.symbolList
-            }
+        }
 
     @property
     def fields(self):
@@ -118,7 +118,8 @@ class SecurityValueHolder(object):
 
             if isinstance(item, tuple):
                 symbolList = set(i.lower() for i in item)
-                pyFinAssert(len(symbolList) == len(item), ValueError, "security name can't be duplicated")
+                pyFinAssert(len(symbolList) == len(item), ValueError,
+                            "security name can't be duplicated")
                 res = SecuritiesValues(
                     {s: self.holders[s].result() for s in symbolList}
                 )
@@ -189,11 +190,11 @@ class FilteredSecurityValueHolder(SecurityValueHolder):
         self._computer = copy.deepcopy(computer)
         self._window = max(computer.window, filtering.window)
         self._returnSize = computer.valueSize
-        self._dependency = _merge2set(self._computer._dependency, self._filter._dependency)
+        self._dependency = _merge2set(
+            self._computer._dependency, self._filter._dependency)
         self._symbolList = computer.symbolList
         self._updated = False
         self._cachedFlag = None
-
 
     @property
     def holders(self):
@@ -219,8 +220,10 @@ class FilteredSecurityValueHolder(SecurityValueHolder):
         except KeyError:
 
             if isinstance(item, tuple):
-                symbolList = set(i.lower() for i in item).intersection(set(filter_flags.index))  # to be corrected
-                pyFinAssert(len(symbolList) == len(item), ValueError, "security name can't be duplicated")
+                symbolList = set(i.lower() for i in item).intersection(
+                    set(filter_flags.index))  # to be corrected
+                pyFinAssert(len(symbolList) == len(item), ValueError,
+                            "security name can't be duplicated")
                 res = SecuritiesValues(
                     {s: self.holders[s].result() for s in symbolList}
                 )
@@ -253,7 +256,8 @@ class SecurityCombinedValueHolder(SecurityValueHolder):
             self._left = copy.deepcopy(left)
             if isinstance(right, SecurityValueHolder):
                 self._right = copy.deepcopy(right)
-                self._symbolList = set(self._left.symbolList).union(set(right.symbolList))
+                self._symbolList = set(self._left.symbolList).union(
+                    set(right.symbolList))
             else:
                 self._right = IdentitySecurityValueHolder(right)
                 self._symbolList = set(self._left.symbolList)
@@ -263,24 +267,25 @@ class SecurityCombinedValueHolder(SecurityValueHolder):
             self._symbolList = set(right.symbolList)
 
         self._window = max(self._left.window, self._right.window)
-        self._dependency = _merge2set(self._left._dependency, self._right._dependency)
+        self._dependency = _merge2set(
+            self._left._dependency, self._right._dependency)
         self._returnSize = self._left.valueSize
 
         if len(self._right.symbolList) == 0:
             self._innerHolders = {
                 name: HolderType(self._left.holders[name], self._right.holders['wildCard'])
                 for name in self._left.symbolList
-                }
+            }
         elif len(self._left.symbolList) == 0:
             self._innerHolders = {
                 name: HolderType(self._left.holders['wildCard'], self._right.holders[name])
                 for name in self._right.symbolList
-                }
+            }
         else:
             self._innerHolders = {
                 name: HolderType(self._left.holders[name], self._right.holders[name])
                 for name in self._left.symbolList
-                }
+            }
 
     @property
     def dependency(self):
@@ -291,61 +296,72 @@ class SecurityCombinedValueHolder(SecurityValueHolder):
 
 class SecurityAddedValueHolder(SecurityCombinedValueHolder):
     def __init__(self, left, right):
-        super(SecurityAddedValueHolder, self).__init__(left, right, AddedValueHolder)
+        super(SecurityAddedValueHolder, self).__init__(
+            left, right, AddedValueHolder)
 
 
 class SecuritySubbedValueHolder(SecurityCombinedValueHolder):
     def __init__(self, left, right):
-        super(SecuritySubbedValueHolder, self).__init__(left, right, MinusedValueHolder)
+        super(SecuritySubbedValueHolder, self).__init__(
+            left, right, MinusedValueHolder)
 
 
 class SecurityMultipliedValueHolder(SecurityCombinedValueHolder):
     def __init__(self, left, right):
-        super(SecurityMultipliedValueHolder, self).__init__(left, right, MultipliedValueHolder)
+        super(SecurityMultipliedValueHolder, self).__init__(
+            left, right, MultipliedValueHolder)
 
 
 class SecurityDividedValueHolder(SecurityCombinedValueHolder):
     def __init__(self, left, right):
-        super(SecurityDividedValueHolder, self).__init__(left, right, DividedValueHolder)
+        super(SecurityDividedValueHolder, self).__init__(
+            left, right, DividedValueHolder)
 
 
 class SecurityLtOperatorValueHolder(SecurityCombinedValueHolder):
     def __init__(self, left, right):
-        super(SecurityLtOperatorValueHolder, self).__init__(left, right, LtOperatorValueHolder)
+        super(SecurityLtOperatorValueHolder, self).__init__(
+            left, right, LtOperatorValueHolder)
 
 
 class SecurityLeOperatorValueHolder(SecurityCombinedValueHolder):
     def __init__(self, left, right):
-        super(SecurityLeOperatorValueHolder, self).__init__(left, right, LeOperatorValueHolder)
+        super(SecurityLeOperatorValueHolder, self).__init__(
+            left, right, LeOperatorValueHolder)
 
 
 class SecurityGtOperatorValueHolder(SecurityCombinedValueHolder):
     def __init__(self, left, right):
-        super(SecurityGtOperatorValueHolder, self).__init__(left, right, GtOperatorValueHolder)
+        super(SecurityGtOperatorValueHolder, self).__init__(
+            left, right, GtOperatorValueHolder)
 
 
 class SecurityGeOperatorValueHolder(SecurityCombinedValueHolder):
     def __init__(self, left, right):
-        super(SecurityGeOperatorValueHolder, self).__init__(left, right, GeOperatorValueHolder)
+        super(SecurityGeOperatorValueHolder, self).__init__(
+            left, right, GeOperatorValueHolder)
 
 
 class SecurityEqOperatorValueHolder(SecurityCombinedValueHolder):
     def __init__(self, left, right):
-        super(SecurityEqOperatorValueHolder, self).__init__(left, right, EqOperatorValueHolder)
+        super(SecurityEqOperatorValueHolder, self).__init__(
+            left, right, EqOperatorValueHolder)
 
 
 class SecurityNeOperatorValueHolder(SecurityCombinedValueHolder):
     def __init__(self, left, right):
-        super(SecurityNeOperatorValueHolder, self).__init__(left, right, NeOperatorValueHolder)
+        super(SecurityNeOperatorValueHolder, self).__init__(
+            left, right, NeOperatorValueHolder)
 
 
 def SecurityShiftedValueHolder(secValueHolder, n):
-    pyFinAssert(n >= 1, ValueError, "shift value should always not be less than 1")
+    pyFinAssert(n >= 1, ValueError,
+                "shift value should always not be less than 1")
     res = copy.deepcopy(secValueHolder)
     res._window = secValueHolder.window + n
     res._innerHolders = {
         name: Shift(secValueHolder.holders[name], n) for name in secValueHolder.holders
-        }
+    }
     return res
 
 
@@ -357,17 +373,17 @@ class SecurityCompoundedValueHolder(SecurityValueHolder):
         self._dependency = left.dependency
         if not isinstance(right.fields, str):
             pyFinAssert(left.valueSize == len(right.fields), ValueError, "left value size {0} is "
-                                                                      "different from right dependency {1}"
-                     .format(left.valueSize, right.fields))
+                        "different from right dependency {1}"
+                        .format(left.valueSize, right.fields))
         else:
             pyFinAssert(left.valueSize == 1, ValueError, "left value size {0} is different from right dependency 1"
-                     .format(left.valueSize))
+                        .format(left.valueSize))
 
         self._right = copy.deepcopy(right.holders[list(right.holders)[0]])
         self._left = copy.deepcopy(left.holders[list(left.holders)[0]])
         self._innerHolders = {
             name: CompoundedValueHolder(self._left, self._right) for name in self._symbolList
-            }
+        }
 
     def push(self, data):
         names = set(self._symbolList).intersection(set(data.keys()))

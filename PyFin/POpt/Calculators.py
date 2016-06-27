@@ -12,12 +12,12 @@ from PyFin.Math.Accumulators import MovingMaxDrawdown
 from PyFin.Math.Accumulators import MovingAverageDrawdown
 
 
-def calculate_annualized_return(returns):
-    return returns.mean() * 50
+def calculate_annualized_return(returns, multplier=50):
+    return returns.mean() * multplier
 
 
-def calculate_volatility(returns):
-    return returns.std(ddof=1) * math.sqrt(50)
+def calculate_volatility(returns, multplier=50):
+    return returns.std(ddof=1) * math.sqrt(multplier)
 
 
 def calculate_max_drawdown(returns):
@@ -34,15 +34,15 @@ def calculate_mean_drawdown(returns):
     return -mdrawdown.value[0]
 
 
-def calculate_sharp(returns):
+def calculate_sharp(returns, multplier=50):
     msharp = MovingSharp(len(returns))
     for ret in returns:
         msharp.push({'ret': ret, 'riskFree': 0.})
-    return msharp.value * math.sqrt(50)
+    return msharp.value * math.sqrt(multplier)
 
 
-def calculate_sortino(returns):
+def calculate_sortino(returns, multplier=50):
     msortino = MovingSortino(len(returns))
     for ret in returns:
         msortino.push({'ret': ret, 'riskFree': 0.})
-    return msortino.value * math.sqrt(50)
+    return msortino.value * math.sqrt(multplier)

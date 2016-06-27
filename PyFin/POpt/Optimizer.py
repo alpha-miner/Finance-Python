@@ -77,7 +77,7 @@ def portfolio_optimization(weights, nav_table, opt_type, rebalance=False):
                                    opt_type == OptTarget.SORTINO)):
         x0 = weights
 
-        bounds = [(0.0, 1.0) for _ in weights]
+        bounds = [(0.0, 0.25) for _ in weights]
 
         def eq_cond(x, *args):
             return sum(x) - 1.0

@@ -57,7 +57,7 @@ class OptTarget(str, Enum):
     RETURN_D_MAX_DRAWDOWN = 'RETURN_D_MAX_DRAWDOWN'
 
 
-def portfolio_optimization(weights, nav_table, opt_type, rebalance=False):
+def portfolio_optimization(weights, nav_table, opt_type, rebalance=False, lb=0., ub=1.):
     if not rebalance and \
             (opt_type == OptTarget.SORTINO
              or opt_type == OptTarget.RETURN_D_MAX_DRAWDOWN
@@ -77,7 +77,7 @@ def portfolio_optimization(weights, nav_table, opt_type, rebalance=False):
                                    opt_type == OptTarget.SORTINO)):
         x0 = weights
 
-        bounds = [(0.0, 0.25) for _ in weights]
+        bounds = [(lb, ub) for _ in weights]
 
         def eq_cond(x, *args):
             return sum(x) - 1.0

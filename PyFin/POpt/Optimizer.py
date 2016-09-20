@@ -28,22 +28,24 @@ def portfolio_returns(weights, nav_table, rebalance):
     return returns
 
 
-def utility_calculator(returns, opt_type):
+def utility_calculator(returns, opt_type, multiplier):
     # switch between different target types
     if opt_type == OptTarget.RETURN:
-        return calculate_annualized_return(returns)
+        return np.exp(calculate_annualized_return(returns, multiplier)) - 1.0
     elif opt_type == OptTarget.VOL:
-        return -calculate_volatility(returns)
+        return -calculate_volatility(returns, multiplier)
     elif opt_type == OptTarget.MAX_DRAWDOWN:
-        return -calculate_max_drawdown(returns)
+        return np.exp(-calculate_max_drawdown(returns)) - 1.0
     elif opt_type == OptTarget.MEAN_DRAWDOWN:
-        return -calculate_mean_drawdown(returns)
+        return np.exp(-calculate_mean_drawdown(returns)) - 1.0
     elif opt_type == OptTarget.SHARP:
-        return calculate_sharp(returns)
+        return calculate_sharp(returns, multiplier)
     elif opt_type == OptTarget.SORTINO:
-        return calculate_sortino(returns)
+        return calculate_sortino(returns, multiplier)
     elif opt_type == OptTarget.RETURN_D_MAX_DRAWDOWN:
-        return calculate_annualized_return(returns) / calculate_max_drawdown(returns)
+        annual_return = np.exp(calculate_annualized_return(returns, multiplier)) - 1.0
+        max_draw_down = 1.0 - np.exp(-calculate_max_drawdown(returns))
+        return annual_return / max_draw_down
 
 
 @unique
@@ -57,7 +59,7 @@ class OptTarget(str, Enum):
     RETURN_D_MAX_DRAWDOWN = 'RETURN_D_MAX_DRAWDOWN'
 
 
-def portfolio_optimization(weights, nav_table, opt_type, rebalance=False, lb=0., ub=1.):
+def portfolio_optimization(weights, nav_table, opt_type, multiplier, rebalance=False, lb=0., ub=1.):
     if not rebalance and \
             (opt_type == OptTarget.SORTINO
              or opt_type == OptTarget.RETURN_D_MAX_DRAWDOWN
@@ -84,7 +86,7 @@ def portfolio_optimization(weights, nav_table, opt_type, rebalance=False, lb=0.,
 
         def func(weights):
             returns = portfolio_returns(weights, nav_table, rebalance)
-            return -utility_calculator(returns, opt_type)
+            return -utility_calculator(returns, opt_type, multiplier)
 
         out, fx, its, imode, smode = opt.fmin_slsqp(func=func,
                                                     x0=x0,

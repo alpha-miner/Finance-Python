@@ -91,8 +91,8 @@ class SortedValueHolder(SingleValuedValueHolder):
 
     def push(self, data):
         value = super(SortedValueHolder, self).push(data)
-        if value is None:
-            return
+        if np.isnan(value):
+            return np.nan
         if self._isFull:
             popout = self._dumpOneValue(value)
             delPos = bisect.bisect_left(self._sortedArray, popout)
@@ -132,10 +132,10 @@ class MovingSum(SingleValuedValueHolder):
 
     def push(self, data):
         value = super(MovingSum, self).push(data)
-        if value is None:
-            return
+        if np.isnan(value):
+            return np.nan
         popout = self._dumpOneValue(value)
-        if popout is not np.nan:
+        if not np.isnan(popout):
             self._runningSum = self._runningSum - popout + value
         else:
             self._runningSum = self._runningSum + value
@@ -151,10 +151,10 @@ class MovingAverage(SingleValuedValueHolder):
 
     def push(self, data):
         value = super(MovingAverage, self).push(data)
-        if value is None or np.isnan(value):
-            return
+        if np.isnan(value):
+            return np.nan
         popout = self._dumpOneValue(value)
-        if popout is not np.nan:
+        if not np.isnan(popout):
             self._runningSum = self._runningSum - popout + value
         else:
             self._runningSum = self._runningSum + value
@@ -174,8 +174,8 @@ class MovingPositiveAverage(SingleValuedValueHolder):
 
     def push(self, data):
         value = super(MovingPositiveAverage, self).push(data)
-        if value is None or np.isnan(value):
-            return
+        if np.isnan(value):
+            return np.nan
         popout = self._dumpOneValue(value)
         if value > 0.0:
             self._runningPositiveCount += 1
@@ -252,8 +252,8 @@ class MovingNegativeAverage(SingleValuedValueHolder):
 
     def push(self, data):
         value = super(MovingNegativeAverage, self).push(data)
-        if value is None:
-            return
+        if np.isnan(value):
+            return np.nan
         popout = self._dumpOneValue(value)
         if value < 0.0:
             self._runningNegativeCount += 1
@@ -281,10 +281,10 @@ class MovingVariance(SingleValuedValueHolder):
 
     def push(self, data):
         value = super(MovingVariance, self).push(data)
-        if value is None:
-            return
+        if np.isnan(value):
+            return np.nan
         popout = self._dumpOneValue(value)
-        if popout is not np.nan:
+        if not np.isnan(popout):
             self._runningSum = self._runningSum - popout + value
             self._runningSumSquare = self._runningSumSquare - popout * popout + value * value
         else:
@@ -314,8 +314,8 @@ class MovingNegativeVariance(SingleValuedValueHolder):
 
     def push(self, data):
         value = super(MovingNegativeVariance, self).push(data)
-        if value is None:
-            return
+        if np.isnan(value):
+            return np.nan
         popout = self._dumpOneValue(value)
         if value < 0:
             self._runningNegativeSum += value
@@ -350,8 +350,8 @@ class MovingCountedPositive(SingleValuedValueHolder):
 
     def push(self, data):
         value = super(MovingCountedPositive, self).push(data)
-        if value is None:
-            return
+        if np.isnan(value):
+            return np.nan
         popout = self._dumpOneValue(value)
 
         if value > 0:
@@ -370,8 +370,8 @@ class MovingCountedNegative(SingleValuedValueHolder):
 
     def push(self, data):
         value = super(MovingCountedNegative, self).push(data)
-        if value is None:
-            return
+        if np.isnan(value):
+            return np.nan
         popout = self._dumpOneValue(value)
 
         if value < 0:
@@ -390,8 +390,8 @@ class MovingHistoricalWindow(StatefulValueHolder):
 
     def push(self, data):
         value = super(MovingHistoricalWindow, self).push(data)
-        if value is None:
-            return
+        if np.isnan(value):
+            return np.nan
         _ = self._dumpOneValue(value)
 
     def __getitem__(self, item):
@@ -417,8 +417,8 @@ class MovingCorrelation(StatefulValueHolder):
 
     def push(self, data):
         value = super(MovingCorrelation, self).push(data)
-        if value is None:
-            return
+        if np.any(np.isnan(value)):
+            return np.nan
         popout = self._dumpOneValue(value)
         if not np.isnan(popout[0]):
             headLeft = popout[0]
@@ -465,8 +465,8 @@ class MovingCorrelationMatrix(StatefulValueHolder):
 
     def push(self, data):
         values = super(MovingCorrelationMatrix, self).push(data)
-        if values is None:
-            return
+        if np.any(np.isnan(values)):
+            return np.nan
         if self._isFirst:
             self._runningSum = np.zeros((1, len(values)))
             self._runningSumCrossSquare = np.zeros((len(values), len(values)))

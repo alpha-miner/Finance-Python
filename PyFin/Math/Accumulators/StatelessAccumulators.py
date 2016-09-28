@@ -25,13 +25,11 @@ class StatelessAccumulator(Accumulator):
 
     def push(self, data):
         value = super(StatelessAccumulator, self).push(data)
-        if value is None:
-            return None
 
         try:
             bool_flag = np.all(np.isnan(value))
             if bool_flag:
-                return None
+                return np.nan
         except TypeError:
             pass
 
@@ -48,8 +46,8 @@ class Latest(StatelessAccumulator):
 
     def push(self, data):
         value = super(Latest, self).push(data)
-        if value is None:
-            return
+        if np.isnan(value):
+            return np.nan
         self._latest = value
 
     def result(self):
@@ -65,8 +63,8 @@ class Positive(StatelessAccumulator):
 
     def push(self, data):
         value = super(Positive, self).push(data)
-        if value is None:
-            return
+        if np.isnan(value):
+            return np.nan
 
         if value > 0.:
             self._pos = value
@@ -88,8 +86,8 @@ class Negative(StatelessAccumulator):
 
     def push(self, data):
         value = super(Negative, self).push(data)
-        if value is None:
-            return
+        if np.isnan(value):
+            return np.nan
 
         if value < 0.:
             self._neg = value
@@ -112,8 +110,8 @@ class Max(StatelessAccumulator):
 
     def push(self, data):
         value = super(Max, self).push(data)
-        if value is None:
-            return
+        if np.isnan(value):
+            return np.nan
         if self._first:
             self._currentMax = value
             self._first = False
@@ -135,8 +133,8 @@ class Minimum(StatelessAccumulator):
 
     def push(self, data):
         value = super(Minimum, self).push(data)
-        if value is None:
-            return
+        if np.isnan(value):
+            return np.nan
         if self._first:
             self._currentMin = value
             self._first = False
@@ -158,8 +156,8 @@ class Sum(StatelessAccumulator):
 
     def push(self, data):
         value = super(Sum, self).push(data)
-        if value is None:
-            return
+        if np.isnan(value):
+            return np.nan
         if self._first:
             self._currentSum = value
             self._first = False
@@ -180,8 +178,8 @@ class Average(StatelessAccumulator):
 
     def push(self, data):
         value = super(Average, self).push(data)
-        if value is None:
-            return
+        if np.isnan(value):
+            return np.nan
         if self._currentCount == 0:
             self._currentSum = value
         else:
@@ -204,8 +202,8 @@ class XAverage(StatelessAccumulator):
 
     def push(self, data):
         value = super(XAverage, self).push(data)
-        if value is None:
-            return
+        if np.isnan(value):
+            return np.nan
         if self._count == 0:
             self._average = value
         else:
@@ -244,8 +242,8 @@ class Variance(StatelessAccumulator):
 
     def push(self, data):
         value = super(Variance, self).push(data)
-        if value is None:
-            return
+        if np.isnan(value):
+            return np.nan
         self._currentSum += value
         self._currentSumSquare += value * value
         self._currentCount += 1
@@ -274,8 +272,8 @@ class Correlation(StatelessAccumulator):
 
     def push(self, data):
         value = super(Correlation, self).push(data)
-        if value is None:
-            return
+        if np.any(np.isnan(value)):
+            return np.nan
         self._runningSumLeft = self._runningSumLeft + value[0]
         self._runningSumRight = self._runningSumRight + value[1]
         self._runningSumSquareLeft = self._runningSumSquareLeft + value[0] * value[0]

@@ -11,6 +11,7 @@ import operator
 from copy import deepcopy
 import math
 import sys
+import numpy as np
 from PyFin.Utilities import pyFinAssert
 
 # get the correct attribute of div
@@ -55,7 +56,7 @@ class Accumulator(object):
                 try:
                     return tuple(data[p] for p in self._dependency)
                 except KeyError:
-                    return None
+                    return np.nan
         else:
             self._dependency.push(data)
             return self._dependency.result()

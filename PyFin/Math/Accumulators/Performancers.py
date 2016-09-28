@@ -24,8 +24,8 @@ class MovingLogReturn(SingleValuedValueHolder):
 
     def push(self, data):
         value = super(MovingLogReturn, self).push(data)
-        if value is None:
-            return
+        if np.isnan(value):
+            return np.nan
         popout = self._dumpOneValue(value)
         if popout is not np.nan and popout != 0.0:
             self._runningReturn = math.log(value / popout)
@@ -45,6 +45,8 @@ class MovingSharp(StatefulValueHolder):
 
     def push(self, data):
         value = super(MovingSharp, self).push(data)
+        if np.any(np.isnan(value)):
+            return np.nan
         ret = value[0]
         benchmark = value[1]
         data = {'x': ret - benchmark}
@@ -67,8 +69,8 @@ class MovingSortino(StatefulValueHolder):
 
     def push(self, data):
         value = super(MovingSortino, self).push(data)
-        if value is None:
-            return
+        if np.any(np.isnan(value)):
+            return np.nan
         ret = value[0]
         benchmark = value[1]
         data = {'x': ret - benchmark}
@@ -91,8 +93,8 @@ class MovingAlphaBeta(StatefulValueHolder):
 
     def push(self, data):
         value = super(MovingAlphaBeta, self).push(data)
-        if value is None:
-            return
+        if np.any(np.isnan(value)):
+            return np.nan
         pReturn = value[0]
         mReturn = value[1]
         rf = value[2]
@@ -136,8 +138,8 @@ class MovingDrawDown(StatefulValueHolder):
 
     def push(self, data):
         value = super(MovingDrawDown, self).push(data)
-        if value is None:
-            return
+        if np.isnan(value):
+            return np.nan
         self._runningIndex += 1
         self._runningCum += value
         self._maxer.push(dict(x=self._runningCum))
@@ -159,8 +161,8 @@ class MovingAverageDrawdown(StatefulValueHolder):
 
     def push(self, data):
         value = super(MovingAverageDrawdown, self).push(data)
-        if value is None:
-            return
+        if np.isnan(value):
+            return np.nan
         self._drawdownCalculator.push(dict(ret=value))
         drawdown, duration, _ = self._drawdownCalculator.result()
         self._drawdownMean.push(dict(drawdown=drawdown))
@@ -178,8 +180,8 @@ class MovingMaxDrawdown(StatefulValueHolder):
 
     def push(self, data):
         value = super(MovingMaxDrawdown, self).push(data)
-        if value is None:
-            return
+        if np.isnan(value):
+            return np.nan
         self._drawdownCalculator.push(dict(x=value))
         drawdown, duration, lastHighIndex = self._drawdownCalculator.result()
         self._dumpOneValue((drawdown, duration, lastHighIndex))

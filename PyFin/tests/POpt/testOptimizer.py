@@ -70,7 +70,7 @@ class TestOptimizer(unittest.TestCase):
 
     def testPortfolioOptimizerWithMaximumReturn(self):
         guess = [0.1 / len(self.instruments)] * len(self.instruments)
-        out, fx, its, imode, smode = portfolio_optimization(guess, self.navData, OptTarget.RETURN)
+        out, fx, its, imode, smode = portfolio_optimization(guess, self.navData, OptTarget.RETURN, multiplier=50)
         matlab_res = self.create_value_dict(self.instruments, [4.75393550839560e-19,
                                                                0,
                                                                3.43546906184303e-19,
@@ -90,7 +90,7 @@ class TestOptimizer(unittest.TestCase):
 
     def testPortfolioOptimizerWithMinimumVolatility(self):
         guess = [0.1 / len(self.instruments)] * len(self.instruments)
-        out, fx, its, imode, smode = portfolio_optimization(guess, self.navData, OptTarget.VOL)
+        out, fx, its, imode, smode = portfolio_optimization(guess, self.navData, OptTarget.VOL, multiplier=50)
         matlab_res = self.create_value_dict(self.instruments, [0,
                                                                0,
                                                                0,
@@ -110,7 +110,7 @@ class TestOptimizer(unittest.TestCase):
 
     def testPortfolioOptimizerWithMaximumSharp(self):
         guess = [0.1 / len(self.instruments)] * len(self.instruments)
-        out, fx, its, imode, smode = portfolio_optimization(guess, self.navData, OptTarget.SHARP)
+        out, fx, its, imode, smode = portfolio_optimization(guess, self.navData, OptTarget.SHARP, multiplier=50)
         matlab_res = self.create_value_dict(self.instruments, [3.72414607721023e-39,
                                                                5.58329252509498e-40,
                                                                8.50903300813402e-40,
@@ -130,7 +130,7 @@ class TestOptimizer(unittest.TestCase):
 
     def testPortfolioOptimizerWithMaximumReturnWithRebalance(self):
         guess = [0.1 / len(self.instruments)] * len(self.instruments)
-        out, fx, its, imode, smode = portfolio_optimization(guess, self.navData, OptTarget.RETURN, True)
+        out, fx, its, imode, smode = portfolio_optimization(guess, self.navData, OptTarget.RETURN, multiplier=50, rebalance=True)
         matlab_res = self.create_value_dict(self.instruments, [1.59234884538490e-17,
                                                                1.64287856671892e-18,
                                                                2.31111593326468e-33,
@@ -150,7 +150,7 @@ class TestOptimizer(unittest.TestCase):
 
     def testPortfolioOptimizerWithMinimumVolatilityWithRebalance(self):
         guess = [0.1 / len(self.instruments)] * len(self.instruments)
-        out, fx, its, imode, smode = portfolio_optimization(guess, self.navData, OptTarget.VOL, True)
+        out, fx, its, imode, smode = portfolio_optimization(guess, self.navData, OptTarget.VOL, multiplier=50, rebalance=True)
         matlab_res = self.create_value_dict(self.instruments, [1.17549435082229e-38,
                                                                0,
                                                                0,
@@ -170,7 +170,7 @@ class TestOptimizer(unittest.TestCase):
 
     def testPortfolioOptimizerWithMaximumSharpWithRebalance(self):
         guess = [0.1 / len(self.instruments)] * len(self.instruments)
-        out, fx, its, imode, smode = portfolio_optimization(guess, self.navData, OptTarget.SHARP, True)
+        out, fx, its, imode, smode = portfolio_optimization(guess, self.navData, OptTarget.SHARP, multiplier=50, rebalance=True)
         matlab_res = self.create_value_dict(self.instruments, [2.76471048953164e-22,
                                                                7.19170303955622e-21,
                                                                2.52983701805491e-21,

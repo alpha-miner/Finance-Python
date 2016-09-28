@@ -6,12 +6,16 @@ Created on 2015-7-29
 """
 
 import unittest
+import math
 import numpy as np
 from PyFin.Math.Accumulators.StatelessAccumulators import Average
 from PyFin.Math.Accumulators.StatelessAccumulators import XAverage
 from PyFin.Math.Accumulators.StatelessAccumulators import MACD
 from PyFin.Math.Accumulators.StatelessAccumulators import Max
 from PyFin.Math.Accumulators.StatelessAccumulators import Minimum
+from PyFin.Math.Accumulators.StatelessAccumulators import Diff
+from PyFin.Math.Accumulators.StatelessAccumulators import SimpleReturn
+from PyFin.Math.Accumulators.StatelessAccumulators import LogReturn
 from PyFin.Math.Accumulators.StatelessAccumulators import Sum
 from PyFin.Math.Accumulators.StatelessAccumulators import Variance
 from PyFin.Math.Accumulators.StatelessAccumulators import Correlation
@@ -115,6 +119,57 @@ class TestStatelessAccumulators(unittest.TestCase):
             self.assertAlmostEqual(expected, calculated, 10, "at index {0:d}\n"
                                                              "expected min:   {1:f}\n"
                                                              "calculated min: {2:f}".format(i, expected, calculated))
+
+    def testDiff(self):
+        mm = Diff(dependency='close')
+        current = np.nan
+        for i, value in enumerate(self.samplesClose):
+            mm.push(dict(close=value))
+            previous = current
+            current = value
+
+            if not np.isnan(previous):
+                expected = current - previous
+                calculated = mm.result()
+
+                self.assertAlmostEqual(expected, calculated, 10, "at index {0:d}\n"
+                                                                 "expected min:   {1:f}\n"
+                                                                 "calculated diff: {2:f}".format(i, expected,
+                                                                                                 calculated))
+
+    def testSimpleReturn(self):
+        mm = SimpleReturn(dependency='close')
+        current = np.nan
+        for i, value in enumerate(self.samplesClose):
+            mm.push(dict(close=value))
+            previous = current
+            current = value
+
+            if not np.isnan(previous):
+                expected = current / previous - 1.
+                calculated = mm.result()
+
+                self.assertAlmostEqual(expected, calculated, 10, "at index {0:d}\n"
+                                                                 "expected min:   {1:f}\n"
+                                                                 "calculated simple return: {2:f}".format(i, expected,
+                                                                                                          calculated))
+
+    def testLogReturn(self):
+        mm = LogReturn(dependency='close')
+        current = np.nan
+        for i, value in enumerate(self.samplesClose):
+            previous = current
+            current = abs(value)
+            mm.push(dict(close=current))
+
+            if not np.isnan(previous):
+                expected = math.log(current / previous)
+                calculated = mm.result()
+
+                self.assertAlmostEqual(expected, calculated, 10, "at index {0:d}\n"
+                                                                 "expected min:   {1:f}\n"
+                                                                 "calculated log return: {2:f}".format(i, expected,
+                                                                                                       calculated))
 
     def testSum(self):
         mm = Sum(dependency='close')

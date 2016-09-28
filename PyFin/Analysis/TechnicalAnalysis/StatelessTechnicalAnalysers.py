@@ -10,6 +10,10 @@ from PyFin.Analysis.SecurityValueHolders import SecurityValueHolder
 from PyFin.Math.Accumulators import Latest
 from PyFin.Math.Accumulators import XAverage
 from PyFin.Math.Accumulators import MACD
+from PyFin.Math.Accumulators import Sqrt
+from PyFin.Math.Accumulators import Diff
+from PyFin.Math.Accumulators import SimpleReturn
+from PyFin.Math.Accumulators import LogReturn
 
 
 class SecurityStatelessSingleValueHolder(SecurityValueHolder):
@@ -54,3 +58,30 @@ class SecurityMACDValueHolder(SecurityStatelessSingleValueHolder):
                                                       short=short,
                                                       long=long)
 
+
+class SecuritySqrtValueHolder(SecurityStatelessSingleValueHolder):
+    def __init__(self, dependency='x', symbolList=None):
+        super(SecuritySqrtValueHolder, self).__init__(holderType=Sqrt,
+                                                      dependency=dependency,
+                                                      symbolList=symbolList)
+
+
+class SecurityDiffValueHolder(SecurityStatelessSingleValueHolder):
+    def __init__(self, dependency='x', symbolList=None):
+        super(SecurityDiffValueHolder, self).__init__(holderType=Diff,
+                                                      dependency=dependency,
+                                                      symbolList=symbolList)
+
+
+class SecuritySimpleReturnValueHolder(SecurityStatelessSingleValueHolder):
+    def __init__(self, dependency='x', symbolList=None):
+        super(SecuritySimpleReturnValueHolder, self).__init__(holderType=SimpleReturn,
+                                                              dependency=dependency,
+                                                              symbolList=symbolList)
+
+
+class SecurityLogReturnValueHolder(SecurityStatelessSingleValueHolder):
+    def __init__(self, dependency='x', symbolList=None):
+        super(SecurityLogReturnValueHolder, self).__init__(holderType=LogReturn,
+                                                           dependency=dependency,
+                                                           symbolList=symbolList)

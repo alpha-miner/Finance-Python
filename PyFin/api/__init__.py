@@ -31,6 +31,10 @@ from PyFin.api.Analysis import HIGH
 from PyFin.api.Analysis import LOW
 from PyFin.api.Analysis import OPEN
 from PyFin.api.Analysis import CLOSE
+from PyFin.api.Analysis import SQRT
+from PyFin.api.Analysis import DIFF
+from PyFin.api.Analysis import RETURNSimple
+from PyFin.api.Analysis import RETURNLog
 
 
 __all__ = ["datesList",
@@ -57,4 +61,8 @@ __all__ = ["datesList",
            "HIGH",
            "LOW",
            "OPEN",
-           "CLOSE"]
+           "CLOSE",
+           "SQRT",
+           "DIFF",
+           "RETURNSimple",
+           "RETURNLog"]

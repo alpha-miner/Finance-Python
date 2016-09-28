@@ -439,16 +439,16 @@ class BasicFunction(Accumulator):
         return self._returnSize.isFull
 
 
-def Exp(valueHolder):
-    return BasicFunction(valueHolder, math.exp)
+def Exp(dependency):
+    return BasicFunction(dependency, math.exp)
 
 
-def Log(valueHolder):
-    return BasicFunction(valueHolder, math.log)
+def Log(dependency):
+    return BasicFunction(dependency, math.log)
 
 
-def Sqrt(valueHolder):
-    return BasicFunction(valueHolder, math.sqrt)
+def Sqrt(dependency):
+    return BasicFunction(dependency, math.sqrt)
 
 
 # due to the fact that pow function is much slower than ** operator

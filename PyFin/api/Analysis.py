@@ -19,6 +19,10 @@ from PyFin.Analysis.TechnicalAnalysis import SecurityMovingHistoricalWindow
 from PyFin.Analysis.TechnicalAnalysis import SecurityLatestValueHolder
 from PyFin.Analysis.TechnicalAnalysis import SecurityXAverageValueHolder
 from PyFin.Analysis.TechnicalAnalysis import SecurityMACDValueHolder
+from PyFin.Analysis.TechnicalAnalysis import SecuritySqrtValueHolder
+from PyFin.Analysis.TechnicalAnalysis import SecurityDiffValueHolder
+from PyFin.Analysis.TechnicalAnalysis import SecuritySimpleReturnValueHolder
+from PyFin.Analysis.TechnicalAnalysis import SecurityLogReturnValueHolder
 
 
 def EMA(window, dependency='x', symbolList=None):
@@ -67,6 +71,23 @@ def HIST(window, dependency='x', symbolList=None):
 
 def LAST(dependency='x', symbolList=None):
     return SecurityLatestValueHolder(dependency, symbolList)
+
+
+def SQRT(dependency='x', symbolList=None):
+    return SecuritySqrtValueHolder(dependency, symbolList)
+
+
+def DIFF(dependency='x', symbolList=None):
+    return SecurityDiffValueHolder(dependency, symbolList)
+
+
+def RETURNSimple(dependency='x', symbolList=None):
+    return SecuritySimpleReturnValueHolder(dependency, symbolList)
+
+
+def RETURNLog(dependency='x', symbolList=None):
+    return SecurityLogReturnValueHolder(dependency, symbolList)
+
 
 HIGH = functools.partial(LAST, 'high')
 LOW = functools.partial(LAST, 'low')

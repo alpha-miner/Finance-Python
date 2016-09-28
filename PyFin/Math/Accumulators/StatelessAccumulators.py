@@ -54,6 +54,66 @@ class Latest(StatelessAccumulator):
         return self._latest
 
 
+class Diff(StatelessAccumulator):
+    def __init__(self, dependency='x'):
+        super(Diff, self).__init__(dependency)
+        _checkParameterList(dependency)
+        self._returnSize = 1
+        self._diff = np.nan
+        self._curr = np.nan
+        self._previous = np.nan
+
+    def push(self, data):
+        value = super(Diff, self).push(data)
+        if np.isnan(value):
+            return np.isnan
+        self._previous = self._curr
+        self._curr = value
+
+    def result(self):
+        return self._curr - self._previous
+
+
+class SimpleReturn(StatelessAccumulator):
+    def __init__(self, dependency='x'):
+        super(SimpleReturn, self).__init__(dependency)
+        _checkParameterList(dependency)
+        self._returnSize = 1
+        self._diff = np.nan
+        self._curr = np.nan
+        self._previous = np.nan
+
+    def push(self, data):
+        value = super(SimpleReturn, self).push(data)
+        if np.isnan(value):
+            return np.isnan
+        self._previous = self._curr
+        self._curr = value
+
+    def result(self):
+        return self._curr / self._previous - 1.
+
+
+class LogReturn(StatelessAccumulator):
+    def __init__(self, dependency='x'):
+        super(LogReturn, self).__init__(dependency)
+        _checkParameterList(dependency)
+        self._returnSize = 1
+        self._diff = np.nan
+        self._curr = np.nan
+        self._previous = np.nan
+
+    def push(self, data):
+        value = super(LogReturn, self).push(data)
+        if np.isnan(value):
+            return np.isnan
+        self._previous = self._curr
+        self._curr = value
+
+    def result(self):
+        return math.log(self._curr / self._previous)
+
+
 class Positive(StatelessAccumulator):
     def __init__(self, dependency='x'):
         super(Positive, self).__init__(dependency)

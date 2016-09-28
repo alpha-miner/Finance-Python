@@ -8,6 +8,10 @@ Created on 2015-8-8
 from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import SecurityLatestValueHolder
 from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import SecurityXAverageValueHolder
 from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import SecurityMACDValueHolder
+from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import SecuritySqrtValueHolder
+from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import SecurityDiffValueHolder
+from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import SecuritySimpleReturnValueHolder
+from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import SecurityLogReturnValueHolder
 
 from PyFin.Analysis.TechnicalAnalysis.StatefulTechnicalAnalysers import SecurityMovingAverage
 from PyFin.Analysis.TechnicalAnalysis.StatefulTechnicalAnalysers import SecurityMovingMax
@@ -27,6 +31,10 @@ from PyFin.Analysis.TechnicalAnalysis.StatefulTechnicalAnalysers import Security
 __all__ = ['SecurityLatestValueHolder',
            'SecurityXAverageValueHolder',
            'SecurityMACDValueHolder',
+           'SecuritySqrtValueHolder',
+           'SecurityDiffValueHolder',
+           'SecuritySimpleReturnValueHolder',
+           'SecurityLogReturnValueHolder',
            'SecurityMovingAverage',
            'SecurityMovingMax',
            'SecurityMovingMinimum',

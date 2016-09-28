@@ -17,6 +17,9 @@ from PyFin.Math.Accumulators.IAccumulators import Asin
 from PyFin.Math.Accumulators.IAccumulators import Asinh
 
 from PyFin.Math.Accumulators.StatelessAccumulators import Latest
+from PyFin.Math.Accumulators.StatelessAccumulators import Diff
+from PyFin.Math.Accumulators.StatelessAccumulators import SimpleReturn
+from PyFin.Math.Accumulators.StatelessAccumulators import LogReturn
 from PyFin.Math.Accumulators.StatelessAccumulators import Positive
 from PyFin.Math.Accumulators.StatelessAccumulators import Negative
 from PyFin.Math.Accumulators.StatelessAccumulators import Max
@@ -64,6 +67,9 @@ __all__ = ["Exp",
            "Asin",
            "Asinh",
            "Latest",
+           "Diff",
+           "SimpleReturn",
+           "LogReturn",
            "Positive",
            "Negative",
            "Max",
@@ -98,5 +104,4 @@ __all__ = ["Exp",
            "MovingAverageDrawdown",
            "MovingMaxDrawdown",
            "MovingSharp",
-           "MovingSortino",
-           "Timeseries"]
+           "MovingSortino"]

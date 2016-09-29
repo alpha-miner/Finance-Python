@@ -152,9 +152,6 @@ class Accumulator(object):
         if isinstance(right, Accumulator):
             return CompoundedValueHolder(self, right)
 
-        if type(right) == type(Accumulator) and issubclass(right, Accumulator):
-            return CompoundedValueHolder(self, right())
-
         try:
             return right(self)
         except TypeError:
@@ -413,79 +410,106 @@ class CompoundedValueHolder(Accumulator):
 
 
 class BasicFunction(Accumulator):
-    def __init__(self, valueHolder, func, *args, **kwargs):
-        self._returnSize = valueHolder.valueSize
-        self._valueHolder = deepcopy(valueHolder)
-        self._dependency = deepcopy(valueHolder.dependency)
+    def __init__(self, dependency, func):
+        super(BasicFunction, self).__init__(dependency)
+        if self._isValueHolderContained:
+            self._returnSize = self._dependency.valueSize
+            self._window = self._dependency.window
+            self._containerSize = self._dependency._containerSize
+        else:
+            self._returnSize = 1
+            self._window = 1
+            self._containerSize = 1
         self._func = func
-        self._args = args
-        self._kwargs = kwargs
-        self._window = valueHolder.window
-        self._containerSize = valueHolder._containerSize
+        self._isFull = 0
+        self._origValue = np.nan
 
     def push(self, data):
-        self._valueHolder.push(data)
+        value = super(BasicFunction, self).push(data)
+        if np.any(np.isnan(value)):
+            return np.nan
+        self._origValue = value
+        self._isFull = 1
 
     def result(self):
-        origValue = self._valueHolder.result()
 
-        if hasattr(origValue, '__iter__'):
-            return tuple(self._func(v, *self._args, **self._kwargs) for v in origValue)
+        if hasattr(self._origValue, '__iter__'):
+            return tuple(self._func(v) for v in self._origValue)
         else:
-            return self._func(origValue, *self._args, **self._kwargs)
-
-    @property
-    def isFull(self):
-        return self._returnSize.isFull
+            return self._func(self._origValue)
 
 
-def Exp(dependency):
-    return BasicFunction(dependency, math.exp)
+class Exp(BasicFunction):
+    def __init__(self, dependency):
+        super(Exp, self).__init__(dependency, math.exp)
 
 
-def Log(dependency):
-    return BasicFunction(dependency, math.log)
+class Log(BasicFunction):
+    def __init__(self, dependency):
+        super(Log, self).__init__(dependency, math.log)
 
 
-def Sqrt(dependency):
-    return BasicFunction(dependency, math.sqrt)
+class Sqrt(BasicFunction):
+    def __init__(self, dependency):
+        super(Sqrt, self).__init__(dependency, math.sqrt)
 
 
 # due to the fact that pow function is much slower than ** operator
 class Pow(Accumulator):
-    def __init__(self, valueHolder, n):
-        self._returnSize = valueHolder.valueSize
-        self._valueHolder = deepcopy(valueHolder)
-        self._dependency = deepcopy(valueHolder.dependency)
-        self._n = n
-        self._window = valueHolder.window
+    def __init__(self, dependency, n):
+        super(Pow, self).__init__(dependency)
+        if self._isValueHolderContained:
+            self._returnSize = self._dependency.valueSize
+            self._window = self._dependency.window
+            self._containerSize = self._dependency._containerSize
+        else:
+            self._returnSize = 1
+            self._window = 1
+            self._containerSize = 1
+        self._isFull = 0
+        self._origValue = np.nan
+        self.n = n
 
     def push(self, data):
-        self._valueHolder.push(data)
+        value = super(Pow, self).push(data)
+        if np.any(np.isnan(value)):
+            return np.nan
+        self._origValue = value
+        self._isFull = 1
 
     def result(self):
-        origValue = self._valueHolder.result()
-        if hasattr(origValue, '__iter__'):
-            return tuple(v ** self._n for v in origValue)
+
+        if hasattr(self._origValue, '__iter__'):
+            return tuple(v ** self.n for v in self._origValue)
         else:
-            return origValue ** self._n
+            return self._origValue ** self.n
 
 
-def Abs(valueHolder):
-    return BasicFunction(valueHolder, abs)
+class Abs(BasicFunction):
+    def __init__(self, dependency):
+        super(Abs, self).__init__(dependency, abs)
 
 
-def Acos(valueHolder):
-    return BasicFunction(valueHolder, math.acos)
+class Sign(BasicFunction):
+    def __init__(self, dependency):
+        super(Sign, self).__init__(dependency, lambda x: 1 if x >= 0 else -1)
 
 
-def Acosh(valueHolder):
-    return BasicFunction(valueHolder, math.acosh)
+class Acos(BasicFunction):
+    def __init__(self, dependency):
+        super(Acos, self).__init__(dependency, math.acos)
 
 
-def Asin(valueHolder):
-    return BasicFunction(valueHolder, math.asin)
+class Acosh(BasicFunction):
+    def __init__(self, dependency):
+        super(Acosh, self).__init__(dependency, math.acosh)
 
 
-def Asinh(valueHolder):
-    return BasicFunction(valueHolder, math.asinh)
+class Asin(BasicFunction):
+    def __init__(self, dependency):
+        super(Asin, self).__init__(dependency, math.asin)
+
+
+class Asinh(BasicFunction):
+    def __init__(self, dependency):
+        super(Asinh, self).__init__(dependency, math.asinh)

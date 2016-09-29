@@ -10,7 +10,15 @@ from PyFin.Analysis.SecurityValueHolders import SecurityValueHolder
 from PyFin.Math.Accumulators import Latest
 from PyFin.Math.Accumulators import XAverage
 from PyFin.Math.Accumulators import MACD
+from PyFin.Math.Accumulators import Exp
+from PyFin.Math.Accumulators import Log
+from PyFin.Math.Accumulators import Pow
 from PyFin.Math.Accumulators import Sqrt
+from PyFin.Math.Accumulators import Abs
+from PyFin.Math.Accumulators import Acos
+from PyFin.Math.Accumulators import Acosh
+from PyFin.Math.Accumulators import Asin
+from PyFin.Math.Accumulators import Asinh
 from PyFin.Math.Accumulators import Diff
 from PyFin.Math.Accumulators import SimpleReturn
 from PyFin.Math.Accumulators import LogReturn
@@ -59,9 +67,65 @@ class SecurityMACDValueHolder(SecurityStatelessSingleValueHolder):
                                                       long=long)
 
 
+class SecurityExpValueHolder(SecurityStatelessSingleValueHolder):
+    def __init__(self, dependency='x', symbolList=None):
+        super(SecurityExpValueHolder, self).__init__(holderType=Exp,
+                                                      dependency=dependency,
+                                                      symbolList=symbolList)
+
+
+class SecurityLogValueHolder(SecurityStatelessSingleValueHolder):
+    def __init__(self, dependency='x', symbolList=None):
+        super(SecurityLogValueHolder, self).__init__(holderType=Log,
+                                                      dependency=dependency,
+                                                      symbolList=symbolList)
+
+
+class SecurityPowValueHolder(SecurityStatelessSingleValueHolder):
+    def __init__(self, dependency='x', symbolList=None):
+        super(SecurityPowValueHolder, self).__init__(holderType=Pow,
+                                                      dependency=dependency,
+                                                      symbolList=symbolList)
+
+
 class SecuritySqrtValueHolder(SecurityStatelessSingleValueHolder):
     def __init__(self, dependency='x', symbolList=None):
         super(SecuritySqrtValueHolder, self).__init__(holderType=Sqrt,
+                                                      dependency=dependency,
+                                                      symbolList=symbolList)
+
+
+class SecurityAbsValueHolder(SecurityStatelessSingleValueHolder):
+    def __init__(self, dependency='x', symbolList=None):
+        super(SecurityAbsValueHolder, self).__init__(holderType=Abs,
+                                                      dependency=dependency,
+                                                      symbolList=symbolList)
+
+
+class SecurityAcosValueHolder(SecurityStatelessSingleValueHolder):
+    def __init__(self, dependency='x', symbolList=None):
+        super(SecurityAcosValueHolder, self).__init__(holderType=Acos,
+                                                      dependency=dependency,
+                                                      symbolList=symbolList)
+
+
+class SecurityAcoshValueHolder(SecurityStatelessSingleValueHolder):
+    def __init__(self, dependency='x', symbolList=None):
+        super(SecurityAcoshValueHolder, self).__init__(holderType=Acosh,
+                                                      dependency=dependency,
+                                                      symbolList=symbolList)
+
+
+class SecurityAsinValueHolder(SecurityStatelessSingleValueHolder):
+    def __init__(self, dependency='x', symbolList=None):
+        super(SecurityAsinValueHolder, self).__init__(holderType=Asin,
+                                                      dependency=dependency,
+                                                      symbolList=symbolList)
+
+
+class SecurityAsinhValueHolder(SecurityStatelessSingleValueHolder):
+    def __init__(self, dependency='x', symbolList=None):
+        super(SecurityAsinhValueHolder, self).__init__(holderType=Asinh,
                                                       dependency=dependency,
                                                       symbolList=symbolList)
 

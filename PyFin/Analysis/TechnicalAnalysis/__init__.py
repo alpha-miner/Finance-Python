@@ -8,7 +8,15 @@ Created on 2015-8-8
 from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import SecurityLatestValueHolder
 from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import SecurityXAverageValueHolder
 from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import SecurityMACDValueHolder
+from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import SecurityExpValueHolder
+from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import SecurityLogValueHolder
 from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import SecuritySqrtValueHolder
+from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import SecurityPowValueHolder
+from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import SecurityAbsValueHolder
+from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import SecurityAcosValueHolder
+from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import SecurityAcoshValueHolder
+from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import SecurityAsinValueHolder
+from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import SecurityAsinhValueHolder
 from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import SecurityDiffValueHolder
 from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import SecuritySimpleReturnValueHolder
 from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import SecurityLogReturnValueHolder
@@ -31,7 +39,14 @@ from PyFin.Analysis.TechnicalAnalysis.StatefulTechnicalAnalysers import Security
 __all__ = ['SecurityLatestValueHolder',
            'SecurityXAverageValueHolder',
            'SecurityMACDValueHolder',
+           'SecurityExpValueHolder',
+           'SecurityLogValueHolder',
            'SecuritySqrtValueHolder',
+           'SecurityPowValueHolder',
+           'SecurityAbsValueHolder',
+           'SecurityAcoshValueHolder',
+           'SecurityAsinValueHolder',
+           'SecurityAsinhValueHolder',
            'SecurityDiffValueHolder',
            'SecuritySimpleReturnValueHolder',
            'SecurityLogReturnValueHolder',

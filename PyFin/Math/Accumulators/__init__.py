@@ -9,6 +9,7 @@ from PyFin.Math.Accumulators.IAccumulators import TruncatedValueHolder
 from PyFin.Math.Accumulators.IAccumulators import Exp
 from PyFin.Math.Accumulators.IAccumulators import Log
 from PyFin.Math.Accumulators.IAccumulators import Sqrt
+from PyFin.Math.Accumulators.IAccumulators import Sign
 from PyFin.Math.Accumulators.IAccumulators import Abs
 from PyFin.Math.Accumulators.IAccumulators import Pow
 from PyFin.Math.Accumulators.IAccumulators import Acos
@@ -60,6 +61,7 @@ from PyFin.Math.Accumulators.Performancers import MovingSortino
 __all__ = ["Exp",
            "Log",
            "Sqrt",
+           "Sign",
            "Abs",
            "Pow",
            "Acos",

@@ -13,6 +13,7 @@ from scipy.stats import linregress
 from PyFin.Math.Accumulators.IAccumulators import Exp
 from PyFin.Math.Accumulators.IAccumulators import Log
 from PyFin.Math.Accumulators.IAccumulators import Sqrt
+from PyFin.Math.Accumulators.IAccumulators import Sign
 from PyFin.Math.Accumulators.IAccumulators import Abs
 from PyFin.Math.Accumulators.IAccumulators import Pow
 from PyFin.Math.Accumulators.IAccumulators import Acos
@@ -700,6 +701,33 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
                 self.assertAlmostEqual(cal, expected, 12, "at index {0:d}\n"
                                                           "expected:   {1:f}\n"
                                                           "calculated: {2:f}".format(i, expected, cal))
+
+    def testSignFunction(self):
+        ma5 = MovingAverage(5, 'close')
+        holder = Sign(ma5)
+        holder2 = (ma5 ^ (-ma5)) >> Sign
+
+        for i, close in enumerate(self.sampleClose):
+            data = {'close': close}
+            ma5.push(data)
+            holder.push(data)
+            holder2.push(data)
+
+            expected = 1 if ma5.result() >= 0 else -1
+            calculated = holder.result()
+
+            self.assertEqual(calculated, expected, "at index {0:d}\n"
+                                                   "expected:   {1:f}\n"
+                                                   "calculated: {2:f}".format(i, expected, calculated))
+
+            calculated = holder2.result()
+            self.assertEqual(calculated[0], expected, "at index {0:d}\n"
+                                                      "expected:   {1:f}\n"
+                                                      "calculated: {2:f}".format(i, expected, calculated[0]))
+
+            self.assertEqual(calculated[1], -expected, "at index {0:d}\n"
+                                                       "expected:   {1:f}\n"
+                                                       "calculated: {2:f}".format(i, expected, calculated[1]))
 
     def testSqrtFunction(self):
         ma5 = MovingAverage(5, 'close')

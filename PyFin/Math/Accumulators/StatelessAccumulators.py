@@ -46,8 +46,12 @@ class Latest(StatelessAccumulator):
 
     def push(self, data):
         value = super(Latest, self).push(data)
-        if np.isnan(value):
-            return np.nan
+        try:
+            if np.isnan(value):
+                return np.nan
+        except TypeError:
+            if not value:
+                return np.nan
         self._latest = value
 
     def result(self):

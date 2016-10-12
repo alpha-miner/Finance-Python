@@ -390,8 +390,12 @@ class MovingHistoricalWindow(StatefulValueHolder):
 
     def push(self, data):
         value = super(MovingHistoricalWindow, self).push(data)
-        if np.isnan(value):
-            return np.nan
+        try:
+            if np.isnan(value):
+                return np.nan
+        except TypeError:
+            if not value:
+                return np.nan
         _ = self._dumpOneValue(value)
 
     def __getitem__(self, item):

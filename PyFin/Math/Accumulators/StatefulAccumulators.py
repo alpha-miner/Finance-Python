@@ -293,6 +293,10 @@ class MovingVariance(SingleValuedValueHolder):
 
     def result(self):
         length = self.size
+
+        if length == 0:
+            return np.nan
+
         tmp = self._runningSumSquare - self._runningSum * self._runningSum / length
 
         if self._isPop:
@@ -301,7 +305,7 @@ class MovingVariance(SingleValuedValueHolder):
             if length >= 2:
                 return tmp / (length - 1)
             else:
-                raise ZeroDivisionError("Container has too few samples: {0:d}".format(self.size))
+                return np.nan
 
 
 class MovingNegativeVariance(SingleValuedValueHolder):

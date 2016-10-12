@@ -8,6 +8,7 @@ Created on 2015-7-16
 import csv
 import unittest
 import os
+import numpy as np
 from PyFin.Math.Accumulators.Performancers import MovingSharp
 from PyFin.Math.Accumulators.Performancers import MovingSortino
 from PyFin.Math.Accumulators.Performancers import MovingAlphaBeta
@@ -31,8 +32,7 @@ class TestPerformancers(unittest.TestCase):
                 data = {'ret': float(row[1]), 'riskFree': float(row[2])}
                 mv.push(data)
                 if i == 1:
-                    with self.assertRaises(ArithmeticError):
-                        _ = mv.result()
+                    self.assertTrue(np.isnan(mv.result()))
                 if i >= 20:
                     calculated = mv.result()
                     expected = float(row[6])

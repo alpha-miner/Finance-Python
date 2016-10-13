@@ -317,9 +317,9 @@ class Variance(StatelessAccumulator):
 
         pop_num = self._currentCount if self._isPop else self._currentCount - 1
 
-        try:
+        if pop_num:
             return tmp / pop_num
-        except ZeroDivisionError:
+        else:
             return np.nan
 
 
@@ -346,12 +346,12 @@ class Correlation(StatelessAccumulator):
         self._currentCount += 1
 
     def result(self):
-        try:
-            n = self._currentCount
-            nominator = n * self._runningSumCrossSquare - self._runningSumLeft * self._runningSumRight
-            denominator = (n * self._runningSumSquareLeft - self._runningSumLeft * self._runningSumLeft) \
-                          * (n * self._runningSumSquareRight - self._runningSumRight * self._runningSumRight)
-            denominator = math.sqrt(denominator)
+        n = self._currentCount
+        nominator = n * self._runningSumCrossSquare - self._runningSumLeft * self._runningSumRight
+        denominator = (n * self._runningSumSquareLeft - self._runningSumLeft * self._runningSumLeft) \
+                      * (n * self._runningSumSquareRight - self._runningSumRight * self._runningSumRight)
+        denominator = math.sqrt(denominator)
+        if denominator != 0:
             return nominator / denominator
-        except ZeroDivisionError:
-                return np.nan
+        else:
+            return np.nan

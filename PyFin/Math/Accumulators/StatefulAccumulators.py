@@ -337,14 +337,14 @@ class MovingNegativeVariance(SingleValuedValueHolder):
                 tmp = self._runningNegativeSumSquare - self._runningNegativeSum * self._runningNegativeSum / length
                 return tmp / length
             else:
-                raise ZeroDivisionError("Negative population variance container has less than 1 samples")
+                return np.nan
         else:
             if self._runningNegativeCount >= 2:
                 length = self._runningNegativeCount
                 tmp = self._runningNegativeSumSquare - self._runningNegativeSum * self._runningNegativeSum / length
                 return tmp / (length - 1)
             else:
-                raise ZeroDivisionError("Negative sample variance container has less than 2 samples")
+                return np.nan
 
 
 class MovingCountedPositive(SingleValuedValueHolder):
@@ -459,7 +459,7 @@ class MovingCorrelation(StatefulValueHolder):
             else:
                 return 0.0
         else:
-            raise ZeroDivisionError("Container has less than 2 samples")
+            return np.nan
 
 
 # Calculator for several series
@@ -498,4 +498,4 @@ class MovingCorrelationMatrix(StatefulValueHolder):
             denominator = np.sqrt(denominator * denominator.T)
             return nominator / denominator
         else:
-            raise ZeroDivisionError("Container has less than 2 samples")
+            return np.ones(len(self._runningSum)) * np.nan

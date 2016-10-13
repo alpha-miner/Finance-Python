@@ -350,8 +350,7 @@ class TestStatefulAccumulators(unittest.TestCase):
             runningSumSquare += value * value
 
             if i == 0:
-                with self.assertRaises(ArithmeticError):
-                    mv.result()
+                self.assertTrue(np.isnan(mv.result()))
 
             if i >= window:
                 runningSum -= con[0]
@@ -372,15 +371,13 @@ class TestStatefulAccumulators(unittest.TestCase):
         mv = MovingNegativeVariance(20, dependency='z', isPopulation=True)
         mv.push(dict(z=20.))
 
-        with self.assertRaises(ArithmeticError):
-            _ = mv.result()
+        self.assertTrue(np.isnan(mv.result()))
 
         mv = MovingNegativeVariance(20, dependency='z', isPopulation=False)
         mv.push(dict(z=20.))
         mv.push(dict(z=-20.))
 
-        with self.assertRaises(ArithmeticError):
-            _ = mv.result()
+        self.assertTrue(np.isnan(mv.result()))
 
         dirName = os.path.dirname(os.path.abspath(__file__))
         filePath = os.path.join(dirName, 'data/negativevariance.csv')
@@ -396,8 +393,7 @@ class TestStatefulAccumulators(unittest.TestCase):
                 mv.push(dict(z=float(row[1])))
 
                 if mv._runningNegativeCount == 1:
-                    with self.assertRaises(ArithmeticError):
-                        mv.result()
+                    self.assertTrue(np.isnan(mv.result()))
 
                 if i >= window:
                     expected = float(row[6])
@@ -462,8 +458,7 @@ class TestStatefulAccumulators(unittest.TestCase):
                 mv.push(dict(z=float(row[0]), t=float(row[1])))
 
                 if i == 1:
-                    with self.assertRaises(ArithmeticError):
-                        _ = mv.result()
+                    self.assertTrue(np.isnan(mv.result()))
 
                 if i >= window:
                     expected = float(row[2])
@@ -501,8 +496,7 @@ class TestStatefulAccumulators(unittest.TestCase):
                 row = [float(value) for value in row]
                 mv.push(dict(samples=row))
                 if i == 0:
-                    with self.assertRaises(ArithmeticError):
-                        _ = mv.result()
+                    self.assertTrue(np.all(np.isnan(mv.result())))
                 if (i + 1) == window:
                     calculated = mv.result()
                     for k, row in enumerate(first100Sample):

@@ -55,8 +55,7 @@ class TestPerformancers(unittest.TestCase):
                     continue
                 mv.push(dict(ret=float(row[2]), riskFree=float(row[3])))
                 if i == 1:
-                    with self.assertRaises(ArithmeticError):
-                        _ = mv.result()
+                    self.assertTrue(np.isnan(mv.result()))
                 if i >= window:
                     calculated = mv.result()
                     expected = float(row[10])
@@ -79,8 +78,7 @@ class TestPerformancers(unittest.TestCase):
                     continue
                 mv.push(dict(pRet=float(row[0]), mRet=float(row[1]), riskFree=float(row[2])))
                 if i == 1:
-                    with self.assertRaises(ArithmeticError):
-                        _ = mv.result()
+                    self.assertTrue(np.all(np.isnan(mv.result())))
                 if i >= window:
                     calculatedAlpha, calculatedBeta = mv.result()
                     expectedBeta = float(row[8])

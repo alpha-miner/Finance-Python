@@ -65,10 +65,15 @@ def nthWeekDay(nth, dayOfWeek, month, year):
     return date.toDateTime()
 
 
-def makeSchedule(firstDate, endDate, tenor):
-    cal = Calendar('NullCalendar')
+def makeSchedule(firstDate,
+                 endDate,
+                 tenor,
+                 calendar='NullCalendar',
+                 dateRule=BizDayConventions.Following):
+
+    cal = Calendar(calendar)
     firstDate = check_date(firstDate)
     endDate = check_date(endDate)
     tenor = Period(tenor)
-    schedule = Schedule(firstDate, endDate, tenor, cal)
+    schedule = Schedule(firstDate, endDate, tenor, cal, convention=dateRule)
     return [d.toDateTime() for d in schedule]

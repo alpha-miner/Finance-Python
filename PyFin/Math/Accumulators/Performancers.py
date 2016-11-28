@@ -83,8 +83,8 @@ class MovingSortino(StatefulValueHolder):
 
 class MovingAlphaBeta(StatefulValueHolder):
     def __init__(self, window, dependency=('pRet', 'mRet', 'riskFree')):
-        self._returnSize = 2
         super(MovingAlphaBeta, self).__init__(window, dependency)
+        self._returnSize = 2
         self._pReturnMean = MovingAverage(window, dependency='x')
         self._mReturnMean = MovingAverage(window, dependency='y')
         self._pReturnVar = MovingVariance(window, dependency='x')

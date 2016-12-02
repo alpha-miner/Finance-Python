@@ -123,7 +123,13 @@ class TestCalendar(unittest.TestCase):
                                   Date(2016, 6, 12),
                                   Date(2016, 9, 18),
                                   Date(2016, 10, 8),
-                                  Date(2016, 10, 9)]
+                                  Date(2016, 10, 9),
+        # China Inter Bank working weekend list in the year 2017
+                                  Date(2017, 1, 22),
+                                  Date(2017, 2, 4),
+                                  Date(2017, 4, 1),
+                                  Date(2017, 5, 27),
+                                  Date(2017, 9, 30)]
 
         cal = Calendar('China.IB')
 

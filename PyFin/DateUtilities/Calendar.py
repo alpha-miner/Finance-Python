@@ -512,6 +512,12 @@ class ChinaIBImpl(object):
         Date.westernStyle(18, Months.September, 2016),
         Date.westernStyle(8, Months.October, 2016),
         Date.westernStyle(9, Months.October, 2016),
+        # 2017
+        Date.westernStyle(22, Months.January, 2017),
+        Date.westernStyle(4, Months.February, 2017),
+        Date.westernStyle(1, Months.April, 2017),
+        Date.westernStyle(27, Months.May, 2017),
+        Date.westernStyle(30, Months.September, 2017),
     }
 
     def __init__(self):

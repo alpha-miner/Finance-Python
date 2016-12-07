@@ -8,6 +8,7 @@ Created on 2015-7-25
 import math
 import numpy as np
 from PyFin.Math.Accumulators.IAccumulators import Accumulator
+from PyFin.Math.Accumulators.IAccumulators import Pow
 
 
 def _checkParameterList(dependency):
@@ -355,3 +356,52 @@ class Correlation(StatelessAccumulator):
             return nominator / denominator
         else:
             return np.nan
+
+
+class Product(StatelessAccumulator):
+    def __init__(self, dependency='x'):
+        super(Product,self).__init__(dependency)
+        self._product = 1.0
+
+    def push(self, data):
+        value = super(Product, self).push(data)
+        try:
+            if np.isnan(value):
+                return np.nan
+        except TypeError:
+            if not value:
+                return np.nan
+        self._product *= value
+
+    def result(self):
+        return self._product
+
+
+class CenterMoment(StatelessAccumulator):
+    def __init__(self, order, dependency='x'):
+        super(CenterMoment, self).__init__(dependency)
+        self._this_list = []
+        self._order = order
+
+    def push(self, data):
+        value = super(CenterMoment, self).push(data)
+        if np.isnan(value):
+            return np.nan
+        else:
+            self._this_list.append(value)
+            self._moment = np.mean(np.power(np.abs(np.array(self._this_list) - np.mean(self._this_list)), self._order))
+
+    def result(self):
+        return self._moment
+
+
+class Skewness(StatelessAccumulator):
+    def __init__(self, dependency='x'):
+        super(Skewness, self).__init__(dependency)
+        self._std3 = Pow(Variance(dependency, isPopulation=True), 1.5)
+        self._moment3 = CenterMoment(3, dependency)
+        self._skewness = self._moment3 / self._std3
+    def push(self,data):
+        self._skewness.push(data)
+    def result(self):
+        return self._skewness.result()

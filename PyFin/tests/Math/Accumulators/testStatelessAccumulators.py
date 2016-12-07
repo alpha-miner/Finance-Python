@@ -19,6 +19,9 @@ from PyFin.Math.Accumulators.StatelessAccumulators import LogReturn
 from PyFin.Math.Accumulators.StatelessAccumulators import Sum
 from PyFin.Math.Accumulators.StatelessAccumulators import Variance
 from PyFin.Math.Accumulators.StatelessAccumulators import Correlation
+from PyFin.Math.Accumulators.StatelessAccumulators import Product
+from PyFin.Math.Accumulators.StatelessAccumulators import CenterMoment
+from PyFin.Math.Accumulators.StatelessAccumulators import Skewness
 
 
 class TestStatelessAccumulators(unittest.TestCase):
@@ -222,3 +225,75 @@ class TestStatelessAccumulators(unittest.TestCase):
                                                                  "expected correlation:   {1:f}\n"
                                                                  "calculated correlation: {2:f}".format(i, expected,
                                                                                                         calculated))
+
+    def testProduct(self):
+        product = Product(dependency='close')
+        expected = 1
+        for i, value in enumerate(self.samplesClose):
+            product.push(dict(close=value))
+            calculated = product.result()
+            expected *= value
+            self.assertAlmostEqual(expected, calculated, 10, "at index {0:d}\n"
+                                                             "expected product:   {1:f}\n"
+                                                             "calculated product: {2:f}".format(i, expected,
+                                                                                                calculated))
+
+    def testCenterMoment(self):
+        order = 1
+        moment = CenterMoment(order, dependency='close')
+        tmp_list = []
+        for i, value in enumerate(self.samplesClose):
+            moment.push(dict(close=value))
+            calculated = moment.result()
+            tmp_list.append(value)
+            expected = np.mean(np.power(np.abs(np.array(tmp_list) - np.mean(tmp_list)), order))
+            self.assertAlmostEqual(expected, calculated, 10, "at index {0:d}\n"
+                                                             "expected moment:   {1:f}\n"
+                                                             "calculated moment: {2:f}".format(i, expected,
+                                                                                                  calculated))
+        order = 2
+        moment = CenterMoment(order, dependency='close')
+        tmp_list = []
+        for i, value in enumerate(self.samplesClose):
+            moment.push(dict(close=value))
+            calculated = moment.result()
+            tmp_list.append(value)
+            expected = np.mean(np.power(np.abs(np.array(tmp_list) - np.mean(tmp_list)), order))
+            self.assertAlmostEqual(expected, calculated, 10, "at index {0:d}\n"
+                                                             "expected moment:   {1:f}\n"
+                                                             "calculated moment: {2:f}".format(i, expected,
+                                                                                                calculated))
+        order = 3
+        moment = CenterMoment(order, dependency='close')
+        tmp_list = []
+        for i, value in enumerate(self.samplesClose):
+            moment.push(dict(close=value))
+            calculated = moment.result()
+            tmp_list.append(value)
+            expected = np.mean(np.power(np.abs(np.array(tmp_list) - np.mean(tmp_list)), order))
+            self.assertAlmostEqual(expected, calculated, 10, "at index {0:d}\n"
+                                                             "expected moment:   {1:f}\n"
+                                                             "calculated moment: {2:f}".format(i, expected,
+                                                                                                calculated))
+
+
+    def testSkewness(self):
+        skewness = Skewness(dependency='close')
+        close_list = []
+
+        for i, value in enumerate(self.samplesClose):
+            close_list.append(value)
+            skewness.push(dict(close=value))
+            calculated = skewness.result()
+            this_moment3 = np.mean(np.power(np.abs(np.array(close_list) - np.mean(close_list)), 3))
+            if i == 0:
+                self.assertTrue(np.isnan(calculated))
+            if i >= 1:
+                expected = this_moment3 / np.power(np.std(close_list), 3)
+                self.assertAlmostEqual(expected, calculated, 10, "at index {0:d}\n"
+                                                                    "expected skewness:   {1:f}\n"
+                                                                    "calculated skewness: {2:f}".format(i, expected,
+                                                                                                        calculated))
+
+if __name__ == '__main__':
+    unittest.main()

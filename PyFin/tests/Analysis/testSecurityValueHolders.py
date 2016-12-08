@@ -12,6 +12,7 @@ from PyFin.Enums import Factors
 from PyFin.Analysis.SecurityValueHolders import SecuritiesValues
 from PyFin.Analysis.SecurityValueHolders import dependencyCalculator
 from PyFin.Analysis.SecurityValueHolders import RankedSecurityValueHolder
+from PyFin.Analysis.SecurityValueHolders import FilteredSecurityValueHolder
 from PyFin.Analysis.TechnicalAnalysis import SecurityLatestValueHolder
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingAverage
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingMax
@@ -49,6 +50,22 @@ class TestSecurityValueHolders(unittest.TestCase):
             rankHolder.push(data)
             benchmarkValues = benchmark.value
             np.testing.assert_array_almost_equal(benchmarkValues.rank(), rankHolder.value)
+
+    def testFilteredSecurityValueHolder(self):
+        benchmark = SecurityLatestValueHolder(dependency='close', symbolList=['aapl', 'ibm']) > 0
+        filtered = FilteredSecurityValueHolder(benchmark, benchmark)
+
+        for i in range(len(self.datas['aapl']['close'])):
+            data = {'aapl': {Factors.CLOSE: self.datas['aapl'][Factors.CLOSE][i],
+                             Factors.OPEN: self.datas['aapl'][Factors.OPEN][i]},
+                    'ibm': {Factors.CLOSE: self.datas['ibm'][Factors.CLOSE][i],
+                            Factors.OPEN: self.datas['ibm'][Factors.OPEN][i]}}
+            benchmark.push(data)
+            filtered.push(data)
+            if np.isnan(filtered['aapl']):
+                self.assertTrue(filtered['aapl'])
+            if np.isnan(filtered['ibm']):
+                self.assertTrue(filtered['ibm'])
 
     def testSecuritiesValuesComparison(self):
 

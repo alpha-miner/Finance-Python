@@ -217,7 +217,9 @@ class FilteredSecurityValueHolder(SecurityValueHolder):
         self._window = max(computer.window, filtering.window)
         self._returnSize = computer.valueSize
         self._dependency = _merge2set(
-            self._computer._dependency, self._filter._dependency)
+            self._computer._dependency,
+            self._filter._dependency
+        )
         self._symbolList = computer.symbolList
         self._updated = False
         self._cachedFlag = None
@@ -245,17 +247,7 @@ class FilteredSecurityValueHolder(SecurityValueHolder):
                 return np.nan
         except KeyError:
 
-            if isinstance(item, tuple):
-                symbolList = set(i.lower() for i in item).intersection(
-                    # TODO: to be corrected
-                    set(filter_flags.index))
-                pyFinAssert(len(symbolList) == len(item), ValueError,
-                            "security name can't be duplicated")
-                res = SecuritiesValues(
-                    {s: self.holders[s].result() for s in symbolList}
-                )
-                return res
-            elif isinstance(item, SecurityValueHolder):
+            if isinstance(item, SecurityValueHolder):
                 return FilteredSecurityValueHolder(self, item)
             else:
                 raise TypeError("{0} is not a valid id".format(item))

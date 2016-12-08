@@ -14,6 +14,7 @@ from PyFin.Math.Accumulators.IAccumulators import Accumulator
 from PyFin.Math.Accumulators.StatelessAccumulators import Latest
 from PyFin.Math.Accumulators.StatelessAccumulators import Positive
 from PyFin.Math.Accumulators.StatelessAccumulators import Negative
+from PyFin.Math.Accumulators.IAccumulators import Pow
 from PyFin.Utilities import pyFinAssert
 from PyFin.Utilities import isClose
 
@@ -499,3 +500,52 @@ class MovingCorrelationMatrix(StatefulValueHolder):
             return nominator / denominator
         else:
             return np.ones(len(self._runningSum)) * np.nan
+
+
+class MovingProduct(StatefulValueHolder):
+    def __init__(self, window, dependency='x'):
+        super(MovingProduct, self).__init__(window, dependency)
+        self._runningProduct = np.nan
+    def push(self, data):
+        value = super(MovingProduct, self).push(data)
+        if np.isnan(value):
+            return np.nan
+        self._dumpOneValue(value)
+        if all(self._con):
+            self._runningProduct = np.product(self._con)
+        else:
+            self._runningProduct = 0
+    def result(self):
+        return self._runningProduct
+
+
+
+class MovingCenterMoment(StatefulValueHolder):
+    def __init__(self, window, order, dependency='x'):
+        super(MovingCenterMoment, self).__init__(window, dependency)
+        self._order = order
+
+    def push(self, data):
+        value = super(MovingCenterMoment, self).push(data)
+        self._dumpOneValue(value)
+        if np.isnan(value):
+            return np.nan
+        else:
+            self._runningMoment = np.mean(np.power(np.abs(np.array(self._con) - np.mean(self._con)), self._order))
+
+    def result(self):
+        return self._runningMoment
+
+
+class MovingSkewness(MovingCenterMoment):
+    def __init__(self, window, dependency='x'):
+        super(MovingSkewness, self).__init__(window,dependency)
+        self._runningStd3 = Pow(MovingVariance(window, dependency, isPopulation=True), 1.5)
+        self._runningMoment3 = MovingCenterMoment(window, 3, dependency)
+        self._runningSkewness = self._runningMoment3 / self._runningStd3
+
+    def push(self, data):
+        self._runningSkewness.push(data)
+
+    def result(self):
+        return self._runningSkewness.result()

@@ -31,6 +31,9 @@ from PyFin.Math.Accumulators.StatelessAccumulators import XAverage
 from PyFin.Math.Accumulators.StatelessAccumulators import MACD
 from PyFin.Math.Accumulators.StatelessAccumulators import Variance
 from PyFin.Math.Accumulators.StatelessAccumulators import Correlation
+from PyFin.Math.Accumulators.StatelessAccumulators import Product
+from PyFin.Math.Accumulators.StatelessAccumulators import CenterMoment
+from PyFin.Math.Accumulators.StatelessAccumulators import Skewness
 
 from PyFin.Math.Accumulators.StatefulAccumulators import Shift
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingAverage
@@ -49,6 +52,9 @@ from PyFin.Math.Accumulators.StatefulAccumulators import MovingCorrelationMatrix
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingMax
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingMinimum
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingHistoricalWindow
+from PyFin.Math.Accumulators.StatefulAccumulators import MovingProduct
+from PyFin.Math.Accumulators.StatefulAccumulators import MovingCenterMoment
+from PyFin.Math.Accumulators.StatefulAccumulators import MovingSkewness
 
 from PyFin.Math.Accumulators.Performancers import MovingLogReturn
 from PyFin.Math.Accumulators.Performancers import MovingAlphaBeta
@@ -106,4 +112,10 @@ __all__ = ["Exp",
            "MovingAverageDrawdown",
            "MovingMaxDrawdown",
            "MovingSharp",
-           "MovingSortino"]
+           "MovingSortino",
+           "Product",
+           "CenterMoment",
+           "Skewness",
+           "MovingProduct",
+           "MovingCenterMoment",
+           "MovingSkewness"]

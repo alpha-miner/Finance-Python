@@ -27,6 +27,9 @@ from PyFin.Math.Accumulators import MovingNegativeVariance
 from PyFin.Math.Accumulators import MovingHistoricalWindow
 from PyFin.Math.Accumulators import MovingCorrelation
 from PyFin.Math.Accumulators import MovingCorrelationMatrix
+from PyFin.Math.Accumulators import MovingProduct
+from PyFin.Math.Accumulators import MovingCenterMoment
+from PyFin.Math.Accumulators import MovingSkewness
 
 
 class TestStatefulAccumulators(unittest.TestCase):
@@ -513,3 +516,87 @@ class TestStatefulAccumulators(unittest.TestCase):
                                                    "Last 100 sample correlation matrix different at ({0:d}, {1:d})\n"
                                                    "Expected: {2:f}\n"
                                                    "Calculated: {3:f}".format(k, j, corr, calculated[k][j]))
+
+
+
+    def testMovingProduct(self):
+        window = 10
+        mp = MovingProduct(window, dependency='x')
+
+        con = []
+        for i, value in enumerate(self.sample):
+            con.append(value)
+            mp.push(dict(x=value))
+            if i >= window:
+                con = con[1:]
+            if i >= window - 1:
+                expected = np.product(con)
+                calculated = mp.result()
+                self.assertAlmostEqual(expected, calculated, 8, "at index {0:d}\n"
+                                                                "product expected:   {1:f}\n"
+                                                                "product calculated: {2:f}".format(i, expected,
+                                                                                                       calculated))
+
+
+    def testMovingCenterMoment(self):
+        window = 10
+        order = 1
+        mm = MovingCenterMoment(window, order, dependency='x')
+
+        con = []
+        for i, value in enumerate(self.sample):
+            con.append(value)
+            mm.push(dict(x=value))
+            if i >= window:
+                con = con[1:]
+            if i >= window - 1:
+                expected = np.mean(np.power(np.abs(np.array(con) - np.mean(con)), order))
+                calculated = mm.result()
+                self.assertAlmostEqual(expected, calculated, 8, "at index {0:d}\n"
+                                                                "moment expected:   {1:f}\n"
+                                                                "moment calculated: {2:f}".format(i, expected,
+                                                                                                  calculated))
+
+
+        window = 10
+        order = 2
+        mm = MovingCenterMoment(window, order, dependency='x')
+
+        con = []
+        for i, value in enumerate(self.sample):
+            con.append(value)
+            mm.push(dict(x=value))
+            if i >= window:
+                con = con[1:]
+            if i >= window - 1:
+                expected = np.mean(np.power(np.abs(np.array(con) - np.mean(con)), order))
+                calculated = mm.result()
+                self.assertAlmostEqual(expected, calculated, 8, "at index {0:d}\n"
+                                                                "moment expected:   {1:f}\n"
+                                                                "moment calculated: {2:f}".format(i, expected,
+                                                                                                  calculated))
+
+
+    def testMovingSkewness(self):
+        window = 10
+        ms = MovingSkewness(window, dependency='x')
+
+        con = []
+        for i, value in enumerate(self.sample):
+            con.append(value)
+            ms.push(dict(x=value))
+            if i >= window:
+                con = con[1:]
+            if i >= window - 1:
+                calculated = ms.result()
+                this_moment3 = np.mean(np.power(np.abs(np.array(con) - np.mean(con)), 3))
+                expected = this_moment3 / np.power(np.std(con), 3)
+                self.assertAlmostEqual(expected, calculated, 8, "at index {0:d}\n"
+                                                                "skewness expected:   {1:f}\n"
+                                                                "skewness calculated: {2:f}".format(i, expected,
+                                                                                                  calculated))
+
+
+if __name__ == '__main__':
+    unittest.main()
+

@@ -191,7 +191,7 @@ class RankedSecurityValueHolder(SecurityValueHolder):
             self._inner = copy.deepcopy(innerValue)
         else:
             # TODO: make the rank value holder workable for a symbol
-            raise ValueError("Currently only value holder input is needed for rank holder.")
+            raise ValueError("Currently only value holder input is allowed for rank holder.")
         self._window = self._inner.window
         self._returnSize = self._inner.valueSize
         self._dependency = self._inner.dependency

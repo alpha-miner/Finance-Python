@@ -221,7 +221,8 @@ class FilteredSecurityValueHolder(SecurityValueHolder):
 
             if isinstance(item, tuple):
                 symbolList = set(i.lower() for i in item).intersection(
-                    set(filter_flags.index))  # to be corrected
+                    # TODO to be corrected
+                    set(filter_flags.index))
                 pyFinAssert(len(symbolList) == len(item), ValueError,
                             "security name can't be duplicated")
                 res = SecuritiesValues(

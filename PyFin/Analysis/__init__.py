@@ -8,11 +8,13 @@ Created on 2015-8-8
 from PyFin.Analysis.DataProviders import DataProvider
 from PyFin.Analysis.SecurityValueHolders import SecurityShiftedValueHolder
 from PyFin.Analysis.SecurityValueHolders import SecurityCompoundedValueHolder
+from PyFin.Analysis.SecurityValueHolders import RankedSecurityValueHolder
 from PyFin.Analysis.SecurityValueHolders import dependencyCalculator
 from PyFin.Analysis import TechnicalAnalysis
 
 __all__ = ['DataProvider',
            'SecurityShiftedValueHolder',
            'SecurityCompoundedValueHolder',
+           'RankedSecurityValueHolder',
            'dependencyCalculator',
            'TechnicalAnalysis']

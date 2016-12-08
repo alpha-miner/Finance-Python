@@ -184,6 +184,32 @@ class SecurityValueHolder(object):
         return SecurityShiftedValueHolder(self, n)
 
 
+class RankedSecurityValueHolder(SecurityValueHolder):
+
+    def __init__(self, innerValue):
+        if isinstance(innerValue, SecurityValueHolder):
+            self._inner = copy.deepcopy(innerValue)
+        else:
+            # TODO: make the rank value holder workable for a symbol
+            raise ValueError("Currently only value holder input is needed for rank holder.")
+        self._window = self._inner.window
+        self._returnSize = self._inner.valueSize
+        self._dependency = self._inner.dependency
+        self._symbolList = self._inner.symbolList
+
+    @property
+    def value(self):
+        raw_values = self._inner.value
+        return raw_values.rank()
+
+    @property
+    def holders(self):
+        return self._inner.holders
+
+    def push(self, data):
+        self._inner.push(data)
+
+
 class FilteredSecurityValueHolder(SecurityValueHolder):
     def __init__(self, computer, filtering):
         self._filter = copy.deepcopy(filtering)
@@ -221,7 +247,7 @@ class FilteredSecurityValueHolder(SecurityValueHolder):
 
             if isinstance(item, tuple):
                 symbolList = set(i.lower() for i in item).intersection(
-                    # TODO to be corrected
+                    # TODO: to be corrected
                     set(filter_flags.index))
                 pyFinAssert(len(symbolList) == len(item), ValueError,
                             "security name can't be duplicated")

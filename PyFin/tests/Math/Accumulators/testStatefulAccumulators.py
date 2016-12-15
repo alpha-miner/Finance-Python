@@ -30,7 +30,18 @@ from PyFin.Math.Accumulators import MovingCorrelationMatrix
 from PyFin.Math.Accumulators import MovingProduct
 from PyFin.Math.Accumulators import MovingCenterMoment
 from PyFin.Math.Accumulators import MovingSkewness
-
+from PyFin.Math.Accumulators import MovingMaxPos
+from PyFin.Math.Accumulators import MovingMinPos
+from PyFin.Math.Accumulators import MovingKurtosis
+from PyFin.Math.Accumulators import MovingRSV
+from PyFin.Math.Accumulators import MACD
+from PyFin.Math.Accumulators import XAverage
+from PyFin.Math.Accumulators import MovingRank
+from PyFin.Math.Accumulators import MovingKDJ
+from PyFin.Math.Accumulators import MovingBias
+from PyFin.Math.Accumulators import MovingAroon
+from PyFin.Math.Accumulators import MovingLevel
+from PyFin.Math.Accumulators import MovingAutoCorrelation
 
 class TestStatefulAccumulators(unittest.TestCase):
     def setUp(self):
@@ -596,6 +607,250 @@ class TestStatefulAccumulators(unittest.TestCase):
                                                                 "skewness calculated: {2:f}".format(i, expected,
                                                                                                   calculated))
 
+
+    def testMovingTsMaxPos(self):
+        window = 10
+        maxPos = MovingMaxPos(window, dependency='x')
+
+        con = []
+        for i, value in enumerate(self.sample):
+            con.append(value)
+            maxPos.push(dict(x=value))
+            if i >= window:
+                con = con[1:]
+            if i >= window - 1:
+                calculated = maxPos.result()
+                expected = con.index(np.max(con))
+                self.assertEqual(expected, calculated, "at index {0:d}\n"
+                                                        "maxPos expected:   {1:f}\n"
+                                                        "maxPos calculated: {2:f}".format(i, expected,
+                                                                                              calculated))
+
+
+    def testMovingTsMinPos(self):
+        window = 10
+        minPos = MovingMinPos(window, dependency='x')
+
+        con = []
+        for i, value in enumerate(self.sample):
+            con.append(value)
+            minPos.push(dict(x=value))
+            if i >= window:
+                con = con[1:]
+            if i >= window - 1:
+                calculated = minPos.result()
+                expected = con.index(np.min(con))
+                self.assertEqual(expected, calculated, "at index {0:d}\n"
+                                                       "minPos expected:   {1:f}\n"
+                                                       "minPos calculated: {2:f}".format(i, expected,
+                                                                                         calculated))
+
+
+    def testMovingKurtosis(self):
+        window = 10
+        mk = MovingKurtosis(window, dependency='x')
+
+        con = []
+        for i, value in enumerate(self.sample):
+            con.append(value)
+            mk.push(dict(x=value))
+            if i >= window:
+                con = con[1:]
+            if i >= window - 1:
+                calculated = mk.result()
+                this_moment4 = np.mean(np.power(np.abs(np.array(con) - np.mean(con)), 4))
+                expected = this_moment4 / np.power(np.std(con), 4)
+                self.assertAlmostEqual(expected, calculated, 8, "at index {0:d}\n"
+                                                                "kurtosis expected:   {1:f}\n"
+                                                                "kurtosis calculated: {2:f}".format(i, expected,
+                                                                                                    calculated))
+
+
+    def testMovingRSV(self):
+        window = 10
+        rsv = MovingRSV(window, dependency='x')
+
+        con = []
+        for i, value in enumerate(self.sample):
+            con.append(value)
+            rsv.push(dict(x=value))
+            if i >= window:
+                con = con[1:]
+            if i >= window - 1:
+                calculated = rsv.result()
+                expected = (value - np.min(con)) / (np.max(con) - np.min(con))
+                self.assertAlmostEqual(expected, calculated, 8, "at index {0:d}\n"
+                                                                "rsv expected:   {1:f}\n"
+                                                                "rsv calculated: {2:f}".format(i, expected,
+                                                                                               calculated))
+
+
+    def testMACD(self):
+        macd = MACD(short=5, long=10, dependency='close')
+        short_average = XAverage(window=5, dependency='close')
+        long_average = XAverage(window=10, dependency='close')
+
+        for i, value in enumerate(self.sample):
+            macd.push(dict(close=value))
+            short_average.push(dict(close=value))
+            long_average.push(dict(close=value))
+            expected = short_average.result() - long_average.result()
+
+            calculated = macd.result()
+            self.assertAlmostEqual(expected, calculated, 10, "at index {0:d}\n"
+                                                             "expected x-average:   {1:f}\n"
+                                                             "calculated x-average: {2:f}".format(i,
+                                                                                                  expected,
+                                                                                                  calculated))
+
+
+    def testEMAMACD(self):
+        fast = 5
+        slow = 10
+        ema_window = 10
+        macd = MACD(fast, slow, 'close')
+        ema_macd = XAverage(ema_window, macd)
+
+        macd_diff = macd - ema_macd
+
+        for i, value in enumerate(self.sample):
+            macd.push(dict(close=value))
+            ema_macd.push(dict(close=value))
+            macd_diff.push(dict(close=value))
+            expected = macd.value - ema_macd.value
+            calculated = macd_diff.value
+            self.assertAlmostEqual(expected, calculated, 10, "at index {0:d}\n"
+                                                             "expected ema macd diff:   {1:f}\n"
+                                                             "calculated ema macd diff: {2:f}".format(i, expected, calculated))
+
+
+    def testMovingRank(self):
+        window = 10
+        mk = MovingRank(window, dependency='x')
+
+        con = []
+        for i, value in enumerate(self.sample):
+            con.append(value)
+            mk.push(dict(x=value))
+            if i >= window:
+                con = con[1:]
+            if i >= window - 1:
+                calculated = mk.result()
+                expected = np.argsort(np.argsort(con))
+                self.assertListEqual(list(expected), calculated, "at index {0:d}\n"
+                                                            "expected rank:   {1}\n"
+                                                            "calculated rank: {2}".format(i, expected, calculated))
+
+
+    def testMovingKDJ(self):
+        window = 10
+        k=3
+        d=3
+        mk = MovingKDJ(window, dependency='x')
+
+        con = []
+        this_j = []
+        tmp_flag = True
+        for i, value in enumerate(self.sample):
+            con.append(value)
+            mk.push(dict(x=value))
+            if i >= window:
+                con = con[1:]
+            this_rsv = (value - np.min(con)) / (np.max(con) - np.min(con))
+            if len(con) == 1:
+                this_j.append(np.nan)
+            else:
+                if len(con) == 2:
+                    this_k = (0.5 * (k - 1) + this_rsv) / k
+                    this_d = (0.5 * (d - 1) + this_k) / d
+                else:
+                    this_k = (this_k * (k - 1) + this_rsv) / k
+                    this_d = (this_d * (d - 1) + this_k) / d
+                this_j.append(3 * this_k - 2 * this_d)
+
+            if i >= window - 1:
+                expected = this_j[-1]
+                calculated = mk.result()
+                self.assertAlmostEqual(expected, calculated, 8, "at index {0:d}\n"
+                                                                "expected kdj:   {1:f}\n"
+                                                                "calculated kdj: {2:f}".format(i, expected, calculated))
+
+
+
+    def testMovingBias(self):
+        window = 10
+        mb = MovingBias(window, dependency='x')
+        con = []
+
+        for i, value in enumerate(self.sample):
+            con.append(value)
+            mb.push(dict(x=value))
+            if i >= window:
+                con = con[1:]
+            if i >= window - 1:
+                calculated = mb.result()
+                expected = value / np.mean(con) - 1
+                self.assertAlmostEqual(expected, calculated, 8, "at index {0:d}\n"
+                                                                "expected bias:   {1:f}\n"
+                                                                "calculated bias: {2:f}".format(i, expected, calculated))
+
+
+    def testMovingAroon(self):
+        window = 10
+        ma = MovingAroon(window, dependency='x')
+        con = []
+
+        for i, value in enumerate(self.sample):
+            con.append(value)
+            ma.push(dict(x=value))
+            if i >= window:
+                con = con[1:]
+            if i >= window - 1:
+                calculated = ma.result()
+                expected = (con.index(np.max(con)) - con.index(np.min(con))) / window
+                self.assertAlmostEqual(expected, calculated, 8, "at index {0:d}\n"
+                                                                "expected aroon:  {1:f}\n"
+                                                                "calculated aroon:{2:f}".format(i, expected, calculated))
+
+
+    def testMovingLevel(self):
+        window = 10
+        ml = MovingLevel(window, dependency='x')
+        con = []
+
+        for i, value in enumerate(self.sample):
+            con.append(value)
+            ml.push(dict(x=value))
+            if i >= window:
+                con = con[1:]
+            if i >= window - 1:
+                calculated = ml.result()
+                expected = con[-1] / con[0]
+                self.assertAlmostEqual(expected, calculated, 8, "at index {0:d}\n"
+                                                                "expected level:   {1:f}\n"
+                                                                "calculated level: {2:f}".format(i, expected, calculated))
+
+
+    def testMovingAutoCorrelation(self):
+        window = 10
+        lags = 2
+        ma = MovingAutoCorrelation(window, lags, dependency='x')
+        con = []
+
+        for i, value in enumerate(self.sample):
+            con.append(value)
+            ma.push(dict(x=value))
+            if i >= window:
+                con = con[1:]
+            if i >= window - 1:
+                calculated = ma.result()
+                con_forward = con[0:window - lags]
+                con_backward = con[-window + lags - 1 : -1]
+                expected = np.cov(con_backward, con_forward) / (np.std(con_forward) * np.std(con_backward))
+                self.assertAlmostEqual(expected[0, 1], calculated, 8, "at index of {0:d}\n"
+                                                                        "expected autoCorr:  {1:f}\n"
+                                                                        "calculated autoCorr:{2:f}".format(i, expected[0,1],
+                                                                                                           calculated))
 
 if __name__ == '__main__':
     unittest.main()

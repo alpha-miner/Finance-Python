@@ -12,7 +12,7 @@ from PyFin.tests import Math
 from PyFin.tests import PricingEngines
 from PyFin.tests import Analysis
 
-__all__ = ["API",
+__all__ = ["api",
            "DateUtilities",
            "Env",
            "Math",

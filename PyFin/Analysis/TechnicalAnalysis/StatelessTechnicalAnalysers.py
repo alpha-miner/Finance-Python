@@ -25,127 +25,109 @@ from PyFin.Math.Accumulators import LogReturn
 
 
 class SecurityStatelessSingleValueHolder(SecurityValueHolder):
-    def __init__(self, holderType, dependency='x', symbolList=None, **kwargs):
-        super(SecurityStatelessSingleValueHolder, self).__init__(dependency, symbolList)
+    def __init__(self, holderType, dependency='x', **kwargs):
+        super(SecurityStatelessSingleValueHolder, self).__init__(dependency)
 
         if isinstance(dependency, SecurityValueHolder):
-            self._symbolList = dependency.symbolList
+            self._symbolList = dependency._symbolList
             self._dependency = dependency._dependency
-            self._innerHolders = \
-                {
-                    name: holderType(dependency=copy.deepcopy(dependency.holders[name]), **kwargs) for name in self._symbolList
-                    }
-
+            self._holderTemplate = holderType(dependency=copy.deepcopy(dependency._holderTemplate), **kwargs)
         else:
-            self._innerHolders = \
-                {
-                    name: holderType(dependency=self._dependency, **kwargs) for name in self._symbolList
-                    }
+            self._holderTemplate = holderType(dependency=self._dependency, **kwargs)
+        self._innerHolders = \
+            {
+                name: copy.deepcopy(self._holderTemplate) for name in self._symbolList
+            }
 
 
 class SecurityLatestValueHolder(SecurityStatelessSingleValueHolder):
-    def __init__(self, dependency='x', symbolList=None):
+    def __init__(self, dependency='x'):
         super(SecurityLatestValueHolder, self).__init__(holderType=Latest,
-                                                        dependency=dependency,
-                                                        symbolList=symbolList)
+                                                        dependency=dependency)
 
 
 class SecurityXAverageValueHolder(SecurityStatelessSingleValueHolder):
-    def __init__(self, window, dependency='x', symbolList=None):
+    def __init__(self, window, dependency='x'):
         super(SecurityXAverageValueHolder, self).__init__(holderType=XAverage,
                                                           dependency=dependency,
-                                                          symbolList=symbolList,
                                                           window=window)
 
 
 class SecurityMACDValueHolder(SecurityStatelessSingleValueHolder):
-    def __init__(self, short, long, dependency='x', symbolList=None):
+    def __init__(self, short, long, dependency='x'):
         super(SecurityMACDValueHolder, self).__init__(holderType=MACD,
                                                       dependency=dependency,
-                                                      symbolList=symbolList,
                                                       short=short,
                                                       long=long)
 
 
 class SecurityExpValueHolder(SecurityStatelessSingleValueHolder):
-    def __init__(self, dependency='x', symbolList=None):
+    def __init__(self, dependency='x'):
         super(SecurityExpValueHolder, self).__init__(holderType=Exp,
-                                                      dependency=dependency,
-                                                      symbolList=symbolList)
+                                                      dependency=dependency)
 
 
 class SecurityLogValueHolder(SecurityStatelessSingleValueHolder):
-    def __init__(self, dependency='x', symbolList=None):
+    def __init__(self, dependency='x'):
         super(SecurityLogValueHolder, self).__init__(holderType=Log,
-                                                      dependency=dependency,
-                                                      symbolList=symbolList)
+                                                      dependency=dependency)
 
 
 class SecurityPowValueHolder(SecurityStatelessSingleValueHolder):
-    def __init__(self, dependency='x', symbolList=None):
+    def __init__(self, dependency='x'):
         super(SecurityPowValueHolder, self).__init__(holderType=Pow,
-                                                      dependency=dependency,
-                                                      symbolList=symbolList)
+                                                      dependency=dependency)
 
 
 class SecuritySqrtValueHolder(SecurityStatelessSingleValueHolder):
-    def __init__(self, dependency='x', symbolList=None):
+    def __init__(self, dependency='x'):
         super(SecuritySqrtValueHolder, self).__init__(holderType=Sqrt,
-                                                      dependency=dependency,
-                                                      symbolList=symbolList)
+                                                      dependency=dependency)
 
 
 class SecurityAbsValueHolder(SecurityStatelessSingleValueHolder):
-    def __init__(self, dependency='x', symbolList=None):
+    def __init__(self, dependency='x'):
         super(SecurityAbsValueHolder, self).__init__(holderType=Abs,
-                                                      dependency=dependency,
-                                                      symbolList=symbolList)
+                                                      dependency=dependency)
 
 
 class SecurityAcosValueHolder(SecurityStatelessSingleValueHolder):
-    def __init__(self, dependency='x', symbolList=None):
+    def __init__(self, dependency='x'):
         super(SecurityAcosValueHolder, self).__init__(holderType=Acos,
-                                                      dependency=dependency,
-                                                      symbolList=symbolList)
+                                                      dependency=dependency)
 
 
 class SecurityAcoshValueHolder(SecurityStatelessSingleValueHolder):
-    def __init__(self, dependency='x', symbolList=None):
+    def __init__(self, dependency='x'):
         super(SecurityAcoshValueHolder, self).__init__(holderType=Acosh,
-                                                      dependency=dependency,
-                                                      symbolList=symbolList)
+                                                      dependency=dependency)
 
 
 class SecurityAsinValueHolder(SecurityStatelessSingleValueHolder):
-    def __init__(self, dependency='x', symbolList=None):
+    def __init__(self, dependency='x'):
         super(SecurityAsinValueHolder, self).__init__(holderType=Asin,
-                                                      dependency=dependency,
-                                                      symbolList=symbolList)
+                                                      dependency=dependency)
 
 
 class SecurityAsinhValueHolder(SecurityStatelessSingleValueHolder):
-    def __init__(self, dependency='x', symbolList=None):
+    def __init__(self, dependency='x'):
         super(SecurityAsinhValueHolder, self).__init__(holderType=Asinh,
-                                                      dependency=dependency,
-                                                      symbolList=symbolList)
+                                                       dependency=dependency)
 
 
 class SecurityDiffValueHolder(SecurityStatelessSingleValueHolder):
-    def __init__(self, dependency='x', symbolList=None):
+    def __init__(self, dependency='x'):
         super(SecurityDiffValueHolder, self).__init__(holderType=Diff,
-                                                      dependency=dependency,
-                                                      symbolList=symbolList)
+                                                      dependency=dependency)
 
 
 class SecuritySimpleReturnValueHolder(SecurityStatelessSingleValueHolder):
-    def __init__(self, dependency='x', symbolList=None):
+    def __init__(self, dependency='x'):
         super(SecuritySimpleReturnValueHolder, self).__init__(holderType=SimpleReturn,
-                                                              dependency=dependency,
-                                                              symbolList=symbolList)
+                                                              dependency=dependency)
 
 
 class SecurityLogReturnValueHolder(SecurityStatelessSingleValueHolder):
-    def __init__(self, dependency='x', symbolList=None):
+    def __init__(self, dependency='x'):
         super(SecurityLogReturnValueHolder, self).__init__(holderType=LogReturn,
-                                                           dependency=dependency,
-                                                           symbolList=symbolList)
+                                                           dependency=dependency)

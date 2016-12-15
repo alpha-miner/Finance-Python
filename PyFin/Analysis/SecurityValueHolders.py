@@ -36,12 +36,8 @@ else:
 class SecurityValueHolder(object):
     __metaclass__ = ABCMeta
 
-    def __init__(self, dependency='x', symbolList=None):
-        if symbolList is None:
-            # should do something to get a global value here
-            self._symbolList = Settings.defaultSymbolList
-        else:
-            self._symbolList = set(s.lower() for s in symbolList)
+    def __init__(self, dependency='x'):
+        self._symbolList = set()
         if isinstance(dependency, SecurityValueHolder):
             self._dependency = dependency._dependency
         else:
@@ -53,6 +49,7 @@ class SecurityValueHolder(object):
                 self._dependency = dependency.lower()
         self._window = 1
         self._returnSize = 1
+        self._holderTemplate = None
 
     @property
     def symbolList(self):
@@ -80,9 +77,14 @@ class SecurityValueHolder(object):
         return self._window
 
     def push(self, data):
-        names = set(self.symbolList).intersection(set(data.keys()))
+        names = set(data.keys())
         for name in names:
-            self.holders[name].push(data[name])
+            if name in self.symbolList:
+                self.holders[name].push(data[name])
+            else:
+                self._symbolList.add(name)
+                self.holders[name] = copy.deepcopy(self._holderTemplate)
+                self.holders[name].push(data[name])
 
     @property
     def value(self):
@@ -195,7 +197,7 @@ class RankedSecurityValueHolder(SecurityValueHolder):
         self._window = self._inner.window
         self._returnSize = self._inner.valueSize
         self._dependency = self._inner.dependency
-        self._symbolList = self._inner.symbolList
+        self._symbolList = self._inner._symbolList
 
     @property
     def value(self):
@@ -220,7 +222,7 @@ class FilteredSecurityValueHolder(SecurityValueHolder):
             self._computer._dependency,
             self._filter._dependency
         )
-        self._symbolList = computer.symbolList
+        self._symbolList = self._computer._symbolList
         self._updated = False
         self._cachedFlag = None
 
@@ -264,9 +266,7 @@ class IdentitySecurityValueHolder(SecurityValueHolder):
         self._window = 1
         self._returnSize = n
         self._dependency = []
-        self._innerHolders = {
-            'wildCard': Identity(value, n)
-        }
+        self._holderTemplate = Identity(value, n)
 
 
 class SecurityCombinedValueHolder(SecurityValueHolder):
@@ -290,27 +290,11 @@ class SecurityCombinedValueHolder(SecurityValueHolder):
             self._left._dependency, self._right._dependency)
         self._returnSize = self._left.valueSize
 
-        if len(self._right.symbolList) == 0:
-            self._innerHolders = {
-                name: HolderType(self._left.holders[name], self._right.holders['wildCard'])
-                for name in self._left.symbolList
-            }
-        elif len(self._left.symbolList) == 0:
-            self._innerHolders = {
-                name: HolderType(self._left.holders['wildCard'], self._right.holders[name])
-                for name in self._right.symbolList
-            }
-        else:
-            self._innerHolders = {
-                name: HolderType(self._left.holders[name], self._right.holders[name])
-                for name in self._left.symbolList
-            }
+        self._holderTemplate = HolderType(self._left._holderTemplate, self._right._holderTemplate)
 
-    @property
-    def dependency(self):
-        left = self._left.dependency
-        right = self._right.dependency
-        return _merge2dict(left, right)
+        self._innerHolders = {
+            name: copy.deepcopy(self._holderTemplate) for name in self._left.symbolList
+        }
 
 
 class SecurityAddedValueHolder(SecurityCombinedValueHolder):
@@ -373,21 +357,24 @@ class SecurityNeOperatorValueHolder(SecurityCombinedValueHolder):
             left, right, NeOperatorValueHolder)
 
 
-def SecurityShiftedValueHolder(secValueHolder, n):
-    pyFinAssert(n >= 1, ValueError,
-                "shift value should always not be less than 1")
-    res = copy.deepcopy(secValueHolder)
-    res._window = secValueHolder.window + n
-    res._innerHolders = {
-        name: Shift(secValueHolder.holders[name], n) for name in secValueHolder.holders
-    }
-    return res
+class SecurityShiftedValueHolder(SecurityValueHolder):
+
+    def __init__(self, right, n):
+        self._returnSize = right.valueSize
+        self._symbolList = set(right.symbolList)
+        self._window = right.window + n
+        self._dependency = right.dependency
+        self._holderTemplate = Shift(right._holderTemplate, n)
+
+        self._innerHolders = {
+            name: copy.deepcopy(self._holderTemplate) for name in self._symbolList
+        }
 
 
 class SecurityCompoundedValueHolder(SecurityValueHolder):
     def __init__(self, left, right):
         self._returnSize = right.valueSize
-        self._symbolList = left.symbolList
+        self._symbolList = set(left.symbolList)
         self._window = left.window + right.window - 1
         self._dependency = left.dependency
         if not isinstance(right.fields, str):
@@ -398,23 +385,20 @@ class SecurityCompoundedValueHolder(SecurityValueHolder):
             pyFinAssert(left.valueSize == 1, ValueError, "left value size {0} is different from right dependency 1"
                         .format(left.valueSize))
 
-        self._right = copy.deepcopy(right.holders[list(right.holders)[0]])
-        self._left = copy.deepcopy(left.holders[list(left.holders)[0]])
-        self._innerHolders = {
-            name: CompoundedValueHolder(self._left, self._right) for name in self._symbolList
-        }
+        self._right = copy.deepcopy(right._holderTemplate)
+        self._left = copy.deepcopy(left._holderTemplate)
 
-    def push(self, data):
-        names = set(self._symbolList).intersection(set(data.keys()))
-        for name in names:
-            self.holders[name].push(data[name])
+        self._holderTemplate = CompoundedValueHolder(self._left, self._right)
+        self._innerHolders = {
+            name: copy.deepcopy(self._holderTemplate) for name in self._symbolList
+        }
 
 
 def dependencyCalculator(*args):
     res = defaultdict(list)
     tmp = {}
     for value in args:
-        tmp = _merge2dict(tmp, value.dependency)
+        tmp = _merge2dict(tmp, value)
 
     for name in tmp:
         if isinstance(tmp[name], list):

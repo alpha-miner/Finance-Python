@@ -12,7 +12,6 @@ from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import Securit
 
 
 class TestStatelessTechnicalAnalysis(unittest.TestCase):
-
     def setUp(self):
         # preparing market data
         np.random.seed(0)
@@ -27,7 +26,7 @@ class TestStatelessTechnicalAnalysis(unittest.TestCase):
 
     def testSecurityXAverageValueHolder(self):
         window = 10
-        xav = SecurityXAverageValueHolder(window, ['close'], ['aapl', 'ibm'])
+        xav = SecurityXAverageValueHolder(window, ['close'])
         exp_weight = 2.0 / (1.0 + window)
 
         expected = {}
@@ -51,12 +50,17 @@ class TestStatelessTechnicalAnalysis(unittest.TestCase):
     def testSecurityMACDValueHolder(self):
         short = 5
         long = 10
-        macd = SecurityMACDValueHolder(short, long, ['close'], ['aapl', 'ibm'])
-        short_average = SecurityXAverageValueHolder(short, ['close'], ['aapl', 'ibm'])
-        long_average = SecurityXAverageValueHolder(long, ['close'], ['aapl', 'ibm'])
+        macd = SecurityMACDValueHolder(short, long, 'close')
+        short_average = SecurityXAverageValueHolder(short, ['close'])
+        long_average = SecurityXAverageValueHolder(long, ['close'])
 
         for i in range(len(self.aapl['close'])):
-            data = {'aapl': {'close': self.aapl['close'][i], 'open': self.aapl['open'][i]}}
+            data = {'aapl':
+                {
+                    'close': self.aapl['close'][i],
+                    'open': self.aapl['open'][i]
+                }
+            }
             data['ibm'] = {'close': self.ibm['close'][i], 'open': self.ibm['open'][i]}
             macd.push(data)
             short_average.push(data)

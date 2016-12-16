@@ -42,11 +42,11 @@ class SecurityValueHolder(object):
             self._dependency = dependency._dependency
         else:
             if not isinstance(dependency, str) and len(dependency) == 1:
-                self._dependency = dependency[0].lower()
+                self._dependency = [dependency[0].lower()]
             elif not isinstance(dependency, str) and len(dependency) >= 1:
                 self._dependency = [name.lower() for name in dependency]
             else:
-                self._dependency = dependency.lower()
+                self._dependency = [dependency.lower()]
         self._window = 1
         self._returnSize = 1
         self._holderTemplate = None
@@ -363,7 +363,7 @@ class SecurityShiftedValueHolder(SecurityValueHolder):
         self._returnSize = right.valueSize
         self._symbolList = set(right.symbolList)
         self._window = right.window + n
-        self._dependency = right.dependency
+        self._dependency = copy.deepcopy(right._dependency)
         self._holderTemplate = Shift(right._holderTemplate, n)
 
         self._innerHolders = {

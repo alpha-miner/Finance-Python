@@ -17,7 +17,7 @@ finpy
 <tr>
   <td>Coverage</td>
   <td><img src="https://coveralls.io/repos/wegamekinglc/Finance-Python/badge.svg?branch=master&service=github" alt="coverage" /></td>
-</tr
+</tr>
 </table>
 
 纯python实现的金融计算库，目标是提供进行量化交易必要的工具，包括但不限于：定价分析工具、技术分析指标。其中部分实现参考了quantlib。

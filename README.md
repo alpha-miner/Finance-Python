@@ -1,4 +1,4 @@
-finpy
+Finance - Python
 ====================
 
 <table>

@@ -38,7 +38,7 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
 
     def testSecurityMovingAverage(self):
         window = 10
-        ma1 = SecurityMovingAverage(window, ['close'], ['aapl', 'ibm'])
+        ma1 = SecurityMovingAverage(window, ['close'])
 
         for i in range(len(self.aapl['close'])):
             data = {'aapl': {'close': self.aapl['close'][i], 'open': self.aapl['open'][i]}}
@@ -58,11 +58,11 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
                                                                  'calculated: {2:.12f}'.format(i, expected, calculated))
 
         with self.assertRaises(ValueError):
-            _ = SecurityMovingAverage(window, ['close', 'open'], ['aapl', 'ibm'])
+            _ = SecurityMovingAverage(window, ['close', 'open'])
 
     def testSecurityMovingMax(self):
         window = 10
-        ma1 = SecurityMovingMax(window, ['close'], ['aapl', 'ibm'])
+        ma1 = SecurityMovingMax(window, ['close'])
 
         for i in range(len(self.aapl['close'])):
             data = {'aapl': {'close': self.aapl['close'][i], 'open': self.aapl['open'][i]}}
@@ -82,11 +82,11 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
                                                                  'calculated: {2:.12f}'.format(i, expected, calculated))
 
         with self.assertRaises(ValueError):
-            _ = SecurityMovingMax(window, ['close', 'open'], ['aapl', 'ibm'])
+            _ = SecurityMovingMax(window, ['close', 'open'])
 
     def testSecurityMovingMinimum(self):
         window = 10
-        ma1 = SecurityMovingMinimum(window, ['close'], ['aapl', 'ibm'])
+        ma1 = SecurityMovingMinimum(window, ['close'])
 
         for i in range(len(self.aapl['close'])):
             data = {'aapl': {'close': self.aapl['close'][i], 'open': self.aapl['open'][i]}}
@@ -106,11 +106,11 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
                                                                  'calculated: {2:.12f}'.format(i, expected, calculated))
 
         with self.assertRaises(ValueError):
-            _ = SecurityMovingMinimum(window, ['close', 'open'], ['aapl', 'ibm'])
+            _ = SecurityMovingMinimum(window, ['close', 'open'])
 
     def testSecurityMovingSum(self):
         window = 10
-        ma1 = SecurityMovingSum(window, ['close'], ['aapl', 'ibm'])
+        ma1 = SecurityMovingSum(window, ['close'])
 
         for i in range(len(self.aapl['close'])):
             data = {'aapl': {'close': self.aapl['close'][i], 'open': self.aapl['open'][i]}}
@@ -131,7 +131,7 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
 
     def testSecurityMovingCountedPositive(self):
         window = 10
-        ma1 = SecurityMovingCountedPositive(window, ['close'], ['aapl', 'ibm'])
+        ma1 = SecurityMovingCountedPositive(window, ['close'])
 
         for i in range(len(self.aapl['close'])):
             data = {'aapl': {'close': self.aapl['close'][i], 'open': self.aapl['open'][i]}}
@@ -151,11 +151,11 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
                                                                  'calculated: {2:.12f}'.format(i, expected, calculated))
 
         with self.assertRaises(ValueError):
-            _ = SecurityMovingCountedPositive(window, ['close', 'open'], ['aapl', 'ibm'])
+            _ = SecurityMovingCountedPositive(window, ['close', 'open'])
 
     def testSecurityMovingPositiveAverage(self):
         window = 10
-        ma1 = SecurityMovingPositiveAverage(window, ['close'], ['aapl', 'ibm'])
+        ma1 = SecurityMovingPositiveAverage(window, ['close'])
 
         for i in range(len(self.aapl['close'])):
             data = {'aapl': {'close': self.aapl['close'][i], 'open': self.aapl['open'][i]}}
@@ -179,13 +179,13 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
                                                                  'calculated: {2:.12f}'.format(i, expected, calculated))
 
         with self.assertRaises(ValueError):
-            _ = SecurityMovingPositiveAverage(window, ['close', 'open'], ['aapl', 'ibm'])
+            _ = SecurityMovingPositiveAverage(window, ['close', 'open'])
 
     def testSecurityMovingRSI(self):
         window = 10
-        rsi = SecurityMovingRSI(window, ['close'], ['aapl', 'ibm'])
-        pos_avg = SecurityMovingPositiveDifferenceAverage(window, ['close'], ['aapl', 'ibm'])
-        neg_avg = SecurityMovingNegativeDifferenceAverage(window, ['close'], ['aapl', 'ibm'])
+        rsi = SecurityMovingRSI(window, ['close'])
+        pos_avg = SecurityMovingPositiveDifferenceAverage(window, ['close'])
+        neg_avg = SecurityMovingNegativeDifferenceAverage(window, ['close'])
 
         for i in range(len(self.aapl['close'])):
             data = {'aapl': {'close': self.aapl['close'][i], 'open': self.aapl['open'][i]}}
@@ -207,7 +207,7 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
 
     def testSecurityMovingLogReturn(self):
         window = 10
-        ma1 = SecurityMovingLogReturn(window, ['close'], ['aapl', 'ibm'])
+        ma1 = SecurityMovingLogReturn(window, ['close'])
         self.newDataSet = copy.deepcopy(self.dataSet)
         self.newDataSet['aapl']['close'] = np.exp(self.newDataSet['aapl']['close'])
         self.newDataSet['aapl']['open'] = np.exp(self.newDataSet['aapl']['open'])
@@ -235,11 +235,11 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
                                                                                                    calculated))
 
         with self.assertRaises(ValueError):
-            _ = SecurityMovingLogReturn(window, ['close', 'open'], ['aapl', 'ibm'])
+            _ = SecurityMovingLogReturn(window, ['close', 'open'])
 
     def testSecurityMovingHistoricalWindow(self):
         window = 5
-        mh = SecurityMovingHistoricalWindow(window, 'close', ['aapl', 'ibm'])
+        mh = SecurityMovingHistoricalWindow(window, 'close')
 
         benchmark = {'aapl': deque(maxlen=window),
                      'ibm': deque(maxlen=window)}
@@ -275,7 +275,7 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
 
     def testValueHolderCompounding(self):
         window = 10
-        ma1 = SecurityMovingAverage(window, 'close', ['aapl'])
+        ma1 = SecurityMovingAverage(window, 'close')
         compounded1 = SecurityMovingMax(2, ma1)
         compounded2 = SecurityMovingAverage(2, ma1)
 

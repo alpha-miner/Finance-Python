@@ -11,20 +11,13 @@ import glob
 
 PACKAGE = "PyFin"
 NAME = "Finance-Python"
-VERSION = "0.4.0"
+VERSION = "0.4.1"
 DESCRIPTION = "PyFin " + VERSION
 AUTHOR = "cheng li"
 AUTHOR_EMAIL = "wegamekinglc@hotmail.com"
 URL = 'https://github.com/ChinaQuants/Finance-Python'
 
-if os.name == "posix":
-    exePath = sys.path
-    for path in exePath:
-        if path.endswith('site-packages'):
-            packagePath = path
-            break
-else:
-    packagePath = sysconfig.get_python_lib()
+packagePath = sysconfig.get_python_lib()
 
 files = glob.glob("PyFin/tests/Math/Accumulators/data/*.csv")
 datafiles = [

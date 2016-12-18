@@ -382,7 +382,23 @@ class ChinaSseImpl(object):
                 Date(2016, 10, 4),
                 Date(2016, 10, 5),
                 Date(2016, 10, 6),
-                Date(2016, 10, 7)}
+                Date(2016, 10, 7),
+                Date(2017, 1, 2),
+                Date(2017, 1, 27),
+                Date(2017, 1, 30),
+                Date(2017, 1, 31),
+                Date(2017, 2, 1),
+                Date(2017, 2, 2),
+                Date(2017, 4, 3),
+                Date(2017, 4, 4),
+                Date(2017, 5, 1),
+                Date(2017, 5, 29),
+                Date(2017, 5, 30),
+                Date(2017, 10, 2),
+                Date(2017, 10, 3),
+                Date(2017, 10, 4),
+                Date(2017, 10, 5),
+                Date(2017, 10, 6)}
 
     def __init__(self):
         pass
@@ -496,6 +512,12 @@ class ChinaIBImpl(object):
         Date.westernStyle(18, Months.September, 2016),
         Date.westernStyle(8, Months.October, 2016),
         Date.westernStyle(9, Months.October, 2016),
+        # 2017
+        Date.westernStyle(22, Months.January, 2017),
+        Date.westernStyle(4, Months.February, 2017),
+        Date.westernStyle(1, Months.April, 2017),
+        Date.westernStyle(27, Months.May, 2017),
+        Date.westernStyle(30, Months.September, 2017),
     }
 
     def __init__(self):

@@ -14,6 +14,10 @@ from PyFin.Math.Accumulators.IAccumulators import Accumulator
 from PyFin.Math.Accumulators.StatelessAccumulators import Latest
 from PyFin.Math.Accumulators.StatelessAccumulators import Positive
 from PyFin.Math.Accumulators.StatelessAccumulators import Negative
+from PyFin.Math.Accumulators.StatelessAccumulators import XAverage
+from PyFin.Math.Accumulators.StatelessAccumulators import StatelessAccumulator
+from PyFin.Math.Accumulators.IAccumulators import Pow
+from PyFin.Math.Accumulators.IAccumulators import Identity
 from PyFin.Utilities import pyFinAssert
 from PyFin.Utilities import isClose
 
@@ -499,3 +503,249 @@ class MovingCorrelationMatrix(StatefulValueHolder):
             return nominator / denominator
         else:
             return np.ones(len(self._runningSum)) * np.nan
+
+
+class MovingProduct(SingleValuedValueHolder):
+    def __init__(self, window, dependency='x'):
+        super(MovingProduct, self).__init__(window, dependency)
+        self._runningProduct = np.nan
+    def push(self, data):
+        value = super(MovingProduct, self).push(data)
+        if np.isnan(value):
+            return np.nan
+        self._dumpOneValue(value)
+        if all(self._con):
+            self._runningProduct = np.product(self._con)
+        else:
+            self._runningProduct = 0
+    def result(self):
+        return self._runningProduct
+
+
+class MovingCenterMoment(SingleValuedValueHolder):
+    def __init__(self, window, order, dependency='x'):
+        super(MovingCenterMoment, self).__init__(window, dependency)
+        self._order = order
+
+    def push(self, data):
+        value = super(MovingCenterMoment, self).push(data)
+        self._dumpOneValue(value)
+        if np.isnan(value):
+            return np.nan
+        else:
+            self._runningMoment = np.mean(np.power(np.abs(np.array(self._con) - np.mean(self._con)), self._order))
+
+    def result(self):
+        return self._runningMoment
+
+
+class MovingSkewness(SingleValuedValueHolder):
+    def __init__(self, window, dependency='x'):
+        super(MovingSkewness, self).__init__(window,dependency)
+        self._runningStd3 = Pow(MovingVariance(window, dependency, isPopulation=True), 1.5)
+        self._runningMoment3 = MovingCenterMoment(window, 3, dependency)
+        self._runningSkewness = self._runningMoment3 / self._runningStd3
+
+    def push(self, data):
+        self._runningSkewness.push(data)
+
+    def result(self):
+        return self._runningSkewness.result()
+
+
+class MovingMaxPos(SortedValueHolder):
+    def __init__(self, window, dependency='x'):
+        super(MovingMaxPos, self).__init__(window, dependency)
+        self._runningTsMaxPos = np.nan
+
+    def push(self, data):
+        super(MovingMaxPos,self).push(data)
+        self._max = self._sortedArray[-1]
+        self._runningTsMaxPos = self._con.index(self._max)
+
+    def result(self):
+        return self._runningTsMaxPos
+
+
+class MovingMinPos(SortedValueHolder):
+    def __init__(self, window, dependency='x'):
+        super(MovingMinPos,self).__init__(window, dependency)
+        self._runningTsMinPos = np.nan
+
+    def push(self, data):
+        super(MovingMinPos,self).push(data)
+        self._min = self._sortedArray[0]
+        self._runningTsMinPos = self._con.index(self._min)
+
+    def result(self):
+        return self._runningTsMinPos
+
+
+class MovingKurtosis(SingleValuedValueHolder):
+    def __init__(self, window, dependency='x'):
+        super(MovingKurtosis, self).__init__(window, dependency)
+        self._runningStd4 = Pow(MovingVariance(window, dependency, isPopulation=True), 2)
+        self._runningMoment4 = MovingCenterMoment(window, 4, dependency)
+        self._runningKurtosis = self._runningMoment4 / self._runningStd4
+
+    def push(self, data):
+        self._runningKurtosis.push(data)
+
+    def result(self):
+        return self._runningKurtosis.result()
+
+
+class MovingRSV(SingleValuedValueHolder):
+    def __init__(self, window, dependency='x'):
+        super(MovingRSV, self).__init__(window, dependency)
+        self._cached_value = None
+
+    def push(self, data):
+
+        value = super(MovingRSV, self).push(data)
+        if np.isnan(value):
+            return np.nan
+        else:
+            self._dumpOneValue(value)
+            self._cached_value = value
+
+    def result(self):
+        return (self._cached_value - min(self._con)) / (max(self._con) - min(self._con))
+
+
+class MACD(StatelessAccumulator):
+    def __init__(self, short, long, dependency='x', method=XAverage):
+        super(MACD, self).__init__(dependency)
+        self._short_average = method(window=short, dependency=dependency)
+        self._long_average = method(window=long, dependency=dependency)
+
+    def push(self, data):
+        self._short_average.push(data)
+        self._long_average.push(data)
+        if self._isFull == 0 and self._short_average.isFull and self._long_average.isFull:
+            self._isFull = 1
+
+    def result(self):
+        return self._short_average.result() - self._long_average.result()
+
+
+class MovingRank(SortedValueHolder):
+    def __init__(self, window, dependency='x'):
+        super(MovingRank, self).__init__(window, dependency)
+        self._runningRank = []
+
+    def push(self, data):
+        super(MovingRank, self).push(data)
+
+    def result(self):
+        self._runningRank = [bisect.bisect_left(self._sortedArray, x) for x in self._con]
+        return self._runningRank
+
+
+#runningJ can be more than 1 or less than 0.
+class MovingKDJ(SingleValuedValueHolder):
+    def __init__(self, window, k=3, d=3, dependency='x'):
+        super(MovingKDJ, self).__init__(window, dependency)
+        self._runningRsv = MovingRSV(window, dependency)
+        self._k = k
+        self._d = d
+
+    def push(self, data):
+        value = self._runningRsv.push(data)
+        rsv = self._runningRsv.value
+        if len(self._con) == 0:
+            self._dumpOneValue(value)
+            self._runningJ = np.nan
+        else:
+            if len(self._con) == 1:
+                self._dumpOneValue(value)
+                self._runningK = (0.5 * (self._k - 1) + rsv) / self._k
+                self._runningD = (0.5 * (self._d - 1) + self._runningK) / self._d
+            else:
+                self._runningK = (self._runningK * (self._k - 1) + rsv) / self._k
+                self._runningD = (self._runningD * (self._d - 1) + self._runningK) / self._d
+            self._runningJ = 3 * self._runningK - 2 * self._runningD
+
+    def result(self):
+        return self._runningJ
+
+
+class MovingAroon(SingleValuedValueHolder):
+    def __init__(self, window, dependency='x'):
+        super(MovingAroon, self).__init__(window, dependency)
+
+    def push(self, data):
+        value = super(MovingAroon, self).push(data)
+        if np.isnan(value):
+            return np.nan
+        else:
+            self._dumpOneValue(value)
+
+    def result(self):
+        self._runningAroonOsc = (self._con.index(np.max(self._con)) - self._con.index(np.min(self._con))) / self.window
+        return self._runningAroonOsc
+
+
+class MovingBias(SingleValuedValueHolder):
+    def __init__(self, window, dependency='x'):
+        super(MovingBias, self).__init__(window, dependency)
+        self._runningMa = np.nan
+
+    def push(self,data):
+        value = super(MovingBias, self).push(data)
+        if np.isnan(value):
+            return np.nan
+        else:
+            self._dumpOneValue(value)
+            self._runningBias = value / np.mean(self._con) - 1
+
+    def result(self):
+        return self._runningBias
+
+
+class MovingLevel(SingleValuedValueHolder):
+    def __init__(self, window, dependency='x'):
+        super(MovingLevel, self).__init__(window, dependency)
+        self._runningLevel = 1
+
+    def push(self, data):
+        value = super(MovingLevel, self).push(data)
+        if np.isnan(value):
+            return np.nan
+        else:
+            self._dumpOneValue(value)
+            if len(self._con) > 1:
+                self._runningLevel = self._con[-1] / self._con[0]
+
+    def result(self):
+        return self._runningLevel
+
+
+class MovingAutoCorrelation(SingleValuedValueHolder):
+    def __init__(self, window, lags, dependency='x'):
+        super(MovingAutoCorrelation, self).__init__(window, dependency)
+        self._lags = lags
+        if window <= lags:
+            raise ValueError ("lags should be less than window however\n"
+                             "window is: {0} while lags is: {1}".format(window, lags))
+
+    def push(self, data):
+        value = super(MovingAutoCorrelation, self).push(data)
+        if np.isnan(value):
+            return np.nan
+        else:
+            self._dumpOneValue(value)
+
+    def result(self):
+        tmp_list = list(self._con)
+        if len(self._con) < self.window:
+            return np.nan
+        else:
+            try:
+                self._runningVecForward = tmp_list[0:self._window - self._lags]
+                self._runningVecBackward = tmp_list[-self._window + self._lags - 1:-1]
+                self._runningAutoCorrMatrix = np.cov(self._runningVecBackward, self._runningVecForward) / \
+                                        (np.std(self._runningVecBackward) * np.std(self._runningVecForward))
+            except ZeroDivisionError:
+                return np.nan
+            return self._runningAutoCorrMatrix[0, 1]

@@ -87,7 +87,14 @@ class TestCalendar(unittest.TestCase):
                        Date(2016, 5, 2),
                        Date(2016, 6, 9), Date(2016, 6, 10),
                        Date(2016, 9, 15), Date(2016, 9, 16),
-                       Date(2016, 10, 3), Date(2016, 10, 4), Date(2016, 10, 5), Date(2016, 10, 6), Date(2016, 10, 7)]
+                       Date(2016, 10, 3), Date(2016, 10, 4), Date(2016, 10, 5), Date(2016, 10, 6), Date(2016, 10, 7),
+        # China Shanghai Securities Exchange holiday list in the year 2017
+                       Date(2017, 1, 1), Date(2017, 1, 2),
+                       Date(2017, 1, 27), Date(2017, 1, 28), Date(2017, 1, 29), Date(2017, 1, 30), Date(2017, 1, 31), Date(2017, 2, 1), Date(2017, 2, 2),
+                       Date(2017, 4, 2), Date(2017, 4, 3), Date(2017, 4, 4),
+                       Date(2017, 5, 1),
+                       Date(2017, 5, 28), Date(2017, 5, 29), Date(2017, 5, 30),
+                       Date(2017, 10, 1), Date(2017, 10, 2), Date(2017, 10, 3), Date(2017, 10, 4), Date(2017, 10, 5), Date(2017, 10, 6), Date(2017, 10, 7), Date(2017, 10, 8)]
 
         cal = Calendar('China.SSE')
 
@@ -116,7 +123,13 @@ class TestCalendar(unittest.TestCase):
                                   Date(2016, 6, 12),
                                   Date(2016, 9, 18),
                                   Date(2016, 10, 8),
-                                  Date(2016, 10, 9)]
+                                  Date(2016, 10, 9),
+        # China Inter Bank working weekend list in the year 2017
+                                  Date(2017, 1, 22),
+                                  Date(2017, 2, 4),
+                                  Date(2017, 4, 1),
+                                  Date(2017, 5, 27),
+                                  Date(2017, 9, 30)]
 
         cal = Calendar('China.IB')
 

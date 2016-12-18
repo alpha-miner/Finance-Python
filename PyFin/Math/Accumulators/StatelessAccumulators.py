@@ -8,6 +8,8 @@ Created on 2015-7-25
 import math
 import numpy as np
 from PyFin.Math.Accumulators.IAccumulators import Accumulator
+from PyFin.Math.Accumulators.IAccumulators import Pow
+import bisect
 
 
 def _checkParameterList(dependency):
@@ -278,22 +280,6 @@ class XAverage(StatelessAccumulator):
         return self._average
 
 
-class MACD(StatelessAccumulator):
-    def __init__(self, short, long, dependency='x'):
-        super(MACD, self).__init__(dependency)
-        self._short_average = XAverage(window=short, dependency=dependency)
-        self._long_average = XAverage(window=long, dependency=dependency)
-
-    def push(self, data):
-        self._short_average.push(data)
-        self._long_average.push(data)
-        if self._isFull == 0 and self._short_average.isFull and self._long_average.isFull:
-            self._isFull = 1
-
-    def result(self):
-        return self._short_average.result() - self._long_average.result()
-
-
 class Variance(StatelessAccumulator):
     def __init__(self, dependency='x', isPopulation=False):
         super(Variance, self).__init__(dependency)
@@ -355,3 +341,155 @@ class Correlation(StatelessAccumulator):
             return nominator / denominator
         else:
             return np.nan
+
+
+class Product(StatelessAccumulator):
+    def __init__(self, dependency='x'):
+        super(Product,self).__init__(dependency)
+        self._product = 1.0
+
+    def push(self, data):
+        value = super(Product, self).push(data)
+        try:
+            if np.isnan(value):
+                return np.nan
+        except TypeError:
+            if not value:
+                return np.nan
+        self._product *= value
+
+    def result(self):
+        return self._product
+
+
+class CenterMoment(StatelessAccumulator):
+    def __init__(self, order, dependency='x'):
+        super(CenterMoment, self).__init__(dependency)
+        self._this_list = []
+        self._order = order
+
+    def push(self, data):
+        value = super(CenterMoment, self).push(data)
+        if np.isnan(value):
+            return np.nan
+        else:
+            self._this_list.append(value)
+            self._moment = np.mean(np.power(np.abs(np.array(self._this_list) - np.mean(self._this_list)), self._order))
+
+    def result(self):
+        return self._moment
+
+
+class Skewness(StatelessAccumulator):
+    def __init__(self, dependency='x'):
+        super(Skewness, self).__init__(dependency)
+        self._std3 = Pow(Variance(dependency, isPopulation=True), 1.5)
+        self._moment3 = CenterMoment(3, dependency)
+        self._skewness = self._moment3 / self._std3
+    def push(self,data):
+        self._skewness.push(data)
+    def result(self):
+        return self._skewness.result()
+
+
+class Kurtosis(StatelessAccumulator):
+    def __init__(self, dependency='x'):
+        super(Kurtosis, self).__init__(dependency)
+        self._std4 = Pow(Variance(dependency, isPopulation=True), 2)
+        self._moment4 = CenterMoment(4, dependency)
+        self._kurtosis = self._moment4 / self._std4
+
+    def push(self, data):
+        self._kurtosis.push(data)
+
+    def result(self):
+        return self._kurtosis.result()
+
+
+class Rank(StatelessAccumulator):
+    def __init__(self, dependency='x'):
+        super(Rank, self).__init__(dependency)
+        self._thisList = []
+        self._sortedList = []
+        self._rank = []
+
+    def push(self, data):
+        value = super(Rank, self).push(data)
+        if np.isnan(value):
+            return np.nan
+        else:
+            self._thisList.append(value)
+            self._sortedList = sorted(self._thisList)
+
+    def result(self):
+        self._rank = [bisect.bisect_left(self._sortedList, x) for x in self._thisList]
+        return self._rank
+
+
+class LevelList(StatelessAccumulator):
+    def __init__(self, dependency='x', ):
+        super(LevelList, self).__init__(dependency)
+        self._levelList = []
+        self._thisList = []
+
+    def push(self, data):
+        value = super(LevelList, self).push(data)
+        if np.isnan(value):
+            return np.nan
+        else:
+            self._thisList.append(value)
+            if len(self._thisList) == 1:
+                self._levelList.append(1.0)
+            else:
+                self._levelList.append(self._thisList[-1] / self._thisList[0])
+
+    def result(self):
+        return self._levelList
+
+
+class LevelValue(StatelessAccumulator):
+    def __init__(self, dependency='x'):
+        super(LevelValue, self).__init__(dependency)
+        self._thisList = []
+
+    def push(self, data):
+        value = super(LevelValue, self).push(data)
+        if np.isnan(value):
+            return np.nan
+        else:
+            self._thisList.append(value)
+            if len(self._thisList) == 1:
+                self._levelValue = 1.0
+            else:
+                self._levelValue = self._thisList[-1] / self._thisList[0]
+
+    def result(self):
+        return self._levelValue
+
+
+class AutoCorrelation(StatelessAccumulator):
+    def __init__(self, lags, dependency='x'):
+        super(AutoCorrelation, self).__init__(dependency)
+        self._lags = lags
+        self._thisList = []
+
+    def push(self, data):
+        value = super(AutoCorrelation, self).push(data)
+        if np.isnan(value):
+            return np.nan
+        else:
+            self._thisList.append(value)
+
+    def result(self):
+        if len(self._thisList) <= self._lags:
+            raise ValueError ("time-series length should be more than lags however\n"
+                              "time-series length is: {0} while lags is: {1}".format(len(self._thisList), self._lags))
+        else:
+            try:
+                self._VecForward = self._thisList[0:len(self._thisList) - self._lags]
+                self._VecBackward = self._thisList[-len(self._thisList) + self._lags - 1:-1]
+                self._AutoCorrMatrix = np.cov(self._VecBackward, self._VecForward) / \
+                                (np.std(self._VecBackward) * np.std(self._VecForward))
+            except ZeroDivisionError:
+                return np.nan
+            return self._AutoCorrMatrix[0, 1]

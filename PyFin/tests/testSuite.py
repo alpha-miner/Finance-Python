@@ -67,7 +67,7 @@ def test():
 
     res = unittest.TextTestRunner(verbosity=3).run(suite)
     if len(res.errors) >= 1 or len(res.failures) >= 1:
-        raise RuntimeError()
+        sys.exit(-1)
     else:
         sys.exit(0)
 

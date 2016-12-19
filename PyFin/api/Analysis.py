@@ -25,68 +25,68 @@ from PyFin.Analysis.TechnicalAnalysis import SecuritySimpleReturnValueHolder
 from PyFin.Analysis.TechnicalAnalysis import SecurityLogReturnValueHolder
 
 
-def EMA(window, dependency='x', symbolList=None):
-    return SecurityXAverageValueHolder(window, dependency, symbolList)
+def EMA(window, dependency='x'):
+    return SecurityXAverageValueHolder(window, dependency)
 
 
-def MACD(short, long, dependency='x', symbolList=None):
-    return SecurityMACDValueHolder(short, long, dependency, symbolList)
+def MACD(short, long, dependency='x'):
+    return SecurityMACDValueHolder(short, long, dependency)
 
 
-def RSI(window, dependency='x', symbolList=None):
-    return SecurityMovingRSI(window, dependency, symbolList)
+def RSI(window, dependency='x'):
+    return SecurityMovingRSI(window, dependency)
 
 
-def MA(window, dependency='x', symbolList=None):
-    return SecurityMovingAverage(window, dependency, symbolList)
+def MA(window, dependency='x'):
+    return SecurityMovingAverage(window, dependency)
 
 
-def MAX(window, dependency='x', symbolList=None):
-    return SecurityMovingMax(window, dependency, symbolList)
+def MAX(window, dependency='x'):
+    return SecurityMovingMax(window, dependency)
 
 
-def MIN(window, dependency='x', symbolList=None):
-    return SecurityMovingMinimum(window, dependency, symbolList)
+def MIN(window, dependency='x'):
+    return SecurityMovingMinimum(window, dependency)
 
 
-def SUM(window, dependency='x', symbolList=None):
-    return SecurityMovingSum(window, dependency, symbolList)
+def SUM(window, dependency='x'):
+    return SecurityMovingSum(window, dependency)
 
 
-def VARIANCE(window, dependency='x', symbolList=None):
-    return SecurityMovingVariance(window, dependency, symbolList)
+def VARIANCE(window, dependency='x'):
+    return SecurityMovingVariance(window, dependency)
 
 
-def NPOSITIVE(window, dependency='x', symbolList=None):
-    return SecurityMovingCountedPositive(window, dependency, symbolList)
+def NPOSITIVE(window, dependency='x'):
+    return SecurityMovingCountedPositive(window, dependency)
 
 
-def MAPOSITIVE(window, dependency='x', symbolList=None):
-    return SecurityMovingPositiveAverage(window, dependency, symbolList)
+def MAPOSITIVE(window, dependency='x'):
+    return SecurityMovingPositiveAverage(window, dependency)
 
 
-def HIST(window, dependency='x', symbolList=None):
-    return SecurityMovingHistoricalWindow(window, dependency, symbolList)
+def HIST(window, dependency='x'):
+    return SecurityMovingHistoricalWindow(window, dependency)
 
 
-def LAST(dependency='x', symbolList=None):
-    return SecurityLatestValueHolder(dependency, symbolList)
+def LAST(dependency='x'):
+    return SecurityLatestValueHolder(dependency)
 
 
-def SQRT(dependency='x', symbolList=None):
-    return SecuritySqrtValueHolder(dependency, symbolList)
+def SQRT(dependency='x'):
+    return SecuritySqrtValueHolder(dependency)
 
 
-def DIFF(dependency='x', symbolList=None):
-    return SecurityDiffValueHolder(dependency, symbolList)
+def DIFF(dependency='x'):
+    return SecurityDiffValueHolder(dependency)
 
 
-def RETURNSimple(dependency='x', symbolList=None):
-    return SecuritySimpleReturnValueHolder(dependency, symbolList)
+def RETURNSimple(dependency='x'):
+    return SecuritySimpleReturnValueHolder(dependency)
 
 
-def RETURNLog(dependency='x', symbolList=None):
-    return SecurityLogReturnValueHolder(dependency, symbolList)
+def RETURNLog(dependency='x'):
+    return SecurityLogReturnValueHolder(dependency)
 
 
 HIGH = functools.partial(LAST, 'high')

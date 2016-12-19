@@ -227,6 +227,10 @@ class Date(object):
 
             pyFinAssert(1900 < y < 2200, ValueError, 'year {0:d} is out of bound. It must be in [1901, 2199]'.format(y))
 
+            length = _MonthLeapLength[monthLeft - 1] if Date.isLeap(y) else _MonthLength[monthLeft - 1]
+            if d > length:
+                d = length
+
             return cls(y, monthLeft, d)
         elif units == TimeUnits.Years:
             d = date.dayOfMonth()
@@ -234,6 +238,9 @@ class Date(object):
             y = date.year() + n
 
             pyFinAssert(1900 < y < 2200, ValueError, 'year {0:d} is out of bound. It must be in [1901, 2199]'.format(y))
+
+            if d == 29 and m == 2 and not Date.isLeap(y):
+                d = 28
 
             return cls(y, m, d)
 

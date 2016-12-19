@@ -24,7 +24,24 @@ class TestSchedule(unittest.TestCase):
                 self.fail("expected {0} at index found {1}".format(expected[i], s[i]))
 
     def testScheduleInitialize(self):
-        pass
+        startDate = Date(2013, 3, 31)
+        endDate = Date(2013, 6, 30)
+        tenor = Period('1m')
+        cal = Calendar('NullCalendar')
+        sch = Schedule(startDate, endDate, tenor, cal)
+        expected = [Date(2013, 3, 31), Date(2013, 4, 30), Date(2013, 5, 31), Date(2013, 6, 30)]
+        for i in range(sch.size()):
+            self.assertEqual(expected[i], sch[i])
+
+    def testScheduleInitializeWithYearly(self):
+        startDate = Date(2012, 2, 29)
+        endDate = Date(2013, 3, 1)
+        tenor = Period('1y')
+        cal = Calendar('NullCalendar')
+        sch = Schedule(startDate, endDate, tenor, cal)
+        expected = [Date(2012, 2, 29), Date(2013, 2, 28), Date(2013, 3, 1)]
+        for i in range(sch.size()):
+            self.assertEqual(expected[i], sch[i])
 
     def testDailySchedule(self):
         # Jan 2 and Jan 3 are skipped as New Year holiday

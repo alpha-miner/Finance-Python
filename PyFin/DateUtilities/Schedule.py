@@ -67,8 +67,8 @@ class Schedule(object):
             pyFinAssert(effectiveDate is not None, ValueError, "null effective date")
 
         pyFinAssert(effectiveDate < terminationDate, ValueError, "effective date ({0}) "
-                                                              "later than or equal to termination date ({1}"
-                 .format(effectiveDate, terminationDate))
+                                                                 "later than or equal to termination date ({1}"
+                    .format(effectiveDate, terminationDate))
 
         if tenor.length == 0:
             self._rule = DateGeneration.Zero
@@ -78,8 +78,8 @@ class Schedule(object):
         if self._firstDate is not None:
             if self._rule == DateGeneration.Backward or self._rule == DateGeneration.Forward:
                 pyFinAssert(effectiveDate < self._firstDate < terminationDate, ValueError,
-                         "first date ({0}) out of effective-termination date range [{1}, {2})"
-                         .format(self._firstDate, effectiveDate, terminationDate))
+                            "first date ({0}) out of effective-termination date range [{1}, {2})"
+                            .format(self._firstDate, effectiveDate, terminationDate))
                 # we should ensure that the above condition is still
                 # verified after adjustment
             elif self._rule == DateGeneration.Zero:
@@ -90,8 +90,8 @@ class Schedule(object):
         if self._nextToLastDate is not None:
             if self._rule == DateGeneration.Backward or self._rule == DateGeneration.Forward:
                 pyFinAssert(effectiveDate < self._nextToLastDate < terminationDate, ValueError,
-                         "next to last date ({0}) out of effective-termination date range [{1}, {2})"
-                         .format(self._nextToLastDate, effectiveDate, terminationDate))
+                            "next to last date ({0}) out of effective-termination date range [{1}, {2})"
+                            .format(self._nextToLastDate, effectiveDate, terminationDate))
                 # we should ensure that the above condition is still
                 # verified after adjustment
             elif self._rule == DateGeneration.Zero:
@@ -130,7 +130,7 @@ class Schedule(object):
                 if temp < exitDate:
                     if self._firstDate is not None and self._cal.adjustDate(self._dates[0],
                                                                             convention) != self._cal.adjustDate(
-                            self._firstDate, convention):
+                        self._firstDate, convention):
                         self._dates.insert(0, self._firstDate)
                         self._isRegular.insert(0, False)
                     break
@@ -171,7 +171,7 @@ class Schedule(object):
                 if temp > exitDate:
                     if self._nextToLastDate is not None and self._cal.adjustDate(self._dates[-1],
                                                                                  convention) != self._cal.adjustDate(
-                            self._nextToLastDate, convention):
+                        self._nextToLastDate, convention):
                         self._dates.append(self._nextToLastDate)
                         self._isRegular.append(False)
                     break
@@ -233,21 +233,21 @@ class Schedule(object):
             self._isRegular = self._isRegular[1:]
 
         pyFinAssert(len(self._dates) >= 1, ValueError, "degenerate single date ({0}) schedule\n"
-                                                    "seed date: {1}\n"
-                                                    "exit date: {2}\n"
-                                                    "effective date: {3}\n"
-                                                    "first date: {4}\n"
-                                                    "next to last date: {5}\n"
-                                                    "termination date: {6}\n"
-                                                    "generation rule: {7}\n"
-                                                    "end of month: {8}\n"
-                 .format(self._dates[0],
-                         seed, exitDate,
-                         effectiveDate,
-                         firstDate,
-                         nextToLastDate,
-                         terminationDate,
-                         self._rule, self._endOfMonth))
+                                                       "seed date: {1}\n"
+                                                       "exit date: {2}\n"
+                                                       "effective date: {3}\n"
+                                                       "first date: {4}\n"
+                                                       "next to last date: {5}\n"
+                                                       "termination date: {6}\n"
+                                                       "generation rule: {7}\n"
+                                                       "end of month: {8}\n"
+                    .format(self._dates[0],
+                            seed, exitDate,
+                            effectiveDate,
+                            firstDate,
+                            nextToLastDate,
+                            terminationDate,
+                            self._rule, self._endOfMonth))
 
     def size(self):
         return len(self._dates)

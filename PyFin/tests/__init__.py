@@ -17,4 +17,4 @@ __all__ = ["api",
            "Env",
            "Math",
            "PricingEngines",
-           "Risk"]
+           "Analysis"]

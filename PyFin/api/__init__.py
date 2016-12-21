@@ -16,6 +16,7 @@ from PyFin.api.DateUtilities import advanceDateByCalendar
 from PyFin.api.DateUtilities import nthWeekDay
 from PyFin.api.DateUtilities import makeSchedule
 
+from PyFin.Analysis import transform
 from PyFin.api.Analysis import EMA
 from PyFin.api.Analysis import MACD
 from PyFin.api.Analysis import RSI
@@ -47,6 +48,7 @@ __all__ = ["datesList",
            "advanceDateByCalendar",
            "nthWeekDay",
            "makeSchedule",
+           "transform",
            "EMA",
            "MACD",
            "RSI",

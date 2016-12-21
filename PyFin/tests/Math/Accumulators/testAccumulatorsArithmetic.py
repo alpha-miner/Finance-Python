@@ -40,8 +40,13 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
         self.sampleClose = np.random.randn(10000)
         self.sampleRf = np.random.randn(10000)
 
-    def testAccumulatorBasic(self):
+    def testAddedNanValue(self):
+        m = Max(dependency='x')
+        m.push({'x': 10.0})
+        m.push({'x': np.nan})
+        self.assertAlmostEqual(10., m.value)
 
+    def testAccumulatorBasic(self):
         # check parameter list should not be empty
         with self.assertRaises(ValueError):
             Max(dependency=[])

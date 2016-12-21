@@ -11,10 +11,12 @@ from PyFin.Analysis.SecurityValueHolders import SecurityCompoundedValueHolder
 from PyFin.Analysis.SecurityValueHolders import RankedSecurityValueHolder
 from PyFin.Analysis.SecurityValueHolders import dependencyCalculator
 from PyFin.Analysis import TechnicalAnalysis
+from PyFin.Analysis.transformer import transform
 
 __all__ = ['DataProvider',
            'SecurityShiftedValueHolder',
            'SecurityCompoundedValueHolder',
            'RankedSecurityValueHolder',
            'dependencyCalculator',
-           'TechnicalAnalysis']
+           'TechnicalAnalysis',
+           'transform']

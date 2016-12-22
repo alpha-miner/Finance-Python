@@ -8,6 +8,16 @@ Created on 2016-12-21
 import pandas as pd
 
 
+def _to_dict(raw_data):
+    category = raw_data.index
+    values = raw_data.values
+    columns = raw_data.columns
+
+    inner_values = [dict(zip(columns, values[i])) for i in range(len(values))]
+    dict_values = dict(zip(category, inner_values))
+    return dict_values, category
+
+
 def transform(data, expression, col=None, category_field=None):
     data = data.copy()
     dummy_category = False
@@ -19,14 +29,14 @@ def transform(data, expression, col=None, category_field=None):
     if not col:
         col = 'user_factor'
 
-    index_list = sorted(data.index.unique())
     series = []
-    for index in index_list:
-        data_slice = data.ix[index]
+
+    for _, data_slice in data.groupby(level=0):
         data_slice = data_slice.set_index(category_field)
-        dict_values = data_slice.to_dict('index')
+        dict_values, category = _to_dict(data_slice)
         expression.push(dict_values)
-        series.append(expression.value[data_slice.index])
+        series.append(expression.value[category])
+
     res = pd.concat(series)
 
     if dummy_category:

@@ -53,12 +53,12 @@ class SecurityValueHolder(object):
 
     @property
     def symbolList(self):
-        return list(self._symbolList)
+        return copy.deepcopy(self._symbolList)
 
     @property
     def dependency(self):
         return {
-            symbol: self.fields for symbol in self.symbolList
+            symbol: self.fields for symbol in self._symbolList
         }
 
     @property
@@ -78,8 +78,9 @@ class SecurityValueHolder(object):
 
     def push(self, data):
         names = set(data.keys())
+        old_names = set(self._symbolList)
         for name in names:
-            if name in self.symbolList:
+            if name in old_names:
                 self.holders[name].push(data[name])
             else:
                 self._symbolList.add(name)

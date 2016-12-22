@@ -6,6 +6,7 @@ Created on 2016-12-21
 """
 
 import pandas as pd
+from PyFin.Analysis.SecurityValueHolders import SecurityValueHolder
 
 
 def _to_dict(raw_data):
@@ -33,9 +34,13 @@ def transform(data, expressions, cols, category_field=None):
         dict_values, category = _to_dict(data_slice)
         series = []
         for exp, name in zip(expressions, cols):
-            exp.push(dict_values)
-            this_series = exp.value[category]
-            this_series.name = name
+            if isinstance(exp, SecurityValueHolder):
+                exp.push(dict_values)
+                this_series = exp.value[category]
+                this_series.name = name
+            else:
+                this_series = data_slice[exp]
+                this_series.nam = name
             series.append(this_series)
         df = pd.concat(series, axis=1)
         dfs.append(df)

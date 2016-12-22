@@ -72,8 +72,6 @@ class TestTransformer(unittest.TestCase):
                                cols=['b', 'factor2'],
                                category_field='code')
 
-        print(calculated)
-
         expected = [13., 13., 13., 13., 11., 9, 9.]
 
         np.testing.assert_array_almost_equal(calculated['b'], test_df['b'])

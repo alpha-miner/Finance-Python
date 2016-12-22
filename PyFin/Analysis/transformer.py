@@ -40,7 +40,7 @@ def transform(data, expressions, cols, category_field=None):
                 this_series.name = name
             else:
                 this_series = data_slice[exp]
-                this_series.nam = name
+                this_series.name = name
             series.append(this_series)
         df = pd.concat(series, axis=1)
         dfs.append(df)

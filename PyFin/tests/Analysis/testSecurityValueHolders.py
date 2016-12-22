@@ -67,6 +67,23 @@ class TestSecurityValueHolders(unittest.TestCase):
             if np.isnan(filtered['ibm']):
                 self.assertTrue(filtered['ibm'])
 
+    def testSecurityValueHolderIsFull(self):
+        test = SecurityMovingMax(2, dependency='close')
+
+        data = {'aapl': {'close': 1.0},
+                'ibm': {'close': 2.0}}
+        test.push(data)
+        self.assertEqual(test.isFull, False)
+
+        data = {'aapl': {'close': 1.0}}
+        test.push(data)
+        self.assertEqual(test.isFull, False)
+
+        data = {'ibm': {'close': 13.0}}
+        test.push(data)
+        self.assertEqual(test.isFull, True)
+
+
     def testSecuritiesValuesComparison(self):
 
         benchmarkValues = SecuritiesValues({'AAPL': 1.0, 'IBM': 2.0, 'GOOG': 3.0})

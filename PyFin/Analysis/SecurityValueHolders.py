@@ -24,7 +24,6 @@ from PyFin.Math.Accumulators.IAccumulators import GtOperatorValueHolder
 from PyFin.Math.Accumulators.IAccumulators import GeOperatorValueHolder
 from PyFin.Math.Accumulators.IAccumulators import EqOperatorValueHolder
 from PyFin.Math.Accumulators.IAccumulators import NeOperatorValueHolder
-from PyFin.Env.Settings import Settings
 from PyFin.Utilities import pyFinAssert
 
 if sys.version_info > (3, 0, 0):
@@ -77,8 +76,8 @@ class SecurityValueHolder(object):
         return self._window
 
     def push(self, data):
-        names = set(data.keys())
-        old_names = set(self._symbolList)
+        names = data.keys()
+        old_names = self.symbolList
         for name in names:
             if name in old_names:
                 self.holders[name].push(data[name])
@@ -106,13 +105,10 @@ class SecurityValueHolder(object):
 
     @property
     def isFull(self):
-        res = {}
         for name in self.holders:
-            try:
-                res[name] = self.holders[name].isFull
-            except ArithmeticError:
-                res[name] = np.nan
-        return SecuritiesValues(res)
+            if not self.holders[name].isFull:
+                return False
+        return True
 
     def __getitem__(self, item):
         try:

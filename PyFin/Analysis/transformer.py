@@ -18,7 +18,7 @@ def _to_dict(raw_data):
     return dict_values, category
 
 
-def transform(data, expression, col=None, category_field=None):
+def transform(data, expressions, cols, category_field=None):
     data = data.copy()
     dummy_category = False
     if not category_field:
@@ -26,23 +26,26 @@ def transform(data, expression, col=None, category_field=None):
         data[category_field] = 1
         dummy_category = True
 
-    if not col:
-        col = 'user_factor'
-
-    series = []
+    dfs = []
 
     for _, data_slice in data.groupby(level=0):
         data_slice = data_slice.set_index(category_field)
         dict_values, category = _to_dict(data_slice)
-        expression.push(dict_values)
-        series.append(expression.value[category])
+        series = []
+        for exp, name in zip(expressions, cols):
+            exp.push(dict_values)
+            this_series = exp.value[category]
+            this_series.name = name
+            series.append(this_series)
+        df = pd.concat(series, axis=1)
+        dfs.append(df)
 
-    res = pd.concat(series)
+    res = pd.concat(dfs)
 
     if dummy_category:
-        return pd.DataFrame({col: res.values},
-                            index=data.index)
+        res.index = data.index
+        return res
     else:
-        return pd.DataFrame({category_field: res.index,
-                             col: res.values},
-                            index=data.index)
+        res[category_field] = res.index
+        res.index = data.index
+        return res

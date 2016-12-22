@@ -22,7 +22,7 @@ class TestTransformer(unittest.TestCase):
                                index=[1, 1, 1, 1, 2, 2, 2])
 
         expression = SecurityMovingMax(20, 'b') + SecurityMovingMinimum(20, 'c')
-        calculated = transform(test_df, expression, category_field='code')
+        calculated = transform(test_df, [expression], cols=['user_factor'], category_field='code')
         expected = [13., 13., 13., 13., 11., 9, 9.]
 
         np.testing.assert_array_almost_equal(calculated['user_factor'], expected)
@@ -33,7 +33,7 @@ class TestTransformer(unittest.TestCase):
                                index=[1, 1, 1, 1, 2, 2, 2])
 
         expression = SecurityMovingMax(20, 'b') + SecurityMovingMinimum(20, 'c')
-        calculated = transform(test_df, expression)
+        calculated = transform(test_df, [expression], cols=['user_factor'])
         expected = [13., 13., 13., 13., 10., 10., 10.]
 
         np.testing.assert_array_almost_equal(calculated['user_factor'], expected)

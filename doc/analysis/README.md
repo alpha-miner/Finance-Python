@@ -29,7 +29,7 @@ In [2]: value_holder = api.MA(2, 'x')
 In [3]: value_holder.push({'s1': {'x': 2}})
 ```
 
-这时我们可以通过``value``方法获取当前的运算结果：
+这里的``s1``就是符号，这时我们可以通过``value``方法获取当前的运算结果：
 
 ```python
 In [4]: value_holder.value
@@ -37,6 +37,8 @@ Out[4]:
 s1    2.0
 dtype: float64
 ```
+
+这个结果表示，符号``s1``关于依赖``'x'``的``MA``运算结果为：``2.0``。
 
 我们可以继续输入值：
 

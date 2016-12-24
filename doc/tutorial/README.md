@@ -49,7 +49,6 @@ Out[5]:
  datetime.date(2016, 12, 28),
  datetime.date(2016, 12, 29),
  datetime.date(2016, 12, 30)]
-
 ```
 
 

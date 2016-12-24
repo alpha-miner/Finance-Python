@@ -1,5 +1,4 @@
-Finance - Python
-====================
+# Finance - Python
 
 <table>
 <tr>

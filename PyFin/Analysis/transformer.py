@@ -6,17 +6,8 @@ Created on 2016-12-21
 """
 
 import pandas as pd
+from PyFin.Utilities import to_dict
 from PyFin.Analysis.SecurityValueHolders import SecurityValueHolder
-
-
-def _to_dict(raw_data):
-    category = raw_data.index
-    values = raw_data.values
-    columns = raw_data.columns
-
-    inner_values = [dict(zip(columns, values[i])) for i in range(len(values))]
-    dict_values = dict(zip(category, inner_values))
-    return dict_values, category
 
 
 def transform(data, expressions, cols, category_field=None):
@@ -31,7 +22,7 @@ def transform(data, expressions, cols, category_field=None):
 
     for _, data_slice in data.groupby(level=0):
         data_slice = data_slice.set_index(category_field)
-        dict_values, category = _to_dict(data_slice)
+        dict_values, category = to_dict(data_slice)
         series = []
         for exp, name in zip(expressions, cols):
             if isinstance(exp, SecurityValueHolder):

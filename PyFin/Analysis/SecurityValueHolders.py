@@ -10,7 +10,9 @@ import copy
 from collections import defaultdict
 import sys
 import numpy as np
+import pandas as pd
 from pandas import Series as SecuritiesValues
+from PyFin.Utilities import to_dict
 from PyFin.Math.Accumulators.StatefulAccumulators import Shift
 from PyFin.Math.Accumulators.IAccumulators import CompoundedValueHolder
 from PyFin.Math.Accumulators.IAccumulators import Identity
@@ -181,6 +183,38 @@ class SecurityValueHolder(object):
 
     def shift(self, n):
         return SecurityShiftedValueHolder(self, n)
+
+    def transform(self, data, name=None, category_field=None):
+        data = data.copy()
+        dummy_category = False
+        if not category_field:
+            category_field = 'dummy'
+            data[category_field] = 1
+            dummy_category = True
+
+        if not name:
+            name = 'transformed'
+
+        dfs = []
+
+        for _, data_slice in data.groupby(level=0):
+            data_slice = data_slice.set_index(category_field)
+            dict_values, category = to_dict(data_slice)
+            self.push(dict_values)
+            this_series = self.value[category]
+            this_series.name = name
+            df = pd.concat([this_series], axis=1)
+            dfs.append(df)
+
+        res = pd.concat(dfs)
+
+        if dummy_category:
+            res.index = data.index
+            return res
+        else:
+            res[category_field] = res.index
+            res.index = data.index
+            return res
 
 
 class RankedSecurityValueHolder(SecurityValueHolder):

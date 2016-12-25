@@ -28,3 +28,13 @@ def check_date(date):
         return Date.strptime(date, dateFormat='%Y-%m-%d')
     else:
         return Date.fromDateTime(date)
+
+
+def to_dict(raw_data):
+    category = raw_data.index
+    values = raw_data.values
+    columns = raw_data.columns
+
+    inner_values = [dict(zip(columns, values[i])) for i in range(len(values))]
+    dict_values = dict(zip(category, inner_values))
+    return dict_values, category

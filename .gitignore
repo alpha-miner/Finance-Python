@@ -15,5 +15,5 @@ doc/_build/*
 *.pyproj
 *.sln
 .vs/*
-
-
+Finance_Python.egg-info/*
+dist/*

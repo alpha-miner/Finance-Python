@@ -103,6 +103,7 @@ setup(
     author_email=AUTHOR_EMAIL,
     url=URL,
     packages=['PyFin.api',
+              'PyFin.examples',
               'PyFin.DateUtilities',
               'PyFin.Enums',
               'PyFin.Env',

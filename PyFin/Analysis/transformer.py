@@ -26,8 +26,11 @@ def transform(data, expressions, cols, category_field=None):
         series = []
         for exp, name in zip(expressions, cols):
             if isinstance(exp, SecurityValueHolder):
-                exp.push(dict_values)
-                this_series = exp.value[category]
+                this_series = []
+                for i, dict_data in enumerate(dict_values):
+                    exp.push({dict_data[0]: dict_data[1]})
+                    this_series.append(exp[category[i]])
+                this_series = pd.Series(this_series, index=category)
                 this_series.name = name
             else:
                 this_series = data_slice[exp]

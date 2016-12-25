@@ -36,5 +36,5 @@ def to_dict(raw_data):
     columns = raw_data.columns
 
     inner_values = [dict(zip(columns, values[i])) for i in range(len(values))]
-    dict_values = dict(zip(category, inner_values))
+    dict_values = list(zip(category, inner_values))
     return dict_values, category

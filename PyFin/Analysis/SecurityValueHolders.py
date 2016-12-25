@@ -200,8 +200,11 @@ class SecurityValueHolder(object):
         for _, data_slice in data.groupby(level=0):
             data_slice = data_slice.set_index(category_field)
             dict_values, category = to_dict(data_slice)
-            self.push(dict_values)
-            this_series = self.value[category]
+            this_series = []
+            for i, dict_data in enumerate(dict_values):
+                self.push({dict_data[0]: dict_data[1]})
+                this_series.append(self.__getitem__(category[i]))
+            this_series = pd.Series(this_series, index=category)
             this_series.name = name
             df = pd.concat([this_series], axis=1)
             dfs.append(df)

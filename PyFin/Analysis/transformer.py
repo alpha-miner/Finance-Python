@@ -28,7 +28,7 @@ def transform(data, expressions, cols, category_field=None):
             if isinstance(exp, SecurityValueHolder):
                 this_series = []
                 for i, dict_data in enumerate(dict_values):
-                    exp.push({dict_data[0]: dict_data[1]})
+                    exp.push_one(dict_data[0], dict_data[1])
                     this_series.append(exp[category[i]])
                 this_series = pd.Series(this_series, index=category)
                 this_series.name = name

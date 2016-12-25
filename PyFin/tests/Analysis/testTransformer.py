@@ -34,7 +34,7 @@ class TestTransformer(unittest.TestCase):
 
         expression = SecurityMovingMax(20, 'b') + SecurityMovingMinimum(20, 'c')
         calculated = transform(test_df, [expression], cols=['user_factor'])
-        expected = [13., 13., 13., 13., 10., 10., 10.]
+        expected = [13., 13., 13., 13., 12., 11., 10.]
 
         np.testing.assert_array_almost_equal(calculated['user_factor'], expected)
 

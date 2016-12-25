@@ -88,6 +88,14 @@ class SecurityValueHolder(object):
                 self.holders[name] = copy.deepcopy(self._holderTemplate)
                 self.holders[name].push(data[name])
 
+    def push_one(self, name, data):
+        if name in self._symbolList:
+            self.holders[name].push(data)
+        else:
+            self._symbolList.add(name)
+            self.holders[name] = copy.deepcopy(self._holderTemplate)
+            self.holders[name].push(data)
+
     @property
     def value(self):
         res = {}
@@ -202,7 +210,7 @@ class SecurityValueHolder(object):
             dict_values, category = to_dict(data_slice)
             this_series = []
             for i, dict_data in enumerate(dict_values):
-                self.push({dict_data[0]: dict_data[1]})
+                self.push_one(dict_data[0], dict_data[1])
                 this_series.append(self.__getitem__(category[i]))
             this_series = pd.Series(this_series, index=category)
             this_series.name = name
@@ -244,6 +252,9 @@ class RankedSecurityValueHolder(SecurityValueHolder):
 
     def push(self, data):
         self._inner.push(data)
+
+    def push_one(self, name, data):
+        self.push_one(name, data)
 
 
 class FilteredSecurityValueHolder(SecurityValueHolder):
@@ -291,6 +302,10 @@ class FilteredSecurityValueHolder(SecurityValueHolder):
     def push(self, data):
         self._computer.push(data)
         self._filter.push(data)
+
+    def push_one(self, name, data):
+        self._computer.push_one(name, data)
+        self._filter.push_one(name, data)
 
 
 class IdentitySecurityValueHolder(SecurityValueHolder):

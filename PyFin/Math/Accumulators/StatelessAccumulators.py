@@ -29,7 +29,7 @@ class StatelessAccumulator(Accumulator):
         value = super(StatelessAccumulator, self).push(data)
 
         try:
-            bool_flag = np.all(np.isnan(value))
+            bool_flag = np.all(math.isnan(value))
             if bool_flag:
                 return np.nan
         except TypeError:
@@ -49,7 +49,7 @@ class Latest(StatelessAccumulator):
     def push(self, data):
         value = super(Latest, self).push(data)
         try:
-            if np.isnan(value):
+            if math.isnan(value):
                 return np.nan
         except TypeError:
             if not value:
@@ -71,8 +71,8 @@ class Diff(StatelessAccumulator):
 
     def push(self, data):
         value = super(Diff, self).push(data)
-        if np.isnan(value):
-            return np.isnan
+        if math.isnan(value):
+            return math.isnan
         self._previous = self._curr
         self._curr = value
 
@@ -91,8 +91,8 @@ class SimpleReturn(StatelessAccumulator):
 
     def push(self, data):
         value = super(SimpleReturn, self).push(data)
-        if np.isnan(value):
-            return np.isnan
+        if math.isnan(value):
+            return math.isnan
         self._previous = self._curr
         self._curr = value
 
@@ -111,8 +111,8 @@ class LogReturn(StatelessAccumulator):
 
     def push(self, data):
         value = super(LogReturn, self).push(data)
-        if np.isnan(value):
-            return np.isnan
+        if math.isnan(value):
+            return math.isnan
         self._previous = self._curr
         self._curr = value
 
@@ -129,7 +129,7 @@ class Positive(StatelessAccumulator):
 
     def push(self, data):
         value = super(Positive, self).push(data)
-        if np.isnan(value):
+        if math.isnan(value):
             return np.nan
 
         if value > 0.:
@@ -152,7 +152,7 @@ class Negative(StatelessAccumulator):
 
     def push(self, data):
         value = super(Negative, self).push(data)
-        if np.isnan(value):
+        if math.isnan(value):
             return np.nan
 
         if value < 0.:
@@ -176,7 +176,7 @@ class Max(StatelessAccumulator):
 
     def push(self, data):
         value = super(Max, self).push(data)
-        if np.isnan(value):
+        if math.isnan(value):
             return np.nan
         if self._first:
             self._currentMax = value
@@ -199,7 +199,7 @@ class Minimum(StatelessAccumulator):
 
     def push(self, data):
         value = super(Minimum, self).push(data)
-        if np.isnan(value):
+        if math.isnan(value):
             return np.nan
         if self._first:
             self._currentMin = value
@@ -222,7 +222,7 @@ class Sum(StatelessAccumulator):
 
     def push(self, data):
         value = super(Sum, self).push(data)
-        if np.isnan(value):
+        if math.isnan(value):
             return np.nan
         if self._first:
             self._currentSum = value
@@ -244,7 +244,7 @@ class Average(StatelessAccumulator):
 
     def push(self, data):
         value = super(Average, self).push(data)
-        if np.isnan(value):
+        if math.isnan(value):
             return np.nan
         if self._currentCount == 0:
             self._currentSum = value
@@ -268,7 +268,7 @@ class XAverage(StatelessAccumulator):
 
     def push(self, data):
         value = super(XAverage, self).push(data)
-        if np.isnan(value):
+        if math.isnan(value):
             return np.nan
         if self._count == 0:
             self._average = value
@@ -292,7 +292,7 @@ class Variance(StatelessAccumulator):
 
     def push(self, data):
         value = super(Variance, self).push(data)
-        if np.isnan(value):
+        if math.isnan(value):
             return np.nan
         self._currentSum += value
         self._currentSumSquare += value * value
@@ -322,7 +322,7 @@ class Correlation(StatelessAccumulator):
 
     def push(self, data):
         value = super(Correlation, self).push(data)
-        if np.any(np.isnan(value)):
+        if math.isnan(value[0]) or math.isnan(value[1]):
             return np.nan
         self._runningSumLeft = self._runningSumLeft + value[0]
         self._runningSumRight = self._runningSumRight + value[1]
@@ -351,7 +351,7 @@ class Product(StatelessAccumulator):
     def push(self, data):
         value = super(Product, self).push(data)
         try:
-            if np.isnan(value):
+            if math.isnan(value):
                 return np.nan
         except TypeError:
             if not value:
@@ -370,7 +370,7 @@ class CenterMoment(StatelessAccumulator):
 
     def push(self, data):
         value = super(CenterMoment, self).push(data)
-        if np.isnan(value):
+        if math.isnan(value):
             return np.nan
         else:
             self._this_list.append(value)
@@ -415,7 +415,7 @@ class Rank(StatelessAccumulator):
 
     def push(self, data):
         value = super(Rank, self).push(data)
-        if np.isnan(value):
+        if math.isnan(value):
             return np.nan
         else:
             self._thisList.append(value)
@@ -434,7 +434,7 @@ class LevelList(StatelessAccumulator):
 
     def push(self, data):
         value = super(LevelList, self).push(data)
-        if np.isnan(value):
+        if math.isnan(value):
             return np.nan
         else:
             self._thisList.append(value)
@@ -454,7 +454,7 @@ class LevelValue(StatelessAccumulator):
 
     def push(self, data):
         value = super(LevelValue, self).push(data)
-        if np.isnan(value):
+        if math.isnan(value):
             return np.nan
         else:
             self._thisList.append(value)
@@ -475,7 +475,7 @@ class AutoCorrelation(StatelessAccumulator):
 
     def push(self, data):
         value = super(AutoCorrelation, self).push(data)
-        if np.isnan(value):
+        if math.isnan(value):
             return np.nan
         else:
             self._thisList.append(value)

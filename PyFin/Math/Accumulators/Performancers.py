@@ -24,7 +24,7 @@ class MovingLogReturn(SingleValuedValueHolder):
 
     def push(self, data):
         value = super(MovingLogReturn, self).push(data)
-        if np.isnan(value):
+        if math.isnan(value):
             return np.nan
         popout = self._dumpOneValue(value)
         if popout is not np.nan and popout != 0.0:
@@ -45,7 +45,7 @@ class MovingSharp(StatefulValueHolder):
 
     def push(self, data):
         value = super(MovingSharp, self).push(data)
-        if np.any(np.isnan(value)):
+        if math.isnan(value[0]) or math.isnan(value[1]):
             return np.nan
         ret = value[0]
         benchmark = value[1]
@@ -69,7 +69,7 @@ class MovingSortino(StatefulValueHolder):
 
     def push(self, data):
         value = super(MovingSortino, self).push(data)
-        if np.any(np.isnan(value)):
+        if math.isnan(value[0]) or math.isnan(value[1]):
             return np.nan
         ret = value[0]
         benchmark = value[1]
@@ -93,7 +93,7 @@ class MovingAlphaBeta(StatefulValueHolder):
 
     def push(self, data):
         value = super(MovingAlphaBeta, self).push(data)
-        if np.any(np.isnan(value)):
+        if math.isnan(value[0]) or math.isnan(value[1]) or math.isnan(value[2]):
             return np.nan
         pReturn = value[0]
         mReturn = value[1]
@@ -138,7 +138,7 @@ class MovingDrawDown(StatefulValueHolder):
 
     def push(self, data):
         value = super(MovingDrawDown, self).push(data)
-        if np.isnan(value):
+        if math.isnan(value):
             return np.nan
         self._runningIndex += 1
         self._runningCum += value
@@ -161,7 +161,7 @@ class MovingAverageDrawdown(StatefulValueHolder):
 
     def push(self, data):
         value = super(MovingAverageDrawdown, self).push(data)
-        if np.isnan(value):
+        if math.isnan(value):
             return np.nan
         self._drawdownCalculator.push(dict(ret=value))
         drawdown, duration, _ = self._drawdownCalculator.result()
@@ -180,7 +180,7 @@ class MovingMaxDrawdown(StatefulValueHolder):
 
     def push(self, data):
         value = super(MovingMaxDrawdown, self).push(data)
-        if np.isnan(value):
+        if math.isnan(value):
             return np.nan
         self._drawdownCalculator.push(dict(x=value))
         drawdown, duration, lastHighIndex = self._drawdownCalculator.result()

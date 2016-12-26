@@ -426,8 +426,12 @@ class BasicFunction(Accumulator):
 
     def push(self, data):
         value = super(BasicFunction, self).push(data)
-        if np.any(np.isnan(value)):
-            return np.nan
+        if self._returnSize == 1:
+            if math.isnan(value):
+                return np.nan
+        else:
+            if np.any(np.isnan(value)):
+                return np.nan
         self._origValue = value
         self._isFull = 1
 
@@ -472,8 +476,12 @@ class Pow(Accumulator):
 
     def push(self, data):
         value = super(Pow, self).push(data)
-        if np.any(np.isnan(value)):
-            return np.nan
+        if self._returnSize == 1:
+            if math.isnan(value):
+                return np.nan
+        else:
+            if np.any(np.isnan(value)):
+                return np.nan
         self._origValue = value
         self._isFull = 1
 

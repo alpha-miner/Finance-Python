@@ -17,7 +17,6 @@ from PyFin.Math.Accumulators.StatelessAccumulators import Negative
 from PyFin.Math.Accumulators.StatelessAccumulators import XAverage
 from PyFin.Math.Accumulators.StatelessAccumulators import StatelessAccumulator
 from PyFin.Math.Accumulators.IAccumulators import Pow
-from PyFin.Math.Accumulators.IAccumulators import Identity
 from PyFin.Utilities import pyFinAssert
 from PyFin.Utilities import isClose
 
@@ -95,7 +94,7 @@ class SortedValueHolder(SingleValuedValueHolder):
 
     def push(self, data):
         value = super(SortedValueHolder, self).push(data)
-        if np.isnan(value):
+        if math.isnan(value):
             return np.nan
         if self._isFull:
             popout = self._dumpOneValue(value)
@@ -136,10 +135,10 @@ class MovingSum(SingleValuedValueHolder):
 
     def push(self, data):
         value = super(MovingSum, self).push(data)
-        if np.isnan(value):
+        if math.isnan(value):
             return np.nan
         popout = self._dumpOneValue(value)
-        if not np.isnan(popout):
+        if not math.isnan(popout):
             self._runningSum = self._runningSum - popout + value
         else:
             self._runningSum = self._runningSum + value
@@ -155,10 +154,10 @@ class MovingAverage(SingleValuedValueHolder):
 
     def push(self, data):
         value = super(MovingAverage, self).push(data)
-        if np.isnan(value):
+        if math.isnan(value):
             return np.nan
         popout = self._dumpOneValue(value)
-        if not np.isnan(popout):
+        if not math.isnan(popout):
             self._runningSum = self._runningSum - popout + value
         else:
             self._runningSum = self._runningSum + value
@@ -178,7 +177,7 @@ class MovingPositiveAverage(SingleValuedValueHolder):
 
     def push(self, data):
         value = super(MovingPositiveAverage, self).push(data)
-        if np.isnan(value):
+        if math.isnan(value):
             return np.nan
         popout = self._dumpOneValue(value)
         if value > 0.0:
@@ -256,7 +255,7 @@ class MovingNegativeAverage(SingleValuedValueHolder):
 
     def push(self, data):
         value = super(MovingNegativeAverage, self).push(data)
-        if np.isnan(value):
+        if math.isnan(value):
             return np.nan
         popout = self._dumpOneValue(value)
         if value < 0.0:
@@ -285,10 +284,10 @@ class MovingVariance(SingleValuedValueHolder):
 
     def push(self, data):
         value = super(MovingVariance, self).push(data)
-        if np.isnan(value):
+        if math.isnan(value):
             return np.nan
         popout = self._dumpOneValue(value)
-        if not np.isnan(popout):
+        if not math.isnan(popout):
             self._runningSum = self._runningSum - popout + value
             self._runningSumSquare = self._runningSumSquare - popout * popout + value * value
         else:
@@ -322,7 +321,7 @@ class MovingNegativeVariance(SingleValuedValueHolder):
 
     def push(self, data):
         value = super(MovingNegativeVariance, self).push(data)
-        if np.isnan(value):
+        if math.isnan(value):
             return np.nan
         popout = self._dumpOneValue(value)
         if value < 0:
@@ -358,7 +357,7 @@ class MovingCountedPositive(SingleValuedValueHolder):
 
     def push(self, data):
         value = super(MovingCountedPositive, self).push(data)
-        if np.isnan(value):
+        if math.isnan(value):
             return np.nan
         popout = self._dumpOneValue(value)
 
@@ -378,7 +377,7 @@ class MovingCountedNegative(SingleValuedValueHolder):
 
     def push(self, data):
         value = super(MovingCountedNegative, self).push(data)
-        if np.isnan(value):
+        if math.isnan(value):
             return np.nan
         popout = self._dumpOneValue(value)
 
@@ -399,7 +398,7 @@ class MovingHistoricalWindow(StatefulValueHolder):
     def push(self, data):
         value = super(MovingHistoricalWindow, self).push(data)
         try:
-            if np.isnan(value):
+            if math.isnan(value):
                 return np.nan
         except TypeError:
             if not value:
@@ -429,10 +428,10 @@ class MovingCorrelation(StatefulValueHolder):
 
     def push(self, data):
         value = super(MovingCorrelation, self).push(data)
-        if np.any(np.isnan(value)):
+        if math.isnan(value[0]) or math.isnan(value[1]):
             return np.nan
         popout = self._dumpOneValue(value)
-        if not np.isnan(popout[0]):
+        if not math.isnan(popout[0]):
             headLeft = popout[0]
             headRight = popout[1]
 
@@ -509,15 +508,17 @@ class MovingProduct(SingleValuedValueHolder):
     def __init__(self, window, dependency='x'):
         super(MovingProduct, self).__init__(window, dependency)
         self._runningProduct = np.nan
+
     def push(self, data):
         value = super(MovingProduct, self).push(data)
-        if np.isnan(value):
+        if math.isnan(value):
             return np.nan
         self._dumpOneValue(value)
         if all(self._con):
             self._runningProduct = np.product(self._con)
         else:
             self._runningProduct = 0
+
     def result(self):
         return self._runningProduct
 
@@ -530,7 +531,7 @@ class MovingCenterMoment(SingleValuedValueHolder):
     def push(self, data):
         value = super(MovingCenterMoment, self).push(data)
         self._dumpOneValue(value)
-        if np.isnan(value):
+        if math.isnan(value):
             return np.nan
         else:
             self._runningMoment = np.mean(np.power(np.abs(np.array(self._con) - np.mean(self._con)), self._order))
@@ -603,7 +604,7 @@ class MovingRSV(SingleValuedValueHolder):
     def push(self, data):
 
         value = super(MovingRSV, self).push(data)
-        if np.isnan(value):
+        if math.isnan(value):
             return np.nan
         else:
             self._dumpOneValue(value)
@@ -676,7 +677,7 @@ class MovingAroon(SingleValuedValueHolder):
 
     def push(self, data):
         value = super(MovingAroon, self).push(data)
-        if np.isnan(value):
+        if math.isnan(value):
             return np.nan
         else:
             self._dumpOneValue(value)
@@ -693,7 +694,7 @@ class MovingBias(SingleValuedValueHolder):
 
     def push(self,data):
         value = super(MovingBias, self).push(data)
-        if np.isnan(value):
+        if math.isnan(value):
             return np.nan
         else:
             self._dumpOneValue(value)
@@ -710,7 +711,7 @@ class MovingLevel(SingleValuedValueHolder):
 
     def push(self, data):
         value = super(MovingLevel, self).push(data)
-        if np.isnan(value):
+        if math.isnan(value):
             return np.nan
         else:
             self._dumpOneValue(value)
@@ -731,7 +732,7 @@ class MovingAutoCorrelation(SingleValuedValueHolder):
 
     def push(self, data):
         value = super(MovingAutoCorrelation, self).push(data)
-        if np.isnan(value):
+        if math.isnan(value):
             return np.nan
         else:
             self._dumpOneValue(value)

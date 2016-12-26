@@ -20,7 +20,10 @@ def transform(data, expressions, cols, category_field=None):
 
     dfs = []
 
-    for _, data_slice in data.groupby(level=0):
+    index_list = data.index.unique()
+
+    for ind in index_list:
+        data_slice = data.ix[ind]
         data_slice = data_slice.set_index(category_field)
         dict_values, category = to_dict(data_slice)
         series = []

@@ -562,9 +562,10 @@ class MovingMaxPos(SortedValueHolder):
     def push(self, data):
         super(MovingMaxPos,self).push(data)
         self._max = self._sortedArray[-1]
-        self._runningTsMaxPos = self._con.index(self._max)
 
     def result(self):
+        tmpList = list(self._con)
+        self._runningTsMaxPos = tmpList.index(self._max)
         return self._runningTsMaxPos
 
 
@@ -576,9 +577,10 @@ class MovingMinPos(SortedValueHolder):
     def push(self, data):
         super(MovingMinPos,self).push(data)
         self._min = self._sortedArray[0]
-        self._runningTsMinPos = self._con.index(self._min)
 
     def result(self):
+        tmpList = list(self._con)
+        self._runningTsMinPos = tmpList.index(self._min)
         return self._runningTsMinPos
 
 
@@ -683,7 +685,8 @@ class MovingAroon(SingleValuedValueHolder):
             self._dumpOneValue(value)
 
     def result(self):
-        self._runningAroonOsc = (self._con.index(np.max(self._con)) - self._con.index(np.min(self._con))) / self.window
+        tmpList = list(self._con)
+        self._runningAroonOsc = (tmpList.index(np.max(tmpList)) - tmpList.index(np.min(tmpList))) / self.window
         return self._runningAroonOsc
 
 

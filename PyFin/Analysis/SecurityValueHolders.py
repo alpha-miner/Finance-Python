@@ -57,12 +57,6 @@ class SecurityValueHolder(object):
         return copy.deepcopy(self._symbolList)
 
     @property
-    def dependency(self):
-        return {
-            symbol: self.fields for symbol in self._symbolList
-        }
-
-    @property
     def fields(self):
         if isinstance(self._dependency, list):
             return self._dependency
@@ -419,7 +413,7 @@ class SecurityCompoundedValueHolder(SecurityValueHolder):
         self._returnSize = right.valueSize
         self._symbolList = set(left.symbolList)
         self._window = left.window + right.window - 1
-        self._dependency = left.dependency
+        self._dependency = copy.deepcopy(left._dependency)
         if not isinstance(right.fields, str):
             pyFinAssert(left.valueSize == len(right.fields), ValueError, "left value size {0} is "
                         "different from right dependency {1}"

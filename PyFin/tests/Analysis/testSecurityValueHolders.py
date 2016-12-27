@@ -202,12 +202,7 @@ class TestSecurityValueHolders(unittest.TestCase):
 
         testValueHolder.push({'aapl': {'close': 1.0}, 'ibm': {'close': 2.0}})
 
-        dependency = {
-            name: pNames for name in symbolList
-            }
-
         self.assertEqual(set(testValueHolder.symbolList), set(symbolList))
-        self.assertEqual(testValueHolder.dependency, dependency)
         self.assertEqual(testValueHolder.valueSize, 1)
         self.assertEqual(testValueHolder.window, window)
 
@@ -216,27 +211,21 @@ class TestSecurityValueHolders(unittest.TestCase):
         pNames2 = ['open']
         test2 = SecurityMovingMax(window2, pNames2)
         binaryValueHolder = testValueHolder + test2
-        dependency2 = {
-            name: pNames + pNames2 for name in symbolList
-            }
 
         self.assertEqual(set(binaryValueHolder.symbolList), set(symbolList))
-        for name in dependency2:
-            self.assertEqual(set(binaryValueHolder.dependency[name]), set(dependency2[name]))
+
         self.assertEqual(binaryValueHolder.valueSize, 1)
         self.assertEqual(binaryValueHolder.window, max(window, window2))
 
         # test compounded operated value holder
         test3 = SecurityMovingMax(window2, testValueHolder)
         self.assertEqual(set(test3.symbolList), set(symbolList))
-        self.assertEqual(test3.dependency, dependency)
         self.assertEqual(test3.valueSize, 1)
         self.assertEqual(test3.window, window + window2 - 1)
 
         # test compounded twice
         test4 = SecurityMovingMax(window2, test3)
         self.assertEqual(set(test4.symbolList), set(symbolList))
-        self.assertEqual(test4.dependency, dependency)
         self.assertEqual(test4.valueSize, 1)
         self.assertEqual(test4.window, window + 2 * window2 - 2)
 
@@ -252,14 +241,6 @@ class TestSecurityValueHolders(unittest.TestCase):
         calculated = dict(dependencyCalculator(h1, h2, h3, h4))
         for name in expected:
             self.assertEqual(set(expected[name]), set(calculated[name]))
-
-    def testDependencyCalculationOnCompoundedValueHolder(self):
-        h = SecurityMovingMax(5, SecurityMovingAverage(10, 'close') + SecurityMovingAverage(20, 'open'))
-        h.push({'aapl': {'close': 5}})
-        expected = {'aapl': ['close', 'open']}
-        calculated = h.dependency
-        for name in expected:
-            self.assertEqual(set(calculated[name]), set(expected[name]))
 
     def testItemizedValueHolder(self):
         window = 10

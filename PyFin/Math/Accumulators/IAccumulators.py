@@ -180,10 +180,10 @@ class NegativeValueHolder(Accumulator):
 
     def result(self):
         res = self._valueHolder.result()
-        if self._returnSize > 1:
-            return tuple(-r for r in res)
-        else:
+        try:
             return -res
+        except TypeError:
+            return [-r for r in res]
 
 
 class ListedValueHolder(Accumulator):
@@ -207,10 +207,10 @@ class ListedValueHolder(Accumulator):
         resRight = self._right.result()
 
         if not hasattr(resLeft, '__iter__'):
-            resLeft = (resLeft,)
+            resLeft = [resLeft]
         if not hasattr(resRight, '__iter__'):
-            resRight = (resRight,)
-        return tuple(resLeft) + tuple(resRight)
+            resRight = [resRight]
+        return resLeft + resRight
 
 
 class TruncatedValueHolder(Accumulator):
@@ -276,9 +276,10 @@ class ArithmeticValueHolder(CombinedValueHolder):
     def result(self):
         res1 = self._left.result()
         res2 = self._right.result()
-        if self._returnSize > 1:
-            return tuple(self._op(r1, r2) for r1, r2 in zip(res1, res2))
-        return self._op(res1, res2)
+        try:
+            return self._op(res1, res2)
+        except TypeError:
+            return [self._op(r1, r2) for r1, r2 in zip(res1, res2)]
 
     @property
     def isFull(self):

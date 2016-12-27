@@ -549,7 +549,7 @@ class TestSecurityValueHolders(unittest.TestCase):
         for name in expected.index:
             self.assertAlmostEqual(expected[name], calculated[name])
 
-        data3 = SecuritiesValues({'aapl': {'close': 3.0},
+        data3 = ({'aapl': {'close': 3.0},
                  'ibm': {'close': 4.0},
                  'goog': {'close': 5.0}})
 

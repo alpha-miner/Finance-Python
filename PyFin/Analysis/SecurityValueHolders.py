@@ -78,20 +78,18 @@ class SecurityValueHolder(object):
         return self._window
 
     def push(self, data):
-        names = data.keys()
-        old_names = self.symbolList
-        for name in names:
-            if name in old_names:
+        for name in data:
+            try:
                 self.holders[name].push(data[name])
-            else:
+            except KeyError:
                 self._symbolList.add(name)
                 self.holders[name] = copy.deepcopy(self._holderTemplate)
                 self.holders[name].push(data[name])
 
     def push_one(self, name, data):
-        if name in self._symbolList:
+        try:
             self.holders[name].push(data)
-        else:
+        except KeyError:
             self._symbolList.add(name)
             self.holders[name] = copy.deepcopy(self._holderTemplate)
             self.holders[name].push(data)

@@ -539,12 +539,12 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
         test = TruncatedValueHolder(ma20 ^ max5, slice(1, 2))
         test.push(dict(close=10.0, open=5.0))
         test.push(dict(close=15.0, open=20.0))
-        self.assertAlmostEqual(test.result(), (20.0,), 15)
+        self.assertAlmostEqual(test.result(), [20.0], 15)
 
         test = TruncatedValueHolder(ma20 ^ max5, slice(0, -1))
         test.push(dict(close=10.0, open=5.0))
         test.push(dict(close=15.0, open=20.0))
-        self.assertAlmostEqual(test.result(), (12.5,), 15)
+        self.assertAlmostEqual(test.result(), [12.5], 15)
 
         with self.assertRaises(ValueError):
             _ = TruncatedValueHolder(ma20 ^ max5, slice(1, -2))
@@ -584,15 +584,15 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
 
         cmp = (m1 ^ m2) <= m2
         cmp.push(dict(x=1.0))
-        self.assertEqual((True, True), cmp.result())
+        self.assertEqual([True, True], cmp.result())
         cmp.push(dict(x=2.0))
-        self.assertEqual((False, True), cmp.result())
+        self.assertEqual([False, True], cmp.result())
 
         cmp = m1 <= (m1 ^ m2)
         cmp.push(dict(x=1.0))
-        self.assertEqual((True, True), cmp.result())
+        self.assertEqual([True, True], cmp.result())
         cmp.push(dict(x=2.0))
-        self.assertEqual((True, False), cmp.result())
+        self.assertEqual([True, False], cmp.result())
 
     def testLessOperator(self):
         m1 = Minimum('x')
@@ -606,15 +606,15 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
 
         cmp = (m1 ^ m2) < m2
         cmp.push(dict(x=1.0))
-        self.assertEqual((False, False), cmp.result())
+        self.assertEqual([False, False], cmp.result())
         cmp.push(dict(x=2.0))
-        self.assertEqual((True, False), cmp.result())
+        self.assertEqual([True, False], cmp.result())
 
         cmp = m1 < (m1 ^ m2)
         cmp.push(dict(x=1.0))
-        self.assertEqual((False, False), cmp.result())
+        self.assertEqual([False, False], cmp.result())
         cmp.push(dict(x=2.0))
-        self.assertEqual((False, True), cmp.result())
+        self.assertEqual([False, True], cmp.result())
 
     def testGreaterOrEqualOperator(self):
         m1 = Minimum('x')
@@ -628,15 +628,15 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
 
         cmp = (m1 ^ m2) >= m2
         cmp.push(dict(x=1.0))
-        self.assertEqual((True, True), cmp.result())
+        self.assertEqual([True, True], cmp.result())
         cmp.push(dict(x=2.0))
-        self.assertEqual((False, True), cmp.result())
+        self.assertEqual([False, True], cmp.result())
 
         cmp = m1 >= (m1 ^ m2)
         cmp.push(dict(x=1.0))
-        self.assertEqual((True, True), cmp.result())
+        self.assertEqual([True, True], cmp.result())
         cmp.push(dict(x=2.0))
-        self.assertEqual((True, False), cmp.result())
+        self.assertEqual([True, False], cmp.result())
 
     def testGreaterOperator(self):
         m1 = Max('x')
@@ -650,15 +650,15 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
 
         cmp = (m1 ^ m2) > m2
         cmp.push(dict(x=1.0))
-        self.assertEqual((False, False), cmp.result())
+        self.assertEqual([False, False], cmp.result())
         cmp.push(dict(x=2.0))
-        self.assertEqual((True, False), cmp.result())
+        self.assertEqual([True, False], cmp.result())
 
         cmp = m1 > (m1 ^ m2)
         cmp.push(dict(x=1.0))
-        self.assertEqual((False, False), cmp.result())
+        self.assertEqual([False, False], cmp.result())
         cmp.push(dict(x=2.0))
-        self.assertEqual((False, True), cmp.result())
+        self.assertEqual([False, True], cmp.result())
 
     def testExpFunction(self):
         ma5 = MovingAverage(5, 'close')

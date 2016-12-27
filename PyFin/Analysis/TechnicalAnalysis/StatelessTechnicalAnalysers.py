@@ -27,16 +27,12 @@ from PyFin.Math.Accumulators import LogReturn
 class SecurityStatelessSingleValueHolder(SecurityValueHolder):
     def __init__(self, holderType, dependency='x', **kwargs):
         super(SecurityStatelessSingleValueHolder, self).__init__(dependency)
-
-        if isinstance(dependency, SecurityValueHolder):
-            self._symbolList = dependency._symbolList
-            self._dependency = dependency._dependency
-            self._holderTemplate = holderType(dependency=copy.deepcopy(dependency._holderTemplate), **kwargs)
+        if self._compHolder:
+            self._holderTemplate = holderType(dependency='x', **kwargs)
         else:
             self._holderTemplate = holderType(dependency=self._dependency, **kwargs)
-        self._innerHolders = \
-            {
-                name: copy.deepcopy(self._holderTemplate) for name in self._symbolList
+        self._innerHolders = {
+            name: copy.deepcopy(self._holderTemplate) for name in self._symbolList
             }
 
 
@@ -64,19 +60,19 @@ class SecurityMACDValueHolder(SecurityStatelessSingleValueHolder):
 class SecurityExpValueHolder(SecurityStatelessSingleValueHolder):
     def __init__(self, dependency='x'):
         super(SecurityExpValueHolder, self).__init__(holderType=Exp,
-                                                      dependency=dependency)
+                                                     dependency=dependency)
 
 
 class SecurityLogValueHolder(SecurityStatelessSingleValueHolder):
     def __init__(self, dependency='x'):
         super(SecurityLogValueHolder, self).__init__(holderType=Log,
-                                                      dependency=dependency)
+                                                     dependency=dependency)
 
 
 class SecurityPowValueHolder(SecurityStatelessSingleValueHolder):
     def __init__(self, dependency='x'):
         super(SecurityPowValueHolder, self).__init__(holderType=Pow,
-                                                      dependency=dependency)
+                                                     dependency=dependency)
 
 
 class SecuritySqrtValueHolder(SecurityStatelessSingleValueHolder):
@@ -88,7 +84,7 @@ class SecuritySqrtValueHolder(SecurityStatelessSingleValueHolder):
 class SecurityAbsValueHolder(SecurityStatelessSingleValueHolder):
     def __init__(self, dependency='x'):
         super(SecurityAbsValueHolder, self).__init__(holderType=Abs,
-                                                      dependency=dependency)
+                                                     dependency=dependency)
 
 
 class SecurityAcosValueHolder(SecurityStatelessSingleValueHolder):
@@ -100,7 +96,7 @@ class SecurityAcosValueHolder(SecurityStatelessSingleValueHolder):
 class SecurityAcoshValueHolder(SecurityStatelessSingleValueHolder):
     def __init__(self, dependency='x'):
         super(SecurityAcoshValueHolder, self).__init__(holderType=Acosh,
-                                                      dependency=dependency)
+                                                       dependency=dependency)
 
 
 class SecurityAsinValueHolder(SecurityStatelessSingleValueHolder):

@@ -30,11 +30,11 @@ class TestTransformer(unittest.TestCase):
     def test_transformer_without_category_name(self):
         test_df = pd.DataFrame({'b': [4, 5, 6, 7, 6, 5, 4],
                                 'c': [9, 8, 7, 6, 5, 4, 3]},
-                               index=[1, 1, 1, 1, 2, 2, 2])
+                               index=[1, 2, 3, 4, 5, 6, 7])
 
         expression = SecurityMovingMax(20, 'b') + SecurityMovingMinimum(20, 'c')
         calculated = transform(test_df, [expression], cols=['user_factor'])
-        expected = [13., 13., 13., 13., 12., 11., 10.]
+        expected = [13., 13., 13., 13., 13., 13., 13.]
 
         np.testing.assert_array_almost_equal(calculated['user_factor'], expected)
 

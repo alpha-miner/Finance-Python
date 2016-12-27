@@ -92,12 +92,15 @@ class SimpleReturn(StatelessAccumulator):
     def push(self, data):
         value = super(SimpleReturn, self).push(data)
         if math.isnan(value):
-            return math.isnan
+            return np.nan
         self._previous = self._curr
         self._curr = value
 
     def result(self):
-        return self._curr / self._previous - 1.
+        try:
+            return self._curr / self._previous - 1.
+        except ValueError:
+            return np.nan
 
 
 class LogReturn(StatelessAccumulator):
@@ -112,12 +115,15 @@ class LogReturn(StatelessAccumulator):
     def push(self, data):
         value = super(LogReturn, self).push(data)
         if math.isnan(value):
-            return math.isnan
+            return np.nan
         self._previous = self._curr
         self._curr = value
 
     def result(self):
-        return math.log(self._curr / self._previous)
+        try:
+            return math.log(self._curr / self._previous)
+        except ValueError:
+            return np.nan
 
 
 class Positive(StatelessAccumulator):

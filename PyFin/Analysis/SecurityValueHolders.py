@@ -232,7 +232,7 @@ class RankedSecurityValueHolder(SecurityValueHolder):
             raise ValueError("Currently only value holder input is allowed for rank holder.")
         self._window = self._inner.window
         self._returnSize = self._inner.valueSize
-        self._dependency = self._inner.dependency
+        self._dependency = copy.deepcopy(self._inner._dependency)
         self._symbolList = self._inner._symbolList
 
     @property
@@ -248,7 +248,7 @@ class RankedSecurityValueHolder(SecurityValueHolder):
         self._inner.push(data)
 
     def push_one(self, name, data):
-        self.push_one(name, data)
+        self._inner.push_one(name, data)
 
 
 class FilteredSecurityValueHolder(SecurityValueHolder):

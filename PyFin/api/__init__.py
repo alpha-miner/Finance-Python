@@ -36,6 +36,7 @@ from PyFin.api.Analysis import SQRT
 from PyFin.api.Analysis import DIFF
 from PyFin.api.Analysis import RETURNSimple
 from PyFin.api.Analysis import RETURNLog
+from PyFin.api.Analysis import CSRank
 
 
 __all__ = ["datesList",
@@ -67,4 +68,5 @@ __all__ = ["datesList",
            "SQRT",
            "DIFF",
            "RETURNSimple",
-           "RETURNLog"]
+           "RETURNLog",
+           "CSRank"]

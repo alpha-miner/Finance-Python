@@ -201,29 +201,24 @@ class SecurityValueHolder(object):
         if not name:
             name = 'transformed'
 
-        dfs = []
+        data_slice = data.set_index(category_field)
+        dict_values, category = to_dict(data_slice)
 
-        for _, data_slice in data.groupby(level=0):
-            data_slice = data_slice.set_index(category_field)
-            dict_values, category = to_dict(data_slice)
-            this_series = []
-            for i, dict_data in enumerate(dict_values):
-                self.push_one(dict_data[0], dict_data[1])
-                this_series.append(self.__getitem__(category[i]))
-            this_series = pd.Series(this_series, index=category)
-            this_series.name = name
-            df = pd.concat([this_series], axis=1)
-            dfs.append(df)
+        values = np.zeros((len(data_slice), 1))
 
-        res = pd.concat(dfs)
+        for i, dict_data in enumerate(dict_values):
+            self.push_one(dict_data[0], dict_data[1])
+            values[i, 0] = self.__getitem__(category[i])
+
+        df = pd.DataFrame(values, index=category, columns=[name])
 
         if dummy_category:
-            res.index = data.index
-            return res
+            df.index = data.index
+            return df
         else:
-            res[category_field] = res.index
-            res.index = data.index
-            return res
+            df[category_field] = df.index
+            df.index = data.index
+            return df
 
 
 class RankedSecurityValueHolder(SecurityValueHolder):

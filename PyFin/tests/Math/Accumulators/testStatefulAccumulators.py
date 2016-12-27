@@ -741,7 +741,6 @@ class TestStatefulAccumulators(unittest.TestCase):
                                                             "expected rank:   {1}\n"
                                                             "calculated rank: {2}".format(i, expected, calculated))
 
-
     def testMovingKDJ(self):
         window = 10
         k=3
@@ -750,16 +749,15 @@ class TestStatefulAccumulators(unittest.TestCase):
 
         con = []
         this_j = []
-        tmp_flag = True
         for i, value in enumerate(self.sample):
             con.append(value)
             mk.push(dict(x=value))
             if i >= window:
                 con = con[1:]
-            this_rsv = (value - np.min(con)) / (np.max(con) - np.min(con))
             if len(con) == 1:
                 this_j.append(np.nan)
             else:
+                this_rsv = (value - np.min(con)) / (np.max(con) - np.min(con))
                 if len(con) == 2:
                     this_k = (0.5 * (k - 1) + this_rsv) / k
                     this_d = (0.5 * (d - 1) + this_k) / d

@@ -584,15 +584,15 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
 
         cmp = (m1 ^ m2) <= m2
         cmp.push(dict(x=1.0))
-        self.assertEqual([True, True], cmp.result())
+        np.testing.assert_array_equal([True, True], cmp.result())
         cmp.push(dict(x=2.0))
-        self.assertEqual([False, True], cmp.result())
+        np.testing.assert_array_equal([False, True], cmp.result())
 
         cmp = m1 <= (m1 ^ m2)
         cmp.push(dict(x=1.0))
-        self.assertEqual([True, True], cmp.result())
+        np.testing.assert_array_equal([True, True], cmp.result())
         cmp.push(dict(x=2.0))
-        self.assertEqual([True, False], cmp.result())
+        np.testing.assert_array_equal([True, False], cmp.result())
 
     def testLessOperator(self):
         m1 = Minimum('x')
@@ -606,15 +606,15 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
 
         cmp = (m1 ^ m2) < m2
         cmp.push(dict(x=1.0))
-        self.assertEqual([False, False], cmp.result())
+        np.testing.assert_array_equal([False, False], cmp.result())
         cmp.push(dict(x=2.0))
-        self.assertEqual([True, False], cmp.result())
+        np.testing.assert_array_equal([True, False], cmp.result())
 
         cmp = m1 < (m1 ^ m2)
         cmp.push(dict(x=1.0))
-        self.assertEqual([False, False], cmp.result())
+        np.testing.assert_array_equal([False, False], cmp.result())
         cmp.push(dict(x=2.0))
-        self.assertEqual([False, True], cmp.result())
+        np.testing.assert_array_equal([False, True], cmp.result())
 
     def testGreaterOrEqualOperator(self):
         m1 = Minimum('x')
@@ -628,15 +628,15 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
 
         cmp = (m1 ^ m2) >= m2
         cmp.push(dict(x=1.0))
-        self.assertEqual([True, True], cmp.result())
+        np.testing.assert_array_equal(np.array([True, True]), cmp.result())
         cmp.push(dict(x=2.0))
-        self.assertEqual([False, True], cmp.result())
+        np.testing.assert_array_equal(np.array([False, True]), cmp.result())
 
         cmp = m1 >= (m1 ^ m2)
         cmp.push(dict(x=1.0))
-        self.assertEqual([True, True], cmp.result())
+        np.testing.assert_array_equal(np.array([True, True]), cmp.result())
         cmp.push(dict(x=2.0))
-        self.assertEqual([True, False], cmp.result())
+        np.testing.assert_array_equal(np.array([True, False]), cmp.result())
 
     def testGreaterOperator(self):
         m1 = Max('x')
@@ -650,15 +650,15 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
 
         cmp = (m1 ^ m2) > m2
         cmp.push(dict(x=1.0))
-        self.assertEqual([False, False], cmp.result())
+        np.testing.assert_array_equal(np.array([False, False]), cmp.result())
         cmp.push(dict(x=2.0))
-        self.assertEqual([True, False], cmp.result())
+        np.testing.assert_array_equal(np.array([True, False]), cmp.result())
 
         cmp = m1 > (m1 ^ m2)
         cmp.push(dict(x=1.0))
-        self.assertEqual([False, False], cmp.result())
+        np.testing.assert_array_equal(np.array([False, False]), cmp.result())
         cmp.push(dict(x=2.0))
-        self.assertEqual([False, True], cmp.result())
+        np.testing.assert_array_equal(np.array([False, True]), cmp.result())
 
     def testExpFunction(self):
         ma5 = MovingAverage(5, 'close')

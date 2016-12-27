@@ -207,10 +207,10 @@ class ListedValueHolder(Accumulator):
         resRight = self._right.result()
 
         if not hasattr(resLeft, '__iter__'):
-            resLeft = [resLeft]
+            resLeft = np.array([resLeft])
         if not hasattr(resRight, '__iter__'):
-            resRight = [resRight]
-        return resLeft + resRight
+            resRight = np.array([resRight])
+        return np.concatenate([resLeft, resRight])
 
 
 class TruncatedValueHolder(Accumulator):
@@ -276,10 +276,8 @@ class ArithmeticValueHolder(CombinedValueHolder):
     def result(self):
         res1 = self._left.result()
         res2 = self._right.result()
-        try:
-            return self._op(res1, res2)
-        except TypeError:
-            return [self._op(r1, r2) for r1, r2 in zip(res1, res2)]
+
+        return self._op(res1, res2)
 
     @property
     def isFull(self):
@@ -370,7 +368,7 @@ class Identity(Accumulator):
         if self._returnSize == 1:
             return value
         else:
-            return (value,) * self._returnSize
+            return np.array([value] * self._returnSize)
 
 
 class CompoundedValueHolder(Accumulator):
@@ -393,10 +391,10 @@ class CompoundedValueHolder(Accumulator):
     def push(self, data):
         self._left.push(data)
         values = self._left.result()
-        if hasattr(values, '__iter__'):
-            parameters = dict((name, value) for name, value in zip(self._right.dependency, values))
-        else:
+        try:
             parameters = {self._right.dependency: values}
+        except TypeError:
+            parameters = dict((name, value) for name, value in zip(self._right.dependency, values))
         self._right.push(parameters)
 
     def result(self):
@@ -437,11 +435,10 @@ class BasicFunction(Accumulator):
         self._isFull = 1
 
     def result(self):
-
-        if hasattr(self._origValue, '__iter__'):
-            return tuple(self._func(v) for v in self._origValue)
-        else:
+        try:
             return self._func(self._origValue)
+        except (TypeError, ValueError) as _:
+            return np.array([self._func(v) for v in self._origValue])
 
 
 class Exp(BasicFunction):
@@ -488,10 +485,10 @@ class Pow(Accumulator):
 
     def result(self):
 
-        if hasattr(self._origValue, '__iter__'):
-            return tuple(v ** self.n for v in self._origValue)
-        else:
+        try:
             return self._origValue ** self.n
+        except TypeError:
+            return np.array(v ** self.n for v in self._origValue)
 
 
 class Abs(BasicFunction):

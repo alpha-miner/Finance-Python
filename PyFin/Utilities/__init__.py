@@ -34,6 +34,6 @@ def to_dict(raw_data):
     values = raw_data.values
     columns = raw_data.columns
 
-    dict_values = (dict(zip(columns, values[i])) for i in range(len(values)))
+    dict_values = [dict(zip(columns, values[i])) for i in range(len(values))]
 
     return dict_values, raw_data.index

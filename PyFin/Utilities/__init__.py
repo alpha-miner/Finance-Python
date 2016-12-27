@@ -31,10 +31,9 @@ def check_date(date):
 
 
 def to_dict(raw_data):
-    category = raw_data.index
     values = raw_data.values
     columns = raw_data.columns
 
-    dict_values = [dict(zip(columns, values[i])) for i in range(len(values))]
+    dict_values = (dict(zip(columns, values[i])) for i in range(len(values)))
 
-    return dict_values, category
+    return dict_values, raw_data.index

@@ -27,8 +27,9 @@ def transform(data, expressions, cols, category_field=None):
     for i, exp in enumerate(expressions):
         if isinstance(exp, SecurityValueHolder):
             for j, dict_data in enumerate(dict_values):
-                exp.push_one(dict_data[0], dict_data[1])
-                values[j, i] = exp[category[j]]
+                key = category[j]
+                exp.push_one(key, dict_data)
+                values[j, i] = exp[key]
         else:
             values[:, i] = data_slice[exp]
     df = pd.DataFrame(values, index=category, columns=cols)

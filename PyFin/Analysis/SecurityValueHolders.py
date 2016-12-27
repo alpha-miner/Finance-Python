@@ -207,8 +207,9 @@ class SecurityValueHolder(object):
         values = np.zeros((len(data_slice), 1))
 
         for i, dict_data in enumerate(dict_values):
-            self.push_one(dict_data[0], dict_data[1])
-            values[i, 0] = self.__getitem__(category[i])
+            key = category[i]
+            self.push_one(key, dict_data)
+            values[i, 0] = self.__getitem__(key)
 
         df = pd.DataFrame(values, index=category, columns=[name])
 

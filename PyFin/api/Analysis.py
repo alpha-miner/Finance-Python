@@ -24,6 +24,12 @@ from PyFin.Analysis.TechnicalAnalysis import SecurityDiffValueHolder
 from PyFin.Analysis.TechnicalAnalysis import SecuritySimpleReturnValueHolder
 from PyFin.Analysis.TechnicalAnalysis import SecurityLogReturnValueHolder
 
+from PyFin.Analysis.SecurityValueHolders import RankedSecurityValueHolder
+
+
+def CSRank(dependency):
+    return RankedSecurityValueHolder(dependency)
+
 
 def EMA(window, dependency='x'):
     return SecurityXAverageValueHolder(window, dependency)

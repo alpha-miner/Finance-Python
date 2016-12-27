@@ -279,7 +279,7 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
         compounded1 = SecurityMovingMax(2, ma1)
         compounded2 = SecurityMovingAverage(2, ma1)
 
-        self.assertEqual(compounded1.window, window + 1)
+        self.assertEqual(compounded1.window, window + 2)
 
         container = [np.nan, np.nan]
         for i in range(len(self.aapl['close'])):

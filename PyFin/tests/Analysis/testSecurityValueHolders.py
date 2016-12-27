@@ -6,7 +6,6 @@ Created on 2015-8-12
 """
 
 import unittest
-from collections import deque
 import numpy as np
 from PyFin.Enums import Factors
 from PyFin.Analysis.SecurityValueHolders import SecuritiesValues
@@ -62,10 +61,17 @@ class TestSecurityValueHolders(unittest.TestCase):
                             Factors.OPEN: self.datas['ibm'][Factors.OPEN][i]}}
             benchmark.push(data)
             filtered.push(data)
-            if np.isnan(filtered['aapl']):
-                self.assertTrue(filtered['aapl'])
-            if np.isnan(filtered['ibm']):
-                self.assertTrue(filtered['ibm'])
+            try:
+                _ = filtered['aapl']
+                self.assertTrue(benchmark['aapl'])
+            except KeyError:
+                self.assertFalse(benchmark['aapl'])
+
+            try:
+                _ = filtered['ibm']
+                self.assertTrue(benchmark['ibm'])
+            except KeyError:
+                self.assertFalse(benchmark['ibm'])
 
     def testSecurityValueHolderIsFull(self):
         test = SecurityMovingMax(2, dependency='close')
@@ -202,12 +208,7 @@ class TestSecurityValueHolders(unittest.TestCase):
 
         testValueHolder.push({'aapl': {'close': 1.0}, 'ibm': {'close': 2.0}})
 
-        dependency = {
-            name: pNames for name in symbolList
-            }
-
         self.assertEqual(set(testValueHolder.symbolList), set(symbolList))
-        self.assertEqual(testValueHolder.dependency, dependency)
         self.assertEqual(testValueHolder.valueSize, 1)
         self.assertEqual(testValueHolder.window, window)
 
@@ -216,29 +217,23 @@ class TestSecurityValueHolders(unittest.TestCase):
         pNames2 = ['open']
         test2 = SecurityMovingMax(window2, pNames2)
         binaryValueHolder = testValueHolder + test2
-        dependency2 = {
-            name: pNames + pNames2 for name in symbolList
-            }
 
         self.assertEqual(set(binaryValueHolder.symbolList), set(symbolList))
-        for name in dependency2:
-            self.assertEqual(set(binaryValueHolder.dependency[name]), set(dependency2[name]))
+
         self.assertEqual(binaryValueHolder.valueSize, 1)
         self.assertEqual(binaryValueHolder.window, max(window, window2))
 
         # test compounded operated value holder
         test3 = SecurityMovingMax(window2, testValueHolder)
         self.assertEqual(set(test3.symbolList), set(symbolList))
-        self.assertEqual(test3.dependency, dependency)
         self.assertEqual(test3.valueSize, 1)
-        self.assertEqual(test3.window, window + window2 - 1)
+        self.assertEqual(test3.window, window + window2)
 
         # test compounded twice
         test4 = SecurityMovingMax(window2, test3)
         self.assertEqual(set(test4.symbolList), set(symbolList))
-        self.assertEqual(test4.dependency, dependency)
         self.assertEqual(test4.valueSize, 1)
-        self.assertEqual(test4.window, window + 2 * window2 - 2)
+        self.assertEqual(test4.window, window + 2 * window2)
 
     def testDependencyCalculation(self):
         h1 = {'aapl': 'close', 'ibm': 'close'}
@@ -253,14 +248,6 @@ class TestSecurityValueHolders(unittest.TestCase):
         for name in expected:
             self.assertEqual(set(expected[name]), set(calculated[name]))
 
-    def testDependencyCalculationOnCompoundedValueHolder(self):
-        h = SecurityMovingMax(5, SecurityMovingAverage(10, 'close') + SecurityMovingAverage(20, 'open'))
-        h.push({'aapl': {'close': 5}})
-        expected = {'aapl': ['close', 'open']}
-        calculated = h.dependency
-        for name in expected:
-            self.assertEqual(set(calculated[name]), set(expected[name]))
-
     def testItemizedValueHolder(self):
         window = 10
         pNames = 'close'
@@ -268,19 +255,9 @@ class TestSecurityValueHolders(unittest.TestCase):
         test.push({'aapl': {'close': 10.0}, 'ibm': {'close': 15.0}, 'goog': {'close': 17.0}})
         test.push({'aapl': {'close': 12.0}, 'ibm': {'close': 10.0}, 'goog': {'close': 13.0}})
 
-        # single named value holder
-        test1 = test['ibm']
-        self.assertAlmostEqual(test1, 12.5, 15)
-
-        # multi-valued named value holder
-        test2 = test['ibm', 'goog']
-        expected = SecuritiesValues({'ibm': 12.5, 'goog':15.0})
-        for s in test2.index:
-            self.assertAlmostEqual(test2[s], expected[s])
-
-        # wrong type of item
-        with self.assertRaises(TypeError):
-            _ = test[1]
+        expected = {'ibm': 12.5, 'goog':15.0}
+        for s in expected:
+            self.assertAlmostEqual(test[s], expected[s])
 
     def testAddedSecurityValueHolders(self):
         window1 = 10
@@ -566,32 +543,9 @@ class TestSecurityValueHolders(unittest.TestCase):
         with self.assertRaises(ValueError):
             _ = mm.shift(0)
 
-    def testCompoundedSecurityValueHolder(self):
-        ma = SecurityMovingAverage(2, 'close')
-        compounded = ma >> SecurityMovingMax(3)
-
-        container = {'aapl': deque(maxlen=3), 'ibm': deque(maxlen=3)}
-        expected = {'aapl': 0.0, 'ibm': 0.0}
-        for i in range(len(self.datas['aapl']['close'])):
-            data = {'aapl': {Factors.CLOSE: self.datas['aapl'][Factors.CLOSE][i]},
-                    'ibm': {Factors.CLOSE: self.datas['ibm'][Factors.CLOSE][i]}}
-            ma.push(data)
-            maRes = ma.value
-            for name in maRes.index:
-                container[name].append(maRes[name])
-                expected[name] = max(container[name])
-
-            compounded.push(data)
-            calculated = compounded.value
-            for name in calculated.index:
-                self.assertAlmostEqual(expected[name], calculated[name], 12, "for {0} at index {1}\n"
-                                                                             "expected:   {2}\n"
-                                                                             "calculated: {3}"
-                                       .format(name, i, expected[name], calculated[name]))
-
     def testLtSecurityValueHolder(self):
         filter = SecurityLatestValueHolder('close') < 10.0
-        ma = SecurityMovingAverage(10, 'close')[filter]
+        ma = FilteredSecurityValueHolder(SecurityMovingAverage(10, 'close'), filter)
 
         data = {'aapl': {'close': 15.},
                 'ibm': {'close': 8.},
@@ -615,7 +569,7 @@ class TestSecurityValueHolders(unittest.TestCase):
 
     def testLeSecurityValueHolder(self):
         filter = SecurityLatestValueHolder('close') <= 10.0
-        ma = SecurityMovingAverage(10, 'close')[filter]
+        ma = FilteredSecurityValueHolder(SecurityMovingAverage(10, 'close'), filter)
 
         data = {'aapl': {'close': 15.},
                 'ibm': {'close': 10.},
@@ -639,7 +593,7 @@ class TestSecurityValueHolders(unittest.TestCase):
 
     def testGtSecurityValueHolder(self):
         filter = SecurityLatestValueHolder('close') > 10.0
-        ma = SecurityMovingAverage(10, 'close')[filter]
+        ma = FilteredSecurityValueHolder(SecurityMovingAverage(10, 'close'), filter)
 
         data = {'aapl': {'close': 15.},
                 'ibm': {'close': 8.},
@@ -663,7 +617,7 @@ class TestSecurityValueHolders(unittest.TestCase):
 
     def testGeSecurityValueHolder(self):
         filter = SecurityMovingAverage(1, 'close') >= 10.0
-        ma = SecurityMovingAverage(10, 'close')[filter]
+        ma = FilteredSecurityValueHolder(SecurityMovingAverage(10, 'close'), filter)
 
         data = {'aapl': {'close': 15.},
                 'ibm': {'close': 10.},

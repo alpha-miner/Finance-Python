@@ -26,25 +26,15 @@ from PyFin.Math.Accumulators.Performancers import MovingLogReturn
 
 
 class SecuritySingleValueHolder(SecurityValueHolder):
-    def __init__(self, window, HolderType, dependency='x',):
+    def __init__(self, window, HolderType, dependency='x'):
         super(SecuritySingleValueHolder, self).__init__(dependency)
-        self._window = window
-
-        if isinstance(dependency, SecurityValueHolder):
-            self._symbolList = set(dependency.symbolList)
-            self._window = window + dependency.window - 1
-            self._dependency = dependency._dependency
-            self._holderTemplate = HolderType(window=window, dependency=copy.deepcopy(dependency._holderTemplate))
-            self._innerHolders = \
-                {
-                    name: HolderType(window, copy.deepcopy(dependency.holders[name])) for name in self._symbolList
-                    }
-
+        self._window += window
+        if self._compHolder:
+            self._holderTemplate = HolderType(window=window, dependency='x')
         else:
             self._holderTemplate = HolderType(window=window, dependency=self._dependency)
-        self._innerHolders = \
-            {
-                name: copy.deepcopy(self._holderTemplate) for name in self._symbolList
+        self._innerHolders = {
+            name: copy.deepcopy(self._holderTemplate) for name in self._symbolList
             }
 
 
@@ -130,3 +120,22 @@ class SecurityMovingHistoricalWindow(SecuritySingleValueHolder):
             return SecuritiesValues(res)
         else:
             raise ValueError("{0} is not recognized as valid int or string".format(item))
+
+
+if __name__ == '__main__':
+
+    from PyFin.api import MA
+
+    t = MA(1, 'x') < MA(1, 'y')
+
+    data = {'aapl': {'x': 4, 'y': 3},
+            'goog': {'x': 1, 'y': 4}
+            }
+
+    t.push(data)
+
+    print(t.value)
+    print(t._dependency)
+
+    for k, v in t.value.items():
+        print(k, v)

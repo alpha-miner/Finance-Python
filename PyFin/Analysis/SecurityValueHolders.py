@@ -164,6 +164,9 @@ class SecurityValueHolder(object):
     def __ne__(self, right):
         return SecurityNeOperatorValueHolder(self, right)
 
+    def __neg__(self):
+        return SecurityNegValueHolder(self)
+
     def shift(self, n):
         return SecurityShiftedValueHolder(self, n)
 
@@ -274,6 +277,31 @@ class IdentitySecurityValueHolder(SecurityValueHolder):
                 self._symbolList.add(name)
                 self.holders[name] = copy.deepcopy(self._holderTemplate)
                 self.holders[name].push(data)
+
+
+class SecurityUnitoryValueHolder(SecurityValueHolder):
+
+    def __init__(self, right, op):
+        self._right = copy.deepcopy(right)
+        self._symbolList = set(right.symbolList)
+
+        self._window = self._right.window
+        self._dependency = copy.deepcopy(self._right._dependency)
+        self._returnSize = self._right.valueSize
+        self._op = op
+
+    def push(self, data):
+        self._right.push(data)
+
+    @property
+    def value(self):
+        return self._op(self._right.value)
+
+
+class SecurityNegValueHolder(SecurityUnitoryValueHolder):
+    def __init__(self, right):
+        super(SecurityNegValueHolder, self).__init__(
+            right, operator.neg)
 
 
 class SecurityCombinedValueHolder(SecurityValueHolder):

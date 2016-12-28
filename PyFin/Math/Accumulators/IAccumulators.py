@@ -437,7 +437,9 @@ class BasicFunction(Accumulator):
     def result(self):
         try:
             return self._func(self._origValue)
-        except (TypeError, ValueError) as _:
+        except ValueError:
+            return np.nan
+        except TypeError:
             return np.array([self._func(v) for v in self._origValue])
 
 
@@ -498,7 +500,17 @@ class Abs(BasicFunction):
 
 class Sign(BasicFunction):
     def __init__(self, dependency):
-        super(Sign, self).__init__(dependency, lambda x: 1 if x >= 0 else -1)
+
+        def sign(x):
+            try:
+                if x >= 0:
+                    return 1
+                else:
+                    return -1
+            except ValueError:
+                raise TypeError
+
+        super(Sign, self).__init__(dependency, sign)
 
 
 class Acos(BasicFunction):

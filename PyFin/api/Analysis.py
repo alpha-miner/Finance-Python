@@ -23,6 +23,16 @@ from PyFin.Analysis.TechnicalAnalysis import SecuritySqrtValueHolder
 from PyFin.Analysis.TechnicalAnalysis import SecurityDiffValueHolder
 from PyFin.Analysis.TechnicalAnalysis import SecuritySimpleReturnValueHolder
 from PyFin.Analysis.TechnicalAnalysis import SecurityLogReturnValueHolder
+from PyFin.Analysis.TechnicalAnalysis import SecurityExpValueHolder
+from PyFin.Analysis.TechnicalAnalysis import SecurityLogValueHolder
+from PyFin.Analysis.TechnicalAnalysis import SecurityPowValueHolder
+from PyFin.Analysis.TechnicalAnalysis import SecurityAbsValueHolder
+from PyFin.Analysis.TechnicalAnalysis import SecurityAcosValueHolder
+from PyFin.Analysis.TechnicalAnalysis import SecurityAcoshValueHolder
+from PyFin.Analysis.TechnicalAnalysis import SecurityAsinValueHolder
+from PyFin.Analysis.TechnicalAnalysis import SecurityAsinhValueHolder
+from PyFin.Analysis import SecurityShiftedValueHolder
+
 
 from PyFin.Analysis.SecurityValueHolders import RankedSecurityValueHolder
 
@@ -93,6 +103,42 @@ def RETURNSimple(dependency='x'):
 
 def RETURNLog(dependency='x'):
     return SecurityLogReturnValueHolder(dependency)
+
+
+def EXP(dependency):
+    return SecurityExpValueHolder(dependency)
+
+
+def LOG(dependency):
+    return SecurityLogValueHolder(dependency)
+
+
+def POW(dependency):
+    return SecurityPowValueHolder(dependency)
+
+
+def ABS(dependency):
+    return SecurityAbsValueHolder(dependency)
+
+
+def ACOS(dependency):
+    return SecurityAcosValueHolder(dependency)
+
+
+def ACOSH(dependency):
+    return SecurityAcoshValueHolder(dependency)
+
+
+def ASIN(dependency):
+    return SecurityAsinValueHolder(dependency)
+
+
+def ASINH(dependency):
+    return SecurityAsinhValueHolder(dependency)
+
+
+def SHIFT(dependency, n):
+    return SecurityShiftedValueHolder(dependency, n)
 
 
 HIGH = functools.partial(LAST, 'high')

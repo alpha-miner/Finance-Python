@@ -72,13 +72,13 @@ class SecurityValueHolder(object):
             self._compHolder.push(data)
             data = self._compHolder.value
 
-            for name, v in data.items():
+            for name in data.index:
                 try:
-                    self.holders[name].push({'x': v})
+                    self.holders[name].push({'x': data[name]})
                 except KeyError:
                     self._symbolList.add(name)
                     self.holders[name] = copy.deepcopy(self._holderTemplate)
-                    self.holders[name].push({'x': v})
+                    self.holders[name].push({'x':  data[name]})
 
         else:
             for name in data:

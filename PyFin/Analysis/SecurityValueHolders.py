@@ -218,7 +218,7 @@ class RankedSecurityValueHolder(SecurityValueHolder):
     @property
     def value(self):
         raw_values = self._inner.value
-        return raw_values.rank()
+        return raw_values.rank(ascending=False)
 
     @property
     def holders(self):

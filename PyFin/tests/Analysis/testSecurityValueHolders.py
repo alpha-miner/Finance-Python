@@ -48,7 +48,7 @@ class TestSecurityValueHolders(unittest.TestCase):
             benchmark.push(data)
             rankHolder.push(data)
             benchmarkValues = benchmark.value
-            np.testing.assert_array_almost_equal(benchmarkValues.rank(), rankHolder.value)
+            np.testing.assert_array_almost_equal(benchmarkValues.rank(ascending=False), rankHolder.value)
 
     def testFilteredSecurityValueHolder(self):
         benchmark = SecurityLatestValueHolder(dependency='close') > 0
@@ -88,7 +88,6 @@ class TestSecurityValueHolders(unittest.TestCase):
         data = {'ibm': {'close': 13.0}}
         test.push(data)
         self.assertEqual(test.isFull, True)
-
 
     def testSecuritiesValuesComparison(self):
 

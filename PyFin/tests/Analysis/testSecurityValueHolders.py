@@ -75,6 +75,29 @@ class TestSecurityValueHolders(unittest.TestCase):
             except KeyError:
                 self.assertFalse(benchmark['ibm'])
 
+    def testFilteredSecurityValueHolderWithGetItemMethod(self):
+        benchmark = SecurityLatestValueHolder(dependency='close') > 0
+        filtered = benchmark[benchmark]
+
+        for i in range(len(self.datas['aapl']['close'])):
+            data = {'aapl': {Factors.CLOSE: self.datas['aapl'][Factors.CLOSE][i],
+                             Factors.OPEN: self.datas['aapl'][Factors.OPEN][i]},
+                    'ibm': {Factors.CLOSE: self.datas['ibm'][Factors.CLOSE][i],
+                            Factors.OPEN: self.datas['ibm'][Factors.OPEN][i]}}
+            benchmark.push(data)
+            filtered.push(data)
+            try:
+                _ = filtered['aapl']
+                self.assertTrue(benchmark['aapl'])
+            except KeyError:
+                self.assertFalse(benchmark['aapl'])
+
+            try:
+                _ = filtered['ibm']
+                self.assertTrue(benchmark['ibm'])
+            except KeyError:
+                self.assertFalse(benchmark['ibm'])
+
     def testSecurityValueHolderIsFull(self):
         test = SecurityMovingMax(2, dependency='close')
 

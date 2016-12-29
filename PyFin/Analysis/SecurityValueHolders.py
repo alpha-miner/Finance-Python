@@ -113,8 +113,11 @@ class SecurityValueHolder(object):
                 return False
         return True
 
-    def __getitem__(self, item):
-        return self.value[item]
+    def __getitem__(self, filter):
+        if isinstance(filter, SecurityValueHolder):
+            return FilteredSecurityValueHolder(self, filter)
+        else:
+            return self.value[filter]
 
     def __add__(self, right):
         return SecurityAddedValueHolder(self, right)
@@ -261,9 +264,6 @@ class FilteredSecurityValueHolder(SecurityValueHolder):
     def push(self, data):
         self._computer.push(data)
         self._filter.push(data)
-
-    def __getitem__(self, item):
-        return self.value[item]
 
 
 class IdentitySecurityValueHolder(SecurityValueHolder):

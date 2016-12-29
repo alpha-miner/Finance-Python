@@ -696,3 +696,13 @@ class TestSecurityValueHolders(unittest.TestCase):
 
         expected = [4., 5., 6., 7., 6., 5., 4.]
         np.testing.assert_array_almost_equal(calculated['new_factor'], expected)
+
+    def testTransformWithoutCategoryAndDuplicatedIndex(self):
+        sample_data = pd.DataFrame(
+            data={'code': [1, 2, 1, 2, 1, 2],
+                  'open': [2.0, 1.0, 1.5, 3.0, 2.4, 3.5],
+                  'close': [1.7, 1.6, 0.9, 3.8, 1.6, 2.1]},
+            index=[1, 1, 2, 2, 3, 3]
+        )
+
+

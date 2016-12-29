@@ -18,8 +18,10 @@ def transform(data, expressions, cols, category_field=None):
         category_field = 'dummy'
         data[category_field] = 1
         dummy_category = True
+        total_index = list(range(len(data)))
+    else:
+        total_index = data.index.tolist()
 
-    total_index = data.index.tolist()
     total_category = data[category_field].tolist()
 
     matrix_values = data.as_matrix()
@@ -43,9 +45,9 @@ def transform(data, expressions, cols, category_field=None):
     df = pd.DataFrame(output_values, index=total_category, columns=cols)
 
     if dummy_category:
-        df.index = total_index
+        df.index = data.index
         return df
     else:
         df[category_field] = df.index
-        df.index = total_index
+        df.index = data.index
         return df

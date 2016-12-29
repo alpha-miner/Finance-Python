@@ -19,37 +19,48 @@ def transform(data, expressions, cols, category_field=None):
         data[category_field] = 1
         dummy_category = True
 
-    index_line = data.index.unique()
-    total_category = data[category_field]
-    values = np.zeros((len(data), len(expressions)))
+    total_index = data.index
+    total_category = data[category_field].values
 
-    splited_values = {}
-    for date in index_line:
-        data_slice = data.ix[date]
-        if not isinstance(data_slice, pd.Series):
-            data_slice = data_slice.set_index(category_field)
-            dict_values, category = to_dict(data_slice)
-            splited_values[date] = (dict_values, category)
-        else:
-            splited_values[date] = ({data_slice.name: data_slice.to_dict()}, [data_slice[category_field]])
+    output_values = np.zeros((len(data), len(expressions)))
+
+    matrix_values = data.as_matrix()
+    columns = data.columns
+
+    splited_values = []
+    splited_category = []
+    n = np.size(matrix_values, 0)
+    current_dict = {}
+    current_category = []
+    previous_index = total_index[0]
+    for i in range(n):
+        key = total_category[i]
+        if total_index[i] != previous_index:
+            splited_values.append(current_dict)
+            splited_category.append(current_category)
+            current_dict = {}
+            current_category = []
+        current_dict[key] = dict(zip(columns, matrix_values[i, :]))
+        current_category.append(key)
+    splited_values.append(current_dict)
+    splited_category.append(current_category)
 
     for i, exp in enumerate(expressions):
         if isinstance(exp, SecurityValueHolder):
             start_count = 0
-            for j, date in enumerate(index_line):
-                category = splited_values[date][1]
-                exp.push(splited_values[date][0])
-                end_count = start_count + len(category)
-                values[start_count:end_count, i] = exp.value[category]
+            for j, dict_data in enumerate(splited_values):
+                exp.push(dict_data)
+                end_count = start_count + len(dict_data)
+                output_values[start_count:end_count, i] = exp.value[splited_category[j]]
                 start_count = end_count
         else:
-            values[:, i] = data[exp]
-    df = pd.DataFrame(values, index=total_category, columns=cols)
+            output_values[:, i] = data[exp]
+    df = pd.DataFrame(output_values, index=total_category, columns=cols)
 
     if dummy_category:
-        df.index = data.index
+        df.index = total_index
         return df
     else:
         df[category_field] = df.index
-        df.index = data.index
+        df.index = total_index
         return df

@@ -8,6 +8,7 @@ Created on 2016-12-21
 import unittest
 import numpy as np
 import pandas as pd
+from PyFin.Analysis.TechnicalAnalysis.StatefulTechnicalAnalysers import SecurityMovingAverage
 from PyFin.Analysis.TechnicalAnalysis.StatefulTechnicalAnalysers import SecurityMovingMax
 from PyFin.Analysis.TechnicalAnalysis.StatefulTechnicalAnalysers import SecurityMovingMinimum
 from PyFin.Analysis.transformer import transform
@@ -34,7 +35,7 @@ class TestTransformer(unittest.TestCase):
 
         expression = SecurityMovingMax(20, 'b') + SecurityMovingMinimum(20, 'c')
         calculated = transform(test_df, [expression], cols=['user_factor'])
-        expected = [13., 13., 13., 13., 13., 13., 13.]
+        expected = [13., 13., 13., 13., 12., 11., 10.]
 
         np.testing.assert_array_almost_equal(calculated['user_factor'], expected)
 
@@ -68,7 +69,7 @@ class TestTransformer(unittest.TestCase):
         expression2 = SecurityMovingMax(20, 'b') + SecurityMovingMinimum(20, 'c')
 
         calculated = transform(test_df,
-                               [expression1, expression2, ],
+                               [expression1, expression2],
                                cols=['b', 'factor2'],
                                category_field='code')
 
@@ -76,3 +77,18 @@ class TestTransformer(unittest.TestCase):
 
         np.testing.assert_array_almost_equal(calculated['b'], test_df['b'])
         np.testing.assert_array_almost_equal(calculated['factor2'], expected)
+
+    def test_transformer_with_category_group_totally_different(self):
+        test_df = pd.DataFrame({'code': [1, 2, 3, 4, 5, 6, 7],
+                                'b': [4, 5, 6, 7, 6, 5, 4],
+                                'c': [9, 8, 7, 6, 5, 4, 3]},
+                               index=[1, 1, 1, 1, 2, 2, 2])
+
+        expression = SecurityMovingAverage(2, 'b')
+        calculated = transform(test_df,
+                               [expression],
+                               cols=['ma'],
+                               category_field='code')
+
+        expected = [4., 5., 6., 7., 6., 5., 4.]
+        np.testing.assert_array_almost_equal(calculated['ma'], expected)

@@ -181,17 +181,29 @@ class SecurityValueHolder(object):
         if not name:
             name = 'transformed'
 
-        data_slice = data.set_index(category_field)
-        dict_values, category = to_dict(data_slice)
+        index_line = data.index.unique()
+        total_category = data[category_field]
+        values = np.zeros((len(data), 1))
 
-        values = np.zeros((len(data_slice), 1))
+        splited_values = {}
+        for date in index_line:
+            data_slice = data.ix[date]
+            if not isinstance(data_slice, pd.Series):
+                data_slice = data_slice.set_index(category_field)
+                dict_values, category = to_dict(data_slice)
+                splited_values[date] = (dict_values, category)
+            else:
+                splited_values[date] = ({data_slice.name: data_slice.to_dict()}, [data_slice[category_field]])
 
-        for i, dict_data in enumerate(dict_values):
-            key = category[i]
-            self.push_one(key, dict_data)
-            values[i, 0] = self.__getitem__(key)
+        start_count = 0
+        for j, date in enumerate(index_line):
+            category = splited_values[date][1]
+            self.push(splited_values[date][0])
+            end_count = start_count + len(category)
+            values[start_count:end_count, 1] = self.value[category]
+            start_count = end_count
 
-        df = pd.DataFrame(values, index=category, columns=[name])
+        df = pd.DataFrame(values, index=total_category, columns=[name])
 
         if dummy_category:
             df.index = data.index

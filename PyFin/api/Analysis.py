@@ -16,7 +16,6 @@ from PyFin.Analysis.TechnicalAnalysis import SecurityMovingCountedPositive
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingPositiveAverage
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingRSI
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingHistoricalWindow
-from PyFin.Analysis.TechnicalAnalysis import SecurityLatestValueHolder
 from PyFin.Analysis.TechnicalAnalysis import SecurityXAverageValueHolder
 from PyFin.Analysis.TechnicalAnalysis import SecurityMACDValueHolder
 from PyFin.Analysis.TechnicalAnalysis import SecuritySqrtValueHolder
@@ -31,7 +30,8 @@ from PyFin.Analysis.TechnicalAnalysis import SecurityAcosValueHolder
 from PyFin.Analysis.TechnicalAnalysis import SecurityAcoshValueHolder
 from PyFin.Analysis.TechnicalAnalysis import SecurityAsinValueHolder
 from PyFin.Analysis.TechnicalAnalysis import SecurityAsinhValueHolder
-from PyFin.Analysis import SecurityShiftedValueHolder
+from PyFin.Analysis.SecurityValueHolders import SecurityShiftedValueHolder
+from PyFin.Analysis.SecurityValueHolders import SecurityLatestValueHolder
 
 
 from PyFin.Analysis.SecurityValueHolders import RankedSecurityValueHolder

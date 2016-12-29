@@ -13,7 +13,7 @@ from PyFin.Analysis.SecurityValueHolders import SecuritiesValues
 from PyFin.Analysis.SecurityValueHolders import dependencyCalculator
 from PyFin.Analysis.SecurityValueHolders import RankedSecurityValueHolder
 from PyFin.Analysis.SecurityValueHolders import FilteredSecurityValueHolder
-from PyFin.Analysis.TechnicalAnalysis import SecurityLatestValueHolder
+from PyFin.Analysis.SecurityValueHolders import SecurityLatestValueHolder
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingAverage
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingMax
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingMinimum
@@ -323,6 +323,25 @@ class TestSecurityValueHolders(unittest.TestCase):
             calculated = combined.value
             for name in expected.index:
                 self.assertAlmostEqual(expected[name], calculated[name], 12)
+
+    def testAddedSecurityValueHolderWithName(self):
+        window = 10
+        dependency = ['close']
+        mm = SecurityMovingSum(window, dependency)
+        combined = 'open' + mm
+
+        for i in range(len(self.datas['aapl']['close'])):
+            data = {'aapl': {Factors.CLOSE: self.datas['aapl'][Factors.CLOSE][i],
+                             Factors.OPEN: self.datas['aapl'][Factors.OPEN][i]},
+                    'ibm': {Factors.CLOSE: self.datas['ibm'][Factors.CLOSE][i],
+                            Factors.OPEN: self.datas['ibm'][Factors.OPEN][i]}}
+            mm.push(data)
+            combined.push(data)
+
+            base = mm.value
+            calculated = combined.value
+            for name in calculated.index:
+                self.assertAlmostEqual(base[name] + data[name]['open'], calculated[name], 12)
 
     def testRAddedSecurityValueHoldersWithScalar(self):
         window = 10

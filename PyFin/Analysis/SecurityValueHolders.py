@@ -293,14 +293,14 @@ class FilteredSecurityValueHolder(SecurityValueHolder):
 
 
 class IdentitySecurityValueHolder(SecurityValueHolder):
-    def __init__(self, value, n=1):
+    def __init__(self, value):
         self._value = value
         self._symbolList = set()
-        self._window = 1
-        self._returnSize = n
+        self._window = 0
+        self._returnSize = 1
         self._dependency = []
         self._innerHolders = {}
-        self._holderTemplate = Identity(value, n)
+        self._holderTemplate = Identity(value)
         self.updated = False
         self.cached = None
 
@@ -349,6 +349,18 @@ class SecurityNegValueHolder(SecurityUnitoryValueHolder):
             right, operator.neg)
 
 
+class SecurityLatestValueHolder(SecurityValueHolder):
+    def __init__(self, dependency='x'):
+        super(SecurityLatestValueHolder, self).__init__(dependency)
+        if self._compHolder:
+            self._holderTemplate = Latest(dependency='x')
+        else:
+            self._holderTemplate = Latest(dependency=self._dependency)
+        self._innerHolders = {
+            name: copy.deepcopy(self._holderTemplate) for name in self._symbolList
+            }
+
+
 class SecurityCombinedValueHolder(SecurityValueHolder):
     def __init__(self, left, right, op):
         if isinstance(left, SecurityValueHolder):
@@ -357,9 +369,16 @@ class SecurityCombinedValueHolder(SecurityValueHolder):
                 self._right = copy.deepcopy(right)
                 self._symbolList = set(self._left.symbolList).union(
                     set(right.symbolList))
+            elif isinstance(right, str):
+                self._right = SecurityLatestValueHolder(right)
+                self._symbolList = set(self._left.symbolList)
             else:
                 self._right = IdentitySecurityValueHolder(right)
                 self._symbolList = set(self._left.symbolList)
+        elif isinstance(left, str):
+            self._left = SecurityLatestValueHolder(left)
+            self._symbolList = set(right.symbolList)
+            self._right = copy.deepcopy(right)
         else:
             self._left = IdentitySecurityValueHolder(left)
             self._right = copy.deepcopy(right)

@@ -90,35 +90,32 @@ class Accumulator(object):
 
     def _binary_operator(self, right, operatorHolder):
         if isinstance(right, Accumulator):
-            if self._returnSize == right.valueSize:
-                return operatorHolder(self, right)
-            elif self._returnSize == 1:
-                return operatorHolder(Identity(self, right.valueSize), right)
-        return operatorHolder(self, Identity(right, self._returnSize))
+            return operatorHolder(self, right)
+        return operatorHolder(self, Identity(right))
 
     def __add__(self, right):
         return self._binary_operator(right, AddedValueHolder)
 
     def __radd__(self, left):
-        return AddedValueHolder(self, Identity(left, self._returnSize))
+        return AddedValueHolder(self, Identity(left))
 
     def __sub__(self, right):
         return self._binary_operator(right, MinusedValueHolder)
 
     def __rsub__(self, left):
-        return MinusedValueHolder(Identity(left, self._returnSize), self)
+        return MinusedValueHolder(Identity(left), self)
 
     def __mul__(self, right):
         return self._binary_operator(right, MultipliedValueHolder)
 
     def __rmul__(self, left):
-        return MultipliedValueHolder(self, Identity(left, self._returnSize))
+        return MultipliedValueHolder(self, Identity(left))
 
     def __div__(self, right):
         return self._binary_operator(right, DividedValueHolder)
 
     def __rdiv__(self, left):
-        return DividedValueHolder(Identity(left, self._returnSize), self)
+        return DividedValueHolder(Identity(left), self)
 
     # only work for python 3
     def __truediv__(self, right):
@@ -143,10 +140,10 @@ class Accumulator(object):
     def __xor__(self, right):
         if isinstance(right, Accumulator):
             return ListedValueHolder(self, right)
-        return ListedValueHolder(self, Identity(right, 1))
+        return ListedValueHolder(self, Identity(right))
 
     def __rxor__(self, left):
-        return ListedValueHolder(Identity(left, 1), self)
+        return ListedValueHolder(Identity(left), self)
 
     def __rshift__(self, right):
         if isinstance(right, Accumulator):
@@ -250,9 +247,6 @@ class TruncatedValueHolder(Accumulator):
 
 class CombinedValueHolder(Accumulator):
     def __init__(self, left, right):
-        pyFinAssert(left.valueSize == right.valueSize, ValueError, "left value size {0} should be equal "
-                                                                "to right value size"
-                 .format(left.valueSize, right.valueSize))
         self._returnSize = left.valueSize
         self._left = deepcopy(left)
         self._right = deepcopy(right)
@@ -338,37 +332,20 @@ class NeOperatorValueHolder(ArithmeticValueHolder):
 
 
 class Identity(Accumulator):
-    def __init__(self, value, n=1):
-        if isinstance(value, Accumulator):
-            pyFinAssert(value.valueSize == 1, ValueError, "Identity can't applied "
-                                                       "to value holder with value size {0} bigger than 1"
-                     .format(value.valueSize))
-            self._dependency = value._dependency
-            self._isValueHolder = True
-            self._window = value.window
-            self._containerSize = value._containerSize
-        else:
-            self._dependency = []
-            self._isValueHolder = False
-            self._window = 1
-            self._containerSize = 1
+    def __init__(self, value):
+        self._dependency = []
+        self._isValueHolder = False
+        self._window = 0
+        self._containerSize = 1
         self._value = value
-        self._returnSize = n
+        self._returnSize = 1
         self._isFull = 0
 
     def push(self, data):
-        if self._isValueHolder:
-            self._value.push(data)
+        pass
 
     def result(self):
-        if self._isValueHolder:
-            value = self._value.result()
-        else:
-            value = self._value
-        if self._returnSize == 1:
-            return value
-        else:
-            return np.array([value] * self._returnSize)
+        return self._value
 
 
 class CompoundedValueHolder(Accumulator):

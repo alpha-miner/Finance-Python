@@ -5,7 +5,6 @@ Created on 2015-8-8
 @author: cheng.li
 """
 
-from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import SecurityLatestValueHolder
 from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import SecurityXAverageValueHolder
 from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import SecurityMACDValueHolder
 from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import SecurityExpValueHolder
@@ -36,8 +35,7 @@ from PyFin.Analysis.TechnicalAnalysis.StatefulTechnicalAnalysers import Security
 from PyFin.Analysis.TechnicalAnalysis.StatefulTechnicalAnalysers import SecurityMovingHistoricalWindow
 from PyFin.Analysis.TechnicalAnalysis.StatefulTechnicalAnalysers import SecurityMovingLogReturn
 
-__all__ = ['SecurityLatestValueHolder',
-           'SecurityXAverageValueHolder',
+__all__ = ['SecurityXAverageValueHolder',
            'SecurityMACDValueHolder',
            'SecurityExpValueHolder',
            'SecurityLogValueHolder',

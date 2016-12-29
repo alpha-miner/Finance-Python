@@ -36,12 +36,6 @@ class SecurityStatelessSingleValueHolder(SecurityValueHolder):
             }
 
 
-class SecurityLatestValueHolder(SecurityStatelessSingleValueHolder):
-    def __init__(self, dependency='x'):
-        super(SecurityLatestValueHolder, self).__init__(holderType=Latest,
-                                                        dependency=dependency)
-
-
 class SecurityXAverageValueHolder(SecurityStatelessSingleValueHolder):
     def __init__(self, window, dependency='x'):
         super(SecurityXAverageValueHolder, self).__init__(holderType=XAverage,

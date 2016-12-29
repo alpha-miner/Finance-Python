@@ -48,6 +48,7 @@ def to_dict(total_index, total_category, matrix_values, columns):
             current_category = []
         current_dict[key] = dict(zip(columns, matrix_values[i, :]))
         current_category.append(key)
+        previous_index = total_index[i]
     splited_values.append(current_dict)
     splited_category.append(current_category)
 

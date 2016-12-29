@@ -22,7 +22,7 @@ class TestTransformer(unittest.TestCase):
                                 'c': [9, 8, 7, 6, 5, 4, 3]},
                                index=[1, 1, 1, 1, 2, 2, 2])
 
-        expression = SecurityMovingMax(20, 'b') + SecurityMovingMinimum(20, 'c')
+        expression = SecurityMovingMax(2, 'b') + SecurityMovingMinimum(2, 'c')
         calculated = transform(test_df, [expression], cols=['user_factor'], category_field='code')
         expected = [13., 13., 13., 13., 11., 9, 9.]
 

@@ -100,7 +100,7 @@ class SecurityValueHolder(object):
             res = {}
             for name in self.holders:
                 try:
-                    res[name] = self.holders[name].value
+                    res[name] = self.holders[name].result()
                 except ArithmeticError:
                     res[name] = np.nan
             series = SecuritiesValues(res)
@@ -108,6 +108,12 @@ class SecurityValueHolder(object):
             self.updated = True
             self.cached = series
             return self.cached
+
+    def value_by_name(self, name):
+        if self.updated:
+            return self.cached[name]
+        else:
+            return self.holders[name].result()
 
     @property
     def holders(self):
@@ -207,11 +213,16 @@ class SecurityValueHolder(object):
         output_values = np.zeros((len(data), 1))
 
         start_count = 0
-        for j, dict_data in enumerate(split_values):
-            self.push(dict_data)
-            end_count = start_count + len(dict_data)
-            output_values[start_count:end_count, 0] = self.value[split_category[j]]
-            start_count = end_count
+        if not dummy_category:
+            for j, dict_data in enumerate(split_values):
+                self.push(dict_data)
+                end_count = start_count + len(dict_data)
+                output_values[start_count:end_count, 0] = self.value[split_category[j]]
+                start_count = end_count
+        else:
+            for j, dict_data in enumerate(split_values):
+                self.push(dict_data)
+                output_values[j, 0] = self.value_by_name(split_category[j][0])
 
         df = pd.DataFrame(output_values, index=total_category, columns=[name])
 
@@ -249,6 +260,15 @@ class RankedSecurityValueHolder(SecurityValueHolder):
             self.updated = True
             return self.cached
 
+    def value_by_name(self, name):
+        if self.updated:
+            return self.cached[name]
+        else:
+            raw_values = self._inner.value
+            self.cached = raw_values.rank(ascending=False)
+            self.updated = True
+            return self.cached[name]
+
     @property
     def holders(self):
         return self._inner.holders
@@ -285,6 +305,16 @@ class FilteredSecurityValueHolder(SecurityValueHolder):
             self.cached = self._computer.value[filter_value != 0]
             self.updated = True
             return self.cached
+
+    def value_by_name(self, name):
+        if self.updated:
+            return self.cached[name]
+        else:
+            filter_value = self._filter.value_by_name(name)
+            if filter_value:
+                return self._computer.value_by_name(name)
+            else:
+                return np.nan
 
     def push(self, data):
         self._computer.push(data)
@@ -341,6 +371,12 @@ class SecurityUnitoryValueHolder(SecurityValueHolder):
             self.cached = self._op(self._right.value)
             self.updated = True
             return self.cached
+
+    def value_by_name(self, name):
+        if self.updated:
+            return self.cached[name]
+        else:
+            return self._op(self._right.value_by_name(name))
 
 
 class SecurityNegValueHolder(SecurityUnitoryValueHolder):
@@ -405,6 +441,12 @@ class SecurityCombinedValueHolder(SecurityValueHolder):
             self.cached = self._op(self._left.value, self._right.value)
             self.updated = True
             return self.cached
+
+    def value_by_name(self, name):
+        if self.updated:
+            return self.cached[name]
+        else:
+            return self._op(self._left.value_by_name(name), self._right.value_by_name(name))
 
 
 class SecurityAddedValueHolder(SecurityCombinedValueHolder):

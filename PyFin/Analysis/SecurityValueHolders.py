@@ -46,6 +46,8 @@ class SecurityValueHolder(object):
             self._window = 0
         self._returnSize = 1
         self._holderTemplate = None
+        self.updated = False
+        self.cached = None
 
     @property
     def symbolList(self):
@@ -67,6 +69,7 @@ class SecurityValueHolder(object):
         return self._window
 
     def push(self, data):
+        self.updated = False
 
         if self._compHolder:
             self._compHolder.push(data)
@@ -91,13 +94,20 @@ class SecurityValueHolder(object):
 
     @property
     def value(self):
-        res = {}
-        for name in self.holders:
-            try:
-                res[name] = self.holders[name].value
-            except ArithmeticError:
-                res[name] = np.nan
-        return SecuritiesValues(res)
+        if self.updated:
+            return self.cached
+        else:
+            res = {}
+            for name in self.holders:
+                try:
+                    res[name] = self.holders[name].value
+                except ArithmeticError:
+                    res[name] = np.nan
+            series = SecuritiesValues(res)
+
+            self.updated = True
+            self.cached = series
+            return self.cached
 
     @property
     def holders(self):
@@ -224,11 +234,18 @@ class RankedSecurityValueHolder(SecurityValueHolder):
         self._returnSize = self._inner.valueSize
         self._dependency = copy.deepcopy(self._inner._dependency)
         self._symbolList = self._inner._symbolList
+        self.updated = False
+        self.cached = None
 
     @property
     def value(self):
-        raw_values = self._inner.value
-        return raw_values.rank(ascending=False)
+        if self.updated:
+            return self.cached
+        else:
+            raw_values = self._inner.value
+            self.cached = raw_values.rank(ascending=False)
+            self.updated = True
+            return self.cached
 
     @property
     def holders(self):
@@ -236,6 +253,7 @@ class RankedSecurityValueHolder(SecurityValueHolder):
 
     def push(self, data):
         self._inner.push(data)
+        self.updated = False
 
 
 class FilteredSecurityValueHolder(SecurityValueHolder):
@@ -249,8 +267,8 @@ class FilteredSecurityValueHolder(SecurityValueHolder):
             self._filter._dependency
         )
         self._symbolList = self._computer._symbolList
-        self._updated = False
-        self._cachedFlag = None
+        self.updated = False
+        self.cached = None
 
     @property
     def holders(self):
@@ -258,12 +276,18 @@ class FilteredSecurityValueHolder(SecurityValueHolder):
 
     @property
     def value(self):
-        filter_value = self._filter.value
-        return self._computer.value[filter_value != 0]
+        if self.updated:
+            return self.cached
+        else:
+            filter_value = self._filter.value
+            self.cached = self._computer.value[filter_value != 0]
+            self.updated = True
+            return self.cached
 
     def push(self, data):
         self._computer.push(data)
         self._filter.push(data)
+        self.updated = False
 
 
 class IdentitySecurityValueHolder(SecurityValueHolder):
@@ -275,6 +299,8 @@ class IdentitySecurityValueHolder(SecurityValueHolder):
         self._dependency = []
         self._innerHolders = {}
         self._holderTemplate = Identity(value, n)
+        self.updated = False
+        self.cached = None
 
     def push(self, data):
         for name in data:
@@ -284,6 +310,8 @@ class IdentitySecurityValueHolder(SecurityValueHolder):
                 self._symbolList.add(name)
                 self.holders[name] = copy.deepcopy(self._holderTemplate)
                 self.holders[name].push(data)
+
+        self.updated = False
 
 
 class SecurityUnitoryValueHolder(SecurityValueHolder):
@@ -296,13 +324,21 @@ class SecurityUnitoryValueHolder(SecurityValueHolder):
         self._dependency = copy.deepcopy(self._right._dependency)
         self._returnSize = self._right.valueSize
         self._op = op
+        self.updated = False
+        self.cached = None
 
     def push(self, data):
         self._right.push(data)
+        self.updated = False
 
     @property
     def value(self):
-        return self._op(self._right.value)
+        if self.updated:
+            return self.cached
+        else:
+            self.cached = self._op(self._right.value)
+            self.updated = True
+            return self.cached
 
 
 class SecurityNegValueHolder(SecurityUnitoryValueHolder):
@@ -332,14 +368,22 @@ class SecurityCombinedValueHolder(SecurityValueHolder):
             self._left._dependency, self._right._dependency)
         self._returnSize = self._left.valueSize
         self._op = op
+        self.updated = False
+        self.cached = None
 
     def push(self, data):
         self._left.push(data)
         self._right.push(data)
+        self.updated = False
 
     @property
     def value(self):
-        return self._op(self._left.value, self._right.value)
+        if self.updated:
+            return self.cached
+        else:
+            self.cached = self._op(self._left.value, self._right.value)
+            self.updated = True
+            return self.cached
 
 
 class SecurityAddedValueHolder(SecurityCombinedValueHolder):

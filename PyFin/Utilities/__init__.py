@@ -6,6 +6,7 @@ Created on 2015-8-17
 """
 
 import time
+import numpy as np
 from PyFin.Utilities.Asserts import pyFinAssert
 from PyFin.Utilities.Asserts import isClose
 
@@ -30,10 +31,24 @@ def check_date(date):
         return Date.fromDateTime(date)
 
 
-def to_dict(raw_data):
-    values = raw_data.values
-    columns = raw_data.columns
+def to_dict(total_index, total_category, matrix_values, columns):
 
-    dict_values = [dict(zip(columns, values[i])) for i in range(len(values))]
+    splited_values = []
+    splited_category = []
+    n = np.size(matrix_values, 0)
+    current_dict = {}
+    current_category = []
+    previous_index = total_index[0]
+    for i in range(n):
+        key = total_category[i]
+        if total_index[i] != previous_index:
+            splited_values.append(current_dict)
+            splited_category.append(current_category)
+            current_dict = {}
+            current_category = []
+        current_dict[key] = dict(zip(columns, matrix_values[i, :]))
+        current_category.append(key)
+    splited_values.append(current_dict)
+    splited_category.append(current_category)
 
-    return dict(zip(raw_data.index, dict_values)), raw_data.index
+    return splited_category, splited_values

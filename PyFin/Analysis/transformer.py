@@ -19,42 +19,27 @@ def transform(data, expressions, cols, category_field=None):
         data[category_field] = 1
         dummy_category = True
 
-    total_index = data.index
-    total_category = data[category_field].values
-
-    output_values = np.zeros((len(data), len(expressions)))
+    total_index = data.index.tolist()
+    total_category = data[category_field].tolist()
 
     matrix_values = data.as_matrix()
-    columns = data.columns
+    columns = data.columns.tolist()
 
-    splited_values = []
-    splited_category = []
-    n = np.size(matrix_values, 0)
-    current_dict = {}
-    current_category = []
-    previous_index = total_index[0]
-    for i in range(n):
-        key = total_category[i]
-        if total_index[i] != previous_index:
-            splited_values.append(current_dict)
-            splited_category.append(current_category)
-            current_dict = {}
-            current_category = []
-        current_dict[key] = dict(zip(columns, matrix_values[i, :]))
-        current_category.append(key)
-    splited_values.append(current_dict)
-    splited_category.append(current_category)
+    split_category, split_values = to_dict(total_index, total_category, matrix_values, columns)
+
+    output_values = np.zeros((len(data), len(expressions)))
 
     for i, exp in enumerate(expressions):
         if isinstance(exp, SecurityValueHolder):
             start_count = 0
-            for j, dict_data in enumerate(splited_values):
+            for j, dict_data in enumerate(split_values):
                 exp.push(dict_data)
                 end_count = start_count + len(dict_data)
-                output_values[start_count:end_count, i] = exp.value[splited_category[j]]
+                output_values[start_count:end_count, i] = exp.value[split_category[j]]
                 start_count = end_count
         else:
             output_values[:, i] = data[exp]
+
     df = pd.DataFrame(output_values, index=total_category, columns=cols)
 
     if dummy_category:

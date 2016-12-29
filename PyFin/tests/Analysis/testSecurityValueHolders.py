@@ -7,6 +7,7 @@ Created on 2015-8-12
 
 import unittest
 import numpy as np
+import pandas as pd
 from PyFin.Enums import Factors
 from PyFin.Analysis.SecurityValueHolders import SecuritiesValues
 from PyFin.Analysis.SecurityValueHolders import dependencyCalculator
@@ -15,6 +16,7 @@ from PyFin.Analysis.SecurityValueHolders import FilteredSecurityValueHolder
 from PyFin.Analysis.TechnicalAnalysis import SecurityLatestValueHolder
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingAverage
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingMax
+from PyFin.Analysis.TechnicalAnalysis import SecurityMovingMinimum
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingSum
 
 
@@ -637,3 +639,37 @@ class TestSecurityValueHolders(unittest.TestCase):
         calculated = ma.value
         for name in expected:
             self.assertAlmostEqual(expected[name], calculated[name], 15)
+
+    def testTransformWithCategory(self):
+        test_df = pd.DataFrame({'code': [1, 2, 3, 4, 1, 2, 3],
+                                'b': [4, 5, 6, 7, 6, 5, 4],
+                                'c': [9, 8, 7, 6, 5, 4, 3]},
+                               index=[1, 1, 1, 1, 2, 2, 2])
+
+        expression = SecurityMovingMax(20, 'b') + SecurityMovingMinimum(20, 'c')
+        calculated = expression.transform(test_df, name='new_factor', category_field='code')
+        expected = [13., 13., 13., 13., 11., 9, 9.]
+
+        np.testing.assert_array_almost_equal(calculated['new_factor'], expected)
+
+    def testTransformWithoutCategory(self):
+        test_df = pd.DataFrame({'b': [4, 5, 6, 7, 6, 5, 4],
+                                'c': [9, 8, 7, 6, 5, 4, 3]},
+                               index=[1, 2, 3, 4, 5, 6, 7])
+
+        expression = SecurityMovingMax(20, 'b') + SecurityMovingMinimum(20, 'c')
+        calculated = expression.transform(test_df, name='new_factor')
+        expected = [13., 13., 13., 13., 12., 11., 10.]
+        np.testing.assert_array_almost_equal(calculated['new_factor'], expected)
+
+    def testTransformWithDifferentGroup(self):
+        test_df = pd.DataFrame({'code': [1, 2, 3, 4, 5, 6, 7],
+                                'b': [4, 5, 6, 7, 6, 5, 4],
+                                'c': [9, 8, 7, 6, 5, 4, 3]},
+                               index=[1, 1, 1, 1, 2, 2, 2])
+
+        expression = SecurityMovingAverage(2, 'b')
+        calculated = expression.transform(test_df, name='new_factor', category_field='code')
+
+        expected = [4., 5., 6., 7., 6., 5., 4.]
+        np.testing.assert_array_almost_equal(calculated['new_factor'], expected)

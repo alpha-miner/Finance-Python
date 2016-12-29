@@ -181,36 +181,31 @@ class SecurityValueHolder(object):
         if not name:
             name = 'transformed'
 
-        index_line = data.index.unique()
-        total_category = data[category_field]
-        values = np.zeros((len(data), 1))
+        total_index = data.index.tolist()
+        total_category = data[category_field].tolist()
 
-        splited_values = {}
-        for date in index_line:
-            data_slice = data.ix[date]
-            if not isinstance(data_slice, pd.Series):
-                data_slice = data_slice.set_index(category_field)
-                dict_values, category = to_dict(data_slice)
-                splited_values[date] = (dict_values, category)
-            else:
-                splited_values[date] = ({data_slice.name: data_slice.to_dict()}, [data_slice[category_field]])
+        matrix_values = data.as_matrix()
+        columns = data.columns.tolist()
+
+        split_category, split_values = to_dict(total_index, total_category, matrix_values, columns)
+
+        output_values = np.zeros((len(data), 1))
 
         start_count = 0
-        for j, date in enumerate(index_line):
-            category = splited_values[date][1]
-            self.push(splited_values[date][0])
-            end_count = start_count + len(category)
-            values[start_count:end_count, 1] = self.value[category]
+        for j, dict_data in enumerate(split_values):
+            self.push(dict_data)
+            end_count = start_count + len(dict_data)
+            output_values[start_count:end_count, 0] = self.value[split_category[j]]
             start_count = end_count
 
-        df = pd.DataFrame(values, index=total_category, columns=[name])
+        df = pd.DataFrame(output_values, index=total_category, columns=[name])
 
         if dummy_category:
-            df.index = data.index
+            df.index = total_index
             return df
         else:
             df[category_field] = df.index
-            df.index = data.index
+            df.index = total_index
             return df
 
 

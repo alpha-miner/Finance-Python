@@ -810,7 +810,6 @@ class TestStatefulAccumulators(unittest.TestCase):
                                                                 "expected aroon:  {1:f}\n"
                                                                 "calculated aroon:{2:f}".format(i, expected, calculated))
 
-
     def testMovingLevel(self):
         window = 10
         ml = MovingLevel(window, dependency='x')

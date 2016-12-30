@@ -49,9 +49,9 @@ class StatefulValueHolder(Accumulator):
             self._con.append(value)
             popout = self._con.popleft()
         else:
-            try:
+            if hasattr(value, '__len__'):
                 popout = np.array([np.nan] * len(value))
-            except TypeError:
+            else:
                 popout = np.nan
 
             self._con.append(value)

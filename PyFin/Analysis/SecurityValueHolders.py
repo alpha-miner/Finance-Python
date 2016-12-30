@@ -47,7 +47,7 @@ class SecurityValueHolder(object):
         self._returnSize = 1
         self._holderTemplate = None
         self.updated = False
-        self.cached = None
+        self.cached = pd.Series()
 
     @property
     def symbolList(self):
@@ -95,18 +95,18 @@ class SecurityValueHolder(object):
     @property
     def value(self):
         if self.updated:
-            return self.cached
+            return SecuritiesValues(self.cached)
         else:
-            res = {}
-            for name in self.holders:
+            keys = self.holders.keys()
+            values = []
+            for name in keys:
                 try:
-                    res[name] = self.holders[name].result()
+                    values.append(self.holders[name].result())
                 except ArithmeticError:
-                    res[name] = np.nan
-            self.cached = SecuritiesValues(res)
-
+                    values.append(np.nan)
+            self.cached = dict(zip(keys, values))
             self.updated = True
-            return self.cached
+            return SecuritiesValues(values, index=keys)
 
     def value_by_name(self, name):
         if self.updated:
@@ -189,6 +189,11 @@ class SecurityValueHolder(object):
         return SecurityShiftedValueHolder(self, n)
 
     def transform(self, data, name=None, category_field=None):
+
+        for f in self._dependency:
+            if f not in data:
+                raise ValueError('({0}) dependency is not in input data'.format(f))
+
         data = data.copy()
         dummy_category = False
         if not category_field:
@@ -247,7 +252,7 @@ class RankedSecurityValueHolder(SecurityValueHolder):
         self._dependency = copy.deepcopy(self._inner._dependency)
         self._symbolList = self._inner._symbolList
         self.updated = False
-        self.cached = None
+        self.cached = pd.Series()
 
     @property
     def value(self):
@@ -289,7 +294,7 @@ class FilteredSecurityValueHolder(SecurityValueHolder):
         )
         self._symbolList = self._computer._symbolList
         self.updated = False
-        self.cached = None
+        self.cached = pd.Series()
 
     @property
     def holders(self):
@@ -331,7 +336,7 @@ class IdentitySecurityValueHolder(SecurityValueHolder):
         self._innerHolders = {}
         self._holderTemplate = Identity(value)
         self.updated = False
-        self.cached = None
+        self.cached = pd.Series()
 
     def push(self, data):
         for name in data:
@@ -356,7 +361,7 @@ class SecurityUnitoryValueHolder(SecurityValueHolder):
         self._returnSize = self._right.valueSize
         self._op = op
         self.updated = False
-        self.cached = None
+        self.cached = pd.Series()
 
     def push(self, data):
         self._right.push(data)
@@ -425,7 +430,7 @@ class SecurityCombinedValueHolder(SecurityValueHolder):
         self._returnSize = self._left.valueSize
         self._op = op
         self.updated = False
-        self.cached = None
+        self.cached = pd.Series()
 
     def push(self, data):
         self._left.push(data)

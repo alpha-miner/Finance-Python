@@ -45,7 +45,7 @@ def to_dict(total_index, total_category, matrix_values, columns):
     previous_index = total_index[0]
     for i in range(n):
         key = total_category[i]
-        if total_index[i] != previous_index:
+        if not total_index[i] == previous_index:
             splited_values.append(current_dict)
             splited_category.append(current_category)
             current_dict = {}

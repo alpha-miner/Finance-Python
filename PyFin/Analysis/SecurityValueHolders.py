@@ -103,10 +103,9 @@ class SecurityValueHolder(object):
                     res[name] = self.holders[name].result()
                 except ArithmeticError:
                     res[name] = np.nan
-            series = SecuritiesValues(res)
+            self.cached = SecuritiesValues(res)
 
             self.updated = True
-            self.cached = series
             return self.cached
 
     def value_by_name(self, name):

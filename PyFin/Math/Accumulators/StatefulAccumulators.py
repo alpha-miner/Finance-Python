@@ -148,6 +148,7 @@ class MovingSum(SingleValuedValueHolder):
 
 
 class MovingAverage(SingleValuedValueHolder):
+
     def __init__(self, window, dependency='x'):
         super(MovingAverage, self).__init__(window, dependency)
         self._runningSum = 0.0
@@ -158,13 +159,13 @@ class MovingAverage(SingleValuedValueHolder):
             return np.nan
         popout = self._dumpOneValue(value)
         if not math.isnan(popout):
-            self._runningSum = self._runningSum - popout + value
+            self._runningSum += value - popout
         else:
-            self._runningSum = self._runningSum + value
+            self._runningSum += value
 
     def result(self):
         try:
-            return self._runningSum / self.size
+            return self._runningSum / len(self._con)
         except ZeroDivisionError:
             return np.nan
 
@@ -288,14 +289,14 @@ class MovingVariance(SingleValuedValueHolder):
             return np.nan
         popout = self._dumpOneValue(value)
         if not math.isnan(popout):
-            self._runningSum = self._runningSum - popout + value
-            self._runningSumSquare = self._runningSumSquare - popout * popout + value * value
+            self._runningSum += value - popout
+            self._runningSumSquare += value * value - popout * popout
         else:
-            self._runningSum = self._runningSum + value
-            self._runningSumSquare = self._runningSumSquare + value * value
+            self._runningSum += value
+            self._runningSumSquare += value * value
 
     def result(self):
-        length = self.size
+        length = len(self._con)
 
         if length == 0:
             return np.nan
@@ -452,7 +453,6 @@ class MovingCorrelation(StatefulValueHolder):
     def result(self):
         n = self.size
         if n >= 2:
-            n = self.size
             nominator = n * self._runningSumCrossSquare - self._runningSumLeft * self._runningSumRight
             denominator = (n * self._runningSumSquareLeft - self._runningSumLeft * self._runningSumLeft) \
                           * (n * self._runningSumSquareRight - self._runningSumRight * self._runningSumRight)
@@ -494,8 +494,8 @@ class MovingCorrelationMatrix(StatefulValueHolder):
             self._runningSumCrossSquare += reshapeValues * reshapeValues.T
 
     def result(self):
-        if len(self._con) >= 2:
-            n = self.size
+        n = len(self._con)
+        if n >= 2:
             nominator = n * self._runningSumCrossSquare - self._runningSum * self._runningSum.T
             denominator = n * np.diag(self._runningSumCrossSquare) - self._runningSum * self._runningSum
             denominator = np.sqrt(denominator * denominator.T)

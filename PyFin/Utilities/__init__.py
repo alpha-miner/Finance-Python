@@ -31,6 +31,10 @@ def check_date(date):
         return Date.fromDateTime(date)
 
 
+def single_row(columns, values):
+    return {k: v for k, v in zip(columns, values)}
+
+
 def to_dict(total_index, total_category, matrix_values, columns):
 
     splited_values = []
@@ -46,7 +50,7 @@ def to_dict(total_index, total_category, matrix_values, columns):
             splited_category.append(current_category)
             current_dict = {}
             current_category = []
-        current_dict[key] = dict(zip(columns, matrix_values[i, :]))
+        current_dict[key] = {k: v for k, v in zip(columns, matrix_values[i, :])}
         current_category.append(key)
         previous_index = total_index[i]
     splited_values.append(current_dict)

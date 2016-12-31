@@ -28,11 +28,8 @@ class StatelessAccumulator(Accumulator):
     def push(self, data):
         value = super(StatelessAccumulator, self).push(data)
 
-        try:
-            if math.isnan(value):
-                return np.nan
-        except TypeError:
-            pass
+        if math.isnan(value):
+            return np.nan
 
         self._isFull = 1
         return value
@@ -47,12 +44,8 @@ class Latest(StatelessAccumulator):
 
     def push(self, data):
         value = super(Latest, self).push(data)
-        try:
-            if math.isnan(value):
-                return np.nan
-        except TypeError:
-            if not value:
-                return np.nan
+        if math.isnan(value):
+            return np.nan
         self._latest = value
 
     def result(self):

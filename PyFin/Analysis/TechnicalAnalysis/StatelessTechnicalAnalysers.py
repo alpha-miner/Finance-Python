@@ -7,7 +7,6 @@ Created on 2015-10-22
 
 import copy
 from PyFin.Analysis.SecurityValueHolders import SecurityValueHolder
-from PyFin.Math.Accumulators import Latest
 from PyFin.Math.Accumulators import XAverage
 from PyFin.Math.Accumulators import MACD
 from PyFin.Math.Accumulators import Exp

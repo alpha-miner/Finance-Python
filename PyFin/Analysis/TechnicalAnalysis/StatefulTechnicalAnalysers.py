@@ -31,11 +31,11 @@ class SecuritySingleValueHolder(SecurityValueHolder):
         self._window += window
         if self._compHolder:
             self._holderTemplate = HolderType(window=window, dependency='x')
+            self._innerHolders = {
+                name: copy.deepcopy(self._holderTemplate) for name in self._compHolder.symbolList
+                }
         else:
             self._holderTemplate = HolderType(window=window, dependency=self._dependency)
-        self._innerHolders = {
-            name: copy.deepcopy(self._holderTemplate) for name in self._symbolList
-            }
 
 
 class SecurityMovingAverage(SecuritySingleValueHolder):

@@ -29,11 +29,11 @@ class SecurityStatelessSingleValueHolder(SecurityValueHolder):
         super(SecurityStatelessSingleValueHolder, self).__init__(dependency)
         if self._compHolder:
             self._holderTemplate = holderType(dependency='x', **kwargs)
+            self._innerHolders = {
+                name: copy.deepcopy(self._holderTemplate) for name in self._compHolder.symbolList
+                }
         else:
             self._holderTemplate = holderType(dependency=self._dependency, **kwargs)
-        self._innerHolders = {
-            name: copy.deepcopy(self._holderTemplate) for name in self._symbolList
-            }
 
 
 class SecurityXAverageValueHolder(SecurityStatelessSingleValueHolder):

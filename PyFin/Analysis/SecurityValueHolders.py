@@ -28,12 +28,10 @@ class SecurityValueHolder(object):
     __metaclass__ = ABCMeta
 
     def __init__(self, dependency='x'):
-        self._symbolList = set()
         if isinstance(dependency, SecurityValueHolder):
             self._dependency = dependency._dependency
             self._compHolder = copy.deepcopy(dependency)
             self._window = self._compHolder._window
-            self._symbolList = copy.deepcopy(dependency._symbolList)
         else:
             self._compHolder = None
             if not isinstance(dependency, str) and len(dependency) == 1:
@@ -48,10 +46,11 @@ class SecurityValueHolder(object):
         self._holderTemplate = None
         self.updated = False
         self.cached = pd.Series()
+        self._innerHolders = {}
 
     @property
     def symbolList(self):
-        return copy.deepcopy(self._symbolList)
+        return self._innerHolders.keys()
 
     @property
     def fields(self):
@@ -77,31 +76,29 @@ class SecurityValueHolder(object):
 
             for name in data.index:
                 try:
-                    self.holders[name].push({'x': data[name]})
+                    self._innerHolders[name].push({'x': data[name]})
                 except KeyError:
-                    self._symbolList.add(name)
-                    self.holders[name] = copy.deepcopy(self._holderTemplate)
-                    self.holders[name].push({'x':  data[name]})
+                    self._innerHolders[name] = copy.deepcopy(self._holderTemplate)
+                    self._innerHolders[name].push({'x':  data[name]})
 
         else:
             for name in data:
                 try:
-                    self.holders[name].push(data[name])
+                    self._innerHolders[name].push(data[name])
                 except KeyError:
-                    self._symbolList.add(name)
-                    self.holders[name] = copy.deepcopy(self._holderTemplate)
-                    self.holders[name].push(data[name])
+                    self._innerHolders[name] = copy.deepcopy(self._holderTemplate)
+                    self._innerHolders[name].push(data[name])
 
     @property
     def value(self):
         if self.updated:
             return SecuritiesValues(self.cached)
         else:
-            keys = self.holders.keys()
+            keys = self._innerHolders.keys()
             values = []
             for name in keys:
                 try:
-                    values.append(self.holders[name].result())
+                    values.append(self._innerHolders[name].result())
                 except ArithmeticError:
                     values.append(np.nan)
             self.cached = dict(zip(keys, values))
@@ -112,19 +109,19 @@ class SecurityValueHolder(object):
         if self.updated:
             return self.cached[name]
         else:
-            return self.holders[name].result()
+            return self._innerHolders[name].result()
 
     @property
     def holders(self):
         return self._innerHolders
 
     def isFullByName(self, name):
-        return self.holders[name].isFull
+        return self._innerHolders[name].isFull
 
     @property
     def isFull(self):
-        for name in self.holders:
-            if not self.holders[name].isFull:
+        for name in self._innerHolders:
+            if not self._innerHolders[name].isFull:
                 return False
         return True
 
@@ -250,9 +247,12 @@ class RankedSecurityValueHolder(SecurityValueHolder):
         self._window = self._inner.window
         self._returnSize = self._inner.valueSize
         self._dependency = copy.deepcopy(self._inner._dependency)
-        self._symbolList = self._inner._symbolList
         self.updated = False
         self.cached = pd.Series()
+
+    @property
+    def symbolList(self):
+        return self._inner.symbolList
 
     @property
     def value(self):
@@ -292,9 +292,12 @@ class FilteredSecurityValueHolder(SecurityValueHolder):
             self._computer._dependency,
             self._filter._dependency
         )
-        self._symbolList = self._computer._symbolList
         self.updated = False
         self.cached = pd.Series()
+
+    @property
+    def symbolList(self):
+        return self._computer.symbolList
 
     @property
     def holders(self):
@@ -329,7 +332,6 @@ class FilteredSecurityValueHolder(SecurityValueHolder):
 class IdentitySecurityValueHolder(SecurityValueHolder):
     def __init__(self, value):
         self._value = value
-        self._symbolList = set()
         self._window = 0
         self._returnSize = 1
         self._dependency = []
@@ -341,11 +343,10 @@ class IdentitySecurityValueHolder(SecurityValueHolder):
     def push(self, data):
         for name in data:
             try:
-                self.holders[name].push(data)
+                self._innerHolders[name].push(data)
             except KeyError:
-                self._symbolList.add(name)
-                self.holders[name] = copy.deepcopy(self._holderTemplate)
-                self.holders[name].push(data)
+                self._innerHolders[name] = copy.deepcopy(self._holderTemplate)
+                self._innerHolders[name].push(data)
 
         self.updated = False
 
@@ -354,7 +355,6 @@ class SecurityUnitoryValueHolder(SecurityValueHolder):
 
     def __init__(self, right, op):
         self._right = copy.deepcopy(right)
-        self._symbolList = set(right.symbolList)
 
         self._window = self._right.window
         self._dependency = copy.deepcopy(self._right._dependency)
@@ -362,6 +362,10 @@ class SecurityUnitoryValueHolder(SecurityValueHolder):
         self._op = op
         self.updated = False
         self.cached = pd.Series()
+
+    @property
+    def symbolList(self):
+        return self._right.symbolList
 
     def push(self, data):
         self._right.push(data)
@@ -394,11 +398,11 @@ class SecurityLatestValueHolder(SecurityValueHolder):
         super(SecurityLatestValueHolder, self).__init__(dependency)
         if self._compHolder:
             self._holderTemplate = Latest(dependency='x')
+            self._innerHolders = {
+                name: copy.deepcopy(self._holderTemplate) for name in self._compHolder.symbolList
+                }
         else:
             self._holderTemplate = Latest(dependency=self._dependency)
-        self._innerHolders = {
-            name: copy.deepcopy(self._holderTemplate) for name in self._symbolList
-            }
 
 
 class SecurityCombinedValueHolder(SecurityValueHolder):
@@ -407,22 +411,16 @@ class SecurityCombinedValueHolder(SecurityValueHolder):
             self._left = copy.deepcopy(left)
             if isinstance(right, SecurityValueHolder):
                 self._right = copy.deepcopy(right)
-                self._symbolList = set(self._left.symbolList).union(
-                    set(right.symbolList))
             elif isinstance(right, str):
                 self._right = SecurityLatestValueHolder(right)
-                self._symbolList = set(self._left.symbolList)
             else:
                 self._right = IdentitySecurityValueHolder(right)
-                self._symbolList = set(self._left.symbolList)
         elif isinstance(left, str):
             self._left = SecurityLatestValueHolder(left)
-            self._symbolList = set(right.symbolList)
             self._right = copy.deepcopy(right)
         else:
             self._left = IdentitySecurityValueHolder(left)
             self._right = copy.deepcopy(right)
-            self._symbolList = set(right.symbolList)
 
         self._window = max(self._left.window, self._right.window)
         self._dependency = _merge2set(
@@ -431,6 +429,10 @@ class SecurityCombinedValueHolder(SecurityValueHolder):
         self._op = op
         self.updated = False
         self.cached = pd.Series()
+
+    @property
+    def symbolList(self):
+        return self._left.symbolList | self._right.symbolList
 
     def push(self, data):
         self._left.push(data)
@@ -518,13 +520,12 @@ class SecurityShiftedValueHolder(SecurityValueHolder):
     def __init__(self, right, n):
         super(SecurityShiftedValueHolder, self).__init__(right)
         self._returnSize = right.valueSize
-        self._symbolList = set(right.symbolList)
         self._window = right.window + n
         self._dependency = copy.deepcopy(right._dependency)
         self._holderTemplate = Shift(Latest('x'), n)
 
         self._innerHolders = {
-            name: copy.deepcopy(self._holderTemplate) for name in self._symbolList
+            name: copy.deepcopy(self._holderTemplate) for name in self._compHolder.symbolList
         }
 
 

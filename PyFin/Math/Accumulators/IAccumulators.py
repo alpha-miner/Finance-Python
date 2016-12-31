@@ -368,9 +368,9 @@ class CompoundedValueHolder(Accumulator):
     def push(self, data):
         self._left.push(data)
         values = self._left.result()
-        try:
+        if not hasattr(values, '__iter__'):
             parameters = {self._right.dependency: values}
-        except TypeError:
+        else:
             parameters = dict((name, value) for name, value in zip(self._right.dependency, values))
         self._right.push(parameters)
 

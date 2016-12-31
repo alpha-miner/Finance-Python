@@ -446,7 +446,7 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
         mvCorr = (Average('close') ^ Sum('close')) >> Correlation(dependency=('x', 'y'))
 
         for i, close in enumerate(self.sampleClose):
-            data = {'close': close, 'open': open}
+            data = {'close': close, 'open': 1.}
             maxer.push(data)
             data2 = {'x': maxer.result()}
             ma5.push(data2)

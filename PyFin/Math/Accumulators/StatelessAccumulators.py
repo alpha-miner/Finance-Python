@@ -335,43 +335,6 @@ class Variance(StatelessSingleValueAccumulator):
             return np.nan
 
 
-class Correlation(StatelessSingleValueAccumulator):
-    def __init__(self, dependency=('x', 'y')):
-        super(Correlation, self).__init__(dependency)
-        self._runningSumLeft = 0.0
-        self._runningSumRight = 0.0
-        self._runningSumSquareLeft = 0.0
-        self._runningSumSquareRight = 0.0
-        self._runningSumCrossSquare = 0.0
-        self._currentCount = 0
-        self._returnSize = 1
-
-    def push(self, data):
-        value = self._push(data)
-        if math.isnan(value[0]) or math.isnan(value[1]):
-            return np.nan
-
-        self._isFull = 1
-
-        self._runningSumLeft = self._runningSumLeft + value[0]
-        self._runningSumRight = self._runningSumRight + value[1]
-        self._runningSumSquareLeft = self._runningSumSquareLeft + value[0] * value[0]
-        self._runningSumSquareRight = self._runningSumSquareRight + value[1] * value[1]
-        self._runningSumCrossSquare = self._runningSumCrossSquare + value[0] * value[1]
-        self._currentCount += 1
-
-    def result(self):
-        n = self._currentCount
-        nominator = n * self._runningSumCrossSquare - self._runningSumLeft * self._runningSumRight
-        denominator = (n * self._runningSumSquareLeft - self._runningSumLeft * self._runningSumLeft) \
-                      * (n * self._runningSumSquareRight - self._runningSumRight * self._runningSumRight)
-        denominator = math.sqrt(denominator)
-        if denominator != 0:
-            return nominator / denominator
-        else:
-            return np.nan
-
-
 class Product(StatelessSingleValueAccumulator):
     def __init__(self, dependency='x'):
         super(Product,self).__init__(dependency)
@@ -533,3 +496,59 @@ class AutoCorrelation(StatelessSingleValueAccumulator):
             except ZeroDivisionError:
                 return np.nan
             return self._AutoCorrMatrix[0, 1]
+
+
+class StatelessMultiValueAccumulator(Accumulator):
+    def __init__(self, dependency):
+        super(StatelessMultiValueAccumulator, self).__init__(dependency)
+        self._returnSize = 1
+        self._window = 1
+        self._containerSize = 1
+
+    def _push(self, data):
+        if not self._isValueHolderContained:
+            try:
+                value = [data[name] for name in self._dependency]
+            except KeyError:
+                value = [np.nan] * len(self._dependency)
+        else:
+            self._dependency.push(data)
+            value = self._dependency.result()
+        return value
+
+
+class Correlation(StatelessMultiValueAccumulator):
+    def __init__(self, dependency=('x', 'y')):
+        super(Correlation, self).__init__(dependency)
+        self._runningSumLeft = 0.0
+        self._runningSumRight = 0.0
+        self._runningSumSquareLeft = 0.0
+        self._runningSumSquareRight = 0.0
+        self._runningSumCrossSquare = 0.0
+        self._currentCount = 0
+        self._returnSize = 1
+
+    def push(self, data):
+        value = self._push(data)
+        if math.isnan(value[0]) or math.isnan(value[1]):
+            return np.nan
+
+        self._isFull = 1
+
+        self._runningSumLeft = self._runningSumLeft + value[0]
+        self._runningSumRight = self._runningSumRight + value[1]
+        self._runningSumSquareLeft = self._runningSumSquareLeft + value[0] * value[0]
+        self._runningSumSquareRight = self._runningSumSquareRight + value[1] * value[1]
+        self._runningSumCrossSquare = self._runningSumCrossSquare + value[0] * value[1]
+        self._currentCount += 1
+
+    def result(self):
+        n = self._currentCount
+        nominator = n * self._runningSumCrossSquare - self._runningSumLeft * self._runningSumRight
+        denominator = (n * self._runningSumSquareLeft - self._runningSumLeft * self._runningSumLeft) \
+                      * (n * self._runningSumSquareRight - self._runningSumRight * self._runningSumRight)
+        denominator = math.sqrt(denominator)
+        if denominator != 0:
+            return nominator / denominator
+        else:
+            return np.nan

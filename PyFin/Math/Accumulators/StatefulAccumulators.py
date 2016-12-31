@@ -72,7 +72,7 @@ class Shift(StatefulValueHolder):
 
     def push(self, data):
         self._valueHolder.push(data)
-        self._popout = super(Shift, self)._dumpOneValue(self._valueHolder.result())
+        self._popout = self._dumpOneValue(self._valueHolder.result())
 
     def result(self):
         try:
@@ -86,6 +86,17 @@ class SingleValuedValueHolder(StatefulValueHolder):
         super(SingleValuedValueHolder, self).__init__(window, dependency)
         _checkParameterList(dependency)
 
+    def _push(self, data):
+        if not self._isValueHolderContained:
+            try:
+                value = data[self._dependency]
+            except KeyError:
+                value = np.nan
+        else:
+            self._dependency.push(data)
+            value = self._dependency.result()
+        return value
+
 
 class SortedValueHolder(SingleValuedValueHolder):
     def __init__(self, window, dependency='x'):
@@ -93,7 +104,7 @@ class SortedValueHolder(SingleValuedValueHolder):
         self._sortedArray = []
 
     def push(self, data):
-        value = super(SortedValueHolder, self).push(data)
+        value = self._push(data)
         if math.isnan(value):
             return np.nan
         if self._isFull:
@@ -134,7 +145,7 @@ class MovingSum(SingleValuedValueHolder):
         self._runningSum = 0.0
 
     def push(self, data):
-        value = super(MovingSum, self).push(data)
+        value = self._push(data)
         if math.isnan(value):
             return np.nan
         popout = self._dumpOneValue(value)
@@ -148,13 +159,12 @@ class MovingSum(SingleValuedValueHolder):
 
 
 class MovingAverage(SingleValuedValueHolder):
-
     def __init__(self, window, dependency='x'):
         super(MovingAverage, self).__init__(window, dependency)
         self._runningSum = 0.0
 
     def push(self, data):
-        value = super(MovingAverage, self).push(data)
+        value = self._push(data)
         if math.isnan(value):
             return np.nan
         popout = self._dumpOneValue(value)
@@ -177,7 +187,7 @@ class MovingPositiveAverage(SingleValuedValueHolder):
         self._runningPositiveCount = 0
 
     def push(self, data):
-        value = super(MovingPositiveAverage, self).push(data)
+        value = self._push(data)
         if math.isnan(value):
             return np.nan
         popout = self._dumpOneValue(value)
@@ -255,7 +265,7 @@ class MovingNegativeAverage(SingleValuedValueHolder):
         self._runningNegativeCount = 0
 
     def push(self, data):
-        value = super(MovingNegativeAverage, self).push(data)
+        value = self._push(data)
         if math.isnan(value):
             return np.nan
         popout = self._dumpOneValue(value)
@@ -284,7 +294,7 @@ class MovingVariance(SingleValuedValueHolder):
             pyFinAssert(window >= 2, ValueError, "sampling variance can't be calculated with window size < 2")
 
     def push(self, data):
-        value = super(MovingVariance, self).push(data)
+        value = self._push(data)
         if math.isnan(value):
             return np.nan
         popout = self._dumpOneValue(value)
@@ -321,7 +331,7 @@ class MovingNegativeVariance(SingleValuedValueHolder):
         self._isPop = isPopulation
 
     def push(self, data):
-        value = super(MovingNegativeVariance, self).push(data)
+        value = self._push(data)
         if math.isnan(value):
             return np.nan
         popout = self._dumpOneValue(value)
@@ -357,7 +367,7 @@ class MovingCountedPositive(SingleValuedValueHolder):
         self._counts = 0
 
     def push(self, data):
-        value = super(MovingCountedPositive, self).push(data)
+        value = self._push(data)
         if math.isnan(value):
             return np.nan
         popout = self._dumpOneValue(value)
@@ -377,7 +387,7 @@ class MovingCountedNegative(SingleValuedValueHolder):
         self._counts = 0
 
     def push(self, data):
-        value = super(MovingCountedNegative, self).push(data)
+        value = self._push(data)
         if math.isnan(value):
             return np.nan
         popout = self._dumpOneValue(value)
@@ -476,7 +486,7 @@ class MovingCorrelationMatrix(StatefulValueHolder):
 
     def push(self, data):
         values = super(MovingCorrelationMatrix, self).push(data)
-        if np.any(np.isnan(values)):
+        if math.isnan(sum(values)):
             return np.nan
         if self._isFirst:
             self._runningSum = np.zeros((1, len(values)))
@@ -510,7 +520,7 @@ class MovingProduct(SingleValuedValueHolder):
         self._runningProduct = np.nan
 
     def push(self, data):
-        value = super(MovingProduct, self).push(data)
+        value = self._push(data)
         if math.isnan(value):
             return np.nan
         self._dumpOneValue(value)
@@ -529,7 +539,7 @@ class MovingCenterMoment(SingleValuedValueHolder):
         self._order = order
 
     def push(self, data):
-        value = super(MovingCenterMoment, self).push(data)
+        value = self._push(data)
         self._dumpOneValue(value)
         if math.isnan(value):
             return np.nan
@@ -542,7 +552,7 @@ class MovingCenterMoment(SingleValuedValueHolder):
 
 class MovingSkewness(SingleValuedValueHolder):
     def __init__(self, window, dependency='x'):
-        super(MovingSkewness, self).__init__(window,dependency)
+        super(MovingSkewness, self).__init__(window, dependency)
         self._runningStd3 = Pow(MovingVariance(window, dependency, isPopulation=True), 1.5)
         self._runningMoment3 = MovingCenterMoment(window, 3, dependency)
         self._runningSkewness = self._runningMoment3 / self._runningStd3
@@ -560,7 +570,7 @@ class MovingMaxPos(SortedValueHolder):
         self._runningTsMaxPos = np.nan
 
     def push(self, data):
-        super(MovingMaxPos,self).push(data)
+        super(MovingMaxPos, self).push(data)
         self._max = self._sortedArray[-1]
 
     def result(self):
@@ -571,11 +581,11 @@ class MovingMaxPos(SortedValueHolder):
 
 class MovingMinPos(SortedValueHolder):
     def __init__(self, window, dependency='x'):
-        super(MovingMinPos,self).__init__(window, dependency)
+        super(MovingMinPos, self).__init__(window, dependency)
         self._runningTsMinPos = np.nan
 
     def push(self, data):
-        super(MovingMinPos,self).push(data)
+        super(MovingMinPos, self).push(data)
         self._min = self._sortedArray[0]
 
     def result(self):
@@ -604,8 +614,7 @@ class MovingRSV(SingleValuedValueHolder):
         self._cached_value = None
 
     def push(self, data):
-
-        value = super(MovingRSV, self).push(data)
+        value = self._push(data)
         if math.isnan(value):
             return np.nan
         else:
@@ -637,15 +646,12 @@ class MovingRank(SortedValueHolder):
         super(MovingRank, self).__init__(window, dependency)
         self._runningRank = []
 
-    def push(self, data):
-        super(MovingRank, self).push(data)
-
     def result(self):
         self._runningRank = [bisect.bisect_left(self._sortedArray, x) for x in self._con]
         return self._runningRank
 
 
-#runningJ can be more than 1 or less than 0.
+# runningJ can be more than 1 or less than 0.
 class MovingKDJ(SingleValuedValueHolder):
     def __init__(self, window, k=3, d=3, dependency='x'):
         super(MovingKDJ, self).__init__(window, dependency)
@@ -678,7 +684,7 @@ class MovingAroon(SingleValuedValueHolder):
         super(MovingAroon, self).__init__(window, dependency)
 
     def push(self, data):
-        value = super(MovingAroon, self).push(data)
+        value = self._push(data)
         if math.isnan(value):
             return np.nan
         else:
@@ -695,8 +701,8 @@ class MovingBias(SingleValuedValueHolder):
         super(MovingBias, self).__init__(window, dependency)
         self._runningMa = np.nan
 
-    def push(self,data):
-        value = super(MovingBias, self).push(data)
+    def push(self, data):
+        value = self._push(data)
         if math.isnan(value):
             return np.nan
         else:
@@ -713,7 +719,7 @@ class MovingLevel(SingleValuedValueHolder):
         self._runningLevel = 1
 
     def push(self, data):
-        value = super(MovingLevel, self).push(data)
+        value = self._push(data)
         if math.isnan(value):
             return np.nan
         else:
@@ -730,11 +736,11 @@ class MovingAutoCorrelation(SingleValuedValueHolder):
         super(MovingAutoCorrelation, self).__init__(window, dependency)
         self._lags = lags
         if window <= lags:
-            raise ValueError ("lags should be less than window however\n"
+            raise ValueError("lags should be less than window however\n"
                              "window is: {0} while lags is: {1}".format(window, lags))
 
     def push(self, data):
-        value = super(MovingAutoCorrelation, self).push(data)
+        value = self._push(data)
         if math.isnan(value):
             return np.nan
         else:
@@ -749,7 +755,7 @@ class MovingAutoCorrelation(SingleValuedValueHolder):
                 self._runningVecForward = tmp_list[0:self._window - self._lags]
                 self._runningVecBackward = tmp_list[-self._window + self._lags - 1:-1]
                 self._runningAutoCorrMatrix = np.cov(self._runningVecBackward, self._runningVecForward) / \
-                                        (np.std(self._runningVecBackward) * np.std(self._runningVecForward))
+                                              (np.std(self._runningVecBackward) * np.std(self._runningVecForward))
             except ZeroDivisionError:
                 return np.nan
             return self._runningAutoCorrMatrix[0, 1]

@@ -15,7 +15,7 @@ from PyFin.Math.Accumulators.StatelessAccumulators import Latest
 from PyFin.Math.Accumulators.StatelessAccumulators import Positive
 from PyFin.Math.Accumulators.StatelessAccumulators import Negative
 from PyFin.Math.Accumulators.StatelessAccumulators import XAverage
-from PyFin.Math.Accumulators.StatelessAccumulators import StatelessAccumulator
+from PyFin.Math.Accumulators.StatelessAccumulators import StatelessSingleValueAccumulator
 from PyFin.Math.Accumulators.IAccumulators import Pow
 from PyFin.Utilities import pyFinAssert
 from PyFin.Utilities import isClose
@@ -616,7 +616,7 @@ class MovingRSV(SingleValuedValueHolder):
         return (self._cached_value - min(self._con)) / (max(self._con) - min(self._con))
 
 
-class MACD(StatelessAccumulator):
+class MACD(StatelessSingleValueAccumulator):
     def __init__(self, short, long, dependency='x', method=XAverage):
         super(MACD, self).__init__(dependency)
         self._short_average = method(window=short, dependency=dependency)

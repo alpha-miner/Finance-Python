@@ -50,7 +50,7 @@ class SecurityValueHolder(object):
 
     @property
     def symbolList(self):
-        return self._innerHolders.keys()
+        return set(self._innerHolders.keys())
 
     @property
     def fields(self):
@@ -432,7 +432,7 @@ class SecurityCombinedValueHolder(SecurityValueHolder):
 
     @property
     def symbolList(self):
-        return self._left.symbolList | self._right.symbolList
+        return self._left.symbolList.union(self._right.symbolList)
 
     def push(self, data):
         self._left.push(data)

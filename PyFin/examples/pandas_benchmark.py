@@ -10,21 +10,21 @@ import numpy as np
 import pandas as pd
 from PyFin.api import *
 
-df = pd.read_csv('mtm.csv', index_col=0).sort_index()
+# df = pd.read_csv('mtm.csv', index_col=0).sort_index()
+#
+# t = MA(20, 'mtm_17') / MA(30, 'mtm_27')
+#
+# start = dt.datetime.now()
+# res = t.transform(df, category_field='productID')
+# print("time elapsed: {0}s".format(dt.datetime.now() - start))
+#
+# start = dt.datetime.now()
+# res = df.groupby('productID').rolling(20).mean()['mtm_17'] / df.groupby('productID').rolling(30).mean()['mtm_27']
+# print("time elapsed: {0}s".format(dt.datetime.now() - start))
 
-t = MA(20, 'mtm_17') / MA(30, 'mtm_27')
 
-start = dt.datetime.now()
-res = t.transform(df, category_field='productID')
-print("time elapsed: {0}s".format(dt.datetime.now() - start))
-
-start = dt.datetime.now()
-res = df.groupby('productID').rolling(20).mean()['mtm_17'] / df.groupby('productID').rolling(30).mean()['mtm_27']
-print("time elapsed: {0}s".format(dt.datetime.now() - start))
-
-
-n = 3000
-m = 4000
+n = 1000
+m = 1000
 
 df = pd.DataFrame(np.random.randn(n*m, 3), columns=['x', 'y', 'z'])
 df['c'] = list(range(n)) * m
@@ -35,7 +35,7 @@ for i in range(m):
 
 df.index = index
 
-t = MA(20, 'x') # / MA(30, 'y')
+t = LAST('x') # / MA(30, 'y')
 
 start = dt.datetime.now()
 res = t.transform(df, category_field='c')

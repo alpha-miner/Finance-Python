@@ -29,8 +29,7 @@ class StatelessAccumulator(Accumulator):
         value = super(StatelessAccumulator, self).push(data)
 
         try:
-            bool_flag = np.all(math.isnan(value))
-            if bool_flag:
+            if math.isnan(value):
                 return np.nan
         except TypeError:
             pass

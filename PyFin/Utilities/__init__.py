@@ -39,18 +39,17 @@ def to_dict(total_index, total_category, matrix_values, columns):
 
     splited_values = []
     splited_category = []
-    n = np.size(matrix_values, 0)
     current_dict = {}
     current_category = []
     previous_index = total_index[0]
-    for i in range(n):
+    for i, row in enumerate(matrix_values):
         key = total_category[i]
         if not total_index[i] == previous_index:
             splited_values.append(current_dict)
             splited_category.append(current_category)
             current_dict = {}
             current_category = []
-        current_dict[key] = {k: v for k, v in zip(columns, matrix_values[i, :])}
+        current_dict[key] = {k: v for k, v in zip(columns, row)}
         current_category.append(key)
         previous_index = total_index[i]
     splited_values.append(current_dict)

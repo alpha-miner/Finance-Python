@@ -8,6 +8,8 @@ import sys
 import io
 import subprocess
 import glob
+import numpy as np
+from Cython.Build import cythonize
 
 PACKAGE = "PyFin"
 NAME = "Finance-Python"
@@ -137,4 +139,6 @@ setup(
     classifiers=[],
     cmdclass={"test": test,
               "version_build": version_build},
+    ext_modules=cythonize("PyFin/Math/Accumulators/impl.pyx"),
+    include_dirs=[np.get_include()]
 )

@@ -7,7 +7,6 @@ Created on 2015-7-16
 
 import math
 import bisect
-from collections import deque
 import numpy as np
 from copy import deepcopy
 from PyFin.Math.Accumulators.IAccumulators import Accumulator
@@ -19,6 +18,7 @@ from PyFin.Math.Accumulators.StatelessAccumulators import StatelessSingleValueAc
 from PyFin.Math.Accumulators.IAccumulators import Pow
 from PyFin.Utilities import pyFinAssert
 from PyFin.Utilities import isClose
+from PyFin.Math.Accumulators.impl import Deque
 
 
 def _checkParameterList(dependency):
@@ -37,27 +37,18 @@ class StatefulValueHolder(Accumulator):
         self._returnSize = 1
         self._window = window
         self._containerSize = window
-        self._con = deque()
+        self._deque = Deque(window)
 
     @property
     def size(self):
-        return len(self._con)
+        return self._deque.size()
+
+    @property
+    def isFull(self):
+        return self._deque.isFull()
 
     def _dumpOneValue(self, value):
-
-        if self._isFull:
-            self._con.append(value)
-            popout = self._con.popleft()
-        else:
-            if hasattr(value, '__len__'):
-                popout = np.array([np.nan] * len(value))
-            else:
-                popout = np.nan
-
-            self._con.append(value)
-            if len(self._con) == self._containerSize:
-                self._isFull = 1
-        return popout
+        return self._deque.dump(value)
 
 
 class Shift(StatefulValueHolder):
@@ -107,7 +98,7 @@ class SortedValueHolder(SingleValuedValueHolder):
         value = self._push(data)
         if math.isnan(value):
             return np.nan
-        if self._isFull:
+        if self._deque.isFull():
             popout = self._dumpOneValue(value)
             delPos = bisect.bisect_left(self._sortedArray, popout)
             del self._sortedArray[delPos]
@@ -175,7 +166,7 @@ class MovingAverage(SingleValuedValueHolder):
 
     def result(self):
         try:
-            return self._runningSum / len(self._con)
+            return self._runningSum / self.size
         except ZeroDivisionError:
             return np.nan
 
@@ -306,7 +297,7 @@ class MovingVariance(SingleValuedValueHolder):
             self._runningSumSquare += value * value
 
     def result(self):
-        length = len(self._con)
+        length = self._deque.size()
 
         if length == 0:
             return np.nan
@@ -421,7 +412,7 @@ class MovingHistoricalWindow(StatefulValueHolder):
         if item >= length:
             raise ValueError("index {0} is out of the bound of the historical current length {1}".format(item, length))
 
-        return self._con[length - 1 - item]
+        return self._deque[length - 1 - item]
 
     def result(self):
         return [self.__getitem__(i) for i in range(self.size)]
@@ -504,7 +495,7 @@ class MovingCorrelationMatrix(StatefulValueHolder):
             self._runningSumCrossSquare += reshapeValues * reshapeValues.T
 
     def result(self):
-        n = len(self._con)
+        n = self.size
         if n >= 2:
             nominator = n * self._runningSumCrossSquare - self._runningSum * self._runningSum.T
             denominator = n * np.diag(self._runningSumCrossSquare) - self._runningSum * self._runningSum
@@ -517,17 +508,17 @@ class MovingCorrelationMatrix(StatefulValueHolder):
 class MovingProduct(SingleValuedValueHolder):
     def __init__(self, window, dependency='x'):
         super(MovingProduct, self).__init__(window, dependency)
-        self._runningProduct = np.nan
+        self._runningProduct = 1.0
 
     def push(self, data):
         value = self._push(data)
         if math.isnan(value):
             return np.nan
-        self._dumpOneValue(value)
-        if all(self._con):
-            self._runningProduct = np.product(self._con)
+        popout = self._dumpOneValue(value)
+        if not math.isnan(popout):
+            self._runningProduct *= value / popout
         else:
-            self._runningProduct = 0
+            self._runningProduct *= value
 
     def result(self):
         return self._runningProduct
@@ -544,7 +535,7 @@ class MovingCenterMoment(SingleValuedValueHolder):
         if math.isnan(value):
             return np.nan
         else:
-            self._runningMoment = np.mean(np.power(np.abs(np.array(self._con) - np.mean(self._con)), self._order))
+            self._runningMoment = np.mean(np.power(np.abs(self._deque.as_array() - np.mean(self._deque.as_array())), self._order))
 
     def result(self):
         return self._runningMoment
@@ -574,7 +565,7 @@ class MovingMaxPos(SortedValueHolder):
         self._max = self._sortedArray[-1]
 
     def result(self):
-        tmpList = list(self._con)
+        tmpList = self._deque.as_list()
         self._runningTsMaxPos = tmpList.index(self._max)
         return self._runningTsMaxPos
 
@@ -589,7 +580,7 @@ class MovingMinPos(SortedValueHolder):
         self._min = self._sortedArray[0]
 
     def result(self):
-        tmpList = list(self._con)
+        tmpList = self._deque.as_list()
         self._runningTsMinPos = tmpList.index(self._min)
         return self._runningTsMinPos
 
@@ -622,7 +613,8 @@ class MovingRSV(SingleValuedValueHolder):
             self._cached_value = value
 
     def result(self):
-        return (self._cached_value - min(self._con)) / (max(self._con) - min(self._con))
+        con = self._deque.as_list()
+        return (self._cached_value - min(con)) / (max(con) - min(con))
 
 
 class MACD(StatelessSingleValueAccumulator):
@@ -647,7 +639,7 @@ class MovingRank(SortedValueHolder):
         self._runningRank = []
 
     def result(self):
-        self._runningRank = [bisect.bisect_left(self._sortedArray, x) for x in self._con]
+        self._runningRank = [bisect.bisect_left(self._sortedArray, x) for x in self._deque.as_list()]
         return self._runningRank
 
 
@@ -662,11 +654,11 @@ class MovingKDJ(SingleValuedValueHolder):
     def push(self, data):
         value = self._runningRsv.push(data)
         rsv = self._runningRsv.value
-        if len(self._con) == 0:
+        if self.size == 0:
             self._dumpOneValue(value)
             self._runningJ = np.nan
         else:
-            if len(self._con) == 1:
+            if self.size == 1:
                 self._dumpOneValue(value)
                 self._runningK = (0.5 * (self._k - 1) + rsv) / self._k
                 self._runningD = (0.5 * (self._d - 1) + self._runningK) / self._d
@@ -691,7 +683,7 @@ class MovingAroon(SingleValuedValueHolder):
             self._dumpOneValue(value)
 
     def result(self):
-        tmpList = list(self._con)
+        tmpList = self._deque.as_list()
         self._runningAroonOsc = (tmpList.index(np.max(tmpList)) - tmpList.index(np.min(tmpList))) / self.window
         return self._runningAroonOsc
 
@@ -707,7 +699,7 @@ class MovingBias(SingleValuedValueHolder):
             return np.nan
         else:
             self._dumpOneValue(value)
-            self._runningBias = value / np.mean(self._con) - 1
+            self._runningBias = value / np.mean(self._deque.as_array()) - 1
 
     def result(self):
         return self._runningBias
@@ -724,8 +716,9 @@ class MovingLevel(SingleValuedValueHolder):
             return np.nan
         else:
             self._dumpOneValue(value)
-            if len(self._con) > 1:
-                self._runningLevel = self._con[-1] / self._con[0]
+            if self.size > 1:
+                con = self._deque.as_list()
+                self._runningLevel = con[-1] / con[0]
 
     def result(self):
         return self._runningLevel
@@ -747,8 +740,8 @@ class MovingAutoCorrelation(SingleValuedValueHolder):
             self._dumpOneValue(value)
 
     def result(self):
-        tmp_list = list(self._con)
-        if len(self._con) < self.window:
+        tmp_list = self._deque.as_list()
+        if len(tmp_list) < self.window:
             return np.nan
         else:
             try:
@@ -759,3 +752,11 @@ class MovingAutoCorrelation(SingleValuedValueHolder):
             except ZeroDivisionError:
                 return np.nan
             return self._runningAutoCorrMatrix[0, 1]
+
+
+if __name__ == '__main__':
+
+    s = Shift(MovingAverage(2, 'x'), 1)
+    s.push({'x': 2})
+    s.push({'x': 3})
+    print(s.result())

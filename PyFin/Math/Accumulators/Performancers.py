@@ -187,5 +187,5 @@ class MovingMaxDrawdown(StatefulValueHolder):
         self._dumpOneValue((drawdown, duration, lastHighIndex))
 
     def result(self):
-        sortedValue = sorted(range(self.size), key=lambda x: self._con[x][0])
-        return self._con[sortedValue[0]]
+        sortedValue = sorted(range(self.size), key=lambda x: self._deque[x][0])
+        return self._deque[sortedValue[0]]

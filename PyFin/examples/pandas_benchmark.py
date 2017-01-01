@@ -23,8 +23,8 @@ from PyFin.api import *
 # print("time elapsed: {0}s".format(dt.datetime.now() - start))
 
 
-n = 200
-m = 200
+n = 1000
+m = 1000
 
 df = pd.DataFrame(np.random.randn(n*m, 3), columns=['x', 'y', 'z'])
 df['c'] = list(range(n)) * m

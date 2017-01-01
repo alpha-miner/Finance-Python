@@ -43,6 +43,7 @@ from PyFin.Math.Accumulators import MovingAroon
 from PyFin.Math.Accumulators import MovingLevel
 from PyFin.Math.Accumulators import MovingAutoCorrelation
 
+
 class TestStatefulAccumulators(unittest.TestCase):
     def setUp(self):
         np.random.seed(0)
@@ -528,8 +529,6 @@ class TestStatefulAccumulators(unittest.TestCase):
                                                    "Expected: {2:f}\n"
                                                    "Calculated: {3:f}".format(k, j, corr, calculated[k][j]))
 
-
-
     def testMovingProduct(self):
         window = 10
         mp = MovingProduct(window, dependency='x')
@@ -546,8 +545,7 @@ class TestStatefulAccumulators(unittest.TestCase):
                 self.assertAlmostEqual(expected, calculated, 8, "at index {0:d}\n"
                                                                 "product expected:   {1:f}\n"
                                                                 "product calculated: {2:f}".format(i, expected,
-                                                                                                       calculated))
-
+                                                                                                   calculated))
 
     def testMovingCenterMoment(self):
         window = 10
@@ -568,7 +566,6 @@ class TestStatefulAccumulators(unittest.TestCase):
                                                                 "moment calculated: {2:f}".format(i, expected,
                                                                                                   calculated))
 
-
         window = 10
         order = 2
         mm = MovingCenterMoment(window, order, dependency='x')
@@ -587,7 +584,6 @@ class TestStatefulAccumulators(unittest.TestCase):
                                                                 "moment calculated: {2:f}".format(i, expected,
                                                                                                   calculated))
 
-
     def testMovingSkewness(self):
         window = 10
         ms = MovingSkewness(window, dependency='x')
@@ -605,8 +601,7 @@ class TestStatefulAccumulators(unittest.TestCase):
                 self.assertAlmostEqual(expected, calculated, 8, "at index {0:d}\n"
                                                                 "skewness expected:   {1:f}\n"
                                                                 "skewness calculated: {2:f}".format(i, expected,
-                                                                                                  calculated))
-
+                                                                                                    calculated))
 
     def testMovingTsMaxPos(self):
         window = 10
@@ -622,10 +617,9 @@ class TestStatefulAccumulators(unittest.TestCase):
                 calculated = maxPos.result()
                 expected = con.index(np.max(con))
                 self.assertEqual(expected, calculated, "at index {0:d}\n"
-                                                        "maxPos expected:   {1:f}\n"
-                                                        "maxPos calculated: {2:f}".format(i, expected,
-                                                                                              calculated))
-
+                                                       "maxPos expected:   {1:f}\n"
+                                                       "maxPos calculated: {2:f}".format(i, expected,
+                                                                                         calculated))
 
     def testMovingTsMinPos(self):
         window = 10
@@ -644,7 +638,6 @@ class TestStatefulAccumulators(unittest.TestCase):
                                                        "minPos expected:   {1:f}\n"
                                                        "minPos calculated: {2:f}".format(i, expected,
                                                                                          calculated))
-
 
     def testMovingKurtosis(self):
         window = 10
@@ -665,7 +658,6 @@ class TestStatefulAccumulators(unittest.TestCase):
                                                                 "kurtosis calculated: {2:f}".format(i, expected,
                                                                                                     calculated))
 
-
     def testMovingRSV(self):
         window = 10
         rsv = MovingRSV(window, dependency='x')
@@ -683,7 +675,6 @@ class TestStatefulAccumulators(unittest.TestCase):
                                                                 "rsv expected:   {1:f}\n"
                                                                 "rsv calculated: {2:f}".format(i, expected,
                                                                                                calculated))
-
 
     def testMACD(self):
         macd = MACD(short=5, long=10, dependency='close')
@@ -703,7 +694,6 @@ class TestStatefulAccumulators(unittest.TestCase):
                                                                                                   expected,
                                                                                                   calculated))
 
-
     def testEMAMACD(self):
         fast = 5
         slow = 10
@@ -721,8 +711,8 @@ class TestStatefulAccumulators(unittest.TestCase):
             calculated = macd_diff.value
             self.assertAlmostEqual(expected, calculated, 10, "at index {0:d}\n"
                                                              "expected ema macd diff:   {1:f}\n"
-                                                             "calculated ema macd diff: {2:f}".format(i, expected, calculated))
-
+                                                             "calculated ema macd diff: {2:f}".format(i, expected,
+                                                                                                      calculated))
 
     def testMovingRank(self):
         window = 10
@@ -738,13 +728,13 @@ class TestStatefulAccumulators(unittest.TestCase):
                 calculated = mk.result()
                 expected = np.argsort(np.argsort(con))
                 self.assertListEqual(list(expected), calculated, "at index {0:d}\n"
-                                                            "expected rank:   {1}\n"
-                                                            "calculated rank: {2}".format(i, expected, calculated))
+                                                                 "expected rank:   {1}\n"
+                                                                 "calculated rank: {2}".format(i, expected, calculated))
 
     def testMovingKDJ(self):
         window = 10
-        k=3
-        d=3
+        k = 3
+        d = 3
         mk = MovingKDJ(window, dependency='x')
 
         con = []
@@ -773,8 +763,6 @@ class TestStatefulAccumulators(unittest.TestCase):
                                                                 "expected kdj:   {1:f}\n"
                                                                 "calculated kdj: {2:f}".format(i, expected, calculated))
 
-
-
     def testMovingBias(self):
         window = 10
         mb = MovingBias(window, dependency='x')
@@ -790,8 +778,8 @@ class TestStatefulAccumulators(unittest.TestCase):
                 expected = value / np.mean(con) - 1
                 self.assertAlmostEqual(expected, calculated, 8, "at index {0:d}\n"
                                                                 "expected bias:   {1:f}\n"
-                                                                "calculated bias: {2:f}".format(i, expected, calculated))
-
+                                                                "calculated bias: {2:f}".format(i, expected,
+                                                                                                calculated))
 
     def testMovingAroon(self):
         window = 10
@@ -808,7 +796,8 @@ class TestStatefulAccumulators(unittest.TestCase):
                 expected = (con.index(np.max(con)) - con.index(np.min(con))) / window
                 self.assertAlmostEqual(expected, calculated, 8, "at index {0:d}\n"
                                                                 "expected aroon:  {1:f}\n"
-                                                                "calculated aroon:{2:f}".format(i, expected, calculated))
+                                                                "calculated aroon:{2:f}".format(i, expected,
+                                                                                                calculated))
 
     def testMovingLevel(self):
         window = 10
@@ -825,8 +814,8 @@ class TestStatefulAccumulators(unittest.TestCase):
                 expected = con[-1] / con[0]
                 self.assertAlmostEqual(expected, calculated, 8, "at index {0:d}\n"
                                                                 "expected level:   {1:f}\n"
-                                                                "calculated level: {2:f}".format(i, expected, calculated))
-
+                                                                "calculated level: {2:f}".format(i, expected,
+                                                                                                 calculated))
 
     def testMovingAutoCorrelation(self):
         window = 10
@@ -842,13 +831,14 @@ class TestStatefulAccumulators(unittest.TestCase):
             if i >= window - 1:
                 calculated = ma.result()
                 con_forward = con[0:window - lags]
-                con_backward = con[-window + lags - 1 : -1]
+                con_backward = con[-window + lags - 1: -1]
                 expected = np.cov(con_backward, con_forward) / (np.std(con_forward) * np.std(con_backward))
                 self.assertAlmostEqual(expected[0, 1], calculated, 8, "at index of {0:d}\n"
-                                                                        "expected autoCorr:  {1:f}\n"
-                                                                        "calculated autoCorr:{2:f}".format(i, expected[0,1],
-                                                                                                           calculated))
+                                                                      "expected autoCorr:  {1:f}\n"
+                                                                      "calculated autoCorr:{2:f}".format(i,
+                                                                                                         expected[0, 1],
+                                                                                                         calculated))
+
 
 if __name__ == '__main__':
     unittest.main()
-    

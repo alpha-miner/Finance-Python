@@ -199,16 +199,14 @@ class SecurityValueHolder(object):
             dummy_category = True
             total_index = list(range(len(data)))
         else:
-            total_index = data.index.tolist()
+            total_index = data.index
 
         if not name:
             name = 'transformed'
 
         total_category = data[category_field].tolist()
-
         matrix_values = data.as_matrix()
         columns = data.columns.tolist()
-
         split_category, split_values = to_dict(total_index, total_category, matrix_values, columns)
 
         output_values = np.zeros((len(data), 1))

@@ -20,7 +20,7 @@ def transform(data, expressions, cols, category_field=None):
         dummy_category = True
         total_index = list(range(len(data)))
     else:
-        total_index = data.index.tolist()
+        total_index = data.index
 
     total_category = data[category_field].tolist()
 

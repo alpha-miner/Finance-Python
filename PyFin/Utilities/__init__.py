@@ -31,28 +31,28 @@ def check_date(date):
         return Date.fromDateTime(date)
 
 
-def single_row(columns, values):
-    return {k: v for k, v in zip(columns, values)}
-
-
 def to_dict(total_index, total_category, matrix_values, columns):
+
+    index_diff_loc = np.where(np.diff(total_index))[0]
 
     splited_values = []
     splited_category = []
-    current_dict = {}
-    current_category = []
-    previous_index = total_index[0]
-    for i, row in enumerate(matrix_values):
-        key = total_category[i]
-        if not total_index[i] == previous_index:
-            splited_values.append(current_dict)
-            splited_category.append(current_category)
-            current_dict = {}
-            current_category = []
-        current_dict[key] = {k: v for k, v in zip(columns, row)}
-        current_category.append(key)
-        previous_index = total_index[i]
+
+    start = 0
+    for i, end in enumerate(index_diff_loc):
+        splited_category.append(total_category[start:end+1])
+        current_dict = {total_category[j]: {k: v for k, v in zip(columns, matrix_values[j])} for j in range(start, end+1)}
+        splited_values.append(current_dict)
+        start = end + 1
+
+    splited_category.append(total_category[start:])
+    current_dict = {total_category[j]: {k: v for k, v in zip(columns, matrix_values[j])} for j in
+                    range(start, len(total_category))}
     splited_values.append(current_dict)
-    splited_category.append(current_category)
 
     return splited_category, splited_values
+
+
+
+
+

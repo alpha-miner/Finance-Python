@@ -32,7 +32,7 @@ cdef class Deque:
         self.start = start
 
     @cython.boundscheck(False)
-    cpdef dump(self, value):
+    def dump(self, value):
         cdef int n
         n = self.start
 
@@ -51,16 +51,16 @@ cdef class Deque:
                 self.is_full = 1
         return popout
 
-    cpdef size(self):
+    def size(self):
         return len(self.con)
 
-    cpdef isFull(self):
+    def isFull(self):
         return self.is_full == 1
 
-    cpdef as_array(self):
+    def as_array(self):
         return np.array(self.as_list())
 
-    cpdef as_list(self):
+    def as_list(self):
         return [self.con[(self.start + item) % self.window] for item in range(len(self.con))]
 
     def __getitem__(self, item):

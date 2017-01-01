@@ -36,6 +36,7 @@ install:
   - conda install numpy
   - conda install scipy
   - conda install pandas
+  - conda install cython
   - pip install coveralls
 # command to run tests
 script:

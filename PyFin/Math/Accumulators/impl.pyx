@@ -8,6 +8,8 @@ Created on 2017-1-1
 import copy
 import numpy as np
 cimport numpy as np
+import cython
+
 
 cdef class Deque:
 
@@ -29,6 +31,7 @@ cdef class Deque:
             self.con = []
         self.start = start
 
+    @cython.boundscheck(False)
     cpdef dump(self, value):
         cdef int n
         n = self.start

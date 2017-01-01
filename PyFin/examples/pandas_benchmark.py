@@ -23,24 +23,24 @@ from PyFin.api import *
 # print("time elapsed: {0}s".format(dt.datetime.now() - start))
 
 
-n = 1000
-m = 1000
+n = 200
+m = 200
 
 df = pd.DataFrame(np.random.randn(n*m, 3), columns=['x', 'y', 'z'])
 df['c'] = list(range(n)) * m
 
 index = []
-for i in range(m):
+for i in pd.date_range(dt.datetime(1990, 1, 1), dt.datetime(1990, 1, 1) + dt.timedelta(days=m-1)):
     index += [i] * n
 
 df.index = index
 
-t = LAST('x') # / MA(30, 'y')
+t = MA(20, 'x') / MA(30, 'y')
 
 start = dt.datetime.now()
 res = t.transform(df, category_field='c')
-print("time elapsed: {0}s".format(dt.datetime.now() - start))
+print("Finance-Python (analysis): {0}s".format(dt.datetime.now() - start))
 
 start = dt.datetime.now()
 res = df.groupby('c').rolling(20).mean()['x'] / df.groupby('c').rolling(30).mean()['y']
-print("time elapsed: {0}s".format(dt.datetime.now() - start))
+print("Pandas (group by): {0}s".format(dt.datetime.now() - start))

@@ -137,5 +137,5 @@ if __name__ == '__main__':
     print(t.value)
     print(t._dependency)
 
-    for k, v in t.value.items():
+    for k, v in t.value.iteritems():
         print(k, v)

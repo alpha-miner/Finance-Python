@@ -12,6 +12,7 @@ from copy import deepcopy
 import math
 import sys
 import numpy as np
+import pandas as pd
 from PyFin.Utilities import pyFinAssert
 
 # get the correct attribute of div
@@ -60,6 +61,24 @@ class Accumulator(object):
         else:
             self._dependency.push(data)
             return self._dependency.result()
+
+    def transform(self, data, name=None):
+        data.sort_index()
+
+        if not name:
+            name = 'transformed'
+
+        matrix_values = data.as_matrix()
+        columns = data.columns.tolist()
+
+        output_values = np.zeros(len(data))
+
+        for i, row in enumerate(matrix_values):
+            self.push({k: v for k, v in zip(columns, row)})
+            output_values[i] = self.result()
+
+        df = pd.Series(output_values, index=data.index, name=name)
+        return df
 
     @abstractmethod
     def result(self):

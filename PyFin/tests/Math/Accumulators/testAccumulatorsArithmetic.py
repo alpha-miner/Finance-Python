@@ -9,6 +9,7 @@ import unittest
 import math
 from collections import deque
 import numpy as np
+import pandas as pd
 from scipy.stats import linregress
 from PyFin.Math.Accumulators.IAccumulators import Exp
 from PyFin.Math.Accumulators.IAccumulators import Log
@@ -856,3 +857,13 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
             self.assertAlmostEqual(calculated, expected, 12, "at index {0:d}\n"
                                                              "expected:   {1:f}\n"
                                                              "calculated: {2:f}".format(i, expected, calculated))
+
+    def testAccumulatorTransform(self):
+        window = 5
+        ma5 = MovingAverage(window, 'close')
+        df = pd.DataFrame(self.sampleClose, columns=['close'])
+        res = ma5.transform(df, name='my_factor')[window-1:]
+        expected = df.rolling(window).mean()[window - 1:]['close']
+
+        self.assertEqual(res.name, 'my_factor')
+        np.testing.assert_array_almost_equal(res, expected)

@@ -12,7 +12,7 @@ from PyFin.Analysis.SecurityValueHolders import SecurityValueHolder
 
 
 def transform(data, expressions, cols, category_field=None):
-    data = data.copy()
+    data = data.sort_index()
     dummy_category = False
     if not category_field:
         category_field = 'dummy'

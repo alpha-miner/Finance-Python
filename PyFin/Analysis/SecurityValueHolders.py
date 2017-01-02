@@ -191,7 +191,7 @@ class SecurityValueHolder(object):
             if f not in data:
                 raise ValueError('({0}) dependency is not in input data'.format(f))
 
-        data = data.copy()
+        data = data.sort_index()
         dummy_category = False
         if not category_field:
             category_field = 'dummy'

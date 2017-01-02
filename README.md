@@ -24,13 +24,15 @@
 ### 依赖
 
     coverage
+    cython
     enum34
     numpy
     pandas
     scipy
+    
+以及相关的c/c++编译器（例如Linux下的gcc，windows下的visual studio）
 
 ### 安装
-
 
 首先将代码保存至本地：
 
@@ -42,6 +44,17 @@
 安装之后，可以直先接运行测试：
 
     python setup.py test
+    
+### 开发环境
+
+在代码目录下，需要运行如下指令：
+
+    python setup.py build_ext --inplace
+    
+如果是windows环境，可能需要显式的指定需要的编译器，例如选用Visual Studio的c/c++编译器：
+
+    python setup.py build_ext --inplace --compiler=msvc
+
 
 ### 主要功能
 

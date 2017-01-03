@@ -284,7 +284,7 @@ cdef class Date(object):
 
 def check_date(date):
     if isinstance(date, str):
-        return Date.parseISO(date, dateFormat='%Y-%m-%d')
+        return Date.parseISO(date)
     else:
         return Date.fromDateTime(date)
 

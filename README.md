@@ -38,8 +38,21 @@
 
     git clone https://github.com/ChinaQuants/Finance-Python.git (如果你是从github获取)
     cd finance-Python
-    python setpy.py install
+    
+* *Linux*
 
+只需运行如下命令：
+
+    python setpy.py install
+    
+* *Windows*
+    
+需要修改项目根目录下``setup.cfg``文件，添加如下两行：
+
+    [build]
+    compiler=msvc
+
+然后再运行：``python setup.py install``
 
 安装之后，可以直先接运行测试：
 
@@ -47,13 +60,19 @@
     
 ### 开发环境
 
+* *Linux*
+
 在代码目录下，需要运行如下指令：
 
     python setup.py build_ext --inplace
     
-如果是windows环境，可能需要显式的指定需要的编译器，例如选用Visual Studio的c/c++编译器：
+* *Windows*
+    
+需要显式的指定编译器，例如选用Visual Studio的c/c++编译器：
 
     python setup.py build_ext --inplace --compiler=msvc
+    
+或者修改``setup.cfg``文件。
 
 
 ### 主要功能

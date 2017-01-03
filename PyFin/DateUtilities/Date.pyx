@@ -1,21 +1,91 @@
 # -*- coding: utf-8 -*-
+# distutils: language=c++
 u"""
-Created on 2015-7-9
+Created on 2017-1-3
 
 @author: cheng.li
 """
 
 import datetime as dt
-import math
+from libc.math cimport floor
 from PyFin.Enums.TimeUnits import TimeUnits
+from PyFin.Utilities import pyFinAssert
 from PyFin.DateUtilities.Period import Period
 from PyFin.Enums.Weekdays import Weekdays
-from PyFin.Utilities import pyFinAssert
+from libcpp cimport bool as bool_t
 
 
-class Date(object):
+cdef int _monthLength(int month, bool_t isLeap):
+    if isLeap:
+        return _MonthLeapLength[month - 1]
+    else:
+        return _MonthLength[month - 1]
+
+
+cdef int _monthOffset(int month, bool_t isLeap):
+    if isLeap:
+        return _MonthLeapOffset[month - 1]
+    else:
+        return _MonthOffset[month - 1]
+
+
+cdef _advance(date, n, units):
+
+    cdef int d
+    cdef int m
+    cdef int y
+    cdef int addedYear
+    cdef int monthLeft
+    cdef int length
+    cdef bool_t leapFlag
+
+    if units == TimeUnits.Days or units == TimeUnits.BDays:
+        return Date(serialNumber=date.__serialNumber__ + n)
+    elif units == TimeUnits.Weeks:
+        return Date(serialNumber=date.__serialNumber__ + 7 * n)
+    elif units == TimeUnits.Months:
+        d = date._day
+        m = date._month + n
+        y = date._year
+        addedYear = int(floor(m / 12))
+        monthLeft = m % 12
+        if monthLeft == 0:
+            monthLeft = 12
+            addedYear -= 1
+        y += addedYear
+        leapFlag = Date.isLeap(y)
+
+        if y <= 1900 or y >= 2200:
+            raise ValueError('year {0:d} is out of bound. It must be in [1901, 2199]'.format(y))
+
+        length = _MonthLeapLength[monthLeft - 1] if leapFlag else _MonthLength[monthLeft - 1]
+        if d > length:
+            d = length
+
+        return Date(y, monthLeft, d)
+    elif units == TimeUnits.Years:
+        d = date._day
+        m = date._month
+        y = date._year + n
+        leapFlag = Date.isLeap(y)
+
+        if y <= 1900 or y >= 2200:
+            raise ValueError('year {0:d} is out of bound. It must be in [1901, 2199]'.format(y))
+
+        if d == 29 and m == 2 and not leapFlag:
+            d = 28
+
+        return Date(y, m, d)
+
+
+cdef class Date(object):
+
+    cdef public int __serialNumber__
+    cdef public int _year
+    cdef public int _month
+    cdef public int _day
+
     def __init__(self, year=None, month=None, day=None, serialNumber=None):
-        # do the input validation
         if serialNumber is not None and year is None and month is None and day is None:
             self.__serialNumber__ = serialNumber
 
@@ -28,11 +98,11 @@ class Date(object):
             d = self.__serialNumber__ - _YearOffset[self._year - 1900]
             m = int(d / 30) + 1
             leap = self.isLeap(self._year)
-            while d <= self._monthOffset(m, leap):
+            while d <= _monthOffset(m, leap):
                 m -= 1
             self._month = m
 
-            self._day = d - self._monthOffset(self._month, leap)
+            self._day = d - _monthOffset(m, leap)
 
             return
         elif serialNumber is not None and (year is not None or month is not None or day is not None):
@@ -40,20 +110,7 @@ class Date(object):
         elif year is None or month is None or day is None:
             raise ValueError("year: {0}, month: {1}, day: {2} can't be null value included".format(year, month, day))
 
-        isLeap = self.isLeap(year)
-
-        pyFinAssert(1 <= month <= 12, ValueError, 'month {0:d} is out of bound. It must be in [1, 12]'.format(month))
-
-        length = self._monthLength(month, isLeap)
-        offset = self._monthOffset(month, isLeap)
-
-        pyFinAssert(1 <= day <= length, ValueError, 'day {0:d} is out of bound. It must be in [1, {1:d}]'
-                 .format(day, length))
-
-        self.__serialNumber__ = day + offset + _YearOffset[year - 1900]
-        self._day = day
-        self._month = month
-        self._year = year
+        self._calculate_date(year, month, day)
 
     def dayOfMonth(self):
         return self._day
@@ -68,6 +125,7 @@ class Date(object):
         return self._month
 
     def weekday(self):
+        cdef int w
         w = self.__serialNumber__ % 7
         return Weekdays(7 if w == 0 else w)
 
@@ -78,54 +136,56 @@ class Date(object):
     def serialNumber(self):
         return self.__serialNumber__
 
-    def __eq__(self, other):
-        return self.__serialNumber__ == other.__serialNumber__
-
-    def __ne__(self, other):
-        return not self.__eq__(other)
-
-    def __le__(self, other):
-        return self.__serialNumber__ <= other.__serialNumber__
-
-    def __lt__(self, other):
-        return self.__serialNumber__ < other.__serialNumber__
-
-    def __ge__(self, other):
-        return not self.__lt__(other)
-
-    def __gt__(self, other):
-        return not self.__le__(other)
+    def __richcmp__(Date self, Date other, int op):
+        if op == 0:
+            return self.__serialNumber__ < other.__serialNumber__
+        elif op == 1:
+            return self.__serialNumber__ <= other.__serialNumber__
+        elif op == 2:
+            return self.__serialNumber__ == other.__serialNumber__
+        elif op == 3:
+            return self.__serialNumber__ != other.__serialNumber__
+        elif op == 4:
+            return self.__serialNumber__ > other.__serialNumber__
+        elif op == 5:
+            return self.__serialNumber__ >= other.__serialNumber__
 
     def __add__(self, period):
         if isinstance(period, Period):
-            return Date._advance(self, period.length, period.units)
+            return _advance(self, period.length, period.units)
         elif isinstance(period, int):
-            return Date._advance(self, period, TimeUnits.Days)
+            return _advance(self, period, TimeUnits.Days)
         else:
             period = Period(period)
-            return Date._advance(self, period.length, period.units)
+            return _advance(self, period.length, period.units)
 
     def __sub__(self, period):
         if isinstance(period, Period):
-            return Date._advance(self, -period.length, period.units)
+            return _advance(self, -period.length, period.units)
         elif isinstance(period, int):
-            return Date._advance(self, -period, TimeUnits.Days)
+            return _advance(self, -period, TimeUnits.Days)
         elif isinstance(period, Date):
-            return self.__serialNumber__ - period.serialNumber
+            return self.__serialNumber__ - period.__serialNumber__
         else:
             period = Period(period)
-            return Date._advance(self, -period.length, period.units)
+            return _advance(self, -period.length, period.units)
 
     def __hash__(self):
         return self.__serialNumber__
 
     def __str__(self):
+        cdef int d
+        cdef int m
+        cdef int y
         d = self.dayOfMonth()
         m = self.month()
         y = self.year()
         return "{0:d}-{1:02d}-{2:02d}".format(y, m, d)
 
     def __repr__(self):
+        cdef int d
+        cdef int m
+        cdef int y
         d = self.dayOfMonth()
         m = self.month()
         y = self.year()
@@ -141,15 +201,19 @@ class Date(object):
 
     @staticmethod
     def endOfMonth(date):
+        cdef int m
+        cdef int y
         m = date.month()
         y = date.year()
-        return Date(y, m, Date._monthLength(m, Date.isLeap(y)))
+        return Date(y, m, _monthLength(m, Date.isLeap(y)))
 
     @staticmethod
     def isEndOfMonth(date):
+        cdef int m
+        cdef int y
         m = date.month()
         y = date.year()
-        return date.dayOfMonth() == Date._monthLength(m, Date.isLeap(y))
+        return date.dayOfMonth() == _monthLength(m, Date.isLeap(y))
 
     @staticmethod
     def nextWeekday(date, dayOfWeek):
@@ -161,6 +225,8 @@ class Date(object):
         pyFinAssert(nth > 0, ValueError, "zeroth day of week in a given (month, year) is undefined")
         pyFinAssert(nth < 6, ValueError, "no more than 5 weekday in a given (month, year)")
 
+        cdef int skip
+
         first = Date(y, m, 1).weekday()
         skip = nth - (1 if dayOfWeek >= first else 0)
         return Date(y, m, (1 + dayOfWeek + skip * 7) - first)
@@ -171,23 +237,8 @@ class Date(object):
         return cls(today.year, today.month, today.day)
 
     @staticmethod
-    def isLeap(year):
-        pyFinAssert(1900 < year < 2200, ValueError, 'year {0:d} is out of bound. It must be in [1901, 2199]'.format(year))
+    def isLeap( year):
         return _YearIsLeap[year - 1900]
-
-    @staticmethod
-    def _monthLength(month, isLeap):
-        if isLeap:
-            return _MonthLeapLength[month - 1]
-        else:
-            return _MonthLength[month - 1]
-
-    @staticmethod
-    def _monthOffset(month, isLeap):
-        if isLeap:
-            return _MonthLeapOffset[month - 1]
-        else:
-            return _MonthOffset[month - 1]
 
     @classmethod
     def fromExcelSerialNumber(cls, serialNumber):
@@ -209,47 +260,32 @@ class Date(object):
         return cls(pydt.year, pydt.month, pydt.day)
 
     @classmethod
-    def _advance(cls, date, n, units):
-        if units == TimeUnits.Days or units == TimeUnits.BDays:
-            return cls.fromExcelSerialNumber(date.__serialNumber__ + n)
-        elif units == TimeUnits.Weeks:
-            return cls.fromExcelSerialNumber(date.__serialNumber__ + 7 * n)
-        elif units == TimeUnits.Months:
-            d = date.dayOfMonth()
-            m = date.month() + n
-            y = date.year()
-            addedYear = int(math.floor(m / 12))
-            monthLeft = m % 12
-            if monthLeft == 0:
-                monthLeft = 12
-                addedYear -= 1
-            y += addedYear
-
-            pyFinAssert(1900 < y < 2200, ValueError, 'year {0:d} is out of bound. It must be in [1901, 2199]'.format(y))
-
-            length = _MonthLeapLength[monthLeft - 1] if Date.isLeap(y) else _MonthLength[monthLeft - 1]
-            if d > length:
-                d = length
-
-            return cls(y, monthLeft, d)
-        elif units == TimeUnits.Years:
-            d = date.dayOfMonth()
-            m = date.month()
-            y = date.year() + n
-
-            pyFinAssert(1900 < y < 2200, ValueError, 'year {0:d} is out of bound. It must be in [1901, 2199]'.format(y))
-
-            if d == 29 and m == 2 and not Date.isLeap(y):
-                d = 28
-
-            return cls(y, m, d)
-
-    @classmethod
     def westernStyle(cls, day, month, year):
         return cls(year, month, day)
 
+    def __deepcopy__(self, memo):
+        return Date(self._year, self._month, self._day)
 
-_YearIsLeap = [
+    cpdef _calculate_date(self, int year, int month, int day):
+        cdef int length
+        cdef int offset
+        cdef bool_t isLeap
+
+        isLeap = self.isLeap(year)
+
+        length = _monthLength(month, isLeap)
+        offset = _monthOffset(month, isLeap)
+
+        self.__serialNumber__ = day + offset + _YearOffset[year - 1900]
+        self._day = day
+        self._month = month
+        self._year = year
+
+
+cdef bool_t _YearIsLeap[301]
+cdef int _YearOffset[301]
+
+_YearIsLeap[:] = [
     # 1900 is leap in agreement with Excel's bug
     # 1900 is out of valid date range anyway
     # 1900-1909
@@ -316,7 +352,7 @@ _YearIsLeap = [
     False
 ]
 
-_YearOffset = [
+_YearOffset[:] = [
     # 1900-1909
     0, 366, 731, 1096, 1461, 1827, 2192, 2557, 2922, 3288,
     # 1910-1919
@@ -381,12 +417,17 @@ _YearOffset = [
     109574
 ]
 
-_MonthLength = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
-_MonthLeapLength = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+cdef int _MonthLength[12]
+cdef int _MonthLeapLength[12]
+cdef int _MonthOffset[13]
+cdef int _MonthLeapOffset[13]
 
-_MonthOffset = [0, 31, 59, 90, 120, 151,  # Jan - Jun
+_MonthLength[:] = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+_MonthLeapLength[:] = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+
+_MonthOffset[:] = [0, 31, 59, 90, 120, 151,  # Jan - Jun
                 181, 212, 243, 273, 304, 334,  # Jun - Dec
                 365]
-_MonthLeapOffset = [0, 31, 60, 91, 121, 152,  # Jan - Jun
+_MonthLeapOffset[:] = [0, 31, 60, 91, 121, 152,  # Jan - Jun
                     182, 213, 244, 274, 305, 335,  # Jun - Dec
                     366]

@@ -282,6 +282,13 @@ cdef class Date(object):
         self._year = year
 
 
+def check_date(date):
+    if isinstance(date, str):
+        return Date.parseISO(date, dateFormat='%Y-%m-%d')
+    else:
+        return Date.fromDateTime(date)
+
+
 cdef bool_t _YearIsLeap[301]
 cdef int _YearOffset[301]
 

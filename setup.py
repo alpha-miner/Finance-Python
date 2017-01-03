@@ -140,6 +140,7 @@ setup(
     cmdclass={"test": test,
               "version_build": version_build},
     ext_modules=cythonize(["PyFin/Math/Accumulators/impl.pyx",
-                           "PyFin/DateUtilities/Date.pyx"]),
+                           "PyFin/DateUtilities/Date.pyx",
+                           "PyFin/Utilities/Asserts.pyx"]),
     include_dirs=[np.get_include()]
 )

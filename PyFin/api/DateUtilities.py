@@ -10,7 +10,7 @@ from PyFin.DateUtilities import Calendar
 from PyFin.DateUtilities import Period
 from PyFin.DateUtilities import Schedule
 from PyFin.Enums import BizDayConventions
-from PyFin.Utilities import check_date
+from PyFin.DateUtilities import check_date
 
 
 def isBizDay(holidayCenter, ref):

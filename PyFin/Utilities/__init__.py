@@ -23,14 +23,6 @@ def print_timing(func):
     return wrapper
 
 
-def check_date(date):
-    from PyFin.DateUtilities import Date
-    if isinstance(date, str):
-        return Date.strptime(date, dateFormat='%Y-%m-%d')
-    else:
-        return Date.fromDateTime(date)
-
-
 def to_dict(total_index, total_category, matrix_values, columns):
 
     index_diff_loc = np.where(np.diff(total_index))[0]

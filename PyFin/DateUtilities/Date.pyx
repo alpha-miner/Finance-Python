@@ -266,6 +266,19 @@ cdef class Date(object):
     def __deepcopy__(self, memo):
         return Date(self._year, self._month, self._day)
 
+    def __getstate__(self):
+        return (self.__serialNumber__,
+                self._year,
+                self._month,
+                self._day)
+
+    def __setstate__(self, state):
+        serialNumber, year, month, day = state
+        self.__serialNumber__ = serialNumber
+        self._year = year
+        self._month = month
+        self._day = day
+
     cpdef _calculate_date(self, int year, int month, int day):
         cdef int length
         cdef int offset

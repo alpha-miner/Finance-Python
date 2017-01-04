@@ -6,6 +6,10 @@ Created on 2015-7-13
 """
 
 import unittest
+import copy
+import tempfile
+import pickle
+import os
 import datetime as dt
 from PyFin.DateUtilities import Date
 from PyFin.DateUtilities import Period
@@ -284,3 +288,24 @@ class TestDate(unittest.TestCase):
         self.assertTrue(flag, "date parsing failed\n"
                               " input date:    {0:s}\n"
                               " parsed:        {1}".format(input_date, d))
+
+    def testDateDeepCopy(self):
+        benchmark_date = Date(2016, 1, 2)
+        copied_date = copy.deepcopy(benchmark_date)
+
+        self.assertEqual(benchmark_date, copied_date)
+
+    def testDatePickle(self):
+        benchmark_date = Date(2016, 1, 2)
+
+        f = tempfile.NamedTemporaryFile('w+b', delete=False)
+        pickle.dump(benchmark_date, f)
+        f.close()
+
+        with open(f.name, 'rb') as f2:
+            pickled_date = pickle.load(f2)
+            self.assertEqual(benchmark_date, pickled_date)
+
+        os.unlink(f.name)
+
+

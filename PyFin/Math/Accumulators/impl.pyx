@@ -13,10 +13,10 @@ import cython
 
 cdef class Deque:
 
-    cdef int window
-    cdef int is_full
-    cdef list con
-    cdef int start
+    cdef public int window
+    cdef public int is_full
+    cdef public list con
+    cdef public int start
 
     def __init__(self,
                  int window,
@@ -71,3 +71,28 @@ cdef class Deque:
                      self.is_full,
                      self.con,
                      self.start)
+
+    def __getstate__(self):
+        return (self.window,
+                self.is_full,
+                self.con,
+                self.start)
+
+    def __richcmp__(Deque self, Deque other, int op):
+        if op == 2:
+            return self.window == other.window \
+                   and self.is_full == other.is_full \
+                   and self.con == other.con \
+                   and self.start == other.start
+        elif op == 3:
+            return self.window != other.window \
+                   or self.is_full != other.is_full \
+                   or self.con != other.con \
+                   or self.start != other.start
+
+    def __setstate__(self, state):
+        window, is_full, con, start = state
+        self.window = window
+        self.is_full = is_full
+        self.con = con
+        self.start = start

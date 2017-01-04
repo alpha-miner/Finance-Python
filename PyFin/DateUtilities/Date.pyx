@@ -14,13 +14,11 @@ from PyFin.DateUtilities.Period import Period
 from PyFin.Enums.Weekdays import Weekdays
 from libcpp cimport bool as bool_t
 
-
 cdef int _monthLength(int month, bool_t isLeap):
     if isLeap:
         return _MonthLeapLength[month - 1]
     else:
         return _MonthLength[month - 1]
-
 
 cdef int _monthOffset(int month, bool_t isLeap):
     if isLeap:
@@ -28,9 +26,7 @@ cdef int _monthOffset(int month, bool_t isLeap):
     else:
         return _MonthOffset[month - 1]
 
-
 cdef _advance(date, n, units):
-
     cdef int d
     cdef int m
     cdef int y
@@ -77,9 +73,7 @@ cdef _advance(date, n, units):
 
         return Date(y, m, d)
 
-
 cdef class Date(object):
-
     cdef public int __serialNumber__
     cdef public int _year
     cdef public int _month
@@ -237,7 +231,7 @@ cdef class Date(object):
         return cls(today.year, today.month, today.day)
 
     @staticmethod
-    def isLeap( year):
+    def isLeap(year):
         return _YearIsLeap[year - 1900]
 
     @classmethod
@@ -251,7 +245,7 @@ cdef class Date(object):
     @classmethod
     def parseISO(cls, dateStr):
         pyFinAssert(len(dateStr) == 10 and dateStr[4] == '-' and dateStr[7] == '-', ValueError,
-                 "invalid format {0}".format(dateStr))
+                    "invalid format {0}".format(dateStr))
         return cls(int(dateStr[0:4]), int(dateStr[5:7]), int(dateStr[8:10]))
 
     @classmethod
@@ -266,18 +260,21 @@ cdef class Date(object):
     def __deepcopy__(self, memo):
         return Date(self._year, self._month, self._day)
 
-    def __getstate__(self):
-        return (self.__serialNumber__,
-                self._year,
-                self._month,
-                self._day)
+    def __reduce__(self):
+        d = {
+                'serialNumber': self.__serialNumber__,
+                'year': self._year,
+                'month': self._month,
+                'day': self._day,
+            }
+
+        return Date, (2000, 1, 1), d
 
     def __setstate__(self, state):
-        serialNumber, year, month, day = state
-        self.__serialNumber__ = serialNumber
-        self._year = year
-        self._month = month
-        self._day = day
+        self.__serialNumber__ = state['serialNumber']
+        self._year = state['year']
+        self._month = state['month']
+        self._day = state['day']
 
     cpdef _calculate_date(self, int year, int month, int day):
         cdef int length
@@ -294,13 +291,11 @@ cdef class Date(object):
         self._month = month
         self._year = year
 
-
 def check_date(date):
     if isinstance(date, str):
         return Date.parseISO(date)
     else:
         return Date.fromDateTime(date)
-
 
 cdef bool_t _YearIsLeap[301]
 cdef int _YearOffset[301]
@@ -446,8 +441,8 @@ _MonthLength[:] = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
 _MonthLeapLength[:] = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
 
 _MonthOffset[:] = [0, 31, 59, 90, 120, 151,  # Jan - Jun
-                181, 212, 243, 273, 304, 334,  # Jun - Dec
-                365]
+                   181, 212, 243, 273, 304, 334,  # Jun - Dec
+                   365]
 _MonthLeapOffset[:] = [0, 31, 60, 91, 121, 152,  # Jan - Jun
-                    182, 213, 244, 274, 305, 335,  # Jun - Dec
-                    366]
+                       182, 213, 244, 274, 305, 335,  # Jun - Dec
+                       366]

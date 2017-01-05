@@ -18,6 +18,7 @@ from PyFin.Math.Accumulators.IAccumulators import Asin
 from PyFin.Math.Accumulators.IAccumulators import Asinh
 
 from PyFin.Math.Accumulators.StatelessAccumulators import Latest
+from PyFin.Math.Accumulators.StatelessAccumulators import Sign
 from PyFin.Math.Accumulators.StatelessAccumulators import Diff
 from PyFin.Math.Accumulators.StatelessAccumulators import SimpleReturn
 from PyFin.Math.Accumulators.StatelessAccumulators import LogReturn
@@ -90,6 +91,7 @@ __all__ = ["Exp",
            "Asin",
            "Asinh",
            "Latest",
+           "Sign",
            "Diff",
            "SimpleReturn",
            "LogReturn",

@@ -7,6 +7,7 @@ Created on 2015-10-22
 
 import copy
 from PyFin.Analysis.SecurityValueHolders import SecurityValueHolder
+from PyFin.Math.Accumulators import Sign
 from PyFin.Math.Accumulators import XAverage
 from PyFin.Math.Accumulators import MACD
 from PyFin.Math.Accumulators import Exp
@@ -48,6 +49,12 @@ class SecurityMACDValueHolder(SecurityStatelessSingleValueHolder):
                                                       dependency=dependency,
                                                       short=short,
                                                       long=long)
+
+
+class SecuritySignValueHolder(SecurityStatelessSingleValueHolder):
+    def __init__(self, dependency='x'):
+        super(SecuritySignValueHolder, self).__init__(holderType=Sign,
+                                                      dependency=dependency)
 
 
 class SecurityExpValueHolder(SecurityStatelessSingleValueHolder):

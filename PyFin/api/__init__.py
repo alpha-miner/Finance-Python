@@ -17,6 +17,7 @@ from PyFin.api.DateUtilities import nthWeekDay
 from PyFin.api.DateUtilities import makeSchedule
 
 from PyFin.Analysis import transform
+from PyFin.api.Analysis import SIGN
 from PyFin.api.Analysis import EMA
 from PyFin.api.Analysis import MACD
 from PyFin.api.Analysis import RSI
@@ -59,6 +60,7 @@ __all__ = ["datesList",
            "nthWeekDay",
            "makeSchedule",
            "transform",
+           "SIGN",
            "EMA",
            "MACD",
            "RSI",

@@ -7,6 +7,7 @@ Created on 2016-1-13
 
 import unittest
 import numpy as np
+from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import SecuritySignValueHolder
 from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import SecurityXAverageValueHolder
 from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import SecurityMACDValueHolder
 
@@ -23,6 +24,24 @@ class TestStatelessTechnicalAnalysis(unittest.TestCase):
         ibmOpen = np.random.randn(1000)
         self.ibm = {'close': ibmClose, 'open': ibmOpen}
         self.dataSet = {'aapl': self.aapl, 'ibm': self.ibm}
+
+    def testSecuritySignValueHolder(self):
+        sign = SecuritySignValueHolder(['close'])
+
+        expected = {}
+        for i in range(len(self.aapl['close'])):
+            data = {'aapl': {'close': self.aapl['close'][i], 'open': self.aapl['open'][i]}}
+            data['ibm'] = {'close': self.ibm['close'][i], 'open': self.ibm['open'][i]}
+            sign.push(data)
+
+            value = sign.value
+            for name in value.index:
+                expected[name] = np.sign(self.dataSet[name]['close'][i])
+                calculated = value[name]
+                self.assertAlmostEqual(expected[name], calculated, 12, 'at index {0}\n'
+                                                                       'expected:   {1:.12f}\n'
+                                                                       'calculated: {2:.12f}'
+                                       .format(i, expected[name], calculated))
 
     def testSecurityXAverageValueHolder(self):
         window = 10

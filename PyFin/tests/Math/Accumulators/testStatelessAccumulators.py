@@ -8,6 +8,7 @@ Created on 2015-7-29
 import unittest
 import math
 import numpy as np
+from PyFin.Math.Accumulators.StatelessAccumulators import Sign
 from PyFin.Math.Accumulators.StatelessAccumulators import Average
 from PyFin.Math.Accumulators.StatelessAccumulators import XAverage
 from PyFin.Math.Accumulators.StatelessAccumulators import Max
@@ -45,8 +46,22 @@ class TestStatelessAccumulators(unittest.TestCase):
             self.assertAlmostEqual(expected, calculated, 10, "at index {0:d}\n"
                                                              "expected average:   {1:f}\n"
                                                              "calculated average: {2:f}".format(i,
-                                                                                                  expected,
-                                                                                                  calculated))
+                                                                                                expected,
+                                                                                                calculated))
+
+    def testSign(self):
+        sign = Sign(dependency='close')
+
+        for i, value in enumerate(self.samplesClose):
+            sign.push(dict(close=value))
+            expected = np.sign(self.samplesClose[i])
+
+            calculated = sign.result()
+            self.assertAlmostEqual(expected, calculated, 10, "at index {0:d}\n"
+                                                             "expected average:   {1:f}\n"
+                                                             "calculated average: {2:f}".format(i,
+                                                                                                expected,
+                                                                                                calculated))
 
     def testXAverage(self):
         xaverage = XAverage(window=5, dependency='close')
@@ -217,7 +232,7 @@ class TestStatelessAccumulators(unittest.TestCase):
             self.assertAlmostEqual(expected, calculated, 10, "at index {0:d}\n"
                                                              "expected moment:   {1:f}\n"
                                                              "calculated moment: {2:f}".format(i, expected,
-                                                                                                  calculated))
+                                                                                               calculated))
         order = 2
         moment = CenterMoment(order, dependency='close')
         tmp_list = []
@@ -229,7 +244,7 @@ class TestStatelessAccumulators(unittest.TestCase):
             self.assertAlmostEqual(expected, calculated, 10, "at index {0:d}\n"
                                                              "expected moment:   {1:f}\n"
                                                              "calculated moment: {2:f}".format(i, expected,
-                                                                                                calculated))
+                                                                                               calculated))
         order = 3
         moment = CenterMoment(order, dependency='close')
         tmp_list = []
@@ -241,8 +256,7 @@ class TestStatelessAccumulators(unittest.TestCase):
             self.assertAlmostEqual(expected, calculated, 10, "at index {0:d}\n"
                                                              "expected moment:   {1:f}\n"
                                                              "calculated moment: {2:f}".format(i, expected,
-                                                                                                calculated))
-
+                                                                                               calculated))
 
     def testSkewness(self):
         skewness = Skewness(dependency='close')
@@ -258,10 +272,9 @@ class TestStatelessAccumulators(unittest.TestCase):
             if i >= 1:
                 expected = this_moment3 / np.power(np.std(close_list), 3)
                 self.assertAlmostEqual(expected, calculated, 10, "at index {0:d}\n"
-                                                                    "expected skewness:   {1:f}\n"
-                                                                    "calculated skewness: {2:f}".format(i, expected,
-                                                                                                        calculated))
-
+                                                                 "expected skewness:   {1:f}\n"
+                                                                 "calculated skewness: {2:f}".format(i, expected,
+                                                                                                     calculated))
 
     def testKurtosis(self):
         kurtosis = Kurtosis(dependency='close')
@@ -277,9 +290,9 @@ class TestStatelessAccumulators(unittest.TestCase):
             if i >= 1:
                 expected = this_moment4 / np.power(np.std(close_list), 4)
                 self.assertAlmostEqual(expected, calculated, 10, "at index {0:d}\n"
-                                                                    "expected skewness:   {1:f}\n"
-                                                                    "calculated skewness: {2:f}".format(i, expected,
-                                                                                                        calculated))
+                                                                 "expected skewness:   {1:f}\n"
+                                                                 "calculated skewness: {2:f}".format(i, expected,
+                                                                                                     calculated))
 
     def testRank(self):
         rank = Rank(dependency='close')
@@ -293,8 +306,7 @@ class TestStatelessAccumulators(unittest.TestCase):
             self.assertListEqual(list(expected), calculated, "at index {0:d}\n"
                                                              "expected rank:   {1}\n"
                                                              "calculated rank: {2}".format(i, expected,
-                                                                                             calculated))
-
+                                                                                           calculated))
 
     def testLevelList(self):
         levelList = LevelList(dependency='close')
@@ -310,9 +322,8 @@ class TestStatelessAccumulators(unittest.TestCase):
                 expected.append(value / first_value)
             calculated = levelList.result()
             self.assertListEqual(expected, calculated, "at index {0}\n"
-                                                        "expected levelList:  {1}\n"
-                                                        "calculated levelList:{2}".format(i, expected, calculated))
-
+                                                       "expected levelList:  {1}\n"
+                                                       "calculated levelList:{2}".format(i, expected, calculated))
 
     def testLevelValue(self):
         levelValue = LevelValue(dependency='close')
@@ -326,9 +337,9 @@ class TestStatelessAccumulators(unittest.TestCase):
                 expected = value / first_value
             calculated = levelValue.result()
             self.assertAlmostEqual(expected, calculated, 10, "at index of {0:d}\n"
-                                                            "expected levelValue:  {1:f}\n"
-                                                            "calculated levelValue:{2:f}".format(i, expected, calculated))
-
+                                                             "expected levelValue:  {1:f}\n"
+                                                             "calculated levelValue:{2:f}".format(i, expected,
+                                                                                                  calculated))
 
     def testAutoCorrelation(self):
         lags = 2
@@ -344,9 +355,11 @@ class TestStatelessAccumulators(unittest.TestCase):
                 expected = np.cov(con_forward, con_backward) / (np.std(con_forward) * np.std(con_backward))
                 calculated = autoCorr.result()
                 self.assertAlmostEqual(expected[0, 1], calculated, 10, "at index of {0:d}\n"
-                                                                "expected autoCorr:   {1:f}\n"
-                                                                "calculated autoCorr: {2:f}".format(i, expected[0, 1],
-                                                                                                    calculated))
+                                                                       "expected autoCorr:   {1:f}\n"
+                                                                       "calculated autoCorr: {2:f}".format(i, expected[
+                    0, 1],
+                                                                                                           calculated))
+
 
 if __name__ == '__main__':
     unittest.main()

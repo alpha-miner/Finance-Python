@@ -55,6 +55,29 @@ class Latest(StatelessSingleValueAccumulator):
         return self._latest
 
 
+class Sign(StatelessSingleValueAccumulator):
+    def __init__(self, dependency='x'):
+        super(Sign, self).__init__(dependency)
+        _checkParameterList(dependency)
+        self._returnSize = 1
+        self._sign = np.nan
+
+    def push(self, data):
+        value = self._push(data)
+        if math.isnan(value):
+            return np.nan
+        self._isFull = 1
+        if value > 0.:
+            self._sign = 1.
+        elif value < 0.:
+            self._sign = -1.
+        else:
+            self._sign = 0.
+
+    def result(self):
+        return self._sign
+
+
 class Diff(StatelessSingleValueAccumulator):
     def __init__(self, dependency='x'):
         super(Diff, self).__init__(dependency)

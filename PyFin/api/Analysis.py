@@ -16,6 +16,7 @@ from PyFin.Analysis.TechnicalAnalysis import SecurityMovingCountedPositive
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingPositiveAverage
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingRSI
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingHistoricalWindow
+from PyFin.Analysis.TechnicalAnalysis import SecuritySignValueHolder
 from PyFin.Analysis.TechnicalAnalysis import SecurityXAverageValueHolder
 from PyFin.Analysis.TechnicalAnalysis import SecurityMACDValueHolder
 from PyFin.Analysis.TechnicalAnalysis import SecuritySqrtValueHolder
@@ -39,6 +40,10 @@ from PyFin.Analysis.SecurityValueHolders import RankedSecurityValueHolder
 
 def CSRank(dependency):
     return RankedSecurityValueHolder(dependency)
+
+
+def SIGN(dependency='x'):
+    return SecuritySignValueHolder(dependency)
 
 
 def EMA(window, dependency='x'):

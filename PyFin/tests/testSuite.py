@@ -34,6 +34,8 @@ def test():
     suite.addTests(tests)
     tests = unittest.TestLoader().loadTestsFromTestCase(Analysis.TestTransformer)
     suite.addTest(tests)
+    tests = unittest.TestLoader().loadTestsFromTestCase(Analysis.TechnicalAnalysis.TestStatelessTechnicalAnalysis)
+    suite.addTests(tests)
     tests = unittest.TestLoader().loadTestsFromTestCase(Analysis.TechnicalAnalysis.TestStatefulTechnicalAnalysis)
     suite.addTests(tests)
     tests = unittest.TestLoader().loadTestsFromTestCase(DateUtilities.TestCalendar)

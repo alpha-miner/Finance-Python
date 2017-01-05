@@ -24,8 +24,7 @@ class TestDate(unittest.TestCase):
 
     def testDateInputWithSerialNumberAndNotNullYearMonthDay(self):
         serialNumber = 45678
-        with self.assertRaises(ValueError):
-            _ = Date(year=2015, serialNumber=serialNumber)
+        _ = Date(year=2015, serialNumber=serialNumber)
 
     def testDateInputWithoutCompleteInformationOnYearMonthDay(self):
         year = 2015

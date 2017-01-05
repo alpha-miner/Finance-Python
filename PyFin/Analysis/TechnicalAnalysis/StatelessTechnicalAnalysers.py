@@ -70,9 +70,10 @@ class SecurityLogValueHolder(SecurityStatelessSingleValueHolder):
 
 
 class SecurityPowValueHolder(SecurityStatelessSingleValueHolder):
-    def __init__(self, dependency='x'):
+    def __init__(self, dependency='x', n=1):
         super(SecurityPowValueHolder, self).__init__(holderType=Pow,
-                                                     dependency=dependency)
+                                                     dependency=dependency,
+                                                     n=n)
 
 
 class SecuritySqrtValueHolder(SecurityStatelessSingleValueHolder):

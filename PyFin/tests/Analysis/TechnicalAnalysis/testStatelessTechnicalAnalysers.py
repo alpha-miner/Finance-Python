@@ -6,9 +6,15 @@ Created on 2016-1-13
 """
 
 import unittest
+import math
 import numpy as np
 from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import SecuritySignValueHolder
 from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import SecurityXAverageValueHolder
+from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import SecurityExpValueHolder
+from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import SecurityLogValueHolder
+from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import SecurityPowValueHolder
+from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import SecuritySqrtValueHolder
+from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import SecurityAbsValueHolder
 from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import SecurityMACDValueHolder
 
 
@@ -30,8 +36,10 @@ class TestStatelessTechnicalAnalysis(unittest.TestCase):
 
         expected = {}
         for i in range(len(self.aapl['close'])):
-            data = {'aapl': {'close': self.aapl['close'][i], 'open': self.aapl['open'][i]}}
-            data['ibm'] = {'close': self.ibm['close'][i], 'open': self.ibm['open'][i]}
+            data = dict(aapl=dict(close=self.aapl['close'][i],
+                                  open=self.aapl['open'][i]),
+                        ibm=dict(close=self.ibm['close'][i],
+                                 open=self.ibm['open'][i]))
             sign.push(data)
 
             value = sign.value
@@ -50,8 +58,10 @@ class TestStatelessTechnicalAnalysis(unittest.TestCase):
 
         expected = {}
         for i in range(len(self.aapl['close'])):
-            data = {'aapl': {'close': self.aapl['close'][i], 'open': self.aapl['open'][i]}}
-            data['ibm'] = {'close': self.ibm['close'][i], 'open': self.ibm['open'][i]}
+            data = dict(aapl=dict(close=self.aapl['close'][i],
+                                  open=self.aapl['open'][i]),
+                        ibm=dict(close=self.ibm['close'][i],
+                                 open=self.ibm['open'][i]))
             xav.push(data)
 
             value = xav.value
@@ -66,6 +76,108 @@ class TestStatelessTechnicalAnalysis(unittest.TestCase):
                                                                        'calculated: {2:.12f}'
                                        .format(i, expected[name], calculated))
 
+    def testSecurityExpValueHolder(self):
+        exp = SecurityExpValueHolder(['close'])
+
+        expected = {}
+        for i in range(len(self.aapl['close'])):
+            data = dict(aapl=dict(close=self.aapl['close'][i],
+                                  open=self.aapl['open'][i]),
+                        ibm=dict(close=self.ibm['close'][i],
+                                 open=self.ibm['open'][i]))
+            exp.push(data)
+
+            value = exp.value
+            for name in value.index:
+                expected[name] = np.exp(self.dataSet[name]['close'][i])
+                calculated = value[name]
+                self.assertAlmostEqual(expected[name], calculated, 12, 'at index {0}\n'
+                                                                       'expected:   {1:.12f}\n'
+                                                                       'calculated: {2:.12f}'
+                                       .format(i, expected[name], calculated))
+
+    def testSecurityLogValueHolder(self):
+        logExp = SecurityLogValueHolder(SecurityExpValueHolder(['close']))
+
+        expected = {}
+        for i in range(len(self.aapl['close'])):
+            data = dict(aapl=dict(close=self.aapl['close'][i],
+                                  open=self.aapl['open'][i]),
+                        ibm=dict(close=self.ibm['close'][i],
+                                 open=self.ibm['open'][i]))
+            logExp.push(data)
+
+            value = logExp.value
+            for name in value.index:
+                expected[name] = self.dataSet[name]['close'][i]
+                calculated = value[name]
+                self.assertAlmostEqual(expected[name], calculated, 12, 'at index {0}\n'
+                                                                       'expected:   {1:.12f}\n'
+                                                                       'calculated: {2:.12f}'
+                                       .format(i, expected[name], calculated))
+
+    def testSecurityPowValueHolder(self):
+        n = 2
+        pow = SecurityPowValueHolder('close', n)
+
+        expected = {}
+        for i in range(len(self.aapl['close'])):
+            data = dict(aapl=dict(close=self.aapl['close'][i],
+                                  open=self.aapl['open'][i]),
+                        ibm=dict(close=self.ibm['close'][i],
+                                 open=self.ibm['open'][i]))
+            pow.push(data)
+
+            value = pow.value
+            for name in value.index:
+                expected[name] = math.pow(self.dataSet[name]['close'][i], n)
+                calculated = value[name]
+                self.assertAlmostEqual(expected[name], calculated, 12, 'at index {0}\n'
+                                                                       'expected:   {1:.12f}\n'
+                                                                       'calculated: {2:.12f}'
+                                       .format(i, expected[name], calculated))
+
+    def testSecuritySqrtValueHolder(self):
+        n = 2
+        sqrtPow = SecuritySqrtValueHolder(SecurityPowValueHolder('close', n))
+
+        expected = {}
+        for i in range(len(self.aapl['close'])):
+            data = dict(aapl=dict(close=self.aapl['close'][i],
+                                  open=self.aapl['open'][i]),
+                        ibm=dict(close=self.ibm['close'][i],
+                                 open=self.ibm['open'][i]))
+            sqrtPow.push(data)
+
+            value = sqrtPow.value
+            for name in value.index:
+                expected[name] = math.sqrt(math.pow(self.dataSet[name]['close'][i], n))
+                calculated = value[name]
+                self.assertAlmostEqual(expected[name], calculated, 12, 'at index {0}\n'
+                                                                       'expected:   {1:.12f}\n'
+                                                                       'calculated: {2:.12f}'
+                                       .format(i, expected[name], calculated))
+
+    def testSecurityAbsValueHolder(self):
+        absHolder = SecurityAbsValueHolder(['close'])
+
+        expected = {}
+        for i in range(len(self.aapl['close'])):
+            data = dict(aapl=dict(close=self.aapl['close'][i],
+                                  open=self.aapl['open'][i]),
+                        ibm=dict(close=self.ibm['close'][i],
+                                 open=self.ibm['open'][i]))
+            absHolder.push(data)
+
+            value = absHolder.value
+            for name in value.index:
+                expected[name] = abs(self.dataSet[name]['close'][i])
+                calculated = value[name]
+                self.assertAlmostEqual(expected[name], calculated, 12, 'at index {0}\n'
+                                                                       'expected:   {1:.12f}\n'
+                                                                       'calculated: {2:.12f}'
+                                       .format(i, expected[name], calculated))
+
     def testSecurityMACDValueHolder(self):
         short = 5
         long = 10
@@ -74,13 +186,10 @@ class TestStatelessTechnicalAnalysis(unittest.TestCase):
         long_average = SecurityXAverageValueHolder(long, ['close'])
 
         for i in range(len(self.aapl['close'])):
-            data = {'aapl':
-                {
-                    'close': self.aapl['close'][i],
-                    'open': self.aapl['open'][i]
-                }
-            }
-            data['ibm'] = {'close': self.ibm['close'][i], 'open': self.ibm['open'][i]}
+            data = dict(aapl=dict(close=self.aapl['close'][i],
+                                  open=self.aapl['open'][i]),
+                        ibm=dict(close=self.ibm['close'][i],
+                                 open=self.ibm['open'][i]))
             macd.push(data)
             short_average.push(data)
             long_average.push(data)

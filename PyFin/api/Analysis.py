@@ -118,8 +118,8 @@ def LOG(dependency):
     return SecurityLogValueHolder(dependency)
 
 
-def POW(dependency):
-    return SecurityPowValueHolder(dependency)
+def POW(dependency, n):
+    return SecurityPowValueHolder(dependency, n)
 
 
 def ABS(dependency):

@@ -80,7 +80,7 @@ cdef class Date(object):
     cdef public int _day
 
     def __init__(self, year=None, month=None, day=None, serialNumber=None):
-        if serialNumber is not None and year is None and month is None and day is None:
+        if serialNumber:
             self.__serialNumber__ = serialNumber
 
             y = (int(self.__serialNumber__ / 365)) + 1900
@@ -146,23 +146,23 @@ cdef class Date(object):
 
     def __add__(self, period):
         if isinstance(period, Period):
-            return _advance(self, period.length, period.units)
+            return _advance(self, period._length, period._units)
         elif isinstance(period, int):
             return _advance(self, period, TimeUnits.Days)
         else:
             period = Period(period)
-            return _advance(self, period.length, period.units)
+            return _advance(self, period._length, period._units)
 
     def __sub__(self, period):
         if isinstance(period, Period):
-            return _advance(self, -period.length, period.units)
+            return _advance(self, -period._length, period._units)
         elif isinstance(period, int):
             return _advance(self, -period, TimeUnits.Days)
         elif isinstance(period, Date):
             return self.__serialNumber__ - period.__serialNumber__
         else:
             period = Period(period)
-            return _advance(self, -period.length, period.units)
+            return _advance(self, -period._length, period._units)
 
     def __hash__(self):
         return self.__serialNumber__

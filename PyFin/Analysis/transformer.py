@@ -41,7 +41,7 @@ def transform(data, expressions, cols, category_field=None):
                 for j, dict_data in enumerate(split_values):
                     exp.push(dict_data)
                     end_count = start_count + len(dict_data)
-                    output_values[start_count:end_count, i] = exp.value[split_category[j]]
+                    output_values[start_count:end_count, i] = exp.value_by_names(split_category[j])
                     start_count = end_count
             else:
                 for j, dict_data in enumerate(split_values):

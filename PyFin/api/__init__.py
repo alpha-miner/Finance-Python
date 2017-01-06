@@ -37,7 +37,6 @@ from PyFin.api.Analysis import SQRT
 from PyFin.api.Analysis import DIFF
 from PyFin.api.Analysis import RETURNSimple
 from PyFin.api.Analysis import RETURNLog
-from PyFin.api.Analysis import CSRank
 from PyFin.api.Analysis import EXP
 from PyFin.api.Analysis import LOG
 from PyFin.api.Analysis import POW
@@ -47,6 +46,10 @@ from PyFin.api.Analysis import ACOSH
 from PyFin.api.Analysis import ASIN
 from PyFin.api.Analysis import ASINH
 from PyFin.api.Analysis import SHIFT
+
+from PyFin.api.Analysis import CSRank
+from PyFin.api.Analysis import CSMean
+from PyFin.api.Analysis import CSMeanAdjusted
 
 
 __all__ = ["datesList",
@@ -80,7 +83,6 @@ __all__ = ["datesList",
            "DIFF",
            "RETURNSimple",
            "RETURNLog",
-           "CSRank",
            "EXP",
            "LOG",
            "POW",
@@ -89,4 +91,7 @@ __all__ = ["datesList",
            "ACOSH",
            "ASIN",
            "ASINH",
-           "SHIFT"]
+           "SHIFT",
+           "CSRank",
+           "CSMean",
+           "CSMeanAdjusted"]

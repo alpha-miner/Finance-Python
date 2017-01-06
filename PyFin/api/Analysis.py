@@ -35,11 +35,21 @@ from PyFin.Analysis.SecurityValueHolders import SecurityShiftedValueHolder
 from PyFin.Analysis.SecurityValueHolders import SecurityLatestValueHolder
 
 
-from PyFin.Analysis.SecurityValueHolders import RankedSecurityValueHolder
+from PyFin.Analysis.CrossSectionValueHolders import CSRankedSecurityValueHolder
+from PyFin.Analysis.CrossSectionValueHolders import CSAverageSecurityValueHolder
+from PyFin.Analysis.CrossSectionValueHolders import CSAverageAdjustedSecurityValueHolder
 
 
 def CSRank(dependency):
-    return RankedSecurityValueHolder(dependency)
+    return CSRankedSecurityValueHolder(dependency)
+
+
+def CSMean(dependency):
+    return CSAverageSecurityValueHolder(dependency)
+
+
+def CSMeanAdjusted(dependency):
+    return CSAverageAdjustedSecurityValueHolder(dependency)
 
 
 def SIGN(dependency='x'):

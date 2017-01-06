@@ -234,52 +234,6 @@ class SecurityValueHolder(object):
             return df
 
 
-class RankedSecurityValueHolder(SecurityValueHolder):
-
-    def __init__(self, innerValue):
-        if isinstance(innerValue, SecurityValueHolder):
-            self._inner = copy.deepcopy(innerValue)
-        else:
-            # TODO: make the rank value holder workable for a symbol
-            raise ValueError("Currently only value holder input is allowed for rank holder.")
-        self._window = self._inner.window
-        self._returnSize = self._inner.valueSize
-        self._dependency = copy.deepcopy(self._inner._dependency)
-        self.updated = False
-        self.cached = pd.Series()
-
-    @property
-    def symbolList(self):
-        return self._inner.symbolList
-
-    @property
-    def value(self):
-        if self.updated:
-            return self.cached
-        else:
-            raw_values = self._inner.value
-            self.cached = raw_values.rank(ascending=False)
-            self.updated = True
-            return self.cached
-
-    def value_by_name(self, name):
-        if self.updated:
-            return self.cached[name]
-        else:
-            raw_values = self._inner.value
-            self.cached = raw_values.rank(ascending=False)
-            self.updated = True
-            return self.cached[name]
-
-    @property
-    def holders(self):
-        return self._inner.holders
-
-    def push(self, data):
-        self._inner.push(data)
-        self.updated = False
-
-
 class FilteredSecurityValueHolder(SecurityValueHolder):
     def __init__(self, computer, filtering):
         self._filter = copy.deepcopy(filtering)

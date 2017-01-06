@@ -105,6 +105,12 @@ class SecurityValueHolder(object):
             self.updated = True
             return SecuritiesValues(values, index=keys)
 
+    def value_by_names(self, names):
+        if self.updated:
+            return self.cached[names]
+        else:
+            return SecuritiesValues([self._innerHolders[name].result() for name in names], index=names)
+
     def value_by_name(self, name):
         if self.updated:
             return self.cached[name]
@@ -216,7 +222,7 @@ class SecurityValueHolder(object):
             for j, dict_data in enumerate(split_values):
                 self.push(dict_data)
                 end_count = start_count + len(dict_data)
-                output_values[start_count:end_count, 0] = self.value[split_category[j]]
+                output_values[start_count:end_count, 0] = self.value_by_names(split_category[j])
                 start_count = end_count
         else:
             for j, dict_data in enumerate(split_values):
@@ -274,6 +280,13 @@ class FilteredSecurityValueHolder(SecurityValueHolder):
                 return self._computer.value_by_name(name)
             else:
                 return np.nan
+
+    def value_by_names(self, names):
+        if self.updated:
+            return self.cached[names]
+        else:
+            filter_value = self._filter.value_by_names(names)
+            return self._computer.value_by_names(names)[filter_value]
 
     def push(self, data):
         self._computer.push(data)
@@ -337,6 +350,12 @@ class SecurityUnitoryValueHolder(SecurityValueHolder):
             return self.cached[name]
         else:
             return self._op(self._right.value_by_name(name))
+
+    def value_by_names(self, names):
+        if self.updated:
+            return self.cached[names]
+        else:
+            return self._op(self._right.value_by_names(names))
 
 
 class SecurityNegValueHolder(SecurityUnitoryValueHolder):
@@ -405,6 +424,12 @@ class SecurityCombinedValueHolder(SecurityValueHolder):
             return self.cached[name]
         else:
             return self._op(self._left.value_by_name(name), self._right.value_by_name(name))
+
+    def value_by_names(self, names):
+        if self.updated:
+            return self.cached[names]
+        else:
+            return self._op(self._left.value_by_names(names), self._right.value_by_names(names))
 
 
 class SecurityAddedValueHolder(SecurityCombinedValueHolder):

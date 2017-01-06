@@ -61,6 +61,11 @@ class CSRankedSecurityValueHolder(CrossSectionValueHolder):
             self.updated = True
             return self.cached[name]
 
+    def value_by_names(self, names):
+        raw_values = self._inner.value_by_names(names)
+        raw_values = raw_values.rank(ascending=False)
+        return raw_values
+
 
 class CSAverageSecurityValueHolder(CrossSectionValueHolder):
     def __init__(self, innerValue):
@@ -87,6 +92,12 @@ class CSAverageSecurityValueHolder(CrossSectionValueHolder):
             self.updated = True
             return self.cached[name]
 
+    def value_by_names(self, names):
+        raw_values = self._inner.value_by_names(names)
+        mean_value = raw_values.mean()
+        raw_values = SecuritiesValues(mean_value, raw_values.index)
+        return raw_values[names]
+
 
 class CSAverageAdjustedSecurityValueHolder(CrossSectionValueHolder):
     def __init__(self, innerValue):
@@ -110,3 +121,8 @@ class CSAverageAdjustedSecurityValueHolder(CrossSectionValueHolder):
             self.cached = raw_values - raw_values.mean()
             self.updated = True
             return self.cached[name]
+
+    def value_by_names(self, names):
+        raw_values = self._inner.value_by_names(names)
+        raw_values = raw_values - raw_values.mean()
+        return raw_values[names]

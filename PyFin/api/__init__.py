@@ -95,3 +95,12 @@ __all__ = ["datesList",
            "CSRank",
            "CSMean",
            "CSMeanAdjusted"]
+
+
+from FactorMiner.provider.utilities import get_factor_data
+
+
+if __name__ == '__main__':
+    factor_data = get_factor_data('ap1_log_chg', '2015-10-01', '2016-12-27', freq=5)
+    factor = CSRank(LAST('ap1_log_chg'))
+    factor.transform(factor_data, category_field='productID')

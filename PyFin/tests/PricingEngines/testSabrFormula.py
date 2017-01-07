@@ -147,3 +147,28 @@ class TestSabrFormula(unittest.TestCase):
                                           calibratedParameters[3])
         expectedVols = self.volatilities
         np.testing.assert_array_almost_equal(calculatedVols, expectedVols, 4)
+
+    def testSabrCalibrationWithFixedBeta(self):
+        x = sabrCalibration(self.strikes,
+                            self.volatilities,
+                            self.forward,
+                            self.expiry,
+                            0.01,
+                            self.initialBeta,
+                            0.01,
+                            0.01,
+                            isFixedBeta=True)
+        calibratedParameters = x[0]
+
+        self.assertAlmostEqual(calibratedParameters[1], self.initialBeta)
+
+        calculatedVols = sabrVolatilities(self.strikes,
+                                          self.forward,
+                                          self.expiry,
+                                          calibratedParameters[0],
+                                          calibratedParameters[1],
+                                          calibratedParameters[2],
+                                          calibratedParameters[3])
+
+        expectedVols = self.volatilities
+        np.testing.assert_array_almost_equal(calculatedVols, expectedVols, 4)

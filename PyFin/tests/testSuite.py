@@ -58,6 +58,8 @@ def test():
     suite.addTests(tests)
     tests = unittest.TestLoader().loadTestsFromTestCase(PricingEngines.TestBlackFormula)
     suite.addTests(tests)
+    tests = unittest.TestLoader().loadTestsFromTestCase(PricingEngines.TestSabrFormula)
+    suite.addTests(tests)
     tests = unittest.TestLoader().loadTestsFromTestCase(Math.Accumulators.TestAccumulatorImpl)
     suite.addTests(tests)
     tests = unittest.TestLoader().loadTestsFromTestCase(Math.Accumulators.TestAccumulatorsArithmetic)

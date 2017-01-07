@@ -12,6 +12,9 @@ from PyFin.PricingEngines.BlackFormula import blackFormula2
 from PyFin.PricingEngines.BlackFormula import blackFormulaImpliedStdDev
 from PyFin.PricingEngines.BlackFormula import blackFormulaImpliedVol
 from PyFin.PricingEngines.SabrFormula import sabrVolatility
+from PyFin.PricingEngines.SabrFormula import sabrVolatilities
+from PyFin.PricingEngines.SabrFormula import sabrCalibration
+
 
 __all__ = ['bachelierFormula',
            'bachelierFormulaImpliedVol',
@@ -19,4 +22,6 @@ __all__ = ['bachelierFormula',
            'blackFormula2',
            'blackFormulaImpliedStdDev',
            'blackFormulaImpliedVol',
-           'sabrVolatility']
+           'sabrVolatility',
+           'sabrVolatilities',
+           'sabrCalibration']

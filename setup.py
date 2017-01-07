@@ -97,6 +97,15 @@ if sys.version_info > (3, 0, 0):
 else:
     requirements = "requirements/py2.txt"
 
+
+ext_modules = [
+    "PyFin/Math/Accumulators/impl.pyx",
+    "PyFin/DateUtilities/Date.pyx",
+    "PyFin/Utilities/Asserts.pyx",
+    "PyFin/Math/ErrorFunction.pyx",
+    "PyFin/PricingEngines/SabrFormulaImpl.pyx"
+]
+
 setup(
     name=NAME,
     version=VERSION,
@@ -139,10 +148,6 @@ setup(
     classifiers=[],
     cmdclass={"test": test,
               "version_build": version_build},
-    ext_modules=cythonize(["PyFin/Math/Accumulators/impl.pyx",
-                           "PyFin/DateUtilities/Date.pyx",
-                           "PyFin/Utilities/Asserts.pyx",
-                           "PyFin/Math/ErrorFunction.pyx",
-                           "PyFin/PricingEngines/SabrFormula.pyx"]),
+    ext_modules=cythonize(ext_modules),
     include_dirs=[np.get_include()]
 )

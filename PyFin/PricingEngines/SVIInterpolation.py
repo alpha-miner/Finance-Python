@@ -5,15 +5,9 @@ Created on 2017-1-7
 @author: cheng.li
 """
 
-import math
 import numpy as np
 from scipy.optimize import least_squares
-
-
-def sviVolatilityImpl(strike, forward, expiry, a, b, sigma, rho, m):
-    k = math.log(strike / forward)
-    totalVairance = a + b * (rho * (k - m) + math.sqrt((k - m) * (k - m) + sigma * sigma))
-    return math.sqrt(totalVairance / expiry)
+from PyFin.PricingEngines.SVIInterpolationImpl import sviVolatilityImpl
 
 
 def sviVolatility(strike, forward, expiry, a, b, sigma, rho, m):
@@ -59,7 +53,7 @@ def _parametersCheck(initialA,
     else:
         freeParameters.append('a')
         x0.append(initialA)
-        bounds[0].append(0.)
+        bounds[0].append(-np.inf)
         bounds[1].append(np.inf)
 
     if isFixedB:
@@ -68,7 +62,7 @@ def _parametersCheck(initialA,
         freeParameters.append('b')
         x0.append(initialB)
         bounds[0].append(0.)
-        bounds[1].append(1.)
+        bounds[1].append(np.inf)
 
     if isFixedSigma:
         fixedParameters['sigma'] = initialSigma
@@ -91,8 +85,8 @@ def _parametersCheck(initialA,
     else:
         freeParameters.append('m')
         x0.append(initialRho)
-        bounds[0].append(-1.)
-        bounds[1].append(1.0)
+        bounds[0].append(-np.inf)
+        bounds[1].append(np.inf)
 
     x0 = np.array(x0)
     return x0, freeParameters, fixedParameters, bounds

@@ -103,7 +103,8 @@ ext_modules = [
     "PyFin/DateUtilities/Date.pyx",
     "PyFin/Utilities/Asserts.pyx",
     "PyFin/Math/ErrorFunction.pyx",
-    "PyFin/PricingEngines/SabrFormulaImpl.pyx"
+    "PyFin/PricingEngines/SabrFormulaImpl.pyx",
+    "PyFin/PricingEngines/SVIInterpolationImpl.pyx"
 ]
 
 setup(

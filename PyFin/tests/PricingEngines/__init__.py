@@ -7,6 +7,8 @@ Created on 2015-7-23
 
 from PyFin.tests.PricingEngines.testBlackFormula import TestBlackFormula
 from PyFin.tests.PricingEngines.testSabrFormula import TestSabrFormula
+from PyFin.tests.PricingEngines.testSVIInterpolation import TestSVIInterpolation
 
 __all__ = ['TestBlackFormula',
-           'TestSabrFormula',]
+           'TestSabrFormula',
+           'TestSVIInterpolation']

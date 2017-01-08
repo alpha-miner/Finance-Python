@@ -124,7 +124,7 @@ cdef class Date(object):
         return Weekdays(7 if w == 0 else w)
 
     def toDateTime(self):
-        return dt.date(self.year(), self.month(), self.dayOfMonth())
+        return dt.datetime(self.year(), self.month(), self.dayOfMonth())
 
     @property
     def serialNumber(self):

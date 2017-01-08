@@ -21,8 +21,8 @@ from PyFin.api.DateUtilities import adjustDateByCalendar
 
 class TestDateUtilities(unittest.TestCase):
     def setUp(self):
-        self.fromDate = dt.date(2010, 1, 1)
-        self.toDate = dt.date.today()
+        self.fromDate = dt.datetime(2010, 1, 1)
+        self.toDate = dt.datetime.today()
 
     def testIsBizDay(self):
         bizDates = bizDatesList('China.SSE', self.fromDate, self.toDate)

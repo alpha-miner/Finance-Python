@@ -69,9 +69,9 @@ class TestDate(unittest.TestCase):
                                                 "expected:   {0:d}\n"
                                                 "calculated: {1:d}".format(5, testDate.weekday()))
 
-        self.assertEqual(testDate.toDateTime(), dt.date(year, month, day), "date datetime representation\n"
-                                                                           "expected:   {0}\n"
-                                                                           "calculated: {1}".format(
+        self.assertEqual(testDate.toDateTime(), dt.datetime(year, month, day), "date datetime representation\n"
+                                                                               "expected:   {0}\n"
+                                                                               "calculated: {1}".format(
             dt.datetime(year, month, day), testDate.toDateTime()))
 
         serialNumber = testDate.serialNumber
@@ -98,10 +98,12 @@ class TestDate(unittest.TestCase):
         self.assertEqual(Date.nextWeekday(testDate, testDate.weekday()), testDate,
                          "{0}'s next same week day should be {1}"
                          .format(testDate, testDate))
-        self.assertEqual(Date.todaysDate().toDateTime(), dt.date.today(), "today's date\n"
-                                                                          "expected:   {0}\n"
-                                                                          "calculated: {1}".format(dt.date.today(),
-                                                                                                   Date.todaysDate()))
+        expectedDate = dt.date.today()
+        expectedDate = dt.datetime(expectedDate.year, expectedDate.month, expectedDate.day)
+        self.assertEqual(Date.todaysDate().toDateTime(), expectedDate, "today's date\n"
+                                                                       "expected:   {0}\n"
+                                                                       "calculated: {1}".format(expectedDate,
+                                                                                                Date.todaysDate()))
 
         # nth-week day
         with self.assertRaises(ValueError):
@@ -306,5 +308,3 @@ class TestDate(unittest.TestCase):
             self.assertEqual(benchmark_date, pickled_date)
 
         os.unlink(f.name)
-
-

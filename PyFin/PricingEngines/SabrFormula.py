@@ -8,6 +8,7 @@ Created on 2017-1-7
 import numpy as np
 from scipy.optimize import least_squares
 from PyFin.PricingEngines.SabrFormulaImpl import sabrVolatilityImpl
+from PyFin.PricingEngines.SabrFormulaImpl import sabrVolatilitiesImpl
 
 
 def sabrVolatility(strike,
@@ -27,7 +28,7 @@ def sabrVolatilities(strikes,
                      beta,
                      nu,
                      rho):
-    return np.array([sabrVolatilityImpl(strike, forward, expiryTime, alpha, beta, nu, rho) for strike in strikes])
+    return sabrVolatilitiesImpl(strikes, forward, expiryTime, alpha, beta, nu, rho)
 
 
 def _sabrCalibrationIteration(parameters,

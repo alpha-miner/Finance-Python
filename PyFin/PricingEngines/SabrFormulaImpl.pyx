@@ -8,6 +8,8 @@ Created on 2017-1-6
 import cython
 from libc.math cimport sqrt
 from libc.math cimport log
+import numpy as np
+cimport numpy as np
 from PyFin.Math.MathConstants import MathConstants
 
 cdef double QL_EPSILON = MathConstants.QL_EPSILON
@@ -55,3 +57,19 @@ cpdef double sabrVolatilityImpl(double strike,
     else:
         multiplier = 1.0 - 0.5 * rho * z - (3.0 * rho * rho - 2.0) * z * z / 12.0
     return (alpha / D) * multiplier * d
+
+
+@cython.boundscheck(False)
+cpdef np.ndarray[double, ndim=1] sabrVolatilitiesImpl(double[:] strikes,
+                     double forward,
+                     double expiry,
+                     double alpha,
+                     double beta,
+                     double nu,
+                     double rho):
+    cdef int length = len(strikes)
+    cdef np.ndarray[double, ndim=1] res = np.empty(length, np.float64)
+
+    for i in range(length):
+        res[i] = sabrVolatilityImpl(strikes[i], forward, expiry, alpha, beta, nu, rho)
+    return res

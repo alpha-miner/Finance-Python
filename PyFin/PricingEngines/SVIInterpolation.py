@@ -8,6 +8,7 @@ Created on 2017-1-7
 import numpy as np
 from scipy.optimize import least_squares
 from PyFin.PricingEngines.SVIInterpolationImpl import sviVolatilityImpl
+from PyFin.PricingEngines.SVIInterpolationImpl import sviVolatilitiesImpl
 
 
 def sviVolatility(strike, forward, expiry, a, b, sigma, rho, m):
@@ -15,7 +16,7 @@ def sviVolatility(strike, forward, expiry, a, b, sigma, rho, m):
 
 
 def sviVolatilities(strikes, forward, expiry, a, b, sigma, rho, m):
-    return np.array([sviVolatilityImpl(strike, forward, expiry, a, b, sigma, rho, m) for strike in strikes])
+    return sviVolatilitiesImpl(strikes, forward, expiry, a, b, sigma, rho, m)
 
 
 def _sviCalibrationIteration(parameters,

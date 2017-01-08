@@ -25,7 +25,8 @@ cpdef double sviVolatilityImpl(double strike,
     return sqrt(totalVairance / expiry)
 
 @cython.boundscheck(False)
-cpdef np.ndarray[double, ndim=1]  sviVolatilitiesImpl(double[:] strikes,
+@cython.wraparound(False)
+cpdef np.ndarray[double, ndim=1]  sviVolatilitiesImpl(np.ndarray[double, ndim=1] strikes,
                                      double forward,
                                      double expiry,
                                      double a,
@@ -33,6 +34,7 @@ cpdef np.ndarray[double, ndim=1]  sviVolatilitiesImpl(double[:] strikes,
                                      double sigma,
                                      double rho,
                                      double m):
+    cdef int i
     cdef int length = len(strikes)
     cdef np.ndarray[double, ndim=1] res = np.empty(length, np.float64)
 

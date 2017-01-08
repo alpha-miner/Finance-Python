@@ -60,13 +60,15 @@ cpdef double sabrVolatilityImpl(double strike,
 
 
 @cython.boundscheck(False)
-cpdef np.ndarray[double, ndim=1] sabrVolatilitiesImpl(double[:] strikes,
+@cython.wraparound(False)
+cpdef np.ndarray[double, ndim=1] sabrVolatilitiesImpl(np.ndarray[double, ndim=1] strikes,
                      double forward,
                      double expiry,
                      double alpha,
                      double beta,
                      double nu,
                      double rho):
+    cdef int i
     cdef int length = len(strikes)
     cdef np.ndarray[double, ndim=1] res = np.empty(length, np.float64)
 

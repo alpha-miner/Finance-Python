@@ -13,7 +13,7 @@ from Cython.Build import cythonize
 
 PACKAGE = "PyFin"
 NAME = "Finance-Python"
-VERSION = "0.4.3"
+VERSION = "0.4.5"
 DESCRIPTION = "PyFin " + VERSION
 AUTHOR = "cheng li"
 AUTHOR_EMAIL = "wegamekinglc@hotmail.com"

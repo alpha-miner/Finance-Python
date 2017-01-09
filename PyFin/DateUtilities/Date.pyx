@@ -43,7 +43,7 @@ cdef _advance(date, n, units):
         d = date._day
         m = date._month + n
         y = date._year
-        addedYear = int(floor(m / 12))
+        addedYear = int(floor(m / 12.))
         monthLeft = m % 12
         if monthLeft == 0:
             monthLeft = 12

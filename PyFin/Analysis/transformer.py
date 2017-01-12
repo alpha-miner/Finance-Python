@@ -54,8 +54,9 @@ def transform(data, expressions, cols, category_field=None):
 
     if dummy_category:
         df.index = data.index
-        return df
     else:
         df[category_field] = df.index
         df.index = data.index
-        return df
+
+    df.dropna(inplace=True)
+    return df

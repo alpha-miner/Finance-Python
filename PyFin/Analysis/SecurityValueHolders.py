@@ -230,14 +230,14 @@ class SecurityValueHolder(object):
                 output_values[j, 0] = self.value_by_name(split_category[j][0])
 
         df = pd.DataFrame(output_values, index=total_category, columns=[name])
-
         if dummy_category:
             df.index = data.index
-            return df
         else:
             df[category_field] = df.index
             df.index = data.index
-            return df
+
+        df.dropna(inplace=True)
+        return df
 
 
 class FilteredSecurityValueHolder(SecurityValueHolder):
@@ -267,7 +267,7 @@ class FilteredSecurityValueHolder(SecurityValueHolder):
             return self.cached
         else:
             filter_value = self._filter.value
-            self.cached = self._computer.value[filter_value != 0]
+            self.cached = self._computer.value[filter_value]
             self.updated = True
             return self.cached
 
@@ -286,7 +286,9 @@ class FilteredSecurityValueHolder(SecurityValueHolder):
             return self.cached[names]
         else:
             filter_value = self._filter.value_by_names(names)
-            return self._computer.value_by_names(names)[filter_value]
+            orig_values = self._computer.value_by_names(names)
+            orig_values.where(filter_value, np.nan, inplace=True)
+            return orig_values
 
     def push(self, data):
         self._computer.push(data)

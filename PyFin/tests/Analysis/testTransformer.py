@@ -8,6 +8,7 @@ Created on 2016-12-21
 import unittest
 import numpy as np
 import pandas as pd
+from PyFin.Analysis.SecurityValueHolders import SecurityLatestValueHolder
 from PyFin.Analysis.TechnicalAnalysis.StatefulTechnicalAnalysers import SecurityMovingAverage
 from PyFin.Analysis.TechnicalAnalysis.StatefulTechnicalAnalysers import SecurityMovingMax
 from PyFin.Analysis.TechnicalAnalysis.StatefulTechnicalAnalysers import SecurityMovingMinimum
@@ -92,3 +93,24 @@ class TestTransformer(unittest.TestCase):
 
         expected = [4., 5., 6., 7., 6., 5., 4.]
         np.testing.assert_array_almost_equal(calculated['ma'], expected)
+
+    def test_transformer_with_filter_value_holder(self):
+        test_df = pd.DataFrame({'code': [1, 2, 3, 4, 1, 2, 3],
+                                'b': [4, 5, 6, 7, 6, 5, 4],
+                                'c': [9, 8, 7, 6, 5, 4, 3]},
+                               index=[1, 1, 1, 1, 2, 2, 2])
+
+        value_holder = SecurityLatestValueHolder('b')
+        filter = SecurityLatestValueHolder('b') >= 5
+
+        filtered_value_holder = value_holder[filter]
+
+        calculated = transform(test_df,
+                               [filtered_value_holder],
+                               cols=['filtered_b'],
+                               category_field='code')
+
+        self.assertTrue(np.all(calculated['filtered_b'] >= 5))
+        expected = test_df[test_df.b >= 5]
+        np.testing.assert_array_almost_equal(expected.b, calculated['filtered_b'])
+        np.testing.assert_array_almost_equal(expected.code, calculated['code'])

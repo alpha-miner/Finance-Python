@@ -71,6 +71,7 @@ class TestSecurityValueHolders(unittest.TestCase):
                             Factors.OPEN: self.datas['ibm'][Factors.OPEN][i]}}
             benchmark.push(data)
             filtered.push(data)
+
             try:
                 _ = filtered['aapl']
                 self.assertTrue(benchmark['aapl'])
@@ -82,6 +83,27 @@ class TestSecurityValueHolders(unittest.TestCase):
                 self.assertTrue(benchmark['ibm'])
             except KeyError:
                 self.assertFalse(benchmark['ibm'])
+
+    def testFilteredSecurityValueHolderTransform(self):
+        rawHolder = SecurityLatestValueHolder(dependency='close')
+        fliterFlag = rawHolder >= 0
+        filteredHolder = rawHolder[fliterFlag]
+
+        for i in range(len(self.datas['aapl']['close'])):
+            data = {'aapl': {Factors.CLOSE: self.datas['aapl'][Factors.CLOSE][i],
+                             Factors.OPEN: self.datas['aapl'][Factors.OPEN][i]},
+                    'ibm': {Factors.CLOSE: self.datas['ibm'][Factors.CLOSE][i],
+                            Factors.OPEN: self.datas['ibm'][Factors.OPEN][i]}}
+            rawHolder.push(data)
+            filteredHolder.push(data)
+
+            self.assertTrue(np.all(filteredHolder.value >= 0.))
+
+            rawValues = rawHolder.value
+            filteredValues = filteredHolder.value
+            for name in rawValues.index:
+                if rawValues[name] >= 0.:
+                    self.assertTrue(name in filteredValues)
 
     def testSecurityValueHolderIsFull(self):
         test = SecurityMovingMax(2, dependency='close')

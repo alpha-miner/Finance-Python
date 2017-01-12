@@ -38,7 +38,6 @@ cpdef double sabrVolatilityImpl(double strike,
 
     if not abs(forward - strike) < 1e-10:
         logM = log(forward / strike)
-
     else:
         epsilon = (forward - strike) / strike
         logM = epsilon * (1. - .5 * epsilon)

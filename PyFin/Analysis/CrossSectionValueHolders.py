@@ -8,6 +8,7 @@ Created on 2017-1-6
 import copy
 from PyFin.Analysis.SecurityValueHolders import SecuritiesValues
 from PyFin.Analysis.SecurityValueHolders import SecurityValueHolder
+from PyFin.Analysis.SecurityValueHolders import SecurityLatestValueHolder
 
 
 class CrossSectionValueHolder(SecurityValueHolder):
@@ -15,8 +16,9 @@ class CrossSectionValueHolder(SecurityValueHolder):
     def __init__(self, innerValue):
         if isinstance(innerValue, SecurityValueHolder):
             self._inner = copy.deepcopy(innerValue)
+        elif isinstance(innerValue, str):
+            self._inner = SecurityLatestValueHolder(innerValue)
         else:
-            # TODO: make the rank value holder workable for a symbol
             raise ValueError("Currently only value holder input is allowed for rank holder.")
         self._window = self._inner.window
         self._returnSize = self._inner.valueSize

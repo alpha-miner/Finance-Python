@@ -24,6 +24,20 @@ class TestCrossSectionValueHolder(unittest.TestCase):
         self.datas = {'aapl': {'close': sample1[:, 0], 'open': sample1[:, 1]},
                       'ibm': {'close': sample2[:, 0], 'open': sample2[:, 1]}}
 
+    def testCSRankedSecurityValueHolderWithSymbolName(self):
+        benchmark = SecurityLatestValueHolder(dependency='close')
+        rankHolder = CSRankedSecurityValueHolder('close')
+
+        for i in range(len(self.datas['aapl']['close'])):
+            data = {'aapl': {Factors.CLOSE: self.datas['aapl'][Factors.CLOSE][i],
+                             Factors.OPEN: self.datas['aapl'][Factors.OPEN][i]},
+                    'ibm': {Factors.CLOSE: self.datas['ibm'][Factors.CLOSE][i],
+                            Factors.OPEN: self.datas['ibm'][Factors.OPEN][i]}}
+            benchmark.push(data)
+            rankHolder.push(data)
+            benchmarkValues = benchmark.value
+            np.testing.assert_array_almost_equal(benchmarkValues.rank(ascending=False), rankHolder.value)
+
     def testCSRankedSecurityValueHolder(self):
         benchmark = SecurityLatestValueHolder(dependency='close')
         rankHolder = CSRankedSecurityValueHolder(benchmark)

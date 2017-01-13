@@ -33,6 +33,7 @@ from PyFin.Analysis.TechnicalAnalysis import SecurityAsinValueHolder
 from PyFin.Analysis.TechnicalAnalysis import SecurityAsinhValueHolder
 from PyFin.Analysis.SecurityValueHolders import SecurityShiftedValueHolder
 from PyFin.Analysis.SecurityValueHolders import SecurityLatestValueHolder
+from PyFin.Analysis.SecurityValueHolders import SecurityWhereValueHolder
 
 
 from PyFin.Analysis.CrossSectionValueHolders import CSRankedSecurityValueHolder
@@ -154,6 +155,10 @@ def ASINH(dependency):
 
 def SHIFT(dependency, n):
     return SecurityShiftedValueHolder(dependency, n)
+
+
+def IIF(flag, left, right):
+    return SecurityWhereValueHolder(flag, left, right)
 
 
 HIGH = functools.partial(LAST, 'high')

@@ -13,6 +13,7 @@ from PyFin.Analysis.SecurityValueHolders import SecuritiesValues
 from PyFin.Analysis.SecurityValueHolders import dependencyCalculator
 from PyFin.Analysis.SecurityValueHolders import FilteredSecurityValueHolder
 from PyFin.Analysis.SecurityValueHolders import SecurityLatestValueHolder
+from PyFin.Analysis.SecurityValueHolders import SecurityWhereValueHolder
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingAverage
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingMax
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingMinimum
@@ -36,6 +37,85 @@ class TestSecurityValueHolders(unittest.TestCase):
                                                                                             expected[name],
                                                                                             calculated[name]))
         self.checker = check_values
+
+    def testSecurityWhereValueHolder(self):
+        benchmark = SecurityLatestValueHolder(dependency='close')
+
+        testValueHolder = SecurityWhereValueHolder(benchmark > 0, benchmark, -benchmark)
+        for i in range(len(self.datas['aapl']['close'])):
+            data = {'aapl': {Factors.CLOSE: self.datas['aapl'][Factors.CLOSE][i],
+                             Factors.OPEN: self.datas['aapl'][Factors.OPEN][i]},
+                    'ibm': {Factors.CLOSE: self.datas['ibm'][Factors.CLOSE][i],
+                            Factors.OPEN: self.datas['ibm'][Factors.OPEN][i]}}
+            benchmark.push(data)
+            testValueHolder.push(data)
+
+            calculated = testValueHolder.value
+
+            self.assertTrue(np.all(calculated > 0.))
+
+            for name in calculated.index:
+                rawValue = data[name][Factors.CLOSE]
+                if rawValue > 0.:
+                    self.assertAlmostEqual(rawValue, calculated[name])
+                else:
+                    self.assertAlmostEqual(-rawValue, calculated[name])
+
+    def testSecurityWhereValueHolderWithSymbolName(self):
+        benchmark = SecurityLatestValueHolder(dependency='close')
+
+        testValueHolder = SecurityWhereValueHolder(benchmark > 0, 'open', -benchmark)
+        for i in range(len(self.datas['aapl']['close'])):
+            data = {'aapl': {Factors.CLOSE: self.datas['aapl'][Factors.CLOSE][i],
+                             Factors.OPEN: self.datas['aapl'][Factors.OPEN][i]},
+                    'ibm': {Factors.CLOSE: self.datas['ibm'][Factors.CLOSE][i],
+                            Factors.OPEN: self.datas['ibm'][Factors.OPEN][i]}}
+            benchmark.push(data)
+            testValueHolder.push(data)
+
+            calculated = testValueHolder.value
+
+            for name in calculated.index:
+                rawValue = data[name][Factors.CLOSE]
+                if rawValue > 0.:
+                    self.assertAlmostEqual(data[name][Factors.OPEN], calculated[name])
+                else:
+                    self.assertAlmostEqual(-rawValue, calculated[name])
+
+        testValueHolder = SecurityWhereValueHolder(benchmark > 0, 'open', 'close')
+        for i in range(len(self.datas['aapl']['close'])):
+            data = {'aapl': {Factors.CLOSE: self.datas['aapl'][Factors.CLOSE][i],
+                             Factors.OPEN: self.datas['aapl'][Factors.OPEN][i]},
+                    'ibm': {Factors.CLOSE: self.datas['ibm'][Factors.CLOSE][i],
+                            Factors.OPEN: self.datas['ibm'][Factors.OPEN][i]}}
+            benchmark.push(data)
+            testValueHolder.push(data)
+
+            calculated = testValueHolder.value
+
+            for name in calculated.index:
+                rawValue = data[name][Factors.CLOSE]
+                if rawValue > 0.:
+                    self.assertAlmostEqual(data[name][Factors.OPEN], calculated[name])
+                else:
+                    self.assertAlmostEqual(rawValue, calculated[name])
+
+    def testSecurityWhereValueHolderWithMissingSymbol(self):
+        benchmark = SecurityLatestValueHolder(dependency='open')
+        benchmark2 = SecurityLatestValueHolder(dependency='close')
+        testValueHolder = SecurityWhereValueHolder(benchmark < 0, 'open', -benchmark2)
+
+        data = {'aapl': {'close': 2.0, 'open': 1.5},
+                'ibm': {'open': 1.7}}
+
+        benchmark.push(data)
+        benchmark2.push(data)
+        testValueHolder.push(data)
+
+        calculated = testValueHolder.value
+
+        self.assertAlmostEqual(calculated['aapl'], -data['aapl']['close'])
+        self.assertTrue(np.isnan(calculated['ibm']))
 
     def testFilteredSecurityValueHolder(self):
         benchmark = SecurityLatestValueHolder(dependency='close') > 0

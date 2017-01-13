@@ -508,6 +508,76 @@ class SecurityShiftedValueHolder(SecurityValueHolder):
         }
 
 
+class SecurityWhereValueHolder(SecurityValueHolder):
+    def __init__(self, flag, left, right):
+
+        if not isinstance(flag, SecurityValueHolder):
+            if isinstance(flag, str):
+                self._flag = SecurityLatestValueHolder(flag)
+            else:
+                self._flag = IdentitySecurityValueHolder(flag)
+        else:
+            self._flag = copy.deepcopy(flag)
+
+        if not isinstance(left, SecurityValueHolder):
+            if isinstance(left, str):
+                self._left = SecurityLatestValueHolder(left)
+            else:
+                self._left = IdentitySecurityValueHolder(left)
+        else:
+            self._left = copy.deepcopy(left)
+
+        if not isinstance(right, SecurityValueHolder):
+            if isinstance(left, str):
+                self._right = SecurityLatestValueHolder(right)
+            else:
+                self._right = IdentitySecurityValueHolder(right)
+        else:
+            self._right = copy.deepcopy(right)
+
+        self._window = max(self._flag.window, self._left.window, self._right.window)
+        self._dependency = _merge2set(self._flag._dependency, _merge2set(
+            self._left._dependency, self._right._dependency))
+        self._returnSize = self._flag.valueSize
+        self.updated = False
+        self.cached = pd.Series()
+
+    @property
+    def symbolList(self):
+        return self._flag.symbolList
+
+    def push(self, data):
+        self._flag.push(data)
+        self._left.push(data)
+        self._right.push(data)
+        self.updated = False
+
+    @property
+    def value(self):
+        if self.updated:
+            return self.cached
+        else:
+            self.cached = self._left.value.where(self._flag.value, self._right.value)
+            self.updated = True
+            return self.cached
+
+    def value_by_name(self, name):
+        if self.updated:
+            return self.cached[name]
+        else:
+            if self._flag.value_by_name(name):
+                return self._left.value_by_name(name)
+            else:
+                return self._right.value_by_name(name)
+
+    def value_by_names(self, names):
+        if self.updated:
+            return self.cached[names]
+        else:
+            return self._left.value_by_names(names).where(self._flag.value_by_name(names),
+                                                          self._right.value_by_names(names))
+
+
 def dependencyCalculator(*args):
     res = defaultdict(list)
     tmp = {}

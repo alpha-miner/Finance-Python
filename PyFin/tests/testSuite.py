@@ -20,6 +20,7 @@ import PyFin.tests.Env as Env
 import PyFin.tests.Math as Math
 import PyFin.tests.POpt as POpt
 import PyFin.tests.PricingEngines as PricingEngines
+import PyFin.tests.Utilities as Utilities
 
 
 def test():
@@ -77,6 +78,8 @@ def test():
     tests = unittest.TestLoader().loadTestsFromTestCase(Math.Timeseries.TestTimeseries)
     suite.addTests(tests)
     tests = unittest.TestLoader().loadTestsFromTestCase(POpt.TestOptimizer)
+    suite.addTests(tests)
+    tests = unittest.TestLoader().loadTestsFromTestCase(Utilities.TestAsserts)
     suite.addTests(tests)
 
     res = unittest.TextTestRunner(verbosity=3).run(suite)

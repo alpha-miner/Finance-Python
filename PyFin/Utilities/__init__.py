@@ -8,9 +8,11 @@ Created on 2015-8-17
 import time
 import numpy as np
 from PyFin.Utilities.Asserts import pyFinAssert
+from PyFin.Utilities.Asserts import pyFinWarning
 from PyFin.Utilities.Asserts import isClose
 
 __all__ = ['pyFinAssert',
+           'pyFinWarning',
            'isClose']
 
 

@@ -188,6 +188,18 @@ class SecurityValueHolder(object):
     def __neg__(self):
         return SecurityNegValueHolder(self)
 
+    def __and__(self, right):
+        return SecurityAndOperatorValueHolder(self, right)
+
+    def __rand__(self, left):
+        return SecurityAndOperatorValueHolder(left, self)
+
+    def __or__(self, right):
+        return SecurityOrOperatorValueHolder(self, right)
+
+    def __ror__(self, left):
+        return SecurityOrOperatorValueHolder(left, self)
+
     def shift(self, n):
         return SecurityShiftedValueHolder(self, n)
 
@@ -492,6 +504,18 @@ class SecurityNeOperatorValueHolder(SecurityCombinedValueHolder):
     def __init__(self, left, right):
         super(SecurityNeOperatorValueHolder, self).__init__(
             left, right, operator.ne)
+
+
+class SecurityAndOperatorValueHolder(SecurityCombinedValueHolder):
+    def __init__(self, left, right):
+        super(SecurityAndOperatorValueHolder, self).__init__(
+            left, right, operator.__and__)
+
+
+class SecurityOrOperatorValueHolder(SecurityCombinedValueHolder):
+    def __init__(self, left, right):
+        super(SecurityOrOperatorValueHolder, self).__init__(
+            left, right, operator.__or__)
 
 
 class SecurityShiftedValueHolder(SecurityValueHolder):

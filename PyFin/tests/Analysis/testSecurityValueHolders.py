@@ -61,6 +61,52 @@ class TestSecurityValueHolders(unittest.TestCase):
                 else:
                     self.assertAlmostEqual(-rawValue, calculated[name])
 
+    def testSecurityAndOperatorValueHolder(self):
+        benchmark = SecurityLatestValueHolder(dependency='close') > 0
+        benchmark2 = SecurityLatestValueHolder(dependency='open') > 0
+
+        testValueHolder = benchmark & benchmark2
+
+        for i in range(len(self.datas['aapl']['close'])):
+            data = {'aapl': {Factors.CLOSE: self.datas['aapl'][Factors.CLOSE][i],
+                             Factors.OPEN: self.datas['aapl'][Factors.OPEN][i]},
+                    'ibm': {Factors.CLOSE: self.datas['ibm'][Factors.CLOSE][i],
+                            Factors.OPEN: self.datas['ibm'][Factors.OPEN][i]}}
+            testValueHolder.push(data)
+            calculated = testValueHolder.value
+
+            for name in calculated.index:
+                close_value = data[name][Factors.CLOSE]
+                open_value = data[name][Factors.OPEN]
+
+                if close_value > 0. and open_value > 0:
+                    self.assertTrue(calculated[name])
+                else:
+                    self.assertFalse(calculated[name])
+
+    def testSecurityOrOperatorValueHolder(self):
+        benchmark = SecurityLatestValueHolder(dependency='close') > 0
+        benchmark2 = SecurityLatestValueHolder(dependency='open') > 0
+
+        testValueHolder = benchmark | benchmark2
+
+        for i in range(len(self.datas['aapl']['close'])):
+            data = {'aapl': {Factors.CLOSE: self.datas['aapl'][Factors.CLOSE][i],
+                             Factors.OPEN: self.datas['aapl'][Factors.OPEN][i]},
+                    'ibm': {Factors.CLOSE: self.datas['ibm'][Factors.CLOSE][i],
+                            Factors.OPEN: self.datas['ibm'][Factors.OPEN][i]}}
+            testValueHolder.push(data)
+            calculated = testValueHolder.value
+
+            for name in calculated.index:
+                close_value = data[name][Factors.CLOSE]
+                open_value = data[name][Factors.OPEN]
+
+                if close_value > 0. or open_value > 0:
+                    self.assertTrue(calculated[name])
+                else:
+                    self.assertFalse(calculated[name])
+
     def testSecurityWhereValueHolderWithSymbolName(self):
         benchmark = SecurityLatestValueHolder(dependency='close')
 

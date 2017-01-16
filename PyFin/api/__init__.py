@@ -24,6 +24,7 @@ from PyFin.api.Analysis import RSI
 from PyFin.api.Analysis import MA
 from PyFin.api.Analysis import MAX
 from PyFin.api.Analysis import MIN
+from PyFin.api.Analysis import QUANTILE
 from PyFin.api.Analysis import VARIANCE
 from PyFin.api.Analysis import NPOSITIVE
 from PyFin.api.Analysis import MAPOSITIVE
@@ -51,6 +52,7 @@ from PyFin.api.Analysis import IIF
 from PyFin.api.Analysis import CSRank
 from PyFin.api.Analysis import CSMean
 from PyFin.api.Analysis import CSMeanAdjusted
+from PyFin.api.Analysis import CSQuantile
 
 
 __all__ = ["datesList",
@@ -71,6 +73,7 @@ __all__ = ["datesList",
            "MA",
            "MAX",
            "MIN",
+           "QUANTILE",
            "VARIANCE",
            "NPOSITIVE",
            "MAPOSITIVE",
@@ -96,4 +99,5 @@ __all__ = ["datesList",
            "IIF",
            "CSRank",
            "CSMean",
-           "CSMeanAdjusted"]
+           "CSMeanAdjusted",
+           "CSQuantile"]

@@ -10,6 +10,7 @@ import functools
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingAverage
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingMax
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingMinimum
+from PyFin.Analysis.TechnicalAnalysis import SecurityMovingQuantile
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingSum
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingVariance
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingCountedPositive
@@ -39,6 +40,7 @@ from PyFin.Analysis.SecurityValueHolders import SecurityWhereValueHolder
 from PyFin.Analysis.CrossSectionValueHolders import CSRankedSecurityValueHolder
 from PyFin.Analysis.CrossSectionValueHolders import CSAverageSecurityValueHolder
 from PyFin.Analysis.CrossSectionValueHolders import CSAverageAdjustedSecurityValueHolder
+from PyFin.Analysis.CrossSectionValueHolders import CSQuantileSecurityValueHolder
 
 
 def CSRank(dependency):
@@ -51,6 +53,10 @@ def CSMean(dependency):
 
 def CSMeanAdjusted(dependency):
     return CSAverageAdjustedSecurityValueHolder(dependency)
+
+
+def CSQuantile(dependency):
+    return CSQuantileSecurityValueHolder(dependency)
 
 
 def SIGN(dependency='x'):
@@ -79,6 +85,10 @@ def MAX(window, dependency='x'):
 
 def MIN(window, dependency='x'):
     return SecurityMovingMinimum(window, dependency)
+
+
+def QUANTILE(window, dependency='x'):
+    return SecurityMovingQuantile(window, dependency)
 
 
 def SUM(window, dependency='x'):

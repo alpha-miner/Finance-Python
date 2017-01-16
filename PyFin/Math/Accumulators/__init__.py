@@ -56,6 +56,7 @@ from PyFin.Math.Accumulators.StatefulAccumulators import MovingCorrelation
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingCorrelationMatrix
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingMax
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingMinimum
+from PyFin.Math.Accumulators.StatefulAccumulators import MovingQuantile
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingHistoricalWindow
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingProduct
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingCenterMoment
@@ -122,6 +123,7 @@ __all__ = ["Exp",
            "MovingCorrelationMatrix",
            "MovingMax",
            "MovingMinimum",
+           "MovingQuantile",
            "MovingVariance",
            "MovingLogReturn",
            "MovingAlphaBeta",

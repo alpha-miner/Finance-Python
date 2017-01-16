@@ -13,6 +13,7 @@ from collections import deque
 from PyFin.Math.Accumulators import Shift
 from PyFin.Math.Accumulators import MovingMax
 from PyFin.Math.Accumulators import MovingMinimum
+from PyFin.Math.Accumulators import MovingQuantile
 from PyFin.Math.Accumulators import MovingAverage
 from PyFin.Math.Accumulators import MovingPositiveAverage
 from PyFin.Math.Accumulators import MovingNegativeAverage
@@ -266,6 +267,25 @@ class TestStatefulAccumulators(unittest.TestCase):
             self.assertAlmostEqual(calculated, expected, 15, "at index {0:d}\n"
                                                              "Min expected:   {1:f}\n"
                                                              "Min calculated: {2:f}".format(i, expected, calculated))
+
+    def testMovingQuantile(self):
+        window = 10
+
+        mq = MovingQuantile(window, dependency='z')
+        total = np.random.randn(2500)
+        con = deque(maxlen=window)
+        for i, value in enumerate(total):
+            value = float(value)
+            con.append(value)
+            mq.push(dict(z=value))
+
+            if i >= 1:
+                calculated = mq.result()
+                sorted_con = sorted(con)
+                expected = sorted_con.index(value) / (len(sorted_con) - 1)
+                self.assertAlmostEqual(calculated, expected, 15, "at index {0:d}\n"
+                                                                 "Quantile expected:   {1:f}\n"
+                                                                 "Quantile calculated: {2:f}".format(i, expected, calculated))
 
     def testMovingCountedPositive(self):
         window = 120

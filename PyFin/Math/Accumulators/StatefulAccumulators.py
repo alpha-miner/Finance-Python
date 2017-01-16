@@ -130,6 +130,18 @@ class MovingMinimum(SortedValueHolder):
             return np.nan
 
 
+class MovingQuantile(SortedValueHolder):
+    def __init__(self, window, dependency='x'):
+        super(MovingQuantile, self).__init__(window, dependency)
+
+    def result(self):
+        n = len(self._sortedArray)
+        if n > 1:
+            return self._sortedArray.index(self._deque[n-1]) / (n - 1.)
+        else:
+            return np.nan
+
+
 class MovingSum(SingleValuedValueHolder):
     def __init__(self, window, dependency='x'):
         super(MovingSum, self).__init__(window, dependency)

@@ -11,6 +11,7 @@ from PyFin.Analysis.SecurityValueHolders import SecurityWhereValueHolder
 from PyFin.Analysis.CrossSectionValueHolders import CSRankedSecurityValueHolder
 from PyFin.Analysis.CrossSectionValueHolders import CSAverageSecurityValueHolder
 from PyFin.Analysis.CrossSectionValueHolders import CSAverageAdjustedSecurityValueHolder
+from PyFin.Analysis.CrossSectionValueHolders import CSQuantileSecurityValueHolder
 from PyFin.Analysis.SecurityValueHolders import SecurityLatestValueHolder
 from PyFin.Analysis.SecurityValueHolders import dependencyCalculator
 from PyFin.Analysis import TechnicalAnalysis
@@ -22,6 +23,7 @@ __all__ = ['DataProvider',
            'CSRankedSecurityValueHolder',
            'CSAverageSecurityValueHolder',
            'CSAverageAdjustedSecurityValueHolder',
+           'CSQuantileSecurityValueHolder',
            'SecurityLatestValueHolder',
            'dependencyCalculator',
            'TechnicalAnalysis',

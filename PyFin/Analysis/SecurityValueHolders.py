@@ -598,7 +598,7 @@ class SecurityWhereValueHolder(SecurityValueHolder):
         if self.updated:
             return self.cached[names]
         else:
-            return self._left.value_by_names(names).where(self._flag.value_by_name(names),
+            return self._left.value_by_names(names).where(self._flag.value_by_names(names),
                                                           self._right.value_by_names(names))
 
 

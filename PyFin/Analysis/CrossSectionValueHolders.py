@@ -50,7 +50,7 @@ class CSRankedSecurityValueHolder(CrossSectionValueHolder):
             return self.cached
         else:
             raw_values = self._inner.value
-            self.cached = raw_values.rank(ascending=False)
+            self.cached = raw_values.rank()
             self.updated = True
             return self.cached
 
@@ -59,13 +59,13 @@ class CSRankedSecurityValueHolder(CrossSectionValueHolder):
             return self.cached[name]
         else:
             raw_values = self._inner.value
-            self.cached = raw_values.rank(ascending=False)
+            self.cached = raw_values.rank()
             self.updated = True
             return self.cached[name]
 
     def value_by_names(self, names):
         raw_values = self._inner.value_by_names(names)
-        raw_values = raw_values.rank(ascending=False)
+        raw_values = raw_values.rank()
         return raw_values
 
 
@@ -127,4 +127,33 @@ class CSAverageAdjustedSecurityValueHolder(CrossSectionValueHolder):
     def value_by_names(self, names):
         raw_values = self._inner.value_by_names(names)
         raw_values = raw_values - raw_values.mean()
+        return raw_values[names]
+
+
+class CSQuantileSecurityValueHolder(CrossSectionValueHolder):
+    def __init__(self, innerValue):
+        super(CSQuantileSecurityValueHolder, self).__init__(innerValue)
+
+    @property
+    def value(self):
+        if self.updated:
+            return self.cached
+        else:
+            raw_values = self._inner.value
+            self.cached = (raw_values.rank() - 1.) / (len(raw_values) - 1.)
+            self.updated = True
+            return self.cached
+
+    def value_by_name(self, name):
+        if self.updated:
+            return self.cached[name]
+        else:
+            raw_values = self._inner.value
+            self.cached = (raw_values.rank() - 1.) / (len(raw_values) - 1.)
+            self.updated = True
+            return self.cached[name]
+
+    def value_by_names(self, names):
+        raw_values = self._inner.value_by_names(names)
+        raw_values = (raw_values.rank() - 1.) / (len(raw_values) - 1.)
         return raw_values[names]

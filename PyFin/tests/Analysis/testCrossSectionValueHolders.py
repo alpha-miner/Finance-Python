@@ -7,11 +7,13 @@ Created on 2017-1-6
 
 import unittest
 import numpy as np
+import pandas as pd
 from PyFin.Enums import Factors
 from PyFin.Analysis.SecurityValueHolders import SecurityLatestValueHolder
 from PyFin.Analysis.CrossSectionValueHolders import CSRankedSecurityValueHolder
 from PyFin.Analysis.CrossSectionValueHolders import CSAverageSecurityValueHolder
 from PyFin.Analysis.CrossSectionValueHolders import CSAverageAdjustedSecurityValueHolder
+from PyFin.Analysis.CrossSectionValueHolders import CSQuantileSecurityValueHolder
 
 
 class TestCrossSectionValueHolder(unittest.TestCase):
@@ -36,7 +38,7 @@ class TestCrossSectionValueHolder(unittest.TestCase):
             benchmark.push(data)
             rankHolder.push(data)
             benchmarkValues = benchmark.value
-            np.testing.assert_array_almost_equal(benchmarkValues.rank(ascending=False), rankHolder.value)
+            np.testing.assert_array_almost_equal(benchmarkValues.rank(), rankHolder.value)
 
     def testCSRankedSecurityValueHolder(self):
         benchmark = SecurityLatestValueHolder(dependency='close')
@@ -50,7 +52,7 @@ class TestCrossSectionValueHolder(unittest.TestCase):
             benchmark.push(data)
             rankHolder.push(data)
             benchmarkValues = benchmark.value
-            np.testing.assert_array_almost_equal(benchmarkValues.rank(ascending=False), rankHolder.value)
+            np.testing.assert_array_almost_equal(benchmarkValues.rank(), rankHolder.value)
 
     def testCSAverageSecurityValueHolder(self):
         benchmark = SecurityLatestValueHolder(dependency='close')
@@ -79,3 +81,23 @@ class TestCrossSectionValueHolder(unittest.TestCase):
             meanAdjustedHolder.push(data)
             benchmarkValues = benchmark.value
             np.testing.assert_array_almost_equal(benchmarkValues - benchmarkValues.mean(), meanAdjustedHolder.value)
+
+    def testCSQuantileSecurityValueHolder(self):
+        keys = list(range(1, 11))
+        values = list(range(10, 0, -1))
+
+        data = {}
+
+        for i, k in enumerate(keys):
+            data[k] = {}
+            data[k]['close'] = values[i]
+
+        quantile_value = CSQuantileSecurityValueHolder('close')
+        quantile_value.push(data)
+        calculated = quantile_value.value.sort_index()
+
+        data = np.linspace(1., 0., 10)
+
+        expected = pd.Series(data=data, index=[x for x in range(1, 11)])
+
+        np.testing.assert_array_almost_equal(expected.values, calculated.values)

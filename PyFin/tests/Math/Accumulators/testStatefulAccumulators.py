@@ -282,7 +282,7 @@ class TestStatefulAccumulators(unittest.TestCase):
             if i >= 1:
                 calculated = mq.result()
                 sorted_con = sorted(con)
-                expected = sorted_con.index(value) / (len(sorted_con) - 1)
+                expected = sorted_con.index(value) / (len(sorted_con) - 1.)
                 self.assertAlmostEqual(calculated, expected, 15, "at index {0:d}\n"
                                                                  "Quantile expected:   {1:f}\n"
                                                                  "Quantile calculated: {2:f}".format(i, expected, calculated))

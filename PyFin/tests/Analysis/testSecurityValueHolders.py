@@ -857,6 +857,12 @@ class TestSecurityValueHolders(unittest.TestCase):
             index=[1, 1, 2, 2, 3, 3]
         )
 
-        # TODO: complete the test example
+        expression = SecurityMovingAverage(2, 'close')
+        calculated = expression.transform(sample_data, name='new_factor')
+
+        expected = sample_data.rolling(window=2).mean()
+
+        np.testing.assert_array_almost_equal(calculated['new_factor'].values[1:],
+                                             expected['close'].values[1:])
 
 

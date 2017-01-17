@@ -13,7 +13,7 @@ from PyFin.Analysis.SecurityValueHolders import SecuritiesValues
 from PyFin.Analysis.SecurityValueHolders import dependencyCalculator
 from PyFin.Analysis.SecurityValueHolders import FilteredSecurityValueHolder
 from PyFin.Analysis.SecurityValueHolders import SecurityLatestValueHolder
-from PyFin.Analysis.SecurityValueHolders import SecurityWhereValueHolder
+from PyFin.Analysis.SecurityValueHolders import SecurityIIFValueHolder
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingAverage
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingMax
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingMinimum
@@ -41,7 +41,7 @@ class TestSecurityValueHolders(unittest.TestCase):
     def testSecurityWhereValueHolder(self):
         benchmark = SecurityLatestValueHolder(dependency='close')
 
-        testValueHolder = SecurityWhereValueHolder(benchmark > 0, benchmark, -benchmark)
+        testValueHolder = SecurityIIFValueHolder(benchmark > 0, benchmark, -benchmark)
         for i in range(len(self.datas['aapl']['close'])):
             data = {'aapl': {Factors.CLOSE: self.datas['aapl'][Factors.CLOSE][i],
                              Factors.OPEN: self.datas['aapl'][Factors.OPEN][i]},
@@ -110,7 +110,7 @@ class TestSecurityValueHolders(unittest.TestCase):
     def testSecurityWhereValueHolderWithSymbolName(self):
         benchmark = SecurityLatestValueHolder(dependency='close')
 
-        testValueHolder = SecurityWhereValueHolder(benchmark > 0, 'open', -benchmark)
+        testValueHolder = SecurityIIFValueHolder(benchmark > 0, 'open', -benchmark)
         for i in range(len(self.datas['aapl']['close'])):
             data = {'aapl': {Factors.CLOSE: self.datas['aapl'][Factors.CLOSE][i],
                              Factors.OPEN: self.datas['aapl'][Factors.OPEN][i]},
@@ -128,7 +128,7 @@ class TestSecurityValueHolders(unittest.TestCase):
                 else:
                     self.assertAlmostEqual(-rawValue, calculated[name])
 
-        testValueHolder = SecurityWhereValueHolder(benchmark > 0, 'open', 'close')
+        testValueHolder = SecurityIIFValueHolder(benchmark > 0, 'open', 'close')
         for i in range(len(self.datas['aapl']['close'])):
             data = {'aapl': {Factors.CLOSE: self.datas['aapl'][Factors.CLOSE][i],
                              Factors.OPEN: self.datas['aapl'][Factors.OPEN][i]},
@@ -149,7 +149,7 @@ class TestSecurityValueHolders(unittest.TestCase):
     def testSecurityWhereValueHolderWithMissingSymbol(self):
         benchmark = SecurityLatestValueHolder(dependency='open')
         benchmark2 = SecurityLatestValueHolder(dependency='close')
-        testValueHolder = SecurityWhereValueHolder(benchmark < 0, 'open', -benchmark2)
+        testValueHolder = SecurityIIFValueHolder(benchmark < 0, 'open', -benchmark2)
 
         data = {'aapl': {'close': 2.0, 'open': 1.5},
                 'ibm': {'open': 1.7}}

@@ -532,7 +532,7 @@ class SecurityShiftedValueHolder(SecurityValueHolder):
         }
 
 
-class SecurityWhereValueHolder(SecurityValueHolder):
+class SecurityIIFValueHolder(SecurityValueHolder):
     def __init__(self, flag, left, right):
 
         if not isinstance(flag, SecurityValueHolder):

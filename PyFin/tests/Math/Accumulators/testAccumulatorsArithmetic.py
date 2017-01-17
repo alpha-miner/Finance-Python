@@ -22,6 +22,8 @@ from PyFin.Math.Accumulators.IAccumulators import Acosh
 from PyFin.Math.Accumulators.IAccumulators import Asin
 from PyFin.Math.Accumulators.IAccumulators import Asinh
 from PyFin.Math.Accumulators.IAccumulators import TruncatedValueHolder
+from PyFin.Math.Accumulators.IAccumulators import IIF
+from PyFin.Math.Accumulators.IAccumulators import Latest
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingAverage
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingVariance
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingMax
@@ -867,3 +869,18 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
 
         self.assertEqual(res.name, 'my_factor')
         np.testing.assert_array_almost_equal(res, expected)
+
+    def testIIFAccumulator(self):
+        iif = IIF(Latest('rf') > 0, 'close', 'open')
+
+        for i, close in enumerate(self.sampleClose):
+            data = {'close': close,
+                    'open': self.sampleOpen[i],
+                    'rf': self.sampleRf[i]}
+
+            iif.push(data)
+
+            if data['rf'] > 0:
+                self.assertAlmostEqual(iif.result(), data['close'])
+            else:
+                self.assertAlmostEqual(iif.result(), data['open'])

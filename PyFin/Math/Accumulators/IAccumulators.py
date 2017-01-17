@@ -451,7 +451,7 @@ class CompoundedValueHolder(Accumulator):
             return False
 
 
-class IIFAccumulator(Accumulator):
+class IIF(Accumulator):
     def __init__(self, cond, left, right):
         self._cond = build_holder(cond)
         self._returnSize = self._cond.valueSize

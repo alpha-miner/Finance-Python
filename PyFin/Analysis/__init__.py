@@ -7,7 +7,7 @@ Created on 2015-8-8
 
 from PyFin.Analysis.DataProviders import DataProvider
 from PyFin.Analysis.SecurityValueHolders import SecurityShiftedValueHolder
-from PyFin.Analysis.SecurityValueHolders import SecurityWhereValueHolder
+from PyFin.Analysis.SecurityValueHolders import SecurityIIFValueHolder
 from PyFin.Analysis.CrossSectionValueHolders import CSRankedSecurityValueHolder
 from PyFin.Analysis.CrossSectionValueHolders import CSAverageSecurityValueHolder
 from PyFin.Analysis.CrossSectionValueHolders import CSAverageAdjustedSecurityValueHolder
@@ -19,7 +19,7 @@ from PyFin.Analysis.transformer import transform
 
 __all__ = ['DataProvider',
            'SecurityShiftedValueHolder',
-           'SecurityWhereValueHolder',
+           'SecurityIIFValueHolder',
            'CSRankedSecurityValueHolder',
            'CSAverageSecurityValueHolder',
            'CSAverageAdjustedSecurityValueHolder',

@@ -17,6 +17,7 @@ from PyFin.Math.Accumulators.IAccumulators import Acosh
 from PyFin.Math.Accumulators.IAccumulators import Asin
 from PyFin.Math.Accumulators.IAccumulators import Asinh
 from PyFin.Math.Accumulators.IAccumulators import Latest
+from PyFin.Math.Accumulators.IAccumulators import IIF
 
 from PyFin.Math.Accumulators.StatelessAccumulators import Sign
 from PyFin.Math.Accumulators.StatelessAccumulators import Diff
@@ -108,6 +109,7 @@ __all__ = ["Exp",
            "Variance",
            "Correlation",
            "Shift",
+           "IIF",
            "MovingAverage",
            "MovingPositiveAverage",
            "MovingNegativeAverage",

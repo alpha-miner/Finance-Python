@@ -9,6 +9,7 @@ import math
 import numpy as np
 from PyFin.Math.Accumulators.IAccumulators import Accumulator
 from PyFin.Math.Accumulators.IAccumulators import Pow
+from PyFin.Math.Accumulators.IAccumulators import StatelessSingleValueAccumulator
 import bisect
 
 
@@ -16,43 +17,6 @@ def _checkParameterList(dependency):
     if not isinstance(dependency, Accumulator) and len(dependency) > 1 and not isinstance(dependency, str):
         raise ValueError("This value holder (e.g. Max or Minimum) can't hold more than 2 parameter names ({0})"
                          " provided".format(dependency))
-
-
-class StatelessSingleValueAccumulator(Accumulator):
-    def __init__(self, dependency='x'):
-        super(StatelessSingleValueAccumulator, self).__init__(dependency)
-        self._returnSize = 1
-        self._window = 1
-        self._containerSize = 1
-
-    def _push(self, data):
-        if not self._isValueHolderContained:
-            try:
-                value = data[self._dependency]
-            except KeyError:
-                value = np.nan
-        else:
-            self._dependency.push(data)
-            value = self._dependency.result()
-        return value
-
-
-class Latest(StatelessSingleValueAccumulator):
-    def __init__(self, dependency='x'):
-        super(Latest, self).__init__(dependency)
-        _checkParameterList(dependency)
-        self._returnSize = 1
-        self._latest = np.nan
-
-    def push(self, data):
-        value = self._push(data)
-        if math.isnan(value):
-            return np.nan
-        self._isFull = 1
-        self._latest = value
-
-    def result(self):
-        return self._latest
 
 
 class Sign(StatelessSingleValueAccumulator):

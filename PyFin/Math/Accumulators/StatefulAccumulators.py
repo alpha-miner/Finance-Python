@@ -10,7 +10,8 @@ import bisect
 import numpy as np
 from copy import deepcopy
 from PyFin.Math.Accumulators.IAccumulators import Accumulator
-from PyFin.Math.Accumulators.StatelessAccumulators import Latest
+from PyFin.Math.Accumulators.IAccumulators import Latest
+from PyFin.Math.Accumulators.IAccumulators import build_holder
 from PyFin.Math.Accumulators.StatelessAccumulators import Positive
 from PyFin.Math.Accumulators.StatelessAccumulators import Negative
 from PyFin.Math.Accumulators.StatelessAccumulators import XAverage
@@ -55,7 +56,7 @@ class Shift(StatefulValueHolder):
     def __init__(self, valueHolder, N=1):
         super(Shift, self).__init__(N, valueHolder._dependency)
         pyFinAssert(N >= 1, ValueError, "shift value should always not be less than 1")
-        self._valueHolder = deepcopy(valueHolder)
+        self._valueHolder = build_holder(valueHolder)
         self._window = valueHolder.window + N
         self._containerSize = N
         self._returnSize = valueHolder.valueSize
@@ -212,7 +213,7 @@ class MovingPositiveAverage(SingleValuedValueHolder):
 class MovingPositiveDifferenceAverage(SingleValuedValueHolder):
     def __init__(self, window, dependency='x'):
         super(MovingPositiveDifferenceAverage, self).__init__(window, dependency)
-        runningPositive = Positive(Latest(dependency) - Shift(Latest(dependency), 1))
+        runningPositive = Positive(build_holder(dependency) - Shift(build_holder(dependency), 1))
         self._runningAverage = MovingAverage(window, dependency=runningPositive)
 
     def push(self, data):
@@ -227,7 +228,7 @@ class MovingPositiveDifferenceAverage(SingleValuedValueHolder):
 class MovingNegativeDifferenceAverage(SingleValuedValueHolder):
     def __init__(self, window, dependency='x'):
         super(MovingNegativeDifferenceAverage, self).__init__(window, dependency)
-        runningNegative = Negative(Latest(dependency) - Shift(Latest(dependency), 1))
+        runningNegative = Negative(build_holder(dependency) - Shift(build_holder(dependency), 1))
         self._runningAverage = MovingAverage(window, dependency=runningNegative)
 
     def push(self, data):

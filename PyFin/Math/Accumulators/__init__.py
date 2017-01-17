@@ -16,8 +16,8 @@ from PyFin.Math.Accumulators.IAccumulators import Acos
 from PyFin.Math.Accumulators.IAccumulators import Acosh
 from PyFin.Math.Accumulators.IAccumulators import Asin
 from PyFin.Math.Accumulators.IAccumulators import Asinh
+from PyFin.Math.Accumulators.IAccumulators import Latest
 
-from PyFin.Math.Accumulators.StatelessAccumulators import Latest
 from PyFin.Math.Accumulators.StatelessAccumulators import Sign
 from PyFin.Math.Accumulators.StatelessAccumulators import Diff
 from PyFin.Math.Accumulators.StatelessAccumulators import SimpleReturn

@@ -182,7 +182,7 @@ class Accumulator(object):
 
 class NegativeValueHolder(Accumulator):
     def __init__(self, valueHolder):
-        self._valueHolder = deepcopy(valueHolder)
+        self._valueHolder = build_holder(valueHolder)
         self._returnSize = valueHolder.valueSize
         self._window = valueHolder.window
         self._containerSize = valueHolder._containerSize
@@ -205,8 +205,8 @@ class NegativeValueHolder(Accumulator):
 class ListedValueHolder(Accumulator):
     def __init__(self, left, right):
         self._returnSize = left.valueSize + right.valueSize
-        self._left = deepcopy(left)
-        self._right = deepcopy(right)
+        self._left = build_holder(left)
+        self._right = build_holder(right)
         self._dependency = list(set(left.dependency).union(set(right.dependency)))
         self._window = max(self._left.window, self._right.window)
         self._containerSize = max(self._left._containerSize, self._right._containerSize)
@@ -247,7 +247,7 @@ class TruncatedValueHolder(Accumulator):
             self._stop = None
             self._returnSize = 1
 
-        self._valueHolder = deepcopy(valueHolder)
+        self._valueHolder = build_holder(valueHolder)
         self._dependency = self._valueHolder.dependency
         self._window = valueHolder.window
         self._containerSize = valueHolder._containerSize
@@ -267,8 +267,8 @@ class TruncatedValueHolder(Accumulator):
 class CombinedValueHolder(Accumulator):
     def __init__(self, left, right):
         self._returnSize = left.valueSize
-        self._left = deepcopy(left)
-        self._right = deepcopy(right)
+        self._left = build_holder(left)
+        self._right = build_holder(right)
         self._dependency = list(set(left.dependency).union(set(right.dependency)))
         self._window = max(self._left.window, self._right.window)
         self._containerSize = max(self._left._containerSize, self._right._containerSize)
@@ -367,11 +367,58 @@ class Identity(Accumulator):
         return self._value
 
 
+class StatelessSingleValueAccumulator(Accumulator):
+    def __init__(self, dependency='x'):
+        super(StatelessSingleValueAccumulator, self).__init__(dependency)
+        self._returnSize = 1
+        self._window = 1
+        self._containerSize = 1
+
+    def _push(self, data):
+        if not self._isValueHolderContained:
+            try:
+                value = data[self._dependency]
+            except KeyError:
+                value = np.nan
+        else:
+            self._dependency.push(data)
+            value = self._dependency.result()
+        return value
+
+
+class Latest(StatelessSingleValueAccumulator):
+    def __init__(self, dependency='x'):
+        super(Latest, self).__init__(dependency)
+        self._window = 1
+        self._returnSize = 1
+        self._containerSize = 1
+        self._latest = np.nan
+
+    def push(self, data):
+        value = self._push(data)
+        if math.isnan(value):
+            return np.nan
+        self._isFull = 1
+        self._latest = value
+
+    def result(self):
+        return self._latest
+
+
+def build_holder(name):
+    if isinstance(name, Accumulator):
+        return deepcopy(name)
+    elif isinstance(name, str):
+        return Latest(name)
+    elif hasattr(name, '__iter__'):
+        return build_holder(name[0])
+
+
 class CompoundedValueHolder(Accumulator):
     def __init__(self, left, right):
         self._returnSize = right.valueSize
-        self._left = deepcopy(left)
-        self._right = deepcopy(right)
+        self._left = build_holder(left)
+        self._right = build_holder(right)
         self._window = self._left.window + self._right.window - 1
         self._containerSize = self._right._containerSize
         self._dependency = deepcopy(left.dependency)
@@ -402,6 +449,28 @@ class CompoundedValueHolder(Accumulator):
             return True
         else:
             return False
+
+
+class IIFAccumulator(Accumulator):
+    def __init__(self, cond, left, right):
+        self._cond = build_holder(cond)
+        self._returnSize = self._cond.valueSize
+        self._left = build_holder(left)
+        self._right = build_holder(right)
+        self._dependency = list(set(self._cond.dependency).union(set(self._cond.dependency).union(set(self._cond.dependency))))
+        self._window = max(self._cond.window, self._left.window, self._right.window)
+        self._containerSize = max(self._cond._containerSize, self._left._containerSize, self._right._containerSize)
+        self._isFull = 0
+
+    def push(self, data):
+        self._cond.push(data)
+        self._left.push(data)
+        self._right.push(data)
+        if self._isFull == 0 and self._cond.isFull and self._left.isFull and self._right.isFull:
+            self._isFull = 1
+
+    def result(self):
+        return self._left.result() if self._cond.result() else self._right.result()
 
 
 class BasicFunction(Accumulator):

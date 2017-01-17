@@ -15,7 +15,7 @@ import pandas as pd
 from pandas import Series as SecuritiesValues
 from PyFin.Utilities import to_dict
 from PyFin.Math.Accumulators.StatefulAccumulators import Shift
-from PyFin.Math.Accumulators.StatelessAccumulators import Latest
+from PyFin.Math.Accumulators.IAccumulators import Latest
 from PyFin.Math.Accumulators.IAccumulators import Identity
 
 if sys.version_info > (3, 0, 0):

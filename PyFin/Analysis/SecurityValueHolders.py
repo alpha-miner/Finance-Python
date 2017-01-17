@@ -12,7 +12,8 @@ import sys
 import operator
 import numpy as np
 import pandas as pd
-from pandas import Series as SecurityValues
+#from pandas import Series as SecurityValues
+from PyFin.Analysis.SecurityValues import SecurityValues
 from PyFin.Utilities import to_dict
 from PyFin.Math.Accumulators.StatefulAccumulators import Shift
 from PyFin.Math.Accumulators.IAccumulators import Latest

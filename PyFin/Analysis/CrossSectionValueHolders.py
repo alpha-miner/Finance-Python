@@ -6,7 +6,7 @@ Created on 2017-1-6
 """
 
 import copy
-from PyFin.Analysis.SecurityValueHolders import SecuritiesValues
+from PyFin.Analysis.SecurityValueHolders import SecurityValues
 from PyFin.Analysis.SecurityValueHolders import SecurityValueHolder
 from PyFin.Analysis.SecurityValueHolders import SecurityLatestValueHolder
 
@@ -24,7 +24,7 @@ class CrossSectionValueHolder(SecurityValueHolder):
         self._returnSize = self._inner.valueSize
         self._dependency = copy.deepcopy(self._inner._dependency)
         self.updated = False
-        self.cached = SecuritiesValues()
+        self.cached = SecurityValues()
 
     @property
     def symbolList(self):
@@ -80,7 +80,7 @@ class CSAverageSecurityValueHolder(CrossSectionValueHolder):
         else:
             raw_values = self._inner.value
             mean_value = raw_values.mean()
-            self.cached = SecuritiesValues(mean_value, raw_values.index)
+            self.cached = SecurityValues(mean_value, raw_values.index)
             self.updated = True
             return self.cached
 
@@ -90,14 +90,14 @@ class CSAverageSecurityValueHolder(CrossSectionValueHolder):
         else:
             raw_values = self._inner.value
             mean_value = raw_values.mean()
-            self.cached = SecuritiesValues(mean_value, raw_values.index)
+            self.cached = SecurityValues(mean_value, raw_values.index)
             self.updated = True
             return self.cached[name]
 
     def value_by_names(self, names):
         raw_values = self._inner.value_by_names(names)
         mean_value = raw_values.mean()
-        raw_values = SecuritiesValues(mean_value, raw_values.index)
+        raw_values = SecurityValues(mean_value, raw_values.index)
         return raw_values[names]
 
 

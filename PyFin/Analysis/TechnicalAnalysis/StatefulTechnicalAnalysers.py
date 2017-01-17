@@ -8,7 +8,7 @@ Created on 2015-8-8
 import copy
 import numpy as np
 from PyFin.Analysis.SecurityValueHolders import SecurityValueHolder
-from PyFin.Analysis.SecurityValueHolders import SecuritiesValues
+from PyFin.Analysis.SecurityValueHolders import SecurityValues
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingAverage
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingMax
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingMinimum
@@ -123,7 +123,7 @@ class SecurityMovingHistoricalWindow(SecuritySingleValueHolder):
                     res[name] = self._innerHolders[name].value[item]
                 except ArithmeticError:
                     res[name] = np.nan
-            return SecuritiesValues(res)
+            return SecurityValues(res)
         else:
             raise ValueError("{0} is not recognized as valid int or string".format(item))
 

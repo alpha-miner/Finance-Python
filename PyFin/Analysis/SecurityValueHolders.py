@@ -12,7 +12,7 @@ import sys
 import operator
 import numpy as np
 import pandas as pd
-from pandas import Series as SecuritiesValues
+from pandas import Series as SecurityValues
 from PyFin.Utilities import to_dict
 from PyFin.Math.Accumulators.StatefulAccumulators import Shift
 from PyFin.Math.Accumulators.IAccumulators import Latest
@@ -92,7 +92,7 @@ class SecurityValueHolder(object):
     @property
     def value(self):
         if self.updated:
-            return SecuritiesValues(self.cached)
+            return SecurityValues(self.cached)
         else:
             keys = self._innerHolders.keys()
             values = []
@@ -103,13 +103,13 @@ class SecurityValueHolder(object):
                     values.append(np.nan)
             self.cached = dict(zip(keys, values))
             self.updated = True
-            return SecuritiesValues(values, index=keys)
+            return SecurityValues(values, index=keys)
 
     def value_by_names(self, names):
         if self.updated:
             return self.cached[names]
         else:
-            return SecuritiesValues([self._innerHolders[name].result() for name in names], index=names)
+            return SecurityValues([self._innerHolders[name].result() for name in names], index=names)
 
     def value_by_name(self, name):
         if self.updated:

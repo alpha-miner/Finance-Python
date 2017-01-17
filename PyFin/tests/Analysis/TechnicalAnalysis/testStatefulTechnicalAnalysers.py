@@ -13,6 +13,7 @@ from collections import deque
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingAverage
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingMax
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingMinimum
+from PyFin.Analysis.TechnicalAnalysis import SecurityMovingQuantile
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingSum
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingCountedPositive
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingPositiveAverage
@@ -107,6 +108,32 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
 
         with self.assertRaises(ValueError):
             _ = SecurityMovingMinimum(window, ['close', 'open'])
+
+    def testSecurityMovingQuantile(self):
+        window = 10
+        mq = SecurityMovingQuantile(window, ['close'])
+
+        for i in range(len(self.aapl['close'])):
+            data = {'aapl': {'close': self.aapl['close'][i], 'open': self.aapl['open'][i]}}
+            data['ibm'] = {'close': self.ibm['close'][i], 'open': self.ibm['open'][i]}
+            mq.push(data)
+            if i < 10:
+                start = 0
+            else:
+                start = i + 1 - window
+
+            if i < 1:
+                continue
+
+            value = mq.value
+            for name in value.index:
+                con = self.dataSet[name]['close'][start:(i + 1)]
+                sorted_con = sorted(con)
+                expected = sorted_con.index(self.dataSet[name]['close'][i]) / (len(sorted_con) - 1.)
+                calculated = value[name]
+                self.assertAlmostEqual(expected, calculated, 12, 'at index {0}\n'
+                                                                 'expected:   {1:.12f}\n'
+                                                                 'calculated: {2:.12f}'.format(i, expected, calculated))
 
     def testSecurityMovingSum(self):
         window = 10

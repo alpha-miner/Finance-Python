@@ -19,3 +19,4 @@ Finance_Python.egg-info/*
 dist/*
 *.pyd
 *.c
+setup.cfg

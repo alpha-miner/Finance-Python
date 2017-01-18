@@ -38,7 +38,7 @@ class TestCrossSectionValueHolder(unittest.TestCase):
             benchmark.push(data)
             rankHolder.push(data)
             benchmarkValues = benchmark.value
-            np.testing.assert_array_almost_equal(benchmarkValues.rank(), rankHolder.value)
+            np.testing.assert_array_almost_equal(benchmarkValues.rank().values, rankHolder.value.values)
 
     def testCSRankedSecurityValueHolder(self):
         benchmark = SecurityLatestValueHolder(dependency='close')
@@ -52,7 +52,7 @@ class TestCrossSectionValueHolder(unittest.TestCase):
             benchmark.push(data)
             rankHolder.push(data)
             benchmarkValues = benchmark.value
-            np.testing.assert_array_almost_equal(benchmarkValues.rank(), rankHolder.value)
+            np.testing.assert_array_almost_equal(benchmarkValues.rank().values, rankHolder.value.values)
 
     def testCSAverageSecurityValueHolder(self):
         benchmark = SecurityLatestValueHolder(dependency='close')
@@ -66,9 +66,9 @@ class TestCrossSectionValueHolder(unittest.TestCase):
             benchmark.push(data)
             meanHolder.push(data)
             benchmarkValues = benchmark.value
-            np.testing.assert_array_almost_equal(benchmarkValues.mean(), meanHolder.value)
+            np.testing.assert_array_almost_equal(benchmarkValues.mean(), meanHolder.value.values)
 
-    def testCSAverageSecurityValueHolder(self):
+    def testCSAverageAdjustedSecurityValueHolder(self):
         benchmark = SecurityLatestValueHolder(dependency='close')
         meanAdjustedHolder = CSAverageAdjustedSecurityValueHolder(benchmark)
 
@@ -80,7 +80,7 @@ class TestCrossSectionValueHolder(unittest.TestCase):
             benchmark.push(data)
             meanAdjustedHolder.push(data)
             benchmarkValues = benchmark.value
-            np.testing.assert_array_almost_equal(benchmarkValues - benchmarkValues.mean(), meanAdjustedHolder.value)
+            np.testing.assert_array_almost_equal(benchmarkValues.values - benchmarkValues.mean(), meanAdjustedHolder.value.values)
 
     def testCSQuantileSecurityValueHolder(self):
         keys = list(range(1, 11))
@@ -94,7 +94,8 @@ class TestCrossSectionValueHolder(unittest.TestCase):
 
         quantile_value = CSQuantileSecurityValueHolder('close')
         quantile_value.push(data)
-        calculated = quantile_value.value.sort_index()
+
+        calculated = quantile_value.value
 
         data = np.linspace(1., 0., 10)
 

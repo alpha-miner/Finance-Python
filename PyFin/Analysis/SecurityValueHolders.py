@@ -12,7 +12,6 @@ import sys
 import operator
 import numpy as np
 import pandas as pd
-#from pandas import Series as SecurityValues
 from PyFin.Analysis.SecurityValues import SecurityValues
 from PyFin.Utilities import to_dict
 from PyFin.Math.Accumulators.StatefulAccumulators import Shift
@@ -93,7 +92,7 @@ class SecurityValueHolder(object):
     @property
     def value(self):
         if self.updated:
-            return SecurityValues(self.cached)
+            return SecurityValues(self.cached.values, self.cached.name_mapping)
         else:
             keys = self._innerHolders.keys()
             values = []
@@ -102,9 +101,9 @@ class SecurityValueHolder(object):
                     values.append(self._innerHolders[name].result())
                 except ArithmeticError:
                     values.append(np.nan)
-            self.cached = dict(zip(keys, values))
+            self.cached = SecurityValues(values, index=keys)
             self.updated = True
-            return SecurityValues(values, index=keys)
+            return self.cached
 
     def value_by_names(self, names):
         if self.updated:
@@ -235,7 +234,7 @@ class SecurityValueHolder(object):
             for j, dict_data in enumerate(split_values):
                 self.push(dict_data)
                 end_count = start_count + len(dict_data)
-                output_values[start_count:end_count, 0] = self.value_by_names(split_category[j])
+                output_values[start_count:end_count, 0] = self.value_by_names(split_category[j]).values
                 start_count = end_count
         else:
             for j, dict_data in enumerate(split_values):
@@ -279,8 +278,8 @@ class FilteredSecurityValueHolder(SecurityValueHolder):
         if self.updated:
             return self.cached
         else:
-            filter_value = self._filter.value
-            self.cached = self._computer.value[filter_value]
+            filter_value = self._filter.value.values
+            self.cached = self._computer.value.mask(filter_value)
             self.updated = True
             return self.cached
 
@@ -300,8 +299,7 @@ class FilteredSecurityValueHolder(SecurityValueHolder):
         else:
             filter_value = self._filter.value_by_names(names)
             orig_values = self._computer.value_by_names(names)
-            orig_values.where(filter_value, np.nan, inplace=True)
-            return orig_values
+            return SecurityValues(np.where(filter_value.values, orig_values.values, np.nan), filter_value.name_mapping)
 
     def push(self, data):
         self._computer.push(data)
@@ -582,7 +580,7 @@ class SecurityIIFValueHolder(SecurityValueHolder):
         if self.updated:
             return self.cached
         else:
-            self.cached = self._left.value.where(self._flag.value, self._right.value)
+            self.cached = SecurityValues(np.where(self._flag.value.values, self._left.value.values, self._right.value.values), self._flag.value.name_mapping)
             self.updated = True
             return self.cached
 

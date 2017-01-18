@@ -30,7 +30,7 @@ class TestSecurityValueHolders(unittest.TestCase):
                       'ibm': {'close': sample2[:, 0], 'open': sample2[:, 1]}}
 
         def check_values(expected, calculated):
-            for name in calculated:
+            for name in calculated.index:
                 self.assertEqual(calculated[name], expected[name], "for the name {0}\n"
                                                                    "expected:   {1}\n"
                                                                    "calculated: {2}".format(name,
@@ -52,7 +52,7 @@ class TestSecurityValueHolders(unittest.TestCase):
 
             calculated = testValueHolder.value
 
-            self.assertTrue(np.all(calculated > 0.))
+            self.assertTrue(np.all((calculated > 0.).values))
 
             for name in calculated.index:
                 rawValue = data[name][Factors.CLOSE]
@@ -223,7 +223,9 @@ class TestSecurityValueHolders(unittest.TestCase):
             rawHolder.push(data)
             filteredHolder.push(data)
 
-            self.assertTrue(np.all(filteredHolder.value >= 0.))
+            filteredValues = filteredHolder.value >= 0.
+
+            self.assertTrue(np.all(filteredValues.values))
 
             rawValues = rawHolder.value
             filteredValues = filteredHolder.value
@@ -301,7 +303,7 @@ class TestSecurityValueHolders(unittest.TestCase):
         for key in benchmarkValues:
             self.assertAlmostEqual(benchmarkValues[key], values[key], 12)
 
-        negValues = - values
+        negValues = -values
         for key in benchmarkValues:
             self.assertAlmostEqual(benchmarkValues[key], -negValues[key], 12)
 

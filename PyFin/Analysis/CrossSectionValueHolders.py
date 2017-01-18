@@ -6,6 +6,7 @@ Created on 2017-1-6
 """
 
 import copy
+import numpy as np
 from PyFin.Analysis.SecurityValueHolders import SecurityValues
 from PyFin.Analysis.SecurityValueHolders import SecurityValueHolder
 from PyFin.Analysis.SecurityValueHolders import SecurityLatestValueHolder
@@ -24,7 +25,7 @@ class CrossSectionValueHolder(SecurityValueHolder):
         self._returnSize = self._inner.valueSize
         self._dependency = copy.deepcopy(self._inner._dependency)
         self.updated = False
-        self.cached = SecurityValues()
+        self.cached = None
 
     @property
     def symbolList(self):
@@ -89,8 +90,7 @@ class CSAverageSecurityValueHolder(CrossSectionValueHolder):
             return self.cached[name]
         else:
             raw_values = self._inner.value
-            mean_value = raw_values.mean()
-            self.cached = SecurityValues(mean_value, raw_values.index)
+            self.cached = SecurityValues(np.ones(len(raw_values.index) * raw_values.mean()), raw_values.index)
             self.updated = True
             return self.cached[name]
 

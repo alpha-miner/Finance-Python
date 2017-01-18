@@ -580,7 +580,10 @@ class SecurityIIFValueHolder(SecurityValueHolder):
         if self.updated:
             return self.cached
         else:
-            self.cached = SecurityValues(np.where(self._flag.value.values, self._left.value.values, self._right.value.values), self._flag.value.name_mapping)
+            self.cached = SecurityValues(np.where(self._flag.value.values,
+                                                  self._left.value.values,
+                                                  self._right.value.values),
+                                         self._flag.value.name_mapping)
             self.updated = True
             return self.cached
 
@@ -597,8 +600,13 @@ class SecurityIIFValueHolder(SecurityValueHolder):
         if self.updated:
             return self.cached[names]
         else:
-            return self._left.value_by_names(names).where(self._flag.value_by_names(names),
-                                                          self._right.value_by_names(names))
+            flag_value = self._flag.value_by_names(names)
+            left_value = self._left.value_by_names(names)
+            right_value = self._right.value_by_names(names)
+            return SecurityValues(np.where(flag_value.values,
+                                           left_value.values,
+                                           right_value.values),
+                                  flag_value.name_mapping)
 
 
 def dependencyCalculator(*args):

@@ -11,8 +11,8 @@ import pandas as pd
 from PyFin.api import MA
 from PyFin.Math.Accumulators import MovingAverage
 
-n = 100
-m = 100
+n = 3000
+m = 30
 
 df = pd.DataFrame(np.random.randn(n*m, 3), columns=['x', 'y', 'z'])
 df['c'] = list(range(n)) * m

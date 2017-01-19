@@ -22,15 +22,17 @@ class SecurityValues:
 
         if isinstance(index, OrderedDict):
             self.name_mapping = index
-            self.name_array = np.array(list(index.keys()))
         else:
             self.name_mapping = OrderedDict(zip(index, range(len(index))))
-            self.name_array = np.array(list(index))
+
+        self.name_array = None
 
     def __getitem__(self, name):
         return self.values[self.name_mapping[name]]
 
     def mask(self, flags):
+        if not self.name_array:
+            self.name_array = np.array(list(self.name_mapping.keys()))
         return SecurityValues(self.values[flags], self.name_array[flags])
 
     def __neg__(self):

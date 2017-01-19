@@ -23,7 +23,6 @@ else:
 
 
 class Accumulator(object):
-    __metaclass__ = ABCMeta
 
     def __init__(self, dependency):
         self._isFull = 0

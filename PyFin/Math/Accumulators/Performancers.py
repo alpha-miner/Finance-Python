@@ -26,7 +26,7 @@ class MovingLogReturn(SingleValuedValueHolder):
         value = super(MovingLogReturn, self).push(data)
         if math.isnan(value):
             return np.nan
-        popout = self._dumpOneValue(value)
+        popout = self._deque.dump(value)
         if popout is not np.nan and popout != 0.0:
             self._runningReturn = math.log(value / popout)
 
@@ -184,7 +184,7 @@ class MovingMaxDrawdown(StatefulValueHolder):
             return np.nan
         self._drawdownCalculator.push(dict(x=value))
         drawdown, duration, lastHighIndex = self._drawdownCalculator.result()
-        self._dumpOneValue((drawdown, duration, lastHighIndex))
+        self._deque.dump((drawdown, duration, lastHighIndex))
 
     def result(self):
         sortedValue = sorted(range(self.size), key=lambda x: self._deque[x][0])

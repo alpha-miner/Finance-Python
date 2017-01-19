@@ -10,7 +10,6 @@ import bisect
 import numpy as np
 from copy import deepcopy
 from PyFin.Math.Accumulators.IAccumulators import Accumulator
-from PyFin.Math.Accumulators.IAccumulators import Latest
 from PyFin.Math.Accumulators.IAccumulators import build_holder
 from PyFin.Math.Accumulators.StatelessAccumulators import Positive
 from PyFin.Math.Accumulators.StatelessAccumulators import Negative
@@ -48,9 +47,6 @@ class StatefulValueHolder(Accumulator):
     def isFull(self):
         return self._deque.isFull()
 
-    def _dumpOneValue(self, value):
-        return self._deque.dump(value)
-
 
 class Shift(StatefulValueHolder):
     def __init__(self, valueHolder, N=1):
@@ -64,7 +60,7 @@ class Shift(StatefulValueHolder):
 
     def push(self, data):
         self._valueHolder.push(data)
-        self._popout = self._dumpOneValue(self._valueHolder.result())
+        self._popout = self._deque.dump(self._valueHolder.result())
 
     def result(self):
         try:
@@ -100,12 +96,12 @@ class SortedValueHolder(SingleValuedValueHolder):
         if math.isnan(value):
             return np.nan
         if self._deque.isFull():
-            popout = self._dumpOneValue(value)
+            popout = self._deque.dump(value)
             delPos = bisect.bisect_left(self._sortedArray, popout)
             del self._sortedArray[delPos]
             bisect.insort_left(self._sortedArray, value)
         else:
-            self._dumpOneValue(value)
+            self._deque.dump(value)
             bisect.insort_left(self._sortedArray, value)
 
 
@@ -152,7 +148,7 @@ class MovingSum(SingleValuedValueHolder):
         value = self._push(data)
         if math.isnan(value):
             return np.nan
-        popout = self._dumpOneValue(value)
+        popout = self._deque.dump(value)
         if not math.isnan(popout):
             self._runningSum = self._runningSum - popout + value
         else:
@@ -171,7 +167,7 @@ class MovingAverage(SingleValuedValueHolder):
         value = self._push(data)
         if math.isnan(value):
             return np.nan
-        popout = self._dumpOneValue(value)
+        popout = self._deque.dump(value)
         if not math.isnan(popout):
             self._runningSum += value - popout
         else:
@@ -194,7 +190,7 @@ class MovingPositiveAverage(SingleValuedValueHolder):
         value = self._push(data)
         if math.isnan(value):
             return np.nan
-        popout = self._dumpOneValue(value)
+        popout = self._deque.dump(value)
         if value > 0.0:
             self._runningPositiveCount += 1
             self._runningPositiveSum += value
@@ -272,7 +268,7 @@ class MovingNegativeAverage(SingleValuedValueHolder):
         value = self._push(data)
         if math.isnan(value):
             return np.nan
-        popout = self._dumpOneValue(value)
+        popout = self._deque.dump(value)
         if value < 0.0:
             self._runningNegativeCount += 1
             self._runningNegativeSum += value
@@ -301,7 +297,7 @@ class MovingVariance(SingleValuedValueHolder):
         value = self._push(data)
         if math.isnan(value):
             return np.nan
-        popout = self._dumpOneValue(value)
+        popout = self._deque.dump(value)
         if not math.isnan(popout):
             self._runningSum += value - popout
             self._runningSumSquare += value * value - popout * popout
@@ -338,7 +334,7 @@ class MovingNegativeVariance(SingleValuedValueHolder):
         value = self._push(data)
         if math.isnan(value):
             return np.nan
-        popout = self._dumpOneValue(value)
+        popout = self._deque.dump(value)
         if value < 0:
             self._runningNegativeSum += value
             self._runningNegativeSumSquare += value * value
@@ -374,7 +370,7 @@ class MovingCountedPositive(SingleValuedValueHolder):
         value = self._push(data)
         if math.isnan(value):
             return np.nan
-        popout = self._dumpOneValue(value)
+        popout = self._deque.dump(value)
 
         if value > 0:
             self._counts += 1
@@ -394,7 +390,7 @@ class MovingCountedNegative(SingleValuedValueHolder):
         value = self._push(data)
         if math.isnan(value):
             return np.nan
-        popout = self._dumpOneValue(value)
+        popout = self._deque.dump(value)
 
         if value < 0:
             self._counts += 1
@@ -418,7 +414,7 @@ class MovingHistoricalWindow(StatefulValueHolder):
         except TypeError:
             if not value:
                 return np.nan
-        _ = self._dumpOneValue(value)
+        _ = self._deque.dump(value)
 
     def __getitem__(self, item):
         length = self.size
@@ -445,7 +441,7 @@ class MovingCorrelation(StatefulValueHolder):
         value = super(MovingCorrelation, self).push(data)
         if math.isnan(value[0]) or math.isnan(value[1]):
             return np.nan
-        popout = self._dumpOneValue(value)
+        popout = self._deque.dump(value)
         if not math.isnan(popout[0]):
             headLeft = popout[0]
             headRight = popout[1]
@@ -497,7 +493,7 @@ class MovingCorrelationMatrix(StatefulValueHolder):
             self._runningSumCrossSquare = np.zeros((len(values), len(values)))
             self._isFirst = False
         reshapeValues = np.array(values).reshape((1, len(values)))
-        popout = self._dumpOneValue(reshapeValues)
+        popout = self._deque.dump(reshapeValues)
         if not np.any(np.isnan(popout)):
             pyFinAssert(len(values) == self._runningSum.size, ValueError, "size incompatiable")
             self._runningSum += reshapeValues - popout
@@ -527,7 +523,7 @@ class MovingProduct(SingleValuedValueHolder):
         value = self._push(data)
         if math.isnan(value):
             return np.nan
-        popout = self._dumpOneValue(value)
+        popout = self._deque.dump(value)
         if not math.isnan(popout):
             self._runningProduct *= value / popout
         else:
@@ -544,7 +540,7 @@ class MovingCenterMoment(SingleValuedValueHolder):
 
     def push(self, data):
         value = self._push(data)
-        self._dumpOneValue(value)
+        self._deque.dump(value)
         if math.isnan(value):
             return np.nan
         else:
@@ -622,7 +618,7 @@ class MovingRSV(SingleValuedValueHolder):
         if math.isnan(value):
             return np.nan
         else:
-            self._dumpOneValue(value)
+            self._deque.dump(value)
             self._cached_value = value
 
     def result(self):
@@ -668,11 +664,11 @@ class MovingKDJ(SingleValuedValueHolder):
         value = self._runningRsv.push(data)
         rsv = self._runningRsv.value
         if self.size == 0:
-            self._dumpOneValue(value)
+            self._deque.dump(value)
             self._runningJ = np.nan
         else:
             if self.size == 1:
-                self._dumpOneValue(value)
+                self._deque.dump(value)
                 self._runningK = (0.5 * (self._k - 1) + rsv) / self._k
                 self._runningD = (0.5 * (self._d - 1) + self._runningK) / self._d
             else:
@@ -693,7 +689,7 @@ class MovingAroon(SingleValuedValueHolder):
         if math.isnan(value):
             return np.nan
         else:
-            self._dumpOneValue(value)
+            self._deque.dump(value)
 
     def result(self):
         tmpList = self._deque.as_list()
@@ -711,7 +707,7 @@ class MovingBias(SingleValuedValueHolder):
         if math.isnan(value):
             return np.nan
         else:
-            self._dumpOneValue(value)
+            self._deque.dump(value)
             self._runningBias = value / np.mean(self._deque.as_array()) - 1
 
     def result(self):
@@ -728,7 +724,7 @@ class MovingLevel(SingleValuedValueHolder):
         if math.isnan(value):
             return np.nan
         else:
-            self._dumpOneValue(value)
+            self._deque.dump(value)
             if self.size > 1:
                 con = self._deque.as_list()
                 self._runningLevel = con[-1] / con[0]
@@ -750,7 +746,7 @@ class MovingAutoCorrelation(SingleValuedValueHolder):
         if math.isnan(value):
             return np.nan
         else:
-            self._dumpOneValue(value)
+            self._deque.dump(value)
 
     def result(self):
         tmp_list = self._deque.as_list()

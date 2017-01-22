@@ -821,7 +821,8 @@ class TestSecurityValueHolders(unittest.TestCase):
         test_df = pd.DataFrame({'code': [1, 2, 3, 4, 1, 2, 3],
                                 'b': [4, 5, 6, 7, 6, 5, 4],
                                 'c': [9, 8, 7, 6, 5, 4, 3]},
-                               index=[1, 1, 1, 1, 2, 2, 2])
+                               index=[1, 1, 1, 1, 2, 2, 2],
+                               dtype=float)
 
         expression = SecurityMovingMax(20, 'b') + SecurityMovingMinimum(20, 'c')
         calculated = expression.transform(test_df, name='new_factor', category_field='code')
@@ -832,7 +833,8 @@ class TestSecurityValueHolders(unittest.TestCase):
     def testTransformWithoutCategory(self):
         test_df = pd.DataFrame({'b': [4, 5, 6, 7, 6, 5, 4],
                                 'c': [9, 8, 7, 6, 5, 4, 3]},
-                               index=[1, 2, 3, 4, 5, 6, 7])
+                               index=[1, 2, 3, 4, 5, 6, 7],
+                               dtype=float)
 
         expression = SecurityMovingMax(20, 'b') + SecurityMovingMinimum(20, 'c')
         calculated = expression.transform(test_df, name='new_factor')
@@ -843,7 +845,8 @@ class TestSecurityValueHolders(unittest.TestCase):
         test_df = pd.DataFrame({'code': [1, 2, 3, 4, 5, 6, 7],
                                 'b': [4, 5, 6, 7, 6, 5, 4],
                                 'c': [9, 8, 7, 6, 5, 4, 3]},
-                               index=[1, 1, 1, 1, 2, 2, 2])
+                               index=[1, 1, 1, 1, 2, 2, 2],
+                               dtype=float)
 
         expression = SecurityMovingAverage(2, 'b')
         calculated = expression.transform(test_df, name='new_factor', category_field='code')
@@ -856,7 +859,8 @@ class TestSecurityValueHolders(unittest.TestCase):
             data={'code': [1, 2, 1, 2, 1, 2],
                   'open': [2.0, 1.0, 1.5, 3.0, 2.4, 3.5],
                   'close': [1.7, 1.6, 0.9, 3.8, 1.6, 2.1]},
-            index=[1, 1, 2, 2, 3, 3]
+            index=[1, 1, 2, 2, 3, 3],
+            dtype=float
         )
 
         expression = SecurityMovingAverage(2, 'close')

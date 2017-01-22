@@ -21,7 +21,8 @@ class TestTransformer(unittest.TestCase):
         test_df = pd.DataFrame({'code': [1, 2, 3, 4, 1, 2, 3],
                                 'b': [4, 5, 6, 7, 6, 5, 4],
                                 'c': [9, 8, 7, 6, 5, 4, 3]},
-                               index=[1, 1, 1, 1, 2, 2, 2])
+                               index=[1, 1, 1, 1, 2, 2, 2],
+                               dtype=float)
 
         expression = SecurityMovingMax(2, 'b') + SecurityMovingMinimum(2, 'c')
         calculated = transform(test_df, [expression], cols=['user_factor'], category_field='code')
@@ -32,7 +33,8 @@ class TestTransformer(unittest.TestCase):
     def test_transformer_without_category_name(self):
         test_df = pd.DataFrame({'b': [4, 5, 6, 7, 6, 5, 4],
                                 'c': [9, 8, 7, 6, 5, 4, 3]},
-                               index=[1, 2, 3, 4, 5, 6, 7])
+                               index=[1, 2, 3, 4, 5, 6, 7],
+                               dtype=float)
 
         expression = SecurityMovingMax(20, 'b') + SecurityMovingMinimum(20, 'c')
         calculated = transform(test_df, [expression], cols=['user_factor'])
@@ -44,7 +46,8 @@ class TestTransformer(unittest.TestCase):
         test_df = pd.DataFrame({'code': [1, 2, 3, 4, 1, 2, 3],
                                 'b': [4, 5, 6, 7, 6, 5, 4],
                                 'c': [9, 8, 7, 6, 5, 4, 3]},
-                               index=[1, 1, 1, 1, 2, 2, 2])
+                               index=[1, 1, 1, 1, 2, 2, 2],
+                               dtype=float)
 
         expression1 = SecurityMovingMax(20, 'b')
         expression2 = SecurityMovingMinimum(20, 'c')
@@ -64,7 +67,8 @@ class TestTransformer(unittest.TestCase):
         test_df = pd.DataFrame({'code': [1, 2, 3, 4, 1, 2, 3],
                                 'b': [4, 5, 6, 7, 6, 5, 4],
                                 'c': [9, 8, 7, 6, 5, 4, 3]},
-                               index=[1, 1, 1, 1, 2, 2, 2])
+                               index=[1, 1, 1, 1, 2, 2, 2],
+                               dtype=float)
 
         expression1 = 'b'
         expression2 = SecurityMovingMax(20, 'b') + SecurityMovingMinimum(20, 'c')
@@ -83,7 +87,8 @@ class TestTransformer(unittest.TestCase):
         test_df = pd.DataFrame({'code': [1, 2, 3, 4, 5, 6, 7],
                                 'b': [4, 5, 6, 7, 6, 5, 4],
                                 'c': [9, 8, 7, 6, 5, 4, 3]},
-                               index=[1, 1, 1, 1, 2, 2, 2])
+                               index=[1, 1, 1, 1, 2, 2, 2],
+                               dtype=float)
 
         expression = SecurityMovingAverage(2, 'b')
         calculated = transform(test_df,
@@ -98,7 +103,8 @@ class TestTransformer(unittest.TestCase):
         test_df = pd.DataFrame({'code': [1, 2, 3, 4, 1, 2, 3],
                                 'b': [4, 5, 6, 7, 6, 5, 4],
                                 'c': [9, 8, 7, 6, 5, 4, 3]},
-                               index=[1, 1, 1, 1, 2, 2, 2])
+                               index=[1, 1, 1, 1, 2, 2, 2],
+                               dtype=float)
 
         value_holder = SecurityLatestValueHolder('b')
         filter = SecurityLatestValueHolder('b') >= 5

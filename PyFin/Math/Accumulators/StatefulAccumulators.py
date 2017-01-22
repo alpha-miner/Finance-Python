@@ -139,6 +139,52 @@ class MovingQuantile(SortedValueHolder):
             return np.nan
 
 
+class MovingAllTrue(SingleValuedValueHolder):
+    def __init__(self, window, dependency='x'):
+        super(MovingAllTrue, self).__init__(window, dependency)
+        self._countedTrue = 0
+
+    def push(self, data):
+        value = self._push(data)
+        if math.isnan(value):
+            return np.nan
+        addedTrue = 0
+
+        if value:
+            addedTrue += 1
+        popout = self._deque.dump(value)
+        if not math.isnan(popout) and popout:
+            addedTrue -= 1
+
+        self._countedTrue += addedTrue
+
+    def result(self):
+        return self._countedTrue == self.size
+
+
+class MovingAnyTrue(SingleValuedValueHolder):
+    def __init__(self, window, dependency='x'):
+        super(MovingAnyTrue, self).__init__(window, dependency)
+        self._countedTrue = 0
+
+    def push(self, data):
+        value = self._push(data)
+        if math.isnan(value):
+            return np.nan
+        addedTrue = 0
+
+        if value:
+            addedTrue += 1
+        popout = self._deque.dump(value)
+        if not math.isnan(popout) and popout:
+            addedTrue -= 1
+
+        self._countedTrue += addedTrue
+
+    def result(self):
+        return self._countedTrue != 0
+
+
 class MovingSum(SingleValuedValueHolder):
     def __init__(self, window, dependency='x'):
         super(MovingSum, self).__init__(window, dependency)

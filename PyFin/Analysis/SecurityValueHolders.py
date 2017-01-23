@@ -223,7 +223,8 @@ class SecurityValueHolder(object):
             name = 'transformed'
 
         total_category = data[category_field].tolist()
-        matrix_values = data.as_matrix()
+        data = data.select_dtypes(include=[np.number])
+        matrix_values = data.as_matrix().astype(np.float64)
         columns = data.columns.tolist()
         split_category, split_values = to_dict(total_index, total_category, matrix_values, columns)
 

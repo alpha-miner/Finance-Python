@@ -13,6 +13,8 @@ from PyFin.Math.Accumulators.StatefulAccumulators import MovingAverage
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingMax
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingMinimum
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingQuantile
+from PyFin.Math.Accumulators.StatefulAccumulators import MovingAllTrue
+from PyFin.Math.Accumulators.StatefulAccumulators import MovingAnyTrue
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingSum
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingVariance
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingCountedPositive
@@ -57,6 +59,16 @@ class SecurityMovingMinimum(SecuritySingleValueHolder):
 class SecurityMovingQuantile(SecuritySingleValueHolder):
     def __init__(self, window, dependency='x'):
         super(SecurityMovingQuantile, self).__init__(window, MovingQuantile, dependency)
+
+
+class SecurityMovingAllTrue(SecuritySingleValueHolder):
+    def __init__(self, window, dependency='x'):
+        super(SecurityMovingAllTrue, self).__init__(window, MovingAllTrue, dependency)
+
+
+class SecurityMovingAnyTrue(SecuritySingleValueHolder):
+    def __init__(self, window, dependency='x'):
+        super(SecurityMovingAnyTrue, self).__init__(window, MovingAnyTrue, dependency)
 
 
 class SecurityMovingSum(SecuritySingleValueHolder):

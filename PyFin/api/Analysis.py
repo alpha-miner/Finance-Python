@@ -11,6 +11,8 @@ from PyFin.Analysis.TechnicalAnalysis import SecurityMovingAverage
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingMax
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingMinimum
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingQuantile
+from PyFin.Analysis.TechnicalAnalysis import SecurityMovingAllTrue
+from PyFin.Analysis.TechnicalAnalysis import SecurityMovingAnyTrue
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingSum
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingVariance
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingCountedPositive
@@ -89,6 +91,14 @@ def MIN(window, dependency='x'):
 
 def QUANTILE(window, dependency='x'):
     return SecurityMovingQuantile(window, dependency)
+
+
+def ALLTRUE(window, dependency='x'):
+    return SecurityMovingAllTrue(window, dependency)
+
+
+def ANYTRUE(window, dependency='x'):
+    return SecurityMovingAnyTrue(window, dependency)
 
 
 def SUM(window, dependency='x'):

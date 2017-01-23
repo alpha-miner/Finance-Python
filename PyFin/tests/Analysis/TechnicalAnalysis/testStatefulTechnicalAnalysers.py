@@ -14,6 +14,8 @@ from PyFin.Analysis.TechnicalAnalysis import SecurityMovingAverage
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingMax
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingMinimum
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingQuantile
+from PyFin.Analysis.TechnicalAnalysis import SecurityMovingAllTrue
+from PyFin.Analysis.TechnicalAnalysis import SecurityMovingAnyTrue
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingSum
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingCountedPositive
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingPositiveAverage
@@ -45,7 +47,7 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
             data = {'aapl': {'close': self.aapl['close'][i], 'open': self.aapl['open'][i]}}
             data['ibm'] = {'close': self.ibm['close'][i], 'open': self.ibm['open'][i]}
             ma1.push(data)
-            if i < 10:
+            if i < window:
                 start = 0
             else:
                 start = i + 1 - window
@@ -69,7 +71,7 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
             data = {'aapl': {'close': self.aapl['close'][i], 'open': self.aapl['open'][i]}}
             data['ibm'] = {'close': self.ibm['close'][i], 'open': self.ibm['open'][i]}
             ma1.push(data)
-            if i < 10:
+            if i < window:
                 start = 0
             else:
                 start = i + 1 - window
@@ -93,7 +95,7 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
             data = {'aapl': {'close': self.aapl['close'][i], 'open': self.aapl['open'][i]}}
             data['ibm'] = {'close': self.ibm['close'][i], 'open': self.ibm['open'][i]}
             ma1.push(data)
-            if i < 10:
+            if i < window:
                 start = 0
             else:
                 start = i + 1 - window
@@ -117,7 +119,7 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
             data = {'aapl': {'close': self.aapl['close'][i], 'open': self.aapl['open'][i]}}
             data['ibm'] = {'close': self.ibm['close'][i], 'open': self.ibm['open'][i]}
             mq.push(data)
-            if i < 10:
+            if i < window:
                 start = 0
             else:
                 start = i + 1 - window
@@ -135,6 +137,64 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
                                                                  'expected:   {1:.12f}\n'
                                                                  'calculated: {2:.12f}'.format(i, expected, calculated))
 
+    def testSecurityMovingAllTru(self):
+        window = 3
+
+        self.aapl['close'] = self.aapl['close'] > 0.
+        self.ibm['close'] = self.ibm['close'] > 0.
+
+        mq = SecurityMovingAllTrue(window, ['close'])
+
+        for i in range(len(self.aapl['close'])):
+            data = {'aapl': {'close': self.aapl['close'][i], 'open': self.aapl['open'][i]}}
+            data['ibm'] = {'close': self.ibm['close'][i], 'open': self.ibm['open'][i]}
+            mq.push(data)
+            if i < window:
+                start = 0
+            else:
+                start = i + 1 - window
+
+            if i < 1:
+                continue
+
+            value = mq.value
+            for name in value.index:
+                con = self.dataSet[name]['close'][start:(i + 1)]
+                expected = np.all(con)
+                calculated = value[name]
+                self.assertEqual(expected, calculated, 'at index {0}\n'
+                                                       'expected:   {1}\n'
+                                                       'calculated: {2}'.format(i, expected, calculated))
+
+    def testSecurityMovingAnyTru(self):
+        window = 3
+
+        self.aapl['close'] = self.aapl['close'] > 0.
+        self.ibm['close'] = self.ibm['close'] > 0.
+
+        mq = SecurityMovingAnyTrue(window, ['close'])
+
+        for i in range(len(self.aapl['close'])):
+            data = {'aapl': {'close': self.aapl['close'][i], 'open': self.aapl['open'][i]}}
+            data['ibm'] = {'close': self.ibm['close'][i], 'open': self.ibm['open'][i]}
+            mq.push(data)
+            if i < window:
+                start = 0
+            else:
+                start = i + 1 - window
+
+            if i < 1:
+                continue
+
+            value = mq.value
+            for name in value.index:
+                con = self.dataSet[name]['close'][start:(i + 1)]
+                expected = np.any(con)
+                calculated = value[name]
+                self.assertEqual(expected, calculated, 'at index {0}\n'
+                                                       'expected:   {1}\n'
+                                                       'calculated: {2}'.format(i, expected, calculated))
+
     def testSecurityMovingSum(self):
         window = 10
         ma1 = SecurityMovingSum(window, ['close'])
@@ -143,7 +203,7 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
             data = {'aapl': {'close': self.aapl['close'][i], 'open': self.aapl['open'][i]}}
             data['ibm'] = {'close': self.ibm['close'][i], 'open': self.ibm['open'][i]}
             ma1.push(data)
-            if i < 10:
+            if i < window:
                 start = 0
             else:
                 start = i + 1 - window
@@ -164,7 +224,7 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
             data = {'aapl': {'close': self.aapl['close'][i], 'open': self.aapl['open'][i]}}
             data['ibm'] = {'close': self.ibm['close'][i], 'open': self.ibm['open'][i]}
             ma1.push(data)
-            if i < 10:
+            if i < window:
                 start = 0
             else:
                 start = i + 1 - window
@@ -188,7 +248,7 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
             data = {'aapl': {'close': self.aapl['close'][i], 'open': self.aapl['open'][i]}}
             data['ibm'] = {'close': self.ibm['close'][i], 'open': self.ibm['open'][i]}
             ma1.push(data)
-            if i < 10:
+            if i < window:
                 start = 0
             else:
                 start = i + 1 - window
@@ -245,7 +305,7 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
             data = {'aapl': {'close': self.newDataSet['aapl']['close'][i], 'open': self.newDataSet['aapl']['open'][i]}}
             data['ibm'] = {'close': self.newDataSet['ibm']['close'][i], 'open': self.newDataSet['ibm']['open'][i]}
             ma1.push(data)
-            if i < 10:
+            if i < window:
                 start = 0
             else:
                 start = i - window

@@ -10,10 +10,13 @@ import csv
 import os
 import numpy as np
 from collections import deque
+from PyFin.Math.Accumulators import Latest
 from PyFin.Math.Accumulators import Shift
 from PyFin.Math.Accumulators import MovingMax
 from PyFin.Math.Accumulators import MovingMinimum
 from PyFin.Math.Accumulators import MovingQuantile
+from PyFin.Math.Accumulators import MovingAllTrue
+from PyFin.Math.Accumulators import MovingAnyTrue
 from PyFin.Math.Accumulators import MovingAverage
 from PyFin.Math.Accumulators import MovingPositiveAverage
 from PyFin.Math.Accumulators import MovingNegativeAverage
@@ -286,6 +289,49 @@ class TestStatefulAccumulators(unittest.TestCase):
                 self.assertAlmostEqual(calculated, expected, 15, "at index {0:d}\n"
                                                                  "Quantile expected:   {1:f}\n"
                                                                  "Quantile calculated: {2:f}".format(i, expected, calculated))
+
+    def testMovingAllTrue(self):
+        window = 3
+
+        underlying = Latest('x') > 0.
+
+        mat = MovingAllTrue(window, dependency=underlying)
+
+        total = np.random.randn(2500)
+        con = deque(maxlen=window)
+        for i, value in enumerate(total):
+            value = float(value)
+            con.append(value)
+            mat.push(dict(x=value))
+
+            calculated = mat.result()
+            expected = np.all(np.array(con) > 0.)
+
+            self.assertEqual(calculated, expected, "at index {0}\n"
+                                                   "Quantile expected:   {1}\n"
+                                                   "Quantile calculated: {2}".format(i, expected, calculated))
+
+    def testMovingAnyTrue(self):
+        window = 3
+
+        underlying = Latest('x') > 0.
+
+        mat = MovingAnyTrue(window, dependency=underlying)
+
+        total = np.random.randn(2500)
+        con = deque(maxlen=window)
+        for i, value in enumerate(total):
+            value = float(value)
+            con.append(value)
+            mat.push(dict(x=value))
+
+            calculated = mat.result()
+            expected = np.any(np.array(con) > 0.)
+
+            self.assertEqual(calculated, expected, "at index {0}\n"
+                                                   "Quantile expected:   {1}\n"
+                                                   "Quantile calculated: {2}".format(i, expected, calculated))
+
 
     def testMovingCountedPositive(self):
         window = 120

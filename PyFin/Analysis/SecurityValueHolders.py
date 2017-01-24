@@ -266,6 +266,13 @@ class FilteredSecurityValueHolder(SecurityValueHolder):
         self.updated = False
         self.cached = pd.Series()
 
+    def isFullByName(self, name):
+        return self._computer.isFullByName(name)
+
+    @property
+    def isFull(self):
+        return self._computer.isFull
+
     @property
     def symbolList(self):
         return self._computer.symbolList
@@ -319,6 +326,13 @@ class IdentitySecurityValueHolder(SecurityValueHolder):
         self.updated = False
         self.cached = pd.Series()
 
+    def isFullByName(self, name):
+        return True
+
+    @property
+    def isFull(self):
+        return True
+
     def push(self, data):
         for name in data:
             try:
@@ -341,6 +355,13 @@ class SecurityUnitoryValueHolder(SecurityValueHolder):
         self._op = op
         self.updated = False
         self.cached = pd.Series()
+
+    def isFullByName(self, name):
+        return self._right.isFullByName(name)
+
+    @property
+    def isFull(self):
+        return self._right.isFull
 
     @property
     def symbolList(self):
@@ -414,6 +435,13 @@ class SecurityCombinedValueHolder(SecurityValueHolder):
         self._op = op
         self.updated = False
         self.cached = pd.Series()
+
+    def isFullByName(self, name):
+        return self._left.isFullByName(name) and self._right.isFullByName(name)
+
+    @property
+    def isFull(self):
+        return self._left.isFull and self._right.isFull
 
     @property
     def symbolList(self):
@@ -565,6 +593,13 @@ class SecurityIIFValueHolder(SecurityValueHolder):
         self._returnSize = self._flag.valueSize
         self.updated = False
         self.cached = pd.Series()
+
+    def isFullByName(self, name):
+        return self._flag.isFullByName(name) and self._left.isFullByName(name) and self._right.isFullByName(name)
+
+    @property
+    def isFull(self):
+        return self._flag.isFull and self._left.isFull and self._right.isFull
 
     @property
     def symbolList(self):

@@ -28,7 +28,11 @@ class SecurityValues:
         self.name_array = None
 
     def __getitem__(self, name):
-        return self.values[self.name_mapping[name]]
+        if not isinstance(name, list):
+            return self.values[self.name_mapping[name]]
+        else:
+            data = np.array([self.values[self.name_mapping[n]] for n in name])
+            return SecurityValues(data, name)
 
     def mask(self, flags):
         if not self.name_array:
@@ -173,3 +177,6 @@ class SecurityValues:
 
     def mean(self):
         return self.values.mean()
+
+    def dot(self, right):
+        return np.dot(self.values, right.values)

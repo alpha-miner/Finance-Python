@@ -232,7 +232,7 @@ cdef class Period(object):
 
 # implementation detail
 
-cdef _lt_cmp(p1, p2):
+cdef _lt_cmp(Period p1, Period p2):
 
     cdef tuple p1lim
     cdef tuple p2lim
@@ -272,7 +272,7 @@ cdef _lt_cmp(p1, p2):
         raise ValueError("undecidable comparison between {0} and {1}".format(p1, p2))
 
 
-cdef tuple _daysMinMax(p):
+cdef tuple _daysMinMax(Period p):
 
     cdef int units = p.units
     cdef int length = p.length

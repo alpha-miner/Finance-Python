@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-# distutils: language=c++
 u"""
 Created on 2017-1-3
 
@@ -12,15 +11,15 @@ from PyFin.Enums.TimeUnits import TimeUnits
 from PyFin.Utilities import pyFinAssert
 from PyFin.DateUtilities.Period import Period
 from PyFin.Enums.Weekdays import Weekdays
-from libcpp cimport bool as bool_t
 
-cdef int _monthLength(int month, bool_t isLeap):
+
+cdef int _monthLength(int month, int isLeap):
     if isLeap:
         return _MonthLeapLength[month - 1]
     else:
         return _MonthLength[month - 1]
 
-cdef int _monthOffset(int month, bool_t isLeap):
+cdef int _monthOffset(int month, int isLeap):
     if isLeap:
         return _MonthLeapOffset[month - 1]
     else:
@@ -33,7 +32,7 @@ cdef _advance(date, n, units):
     cdef int addedYear
     cdef int monthLeft
     cdef int length
-    cdef bool_t leapFlag
+    cdef int leapFlag
 
     if units == TimeUnits.Days or units == TimeUnits.BDays:
         return Date(serialNumber=date.__serialNumber__ + n)
@@ -80,6 +79,12 @@ cdef class Date(object):
     cdef public int _day
 
     def __init__(self, year=None, month=None, day=None, serialNumber=None):
+
+        cdef int leap
+        cdef int y
+        cdef int m
+        cdef int d
+
         if serialNumber:
             self.__serialNumber__ = serialNumber
 
@@ -146,23 +151,23 @@ cdef class Date(object):
 
     def __add__(self, period):
         if isinstance(period, Period):
-            return _advance(self, period._length, period._units)
+            return _advance(self, period.length, period.units)
         elif isinstance(period, int):
             return _advance(self, period, TimeUnits.Days)
         else:
             period = Period(period)
-            return _advance(self, period._length, period._units)
+            return _advance(self, period.length, period.units)
 
     def __sub__(self, period):
         if isinstance(period, Period):
-            return _advance(self, -period._length, period._units)
+            return _advance(self, -period.length, period.units)
         elif isinstance(period, int):
             return _advance(self, -period, TimeUnits.Days)
         elif isinstance(period, Date):
             return self.__serialNumber__ - period.__serialNumber__
         else:
             period = Period(period)
-            return _advance(self, -period._length, period._units)
+            return _advance(self, -period.length, period.units)
 
     def __hash__(self):
         return self.__serialNumber__
@@ -194,7 +199,7 @@ cdef class Date(object):
         return Date(2199, 12, 31)
 
     @staticmethod
-    def endOfMonth(date):
+    def endOfMonth(Date date):
         cdef int m
         cdef int y
         m = date.month()
@@ -202,7 +207,7 @@ cdef class Date(object):
         return Date(y, m, _monthLength(m, Date.isLeap(y)))
 
     @staticmethod
-    def isEndOfMonth(date):
+    def isEndOfMonth(Date date):
         cdef int m
         cdef int y
         m = date.month()
@@ -210,16 +215,17 @@ cdef class Date(object):
         return date.dayOfMonth() == _monthLength(m, Date.isLeap(y))
 
     @staticmethod
-    def nextWeekday(date, dayOfWeek):
-        wd = date.weekday()
+    def nextWeekday(Date date, int dayOfWeek):
+        cdef wd = date.weekday()
         return date + ((7 if wd > dayOfWeek else 0) - wd + dayOfWeek)
 
     @staticmethod
-    def nthWeekday(nth, dayOfWeek, m, y):
+    def nthWeekday(int nth, int dayOfWeek, int m, int y):
         pyFinAssert(nth > 0, ValueError, "zeroth day of week in a given (month, year) is undefined")
         pyFinAssert(nth < 6, ValueError, "no more than 5 weekday in a given (month, year)")
 
         cdef int skip
+        cdef int first
 
         first = Date(y, m, 1).weekday()
         skip = nth - (1 if dayOfWeek >= first else 0)
@@ -279,7 +285,7 @@ cdef class Date(object):
     cpdef _calculate_date(self, int year, int month, int day):
         cdef int length
         cdef int offset
-        cdef bool_t isLeap
+        cdef int isLeap
 
         isLeap = self.isLeap(year)
 
@@ -297,7 +303,7 @@ def check_date(date):
     else:
         return Date.fromDateTime(date)
 
-cdef bool_t _YearIsLeap[301]
+cdef int _YearIsLeap[301]
 cdef int _YearOffset[301]
 
 _YearIsLeap[:] = [

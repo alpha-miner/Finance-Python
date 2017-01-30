@@ -1,16 +1,11 @@
 # -*- coding: utf-8 -*-
 u"""
-Created on 2015-7-9
+Created on 2017-1-30
 
 @author: cheng.li
 """
 
-from enum import IntEnum
-from enum import unique
-
-
-@unique
-class BizDayConventions(IntEnum):
+cpdef enum BizDayConventions:
     Following = 0
     ModifiedFollowing = 1
     Preceding = 2

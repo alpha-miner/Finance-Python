@@ -105,7 +105,14 @@ ext_modules = [
     "PyFin/Utilities/Tools.pyx",
     "PyFin/Math/ErrorFunction.pyx",
     "PyFin/PricingEngines/SabrFormulaImpl.pyx",
-    "PyFin/PricingEngines/SVIInterpolationImpl.pyx"
+    "PyFin/PricingEngines/SVIInterpolationImpl.pyx",
+    "PyFin/Enums/TimeUnits.pyx",
+    "PyFin/Enums/BizDayConventions.pyx",
+    "PyFin/Enums/DateGeneration.pyx",
+    "PyFin/Enums/Months.pyx",
+    "PyFin/Enums/NormalizingType.pyx",
+    "PyFin/Enums/OptionType.pyx",
+    "PyFin/Enums/Weekdays.pyx"
 ]
 
 setup(

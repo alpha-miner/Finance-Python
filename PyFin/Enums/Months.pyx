@@ -1,14 +1,11 @@
 # -*- coding: utf-8 -*-
 u"""
-Created on 2015-7-9
+Created on 2017-1-30
 
 @author: cheng.li
 """
 
-from enum import IntEnum
-
-
-class Months(IntEnum):
+cpdef enum Months:
     January = 1
     February = 2
     March = 3

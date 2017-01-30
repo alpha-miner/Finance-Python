@@ -50,7 +50,7 @@ class TestSchedule(unittest.TestCase):
         startDate = Date(2012, 1, 1)
         s = Schedule(startDate,
                      startDate + 7,
-                     Period(1, TimeUnits.Days),
+                     Period(length=1, units=TimeUnits.Days),
                      Calendar("China.SSE"),
                      BizDayConventions.Preceding)
 
@@ -63,7 +63,7 @@ class TestSchedule(unittest.TestCase):
         startDate = Date(2012, 1, 17)
         s = Schedule(startDate,
                      startDate + 7,
-                     Period(1, TimeUnits.Days),
+                     Period(length=1, units=TimeUnits.Days),
                      Calendar("Target"),
                      BizDayConventions.Preceding)
         expected = [Date(2012, 1, 17), Date(2012, 1, 18), Date(2012, 1, 19), Date(2012, 1, 20), Date(2012, 1, 23),

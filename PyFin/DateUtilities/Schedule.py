@@ -59,10 +59,10 @@ class Schedule(object):
             pyFinAssert(evalDate < terminationDate, ValueError, "null effective date")
             if nextToLastDate is not None:
                 y = int((nextToLastDate - evalDate) / 366) + 1
-                effectiveDate = nextToLastDate - Period(y, TimeUnits.Years)
+                effectiveDate = nextToLastDate - Period(length=y, units=TimeUnits.Years)
             else:
                 y = int((terminationDate - evalDate) / 366) + 1
-                effectiveDate = terminationDate - Period(y, TimeUnits.Years)
+                effectiveDate = terminationDate - Period(length=y, units=TimeUnits.Years)
         else:
             pyFinAssert(effectiveDate is not None, ValueError, "null effective date")
 
@@ -104,7 +104,7 @@ class Schedule(object):
         periods = 1
 
         if self._rule == DateGeneration.Zero:
-            self._tenor = Period(0, TimeUnits.Years)
+            self._tenor = Period(length=0, units=TimeUnits.Years)
             self._dates.extend([effectiveDate, terminationDate])
             self._isRegular.append(True)
         elif self._rule == DateGeneration.Backward:
@@ -112,7 +112,7 @@ class Schedule(object):
             seed = terminationDate
             if self._nextToLastDate is not None:
                 self._dates.insert(0, self._nextToLastDate)
-                temp = nullCalendar.advanceDate(seed, Period(-periods * self._tenor.length, self._tenor.units),
+                temp = nullCalendar.advanceDate(seed, Period(length=-periods * self._tenor.length, units=self._tenor.units),
                                                 convention, self._endOfMonth)
                 if temp != self._nextToLastDate:
                     self._isRegular.insert(0, False)
@@ -125,7 +125,7 @@ class Schedule(object):
                 exitDate = self._firstDate
 
             while True:
-                temp = nullCalendar.advanceDate(seed, Period(-periods * self._tenor.length, self._tenor.units),
+                temp = nullCalendar.advanceDate(seed, Period(length=-periods * self._tenor.length, units=self._tenor.units),
                                                 convention, self._endOfMonth)
                 if temp < exitDate:
                     if self._firstDate is not None and self._cal.adjustDate(self._dates[0],
@@ -153,7 +153,7 @@ class Schedule(object):
 
             if self._firstDate is not None:
                 self._dates.append(self._firstDate)
-                temp = nullCalendar.advanceDate(seed, Period(periods * self._tenor.length, self._tenor.units),
+                temp = nullCalendar.advanceDate(seed, Period(length=periods * self._tenor.length, units=self._tenor.units),
                                                 convention, self._endOfMonth)
                 if temp != self._firstDate:
                     self._isRegular.append(False)
@@ -166,7 +166,7 @@ class Schedule(object):
                 exitDate = self._nextToLastDate
 
             while True:
-                temp = nullCalendar.advanceDate(seed, Period(periods * self._tenor.length, self._tenor.units),
+                temp = nullCalendar.advanceDate(seed, Period(length=periods * self._tenor.length, units=self._tenor.units),
                                                 convention, self._endOfMonth)
                 if temp > exitDate:
                     if self._nextToLastDate is not None and self._cal.adjustDate(self._dates[-1],

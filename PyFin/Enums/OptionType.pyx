@@ -5,6 +5,9 @@ Created on 2017-1-30
 @author: cheng.li
 """
 
+from PyFin.Enums._OptionType cimport OptionType as ot
+
+
 cpdef enum OptionType:
-    Call = 1
-    Put = -1
+    Call = ot.Call
+    Put = ot.Put

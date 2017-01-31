@@ -5,10 +5,10 @@ Created on 2017-2-1
 @author: cheng.li
 """
 
-from PyFin.Enums.Weekdays import Weekdays
-from PyFin.Enums.Months import Months
-from PyFin.Enums.BizDayConventions import BizDayConventions
-from PyFin.Enums.TimeUnits import TimeUnits
+from PyFin.Enums._Weekdays cimport Weekdays
+from PyFin.Enums._TimeUnits cimport TimeUnits
+from PyFin.Enums._Months cimport Months
+from PyFin.Enums._BizDayConventions cimport BizDayConventions
 from PyFin.DateUtilities.Date import Date
 from PyFin.DateUtilities.Period import Period
 from PyFin.Utilities import pyFinAssert
@@ -17,6 +17,7 @@ from PyFin.Utilities import pyFinAssert
 cdef class Calendar(object):
 
     cdef public object _impl
+    cdef public str name
 
     def __init__(self, holCenter):
         if isinstance(holCenter, str):
@@ -25,6 +26,7 @@ cdef class Calendar(object):
                 self._impl = _holDict[holCenter]()
             except KeyError:
                 raise ValueError("{0} is not a valid description of a holiday center".format(holCenter))
+            self.name = holCenter
         else:
             raise ValueError("{0} is not a valid description of a holiday center".format(holCenter))
 
@@ -34,7 +36,7 @@ cdef class Calendar(object):
     def isHoliday(self, d):
         return not self._impl.isBizDay(d)
 
-    def isWeekEnd(self, weekday):
+    def isWeekEnd(self, int weekday):
         return self._impl.isWeekEnd(weekday)
 
     def isEndOfMonth(self, d):
@@ -44,7 +46,7 @@ cdef class Calendar(object):
         return self.adjustDate(Date.endOfMonth(d), BizDayConventions.Preceding)
 
     def bizDaysBetween(self, fromDate, toDate, includeFirst=True, includeLast=False):
-        wd = 0
+        cdef int wd = 0
         if fromDate != toDate:
             if fromDate < toDate:
                 d = fromDate
@@ -104,6 +106,9 @@ cdef class Calendar(object):
 
     def advanceDate(self, d, period, c=BizDayConventions.Following, endOfMonth=False):
 
+        cdef int n
+        cdef int units
+
         if isinstance(period, str):
             period = Period(period)
 
@@ -161,6 +166,17 @@ cdef class Calendar(object):
     def __richcmp__(self, right, int op):
         if op == 2:
             return self._impl == right._impl
+
+    def __deepcopy__(self, memo):
+        return Calendar(self.name)
+
+    def __reduce__(self):
+        d = {}
+
+        return Calendar, (self.name, ), d
+
+    def __setstate__(self, state):
+        pass
 
 
 cdef class ChinaSseImpl(object):
@@ -408,12 +424,12 @@ cdef class ChinaSseImpl(object):
         pass
 
     def isBizDay(self, date):
-        w = date.weekday()
+        cdef int w = date.weekday()
         if self.isWeekEnd(w) or date in ChinaSseImpl._holDays:
             return False
         return True
 
-    def isWeekEnd(self, weekDay):
+    def isWeekEnd(self, int weekDay):
         return weekDay == Weekdays.Saturday or weekDay == Weekdays.Sunday
 
     def __richcmp__(self, right, int op):
@@ -533,7 +549,7 @@ cdef class ChinaIBImpl(object):
     def isBizDay(self, date):
         return ChinaIBImpl._sseImpl.isBizDay(date) or date in ChinaIBImpl._working_weekends
 
-    def isWeekEnd(self, weekDay):
+    def isWeekEnd(self, int weekDay):
         return weekDay == Weekdays.Saturday or weekDay == Weekdays.Sunday
 
     def __richcmp__(self, right, int op):
@@ -551,7 +567,7 @@ cdef class NullCalendar(object):
     def isBizDay(self, date):
         return True
 
-    def isWeekEnd(self, weekDay):
+    def isWeekEnd(self, int weekDay):
         return weekDay == Weekdays.Saturday or weekDay == Weekdays.Sunday
 
     def __richcmp__(self, right, int op):
@@ -563,14 +579,17 @@ cdef class NullCalendar(object):
 
 
 cdef class ChinaCFFEXImpl(object):
+
+    _sseImpl = ChinaSseImpl()
+
     def __init__(self):
-        self._sseImpl = ChinaSseImpl()
+        pass
 
     def isBizDay(self, date):
         return self.isBizDay(date)
 
-    def isWeekEnd(self, weekDay):
-        return self._sseImpl.isWeekEnd(weekDay)
+    def isWeekEnd(self, int weekDay):
+        return ChinaCFFEXImpl._sseImpl.isWeekEnd(weekDay)
 
     def __richcmp__(self, right, int op):
         if op == 2:
@@ -614,11 +633,11 @@ cdef class WestenImpl(object):
         116, 101, 93, 112, 97, 89, 109, 100, 85, 105  # 2190-2199
     ]
 
-    def isWeekEnd(self, weekDay):
+    def isWeekEnd(self, int weekDay):
         return weekDay == Weekdays.Saturday or weekDay == Weekdays.Sunday
 
     @classmethod
-    def easterMonday(cls, year):
+    def easterMonday(cls, int year):
         return cls.EasterMonday[year - 1901]
 
 

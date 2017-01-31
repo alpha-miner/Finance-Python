@@ -6,6 +6,10 @@ Created on 2015-7-13
 """
 
 import unittest
+import copy
+import tempfile
+import os
+import pickle
 from PyFin.DateUtilities import Date
 from PyFin.DateUtilities import Calendar
 from PyFin.Enums import BizDayConventions
@@ -238,3 +242,22 @@ class TestCalendar(unittest.TestCase):
 
         with self.assertRaises(ValueError):
             _ = sseCal.adjustDate(referenceDate, -1)
+
+    def testCalendarDeepCopy(self):
+        sseCal = Calendar('China.SSE')
+        copiedCal = copy.deepcopy(sseCal)
+
+        self.assertEqual(sseCal, copiedCal)
+
+    def testCalendarPickle(self):
+        sseCal = Calendar('China.SSE')
+
+        f = tempfile.NamedTemporaryFile('w+b', delete=False)
+        pickle.dump(sseCal, f)
+        f.close()
+
+        with open(f.name, 'rb') as f2:
+            pickledCal = pickle.load(f2)
+            self.assertEqual(sseCal, pickledCal)
+
+        os.unlink(f.name)

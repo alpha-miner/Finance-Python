@@ -7,7 +7,7 @@ Created on 2017-1-30
 
 import re
 from libc.math cimport floor
-from PyFin.Enums.TimeUnits import TimeUnits
+from PyFin.Enums._TimeUnits cimport TimeUnits
 from PyFin.Utilities import pyFinAssert
 
 
@@ -218,16 +218,12 @@ cdef class Period(object):
         return Period(length=self.length, units=self.units)
 
     def __reduce__(self):
-        d = {
-                'length': self.length,
-                'units': self.units
-            }
+        d = {}
 
-        return Period, (None,), d
+        return Period, (None, self.length, self.units), d
 
     def __setstate__(self, state):
-        self._length = state['length']
-        self._units = state['units']
+        pass
 
 
 # implementation detail

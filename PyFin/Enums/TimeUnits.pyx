@@ -5,9 +5,11 @@ Created on 2017-1-30
 @author: cheng.li
 """
 
+from PyFin.Enums._TimeUnits cimport TimeUnits as tu
+
 cpdef enum TimeUnits:
-    BDays = 0
-    Days = 1
-    Weeks = 2
-    Months = 3
-    Years = 4
+    BDays = tu.BDays
+    Days = tu.Days
+    Weeks = tu.Weeks
+    Months = tu.Months
+    Years = tu.Years

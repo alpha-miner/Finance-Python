@@ -7,7 +7,7 @@ Created on 2017-1-3
 
 import datetime as dt
 from libc.math cimport floor
-from PyFin.Enums.TimeUnits import TimeUnits
+from PyFin.Enums._TimeUnits cimport TimeUnits
 from PyFin.Utilities import pyFinAssert
 from PyFin.DateUtilities.Period import Period
 
@@ -264,20 +264,12 @@ cdef class Date(object):
         return Date(self._year, self._month, self._day)
 
     def __reduce__(self):
-        d = {
-                'serialNumber': self.__serialNumber__,
-                'year': self._year,
-                'month': self._month,
-                'day': self._day,
-            }
+        d = {}
 
-        return Date, (2000, 1, 1), d
+        return Date, (self._year, self._month, self._day), d
 
     def __setstate__(self, state):
-        self.__serialNumber__ = state['serialNumber']
-        self._year = state['year']
-        self._month = state['month']
-        self._day = state['day']
+        pass
 
     cpdef _calculate_date(self, int year, int month, int day):
         cdef int length

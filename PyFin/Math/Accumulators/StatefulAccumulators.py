@@ -453,7 +453,7 @@ class MovingHistoricalWindow(StatefulValueHolder):
         self._returnSize = window
 
     def push(self, data):
-        value = super(MovingHistoricalWindow, self).push(data)
+        value = self.extract(data)
         try:
             if math.isnan(value):
                 return np.nan
@@ -484,7 +484,7 @@ class MovingCorrelation(StatefulValueHolder):
         self._runningSumCrossSquare = 0.0
 
     def push(self, data):
-        value = super(MovingCorrelation, self).push(data)
+        value = self.extract(data)
         if math.isnan(value[0]) or math.isnan(value[1]):
             return np.nan
         popout = self._deque.dump(value)
@@ -531,7 +531,7 @@ class MovingCorrelationMatrix(StatefulValueHolder):
         self._runningSumCrossSquare = None
 
     def push(self, data):
-        values = super(MovingCorrelationMatrix, self).push(data)
+        values = self.extract(data)
         if math.isnan(sum(values)):
             return np.nan
         if self._isFirst:

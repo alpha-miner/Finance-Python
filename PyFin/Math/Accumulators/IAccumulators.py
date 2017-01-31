@@ -22,7 +22,82 @@ else:
     div_attr = "div"
 
 
-class Accumulator(object):
+class IAccumulator(object):
+
+    def _binary_operator(self, right, operatorHolder):
+        if isinstance(right, IAccumulator):
+            return operatorHolder(self, right)
+        return operatorHolder(self, Identity(right))
+
+    def __add__(self, right):
+        return self._binary_operator(right, AddedValueHolder)
+
+    def __radd__(self, left):
+        return AddedValueHolder(self, Identity(left))
+
+    def __sub__(self, right):
+        return self._binary_operator(right, MinusedValueHolder)
+
+    def __rsub__(self, left):
+        return MinusedValueHolder(Identity(left), self)
+
+    def __mul__(self, right):
+        return self._binary_operator(right, MultipliedValueHolder)
+
+    def __rmul__(self, left):
+        return MultipliedValueHolder(self, Identity(left))
+
+    def __div__(self, right):
+        return self._binary_operator(right, DividedValueHolder)
+
+    def __rdiv__(self, left):
+        return DividedValueHolder(Identity(left), self)
+
+    # only work for python 3
+    def __truediv__(self, right):
+        return self.__div__(right)
+
+    # only work for python 3
+    def __rtruediv__(self, left):
+        return self.__rdiv__(left)
+
+    def __le__(self, right):
+        return self._binary_operator(right, LeOperatorValueHolder)
+
+    def __lt__(self, right):
+        return self._binary_operator(right, LtOperatorValueHolder)
+
+    def __ge__(self, right):
+        return self._binary_operator(right, GeOperatorValueHolder)
+
+    def __gt__(self, right):
+        return self._binary_operator(right, GtOperatorValueHolder)
+
+    def __xor__(self, right):
+        if isinstance(right, IAccumulator):
+            return ListedValueHolder(self, right)
+        return ListedValueHolder(self, Identity(right))
+
+    def __rxor__(self, left):
+        return ListedValueHolder(Identity(left), self)
+
+    def __rshift__(self, right):
+        if isinstance(right, IAccumulator):
+            return CompoundedValueHolder(self, right)
+
+        try:
+            return right(self)
+        except TypeError:
+            raise ValueError('{0} is not recognized as a valid operator'.format(right))
+
+    def __neg__(self):
+        return NegativeValueHolder(self)
+
+    def __getitem__(self, item):
+        return TruncatedValueHolder(self, item)
+
+
+class Accumulator(IAccumulator):
 
     def __init__(self, dependency):
         self._isFull = 0
@@ -48,7 +123,7 @@ class Accumulator(object):
                         .format(dependency, type(dependency)))
             self._dependency = deepcopy(dependency)
 
-    def push(self, data):
+    def extract(self, data):
         if not self._isValueHolderContained:
             try:
                 return data[self._dependency]
@@ -105,78 +180,6 @@ class Accumulator(object):
             return self._dependency
         else:
             return self._dependency.dependency
-
-    def _binary_operator(self, right, operatorHolder):
-        if isinstance(right, Accumulator):
-            return operatorHolder(self, right)
-        return operatorHolder(self, Identity(right))
-
-    def __add__(self, right):
-        return self._binary_operator(right, AddedValueHolder)
-
-    def __radd__(self, left):
-        return AddedValueHolder(self, Identity(left))
-
-    def __sub__(self, right):
-        return self._binary_operator(right, MinusedValueHolder)
-
-    def __rsub__(self, left):
-        return MinusedValueHolder(Identity(left), self)
-
-    def __mul__(self, right):
-        return self._binary_operator(right, MultipliedValueHolder)
-
-    def __rmul__(self, left):
-        return MultipliedValueHolder(self, Identity(left))
-
-    def __div__(self, right):
-        return self._binary_operator(right, DividedValueHolder)
-
-    def __rdiv__(self, left):
-        return DividedValueHolder(Identity(left), self)
-
-    # only work for python 3
-    def __truediv__(self, right):
-        return self.__div__(right)
-
-    # only work for python 3
-    def __rtruediv__(self, left):
-        return self.__rdiv__(left)
-
-    def __le__(self, right):
-        return self._binary_operator(right, LeOperatorValueHolder)
-
-    def __lt__(self, right):
-        return self._binary_operator(right, LtOperatorValueHolder)
-
-    def __ge__(self, right):
-        return self._binary_operator(right, GeOperatorValueHolder)
-
-    def __gt__(self, right):
-        return self._binary_operator(right, GtOperatorValueHolder)
-
-    def __xor__(self, right):
-        if isinstance(right, Accumulator):
-            return ListedValueHolder(self, right)
-        return ListedValueHolder(self, Identity(right))
-
-    def __rxor__(self, left):
-        return ListedValueHolder(Identity(left), self)
-
-    def __rshift__(self, right):
-        if isinstance(right, Accumulator):
-            return CompoundedValueHolder(self, right)
-
-        try:
-            return right(self)
-        except TypeError:
-            raise ValueError('{0} is not recognized as a valid operator'.format(right))
-
-    def __neg__(self):
-        return NegativeValueHolder(self)
-
-    def __getitem__(self, item):
-        return TruncatedValueHolder(self, item)
 
 
 class NegativeValueHolder(Accumulator):
@@ -488,7 +491,7 @@ class BasicFunction(Accumulator):
         self._origValue = np.nan
 
     def push(self, data):
-        value = super(BasicFunction, self).push(data)
+        value = self.extract(data)
         if self._returnSize == 1:
             if math.isnan(value):
                 return np.nan
@@ -539,7 +542,7 @@ class Pow(Accumulator):
         self.n = n
 
     def push(self, data):
-        value = super(Pow, self).push(data)
+        value = self.extract(data)
         if self._returnSize == 1:
             if math.isnan(value):
                 return np.nan

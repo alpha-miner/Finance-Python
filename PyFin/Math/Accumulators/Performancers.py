@@ -23,7 +23,7 @@ class MovingLogReturn(SingleValuedValueHolder):
         self._runningReturn = np.nan
 
     def push(self, data):
-        value = super(MovingLogReturn, self).push(data)
+        value = self.extract(data)
         if math.isnan(value):
             return np.nan
         popout = self._deque.dump(value)
@@ -44,7 +44,7 @@ class MovingSharp(StatefulValueHolder):
         self._var = MovingVariance(window, dependency='x', isPopulation=False)
 
     def push(self, data):
-        value = super(MovingSharp, self).push(data)
+        value = self.extract(data)
         if math.isnan(value[0]) or math.isnan(value[1]):
             return np.nan
         ret = value[0]
@@ -68,7 +68,7 @@ class MovingSortino(StatefulValueHolder):
         self._negativeVar = MovingNegativeVariance(window, dependency='x')
 
     def push(self, data):
-        value = super(MovingSortino, self).push(data)
+        value = self.extract(data)
         if math.isnan(value[0]) or math.isnan(value[1]):
             return np.nan
         ret = value[0]
@@ -92,7 +92,7 @@ class MovingAlphaBeta(StatefulValueHolder):
         self._correlationHolder = MovingCorrelation(window, dependency=['x', 'y'])
 
     def push(self, data):
-        value = super(MovingAlphaBeta, self).push(data)
+        value = self.extract(data)
         if math.isnan(value[0]) or math.isnan(value[1]) or math.isnan(value[2]):
             return np.nan
         pReturn = value[0]
@@ -137,7 +137,7 @@ class MovingDrawDown(StatefulValueHolder):
         self._runningIndex = -1
 
     def push(self, data):
-        value = super(MovingDrawDown, self).push(data)
+        value = self.extract(data)
         if math.isnan(value):
             return np.nan
         self._runningIndex += 1
@@ -160,7 +160,7 @@ class MovingAverageDrawdown(StatefulValueHolder):
         self._durationMean = MovingAverage(window, dependency='duration')
 
     def push(self, data):
-        value = super(MovingAverageDrawdown, self).push(data)
+        value = self.extract(data)
         if math.isnan(value):
             return np.nan
         self._drawdownCalculator.push(dict(ret=value))
@@ -179,7 +179,7 @@ class MovingMaxDrawdown(StatefulValueHolder):
         self._drawdownCalculator = MovingDrawDown(window, 'x')
 
     def push(self, data):
-        value = super(MovingMaxDrawdown, self).push(data)
+        value = self.extract(data)
         if math.isnan(value):
             return np.nan
         self._drawdownCalculator.push(dict(x=value))

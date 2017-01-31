@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 u"""
-Created on 2015-7-9
+Created on 2017-2-1
 
 @author: cheng.li
 """
@@ -14,7 +14,10 @@ from PyFin.DateUtilities.Period import Period
 from PyFin.Utilities import pyFinAssert
 
 
-class Calendar(object):
+cdef class Calendar(object):
+
+    cdef public object _impl
+
     def __init__(self, holCenter):
         if isinstance(holCenter, str):
             holCenter = holCenter.lower()
@@ -29,7 +32,7 @@ class Calendar(object):
         return self._impl.isBizDay(d)
 
     def isHoliday(self, d):
-        return not self.isBizDay(d)
+        return not self._impl.isBizDay(d)
 
     def isWeekEnd(self, weekday):
         return self._impl.isWeekEnd(weekday)
@@ -155,11 +158,12 @@ class Calendar(object):
             d += 1
         return result
 
-    def __eq__(self, right):
-        return self._impl == right._impl
+    def __richcmp__(self, right, int op):
+        if op == 2:
+            return self._impl == right._impl
 
 
-class ChinaSseImpl(object):
+cdef class ChinaSseImpl(object):
     _holDays = {Date(2005, 1, 3),
                 Date(2005, 2, 7),
                 Date(2005, 2, 8),
@@ -405,21 +409,22 @@ class ChinaSseImpl(object):
 
     def isBizDay(self, date):
         w = date.weekday()
-        if self.isWeekEnd(w) or date in self._holDays:
+        if self.isWeekEnd(w) or date in ChinaSseImpl._holDays:
             return False
         return True
 
     def isWeekEnd(self, weekDay):
         return weekDay == Weekdays.Saturday or weekDay == Weekdays.Sunday
 
-    def __eq__(self, right):
-        if isinstance(right, ChinaSseImpl):
-            return True
-        else:
-            return False
+    def __richcmp__(self, right, int op):
+        if op == 2:
+            if isinstance(right, ChinaSseImpl):
+                return True
+            else:
+                return False
 
 
-class ChinaIBImpl(object):
+cdef class ChinaIBImpl(object):
     _working_weekends = {
         # 2005
         Date.westernStyle(5, Months.February, 2005),
@@ -520,23 +525,26 @@ class ChinaIBImpl(object):
         Date.westernStyle(30, Months.September, 2017),
     }
 
+    _sseImpl = ChinaSseImpl()
+
     def __init__(self):
-        self._sseImpl = ChinaSseImpl()
+        pass
 
     def isBizDay(self, date):
-        return self._sseImpl.isBizDay(date) or date in ChinaIBImpl._working_weekends
+        return ChinaIBImpl._sseImpl.isBizDay(date) or date in ChinaIBImpl._working_weekends
 
     def isWeekEnd(self, weekDay):
         return weekDay == Weekdays.Saturday or weekDay == Weekdays.Sunday
 
-    def __eq__(self, right):
-        if isinstance(right, ChinaIBImpl):
-            return True
-        else:
-            return False
+    def __richcmp__(self, right, int op):
+        if op == 2:
+            if isinstance(right, ChinaIBImpl):
+                return True
+            else:
+                return False
 
 
-class NullCalendar(object):
+cdef class NullCalendar(object):
     def __init__(self):
         pass
 
@@ -546,14 +554,15 @@ class NullCalendar(object):
     def isWeekEnd(self, weekDay):
         return weekDay == Weekdays.Saturday or weekDay == Weekdays.Sunday
 
-    def __eq__(self, right):
-        if isinstance(right, NullCalendar):
-            return True
-        else:
-            return False
+    def __richcmp__(self, right, int op):
+        if op == 2:
+            if isinstance(right, NullCalendar):
+                return True
+            else:
+                return False
 
 
-class ChinaCFFEXImpl(object):
+cdef class ChinaCFFEXImpl(object):
     def __init__(self):
         self._sseImpl = ChinaSseImpl()
 
@@ -563,14 +572,15 @@ class ChinaCFFEXImpl(object):
     def isWeekEnd(self, weekDay):
         return self._sseImpl.isWeekEnd(weekDay)
 
-    def __eq__(self, right):
-        if isinstance(right, ChinaCFFEXImpl):
-            return True
-        else:
-            return False
+    def __richcmp__(self, right, int op):
+        if op == 2:
+            if isinstance(right, ChinaCFFEXImpl):
+                return True
+            else:
+                return False
 
 
-class WestenImpl(object):
+cdef class WestenImpl(object):
     EasterMonday = [
         98, 90, 103, 95, 114, 106, 91, 111, 102,  # 1901-1909
         87, 107, 99, 83, 103, 95, 115, 99, 91, 111,  # 1910-1919
@@ -612,7 +622,7 @@ class WestenImpl(object):
         return cls.EasterMonday[year - 1901]
 
 
-class TargetImpl(WestenImpl):
+cdef class TargetImpl(WestenImpl):
     def __init__(self):
         pass
 
@@ -635,11 +645,12 @@ class TargetImpl(WestenImpl):
             return False
         return True
 
-    def __eq__(self, right):
-        if isinstance(right, TargetImpl):
-            return True
-        else:
-            return False
+    def __richcmp__(self, right, int op):
+        if op == 2:
+            if isinstance(right, TargetImpl):
+                return True
+            else:
+                return False
 
 
 _holDict = {'china.sse': ChinaSseImpl,

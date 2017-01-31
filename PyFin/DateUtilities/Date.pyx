@@ -10,8 +10,6 @@ from libc.math cimport floor
 from PyFin.Enums.TimeUnits import TimeUnits
 from PyFin.Utilities import pyFinAssert
 from PyFin.DateUtilities.Period import Period
-from PyFin.Enums.Weekdays import Weekdays
-
 
 cdef int _monthLength(int month, int isLeap):
     if isLeap:
@@ -88,19 +86,18 @@ cdef class Date(object):
         if serialNumber:
             self.__serialNumber__ = serialNumber
 
-            y = (int(self.__serialNumber__ / 365)) + 1900
-            if self.__serialNumber__ <= _YearOffset[y - 1900]:
-                self._year = y - 1
-            else:
-                self._year = y
+            y = (int(serialNumber / 365)) + 1900
+            if serialNumber <= _YearOffset[y - 1900]:
+                y -= 1
 
-            d = self.__serialNumber__ - _YearOffset[self._year - 1900]
+            d = serialNumber - _YearOffset[y - 1900]
             m = int(d / 30) + 1
-            leap = self.isLeap(self._year)
+            leap = self.isLeap(y)
             while d <= _monthOffset(m, leap):
                 m -= 1
-            self._month = m
 
+            self._year = y
+            self._month = m
             self._day = d - _monthOffset(m, leap)
 
             return
@@ -126,7 +123,7 @@ cdef class Date(object):
     def weekday(self):
         cdef int w
         w = self.__serialNumber__ % 7
-        return Weekdays(7 if w == 0 else w)
+        return 7 if w == 0 else w
 
     def toDateTime(self):
         return dt.datetime(self.year(), self.month(), self.dayOfMonth())
@@ -153,7 +150,7 @@ cdef class Date(object):
         if isinstance(period, Period):
             return _advance(self, period.length, period.units)
         elif isinstance(period, int):
-            return _advance(self, period, TimeUnits.Days)
+            return Date(serialNumber=self.__serialNumber__ + period)
         else:
             period = Period(period)
             return _advance(self, period.length, period.units)
@@ -162,7 +159,7 @@ cdef class Date(object):
         if isinstance(period, Period):
             return _advance(self, -period.length, period.units)
         elif isinstance(period, int):
-            return _advance(self, -period, TimeUnits.Days)
+            return Date(serialNumber=self.__serialNumber__ - period)
         elif isinstance(period, Date):
             return self.__serialNumber__ - period.__serialNumber__
         else:
@@ -216,7 +213,7 @@ cdef class Date(object):
 
     @staticmethod
     def nextWeekday(Date date, int dayOfWeek):
-        cdef wd = date.weekday()
+        cdef int wd = date.weekday()
         return date + ((7 if wd > dayOfWeek else 0) - wd + dayOfWeek)
 
     @staticmethod

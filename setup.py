@@ -100,6 +100,7 @@ else:
 
 ext_modules = [
     "PyFin/Math/Accumulators/impl.pyx",
+    "PyFin/DateUtilities/Calendar.pyx",
     "PyFin/DateUtilities/Date.pyx",
     "PyFin/DateUtilities/Period.pyx",
     "PyFin/Utilities/Asserts.pyx",

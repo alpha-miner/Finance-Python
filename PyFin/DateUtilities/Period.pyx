@@ -6,7 +6,7 @@ Created on 2017-1-30
 """
 
 import re
-import math
+from libc.math cimport floor
 from PyFin.Enums.TimeUnits import TimeUnits
 from PyFin.Utilities import pyFinAssert
 
@@ -181,28 +181,28 @@ cdef class Period(object):
 
         if units == TimeUnits.Days:
             if n >= 7:
-                m = int(math.floor(n / 7))
-                out += str(m) + "W"
+                m = int(floor(n / 7,))
+                out = '{0}W'.format(m)
                 n %= 7
             if n != 0 or m == 0:
-                return out + str(n) + "D"
+                return '{0}{1}D'.format(out, n)
             else:
                 return out
         elif units == TimeUnits.Weeks:
-            return out + str(n) + "W"
+            return '{0}W'.format(n)
         elif units == TimeUnits.Months:
             if n >= 12:
-                m = int(math.floor(n / 12))
-                out += str(m) + "Y"
+                m = int(floor(n / 12.))
+                out = '{0}Y'.format(m)
                 n %= 12
             if n != 0 or m == 0:
-                return out + str(n) + "M"
+                return '{0}{1}M'.format(out, n)
             else:
                 return out
         elif units == TimeUnits.Years:
-            return out + str(n) + "Y"
+            return '{0}Y'.format(n)
         elif units == TimeUnits.BDays:
-            return out + str(n) + "B"
+            return '{0}B'.format(n)
 
     def __richcmp__(self, right, int op):
         if op == 0:

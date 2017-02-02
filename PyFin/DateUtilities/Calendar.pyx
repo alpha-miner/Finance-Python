@@ -5,6 +5,7 @@ Created on 2017-2-1
 @author: cheng.li
 """
 
+cimport cython
 from PyFin.Enums._Weekdays cimport Weekdays
 from PyFin.Enums._TimeUnits cimport TimeUnits
 from PyFin.Enums._Months cimport Months
@@ -14,6 +15,7 @@ from PyFin.DateUtilities.Period import Period
 from PyFin.Utilities import pyFinAssert
 
 
+@cython.embedsignature(True)
 cdef class Calendar(object):
 
     cdef public object _impl

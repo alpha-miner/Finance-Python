@@ -5,7 +5,7 @@ Created on 2017-1-8
 @author: cheng.li
 """
 
-import cython
+cimport cython
 from libc.math cimport sqrt
 from libc.math cimport log
 import numpy as np

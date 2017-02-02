@@ -5,7 +5,7 @@ Created on 2017-1-3
 @author: cheng.li
 """
 
-import cython
+cimport cython
 from libc.math cimport exp
 from PyFin.Math.MathConstants import MathConstants
 

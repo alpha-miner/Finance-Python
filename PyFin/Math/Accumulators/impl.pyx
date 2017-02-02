@@ -8,7 +8,7 @@ Created on 2017-1-1
 import copy
 import numpy as np
 cimport numpy as np
-import cython
+cimport cython
 
 
 cdef class Deque:

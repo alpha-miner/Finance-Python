@@ -6,6 +6,7 @@ Created on 2017-1-30
 """
 
 import re
+cimport cython
 from libc.math cimport floor
 from PyFin.Enums._TimeUnits cimport TimeUnits
 from PyFin.Utilities import pyFinAssert
@@ -21,6 +22,7 @@ _unitsDict = {'d': TimeUnits.Days,
               'y': TimeUnits.Years}
 
 
+@cython.embedsignature(True)
 cdef class Period(object):
 
     cdef public int _length

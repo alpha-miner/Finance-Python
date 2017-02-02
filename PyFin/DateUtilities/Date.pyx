@@ -6,6 +6,7 @@ Created on 2017-1-3
 """
 
 import datetime as dt
+cimport cython
 from libc.math cimport floor
 from PyFin.Enums._TimeUnits cimport TimeUnits
 from PyFin.Utilities import pyFinAssert
@@ -70,6 +71,7 @@ cdef _advance(date, n, units):
 
         return Date(y, m, d)
 
+@cython.embedsignature(True)
 cdef class Date(object):
     cdef public int __serialNumber__
     cdef public int _year
@@ -77,7 +79,6 @@ cdef class Date(object):
     cdef public int _day
 
     def __init__(self, year=None, month=None, day=None, serialNumber=None):
-
         cdef int leap
         cdef int y
         cdef int m

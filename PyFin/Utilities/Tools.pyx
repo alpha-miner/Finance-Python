@@ -5,7 +5,7 @@ Created on 2017-1-22
 @author: cheng.li
 """
 
-import cython
+cimport cython
 import numpy as np
 cimport numpy as np
 

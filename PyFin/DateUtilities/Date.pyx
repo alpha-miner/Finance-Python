@@ -12,19 +12,28 @@ from PyFin.Enums._TimeUnits cimport TimeUnits
 from PyFin.Utilities import pyFinAssert
 from PyFin.DateUtilities.Period import Period
 
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
 cdef int _monthLength(int month, int isLeap):
     if isLeap:
         return _MonthLeapLength[month - 1]
     else:
         return _MonthLength[month - 1]
 
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
 cdef int _monthOffset(int month, int isLeap):
     if isLeap:
         return _MonthLeapOffset[month - 1]
     else:
         return _MonthOffset[month - 1]
 
-cdef _advance(date, n, units):
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+cdef Date _advance(Date date, int n, int units):
     cdef int d
     cdef int m
     cdef int y
@@ -272,7 +281,7 @@ cdef class Date(object):
     def __setstate__(self, state):
         pass
 
-    cpdef _calculate_date(self, int year, int month, int day):
+    cdef _calculate_date(self, int year, int month, int day):
         cdef int length
         cdef int offset
         cdef int isLeap

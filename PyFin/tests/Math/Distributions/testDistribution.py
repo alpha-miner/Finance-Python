@@ -88,6 +88,5 @@ class TestDistribution(unittest.TestCase):
                                                              "Expected:  {1:f}\n"
                                                              "Calculated: {2:f}".format(i, expected, calculated))
 
-        # test exception raising
-        with self.assertRaises(ArithmeticError):
-            invCum(-0.5)
+        # test nan value returning
+        self.assertTrue(math.isnan(invCum(-0.5)))

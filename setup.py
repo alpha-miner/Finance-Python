@@ -28,6 +28,15 @@ datafiles = [
 files = glob.glob("PyFin/tests/POpt/data/*.csv")
 datafiles.append((os.path.join(packagePath, "PyFin/tests/POpt/data"), files))
 
+files = glob.glob("PyFin/Enums/*.pxd")
+datafiles.append((os.path.join(packagePath, "PyFin/Enums"), files))
+
+files = glob.glob("PyFin/Math/*.pxd")
+datafiles.append((os.path.join(packagePath, "PyFin/Math"), files))
+
+files = glob.glob("PyFin/Math/Distributions/*.pxd")
+datafiles.append((os.path.join(packagePath, "PyFin/Math/Distributions"), files))
+
 
 def git_version():
     from subprocess import Popen, PIPE
@@ -100,12 +109,15 @@ else:
 
 ext_modules = [
     "PyFin/Math/Accumulators/impl.pyx",
+    "PyFin/Math/Distributions/NormalDistribution.pyx",
+    "PyFin/Math/Distributions/norm.pyx",
+    "PyFin/Math/ErrorFunction.pyx",
     "PyFin/DateUtilities/Calendar.pyx",
     "PyFin/DateUtilities/Date.pyx",
     "PyFin/DateUtilities/Period.pyx",
     "PyFin/Utilities/Asserts.pyx",
     "PyFin/Utilities/Tools.pyx",
-    "PyFin/Math/ErrorFunction.pyx",
+    "PyFin/PricingEngines/BlackFormula.pyx",
     "PyFin/PricingEngines/SabrFormulaImpl.pyx",
     "PyFin/PricingEngines/SVIInterpolationImpl.pyx",
     "PyFin/Enums/TimeUnits.pyx",

@@ -45,7 +45,7 @@ class TestBlackFormula(unittest.TestCase):
         bpvol = 0.25
         tte = 10.0
         stdDev = bpvol * math.sqrt(tte)
-        discount = 0.95
+        discount = math.exp(-0.05 * tte)
 
         dList = [-3.0, -2.0, -1.0, -0.5, 0.0, 0.5, 1.0, 2.0, 3.0]
 
@@ -53,11 +53,11 @@ class TestBlackFormula(unittest.TestCase):
             strike = forward * math.exp(d * bpvol * math.sqrt(tte))
             callPrem = blackFormula(OptionType.Call, strike, forward, stdDev, discount)
             impliedStdDev = blackFormulaImpliedStdDev(OptionType.Call, strike, forward, callPrem, discount)
-            self.assertAlmostEqual(impliedStdDev, stdDev, 10)
+            self.assertAlmostEqual(impliedStdDev, stdDev, 8)
 
             putPrem = blackFormula(OptionType.Put, strike, forward, stdDev, discount)
             impliedStdDev = blackFormulaImpliedStdDev(OptionType.Put, strike, forward, putPrem, discount)
-            self.assertAlmostEqual(impliedStdDev, stdDev, 10)
+            self.assertAlmostEqual(impliedStdDev, stdDev, 8)
 
     def testBlackImpliedVol(self):
         forward = 1.0
@@ -71,11 +71,11 @@ class TestBlackFormula(unittest.TestCase):
             strike = forward * math.exp(d * bpvol * math.sqrt(tte))
             callPrem = blackFormula2(OptionType.Call, strike, forward, tte, bpvol, riskFree)
             impliedVol = blackFormulaImpliedVol(OptionType.Call, strike, forward, tte, callPrem, riskFree)
-            self.assertAlmostEqual(impliedVol, bpvol, 10)
+            self.assertAlmostEqual(impliedVol, bpvol, 8)
 
             putPrem = blackFormula2(OptionType.Put, strike, forward, tte, bpvol, riskFree)
             impliedVol = blackFormulaImpliedVol(OptionType.Put, strike, forward, tte, putPrem, riskFree)
-            self.assertAlmostEqual(impliedVol, bpvol, 10)
+            self.assertAlmostEqual(impliedVol, bpvol, 8)
 
     def testBachelierImpliedVol(self):
         forward = 1.0

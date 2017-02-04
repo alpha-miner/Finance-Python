@@ -7,9 +7,8 @@ Created on 2017-1-3
 
 cimport cython
 from libc.math cimport exp
-from PyFin.Math.MathConstants import MathConstants
 
-cdef double _DBL_MIN = MathConstants.DBL_MIN
+cdef double _DBL_MIN = 2.2250738585072014e-308
 
 cdef double tiny = 0.0
 cdef double one = 1.0
@@ -76,7 +75,7 @@ cdef double sb7 = -2.24409524465858183362e+01
 
 
 @cython.cdivision(True)
-def errorFunction(double x):
+cdef double errorFunction(double x):
     cdef double ax
     cdef double z
     cdef double r

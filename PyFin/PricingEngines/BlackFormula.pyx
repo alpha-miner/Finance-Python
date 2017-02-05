@@ -12,6 +12,8 @@ from libc.math cimport sqrt
 from libc.math cimport fabs
 from libc.math cimport atanh
 from PyFin.Enums._OptionType cimport OptionType
+from libc.stdlib cimport malloc
+from libc.stdlib cimport free
 from PyFin.Math.Distributions.norm cimport cdf
 from PyFin.Math.Distributions.norm cimport pdf
 from PyFin.Math.Distributions.norm cimport cdf_derivative
@@ -26,7 +28,6 @@ cdef int _checkParameters(double strike, double forward, double displacement):
         return 0
     else:
         return -1
-
 
 @cython.cdivision(True)
 cdef double _bsImpl(int optionType,
@@ -58,19 +59,34 @@ cdef double _bsImpl(int optionType,
 
 
 @cython.cdivision(True)
-cdef double _bsDStdDev(int optionType,
-                       double strike,
-                       double forward,
-                       double stdDev,
-                       double discount=1.0,
-                       double displacement=0.0):
+cdef double _bsImplWithDerivative(double* dStdDev,
+                    int optionType,
+                    double strike,
+                    double forward,
+                    double stdDev,
+                    double discount=1.0,
+                    double displacement=0.0):
+    cdef double d1
     cdef double d2
+    cdef double nd1
+    cdef double nd2
+
+    if stdDev == 0.0:
+        return max((forward - strike) * optionType, 0.0) * discount
 
     forward += displacement
     strike += displacement
 
-    d2 = log(forward / strike) / stdDev - 0.5 * stdDev
-    return discount * strike * pdf(optionType * d2, 2.0, _M_SQRT_2 * _M_1_SQRTPI)
+    if strike == 0.0:
+        return forward * discount if optionType == OptionType.Call else 0.0
+
+    d1 = log(forward / strike) / stdDev + 0.5 * stdDev
+    d2 = d1 - stdDev
+    nd1 = cdf(d1 * optionType)
+    nd2 = cdf(d2 * optionType)
+
+    dStdDev[0] = discount * strike * pdf(optionType * d2, 2.0, _M_SQRT_2 * _M_1_SQRTPI)
+    return discount * optionType * (forward * nd1 - strike * nd2)
 
 
 @cython.embedsignature(True)
@@ -151,19 +167,18 @@ cdef double _bsImplStdDev(int optionType, double strike, double forward, double 
     cdef double stdDev
     cdef int count = 0
     cdef double err
-    cdef double absErr
+    cdef double* dStdDev = <double *>malloc(sizeof(double))
 
     # using newton step to fine tune the stdDev
     stdDev = _bsImplStdDevAppr(optionType, strike, forward, blackPrice, discount, displacement)
 
-    err = _bsImpl(optionType, strike, forward, stdDev, discount, displacement) - blackPrice
+    err = _bsImplWithDerivative(dStdDev, optionType, strike, forward, stdDev, discount, displacement) - blackPrice
     absErr = fabs(err)
-    while (absErr >= 1e-10 or absErr >= 1e-6 * blackPrice) and count <= 10:
+    while fabs(err) >= min(1e-10, 1e-6 * blackPrice) and count <= 5:
         count += 1
-        stdDev -= err / _bsDStdDev(optionType, strike, forward, stdDev, discount, displacement)
-        err = _bsImpl(optionType, strike, forward, stdDev, discount, displacement) - blackPrice
-        absErr = fabs(err)
-
+        stdDev -= err / dStdDev[0]
+        err = _bsImplWithDerivative(dStdDev, optionType, strike, forward, stdDev, discount, displacement) - blackPrice
+    free(dStdDev)
     return stdDev
 
 

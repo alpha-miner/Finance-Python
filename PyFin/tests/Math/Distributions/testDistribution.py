@@ -7,6 +7,7 @@ Created on 2015-7-23
 
 import unittest
 import math
+import copy
 from PyFin.Math.MathConstants import MathConstants
 from PyFin.Math.Distributions import InverseCumulativeNormal
 from PyFin.Math.Distributions import NormalDistribution
@@ -29,6 +30,7 @@ def gaussianDerivative(x):
 
 
 class TestDistribution(unittest.TestCase):
+
     def testNormal(self):
         invCumStandardNormal = InverseCumulativeNormal()
 
@@ -90,3 +92,9 @@ class TestDistribution(unittest.TestCase):
 
         # test nan value returning
         self.assertTrue(math.isnan(invCum(-0.5)))
+
+    def testNormalDistributionCopy(self):
+        norm = NormalDistribution(average, sigma)
+        copied = copy.deepcopy(norm)
+
+        pass

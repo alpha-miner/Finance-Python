@@ -6,7 +6,6 @@ Created on 2017-2-4
 """
 
 cimport cython
-from libc.math cimport exp
 from libc.math cimport fabs
 from PyFin.Math.ErrorFunction cimport errorFunction
 
@@ -14,12 +13,6 @@ from PyFin.Math.ErrorFunction cimport errorFunction
 cdef double _M_SQRT_2 = 0.7071067811865475244008443621048490392848359376887
 cdef double _M_1_SQRTPI = 0.564189583547756286948
 cdef double _QL_EPSILON = 2.2250738585072014e-308
-
-
-@cython.cdivision(True)
-cdef double pdf(double x, double denorminator, double normalizer):
-        cdef double exponent = -(x * x) / denorminator
-        return 0.0 if exponent <= -690.0 else normalizer * exp(exponent)
 
 
 @cython.cdivision(True)
@@ -59,5 +52,3 @@ cdef double cdf(double z):
     return result
 
 
-cdef double cdf_derivative(double z):
-    return pdf(z, 2.0, _M_SQRT_2 * _M_1_SQRTPI)

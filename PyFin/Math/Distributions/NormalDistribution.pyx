@@ -30,6 +30,14 @@ cdef class NormalDistribution(object):
         self._derNormalizationFactor = self._sigma * self._sigma
         self._denominator = 2.0 * self._derNormalizationFactor
 
+    @property
+    def average(self):
+        return self._average
+
+    @property
+    def sigma(self):
+        return self._sigma
+
     def __call__(self, double x):
         x = x - self._average
         return pdf(x, self._denominator, self._normalizationFactor)
@@ -51,6 +59,14 @@ cdef class CumulativeNormalDistribution(object):
     def __init__(self, average=0.0, sigma=1.0):
         self._average = average
         self._sigma = sigma
+
+    @property
+    def average(self):
+        return self._average
+
+    @property
+    def sigma(self):
+        return self._sigma
 
     @cython.cdivision(True)
     def __call__(self, double z):

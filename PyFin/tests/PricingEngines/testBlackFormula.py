@@ -17,6 +17,7 @@ from PyFin.PricingEngines.BlackFormula import blackFormulaImpliedVol
 
 
 class TestBlackFormula(unittest.TestCase):
+
     def testBlackBasic(self):
         strike = 1.0
         forward = 1.2

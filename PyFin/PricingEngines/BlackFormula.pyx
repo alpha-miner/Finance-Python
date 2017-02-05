@@ -163,20 +163,28 @@ cdef double _bsImplStdDevAppr(int optionType, double strike, double forward, dou
 
 
 @cython.cdivision(True)
-cdef double _bsImplStdDev(int optionType, double strike, double forward, double blackPrice, double discount=1.0, double displacement=0.0):
+cdef double _bsImplStdDev(int optionType, double strike, double forward, double blackPrice, double discount=1.0, double displacement=0.0, double xAccuracy=1e-5):
     cdef double stdDev
-    cdef int count = 0
+    cdef double stdDevOld
     cdef double err
+    cdef double diff
+    cdef int count = 0
     cdef double* dStdDev = <double *>malloc(sizeof(double))
 
     # using newton step to fine tune the stdDev
     stdDev = _bsImplStdDevAppr(optionType, strike, forward, blackPrice, discount, displacement)
 
     err = _bsImplWithDerivative(dStdDev, optionType, strike, forward, stdDev, discount, displacement) - blackPrice
-    while fabs(err) >= min(1e-12, 1e-8 * blackPrice) and count <= 10:
+    while count <= 100:
         count += 1
-        stdDev -= err / dStdDev[0]
+        stdDevOld = stdDev
+        diff = err / dStdDev[0]
+        stdDev -= diff
         err = _bsImplWithDerivative(dStdDev, optionType, strike, forward, stdDev, discount, displacement) - blackPrice
+
+        if fabs(diff) <= xAccuracy:
+            break
+
     free(dStdDev)
     return stdDev
 
@@ -187,13 +195,15 @@ def blackFormulaImpliedStdDev(int optionType,
                               double forward,
                               double blackPrice,
                               double discount=1.0,
-                              double displacement=0.0):
+                              double displacement=0.0,
+                              double xAccuracy=1e-5):
     return _bsImplStdDev(optionType,
                          strike,
                          forward,
                          blackPrice,
                          discount,
-                         displacement)
+                         displacement,
+                         xAccuracy)
 
 
 @cython.embedsignature(True)

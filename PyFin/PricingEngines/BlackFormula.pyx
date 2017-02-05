@@ -173,7 +173,6 @@ cdef double _bsImplStdDev(int optionType, double strike, double forward, double 
     stdDev = _bsImplStdDevAppr(optionType, strike, forward, blackPrice, discount, displacement)
 
     err = _bsImplWithDerivative(dStdDev, optionType, strike, forward, stdDev, discount, displacement) - blackPrice
-    absErr = fabs(err)
     while fabs(err) >= min(1e-10, 1e-6 * blackPrice) and count <= 5:
         count += 1
         stdDev -= err / dStdDev[0]
@@ -196,6 +195,8 @@ def blackFormulaImpliedStdDev(int optionType,
                          discount,
                          displacement)
 
+
+@cython.embedsignature(True)
 def blackFormulaImpliedVol(int optionType,
                            double strike,
                            double forward,

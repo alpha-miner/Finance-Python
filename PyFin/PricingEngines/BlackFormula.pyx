@@ -173,7 +173,7 @@ cdef double _bsImplStdDev(int optionType, double strike, double forward, double 
     stdDev = _bsImplStdDevAppr(optionType, strike, forward, blackPrice, discount, displacement)
 
     err = _bsImplWithDerivative(dStdDev, optionType, strike, forward, stdDev, discount, displacement) - blackPrice
-    while fabs(err) >= min(1e-10, 1e-6 * blackPrice) and count <= 5:
+    while fabs(err) >= min(1e-12, 1e-8 * blackPrice) and count <= 10:
         count += 1
         stdDev -= err / dStdDev[0]
         err = _bsImplWithDerivative(dStdDev, optionType, strike, forward, stdDev, discount, displacement) - blackPrice

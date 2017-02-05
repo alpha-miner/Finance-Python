@@ -8,6 +8,9 @@ Created on 2015-7-23
 import unittest
 import math
 import copy
+import tempfile
+import pickle
+import os
 from PyFin.Math.MathConstants import MathConstants
 from PyFin.Math.Distributions import InverseCumulativeNormal
 from PyFin.Math.Distributions import NormalDistribution
@@ -97,4 +100,53 @@ class TestDistribution(unittest.TestCase):
         norm = NormalDistribution(average, sigma)
         copied = copy.deepcopy(norm)
 
-        pass
+        self.assertEqual(norm, copied)
+
+    def testNormalDistributionPickle(self):
+        benchmark_norm = NormalDistribution(average, sigma)
+
+        f = tempfile.NamedTemporaryFile('w+b', delete=False)
+        pickle.dump(benchmark_norm, f)
+        f.close()
+
+        with open(f.name, 'rb') as f2:
+            pickled_norm = pickle.load(f2)
+            self.assertEqual(benchmark_norm, pickled_norm)
+
+        os.unlink(f.name)
+
+    def testCumulativeNormalDistribution(self):
+        norm = CumulativeNormalDistribution(average, sigma)
+        copied = copy.deepcopy(norm)
+
+        self.assertEqual(norm, copied)
+
+    def testCumulativeNormalDistributionPickle(self):
+        benchmark_norm = CumulativeNormalDistribution(average, sigma)
+
+        f = tempfile.NamedTemporaryFile('w+b', delete=False)
+        pickle.dump(benchmark_norm, f)
+        f.close()
+
+        with open(f.name, 'rb') as f2:
+            pickled_norm = pickle.load(f2)
+            self.assertEqual(benchmark_norm, pickled_norm)
+
+        os.unlink(f.name)
+
+    def testInverseCumulativeNormal(self):
+        norm = InverseCumulativeNormal(average, sigma, True)
+        copied = copy.deepcopy(norm)
+
+        self.assertEqual(norm, copied)
+
+    def testInverseCumulativeNormalPickle(self):
+        benchmark_norm = InverseCumulativeNormal(average, sigma)
+
+        f = tempfile.NamedTemporaryFile('w+b', delete=False)
+        pickle.dump(benchmark_norm, f)
+        f.close()
+
+        with open(f.name, 'rb') as f2:
+            pickled_norm = pickle.load(f2)
+            self.assertEqual(benchmark_norm, pickled_norm)

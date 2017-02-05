@@ -50,6 +50,22 @@ cdef class NormalDistribution(object):
         return -normVal * deltax / self._derNormalizationFactor
 
 
+    def __deepcopy__(self, memo):
+        return NormalDistribution(self._average, self._sigma)
+
+    def __reduce__(self):
+        d = {}
+
+        return NormalDistribution, (self._average, self._sigma), d
+
+    def __setstate__(self, state):
+        pass
+
+    def __richcmp__(NormalDistribution self, NormalDistribution other, int op):
+        if op == 2:
+            return self._average == other.average and self._sigma == other.sigma
+
+
 @cython.embedsignature(True)
 cdef class CumulativeNormalDistribution(object):
 
@@ -77,6 +93,21 @@ cdef class CumulativeNormalDistribution(object):
     def derivative(self, z):
         cdef double zn = (z - self._average) / self._sigma
         return cdf_derivative(zn) / self._sigma
+
+    def __deepcopy__(self, memo):
+        return CumulativeNormalDistribution(self._average, self._sigma)
+
+    def __reduce__(self):
+        d = {}
+
+        return CumulativeNormalDistribution, (self._average, self._sigma), d
+
+    def __setstate__(self, state):
+        pass
+
+    def __richcmp__(CumulativeNormalDistribution self, CumulativeNormalDistribution other, int op):
+        if op == 2:
+            return self._average == other.average and self._sigma == other.sigma
 
 
 cdef double _a1 = -3.969683028665376e+01
@@ -138,6 +169,18 @@ cdef class InverseCumulativeNormal(object):
         self._sigma = sigma
         self._fullAcc = fullAccuracy
 
+    @property
+    def average(self):
+        return self._average
+
+    @property
+    def sigma(self):
+        return self._sigma
+
+    @property
+    def isFullAcc(self):
+        return self._fullAcc
+
     @cython.cdivision(True)
     cdef double _standard_value(self, double x):
 
@@ -158,3 +201,18 @@ cdef class InverseCumulativeNormal(object):
 
     def __call__(self, x):
         return self._average + self._sigma * self._standard_value(x)
+
+    def __deepcopy__(self, memo):
+        return InverseCumulativeNormal(self._average, self._sigma, self._fullAcc)
+
+    def __reduce__(self):
+        d = {}
+
+        return InverseCumulativeNormal, (self._average, self._sigma, self._fullAcc), d
+
+    def __setstate__(self, state):
+        pass
+
+    def __richcmp__(InverseCumulativeNormal self, InverseCumulativeNormal other, int op):
+        if op == 2:
+            return self._average == other.average and self._sigma == other.sigma and self._fullAcc == self.isFullAcc

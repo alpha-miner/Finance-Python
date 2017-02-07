@@ -82,7 +82,7 @@ class CSAverageSecurityValueHolder(CrossSectionValueHolder):
             raw_values = self._inner.value
             mean_value = np.array([raw_values.mean()] * len(raw_values))
             mean_value[np.isnan(raw_values.values)] = np.nan
-            self.cached = SecurityValues(mean_value, raw_values.index)
+            self.cached = SecurityValues(mean_value, raw_values.name_mapping)
             self.updated = True
             return self.cached
 
@@ -93,7 +93,7 @@ class CSAverageSecurityValueHolder(CrossSectionValueHolder):
             raw_values = self._inner.value
             mean_value = np.array([raw_values.mean()] * len(raw_values))
             mean_value[np.isnan(raw_values.values)] = np.nan
-            self.cached = SecurityValues(mean_value, raw_values.index)
+            self.cached = SecurityValues(mean_value, raw_values.name_mapping)
             self.updated = True
             return self.cached[name]
 
@@ -101,7 +101,7 @@ class CSAverageSecurityValueHolder(CrossSectionValueHolder):
         raw_values = self._inner.value_by_names(names)
         mean_value = np.array([raw_values.mean()] * len(raw_values))
         mean_value[np.isnan(raw_values.values)] = np.nan
-        raw_values = SecurityValues(mean_value, raw_values.index)
+        raw_values = SecurityValues(mean_value, raw_values.name_mapping)
         return raw_values[names]
 
 

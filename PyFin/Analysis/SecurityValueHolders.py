@@ -8,6 +8,7 @@ Created on 2015-8-7
 from abc import ABCMeta
 import copy
 from collections import defaultdict
+from collections import OrderedDict
 import sys
 import operator
 import numpy as np
@@ -101,7 +102,7 @@ class SecurityValueHolder(object):
                     values.append(self._innerHolders[name].result())
                 except ArithmeticError:
                     values.append(np.nan)
-            self.cached = SecurityValues(values, index=keys)
+            self.cached = SecurityValues(np.array(values), index=OrderedDict(zip(keys, range(len(keys)))))
             self.updated = True
             return self.cached
 
@@ -109,7 +110,8 @@ class SecurityValueHolder(object):
         if self.updated:
             return self.cached[names]
         else:
-            return SecurityValues([self._innerHolders[name].result() for name in names], index=names)
+            return SecurityValues(np.array([self._innerHolders[name].result() for name in names]),
+                                  index=OrderedDict(zip(names, range(len(names)))))
 
     def value_by_name(self, name):
         if self.updated:

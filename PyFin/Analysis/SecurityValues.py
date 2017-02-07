@@ -12,19 +12,11 @@ import numpy as np
 class SecurityValues:
     def __init__(self, data, index=None):
         if isinstance(data, dict):
-            index = data.keys()
+            index = OrderedDict(zip(data.keys(), range(len(data))))
             data = np.array(list(data.values()))
 
-        if isinstance(data, np.ndarray):
-            self.values = data
-        else:
-            self.values = np.array(data)
-
-        if isinstance(index, OrderedDict):
-            self.name_mapping = index
-        else:
-            self.name_mapping = OrderedDict(zip(index, range(len(index))))
-
+        self.values = data
+        self.name_mapping = index
         self.name_array = None
 
     def __getitem__(self, name):
@@ -37,7 +29,9 @@ class SecurityValues:
     def mask(self, flags):
         if not self.name_array:
             self.name_array = np.array(list(self.name_mapping.keys()))
-        return SecurityValues(self.values[flags], self.name_array[flags])
+
+        filtered_names = self.name_array[flags]
+        return SecurityValues(self.values[flags], OrderedDict(zip(filtered_names, range(len(filtered_names)))))
 
     def __invert__(self):
         return SecurityValues(~self.values, self.name_mapping)

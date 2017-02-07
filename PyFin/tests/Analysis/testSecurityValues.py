@@ -7,16 +7,17 @@ Created on 2017-1-25
 
 import unittest
 import numpy as np
+from collections import OrderedDict
 from PyFin.Analysis.SecurityValues import SecurityValues
 
 
 class TestSecurityValues(unittest.TestCase):
 
     def testSecurityValuesInit(self):
-        data = [1, 2, 3]
+        data = np.array([1, 2, 3])
         index = ['c', 'b', 'a']
 
-        test = SecurityValues(data, index)
+        test = SecurityValues(data, OrderedDict(zip(index, range(len(index)))))
         expected = dict(zip(index, data))
 
         for name in test.index:
@@ -27,10 +28,10 @@ class TestSecurityValues(unittest.TestCase):
         data = np.array([3, 2, np.nan, np.nan, 4, 5])
         index = [1, 2, 3, 4, 5, 6]
 
-        data = SecurityValues(data, index)
+        data = SecurityValues(data, OrderedDict(zip(index, range(len(index)))))
         test = data.rank()
 
-        expected = SecurityValues([2, 1, np.nan, np.nan, 3, 4], index)
+        expected = SecurityValues([2, 1, np.nan, np.nan, 3, 4], OrderedDict(zip(index, range(len(index)))))
         for name in test.index:
             if np.isnan(test[name]):
                 self.assertTrue(np.isnan(expected[name]))

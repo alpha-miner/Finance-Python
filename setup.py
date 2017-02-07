@@ -108,6 +108,7 @@ else:
 
 
 ext_modules = [
+    "PyFin/Analysis/SecurityValues.pyx",
     "PyFin/Math/Accumulators/impl.pyx",
     "PyFin/Math/Distributions/NormalDistribution.pyx",
     "PyFin/Math/Distributions/norm.pyx",

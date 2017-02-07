@@ -35,12 +35,12 @@ class SecurityValueHolder(object):
         else:
             self._compHolder = None
             if not isinstance(dependency, str) and len(dependency) == 1:
-                self._dependency = [dependency[0].lower()]
+                self._dependency = [dependency[0]]
 
             elif not isinstance(dependency, str) and len(dependency) >= 1:
-                self._dependency = [name.lower() for name in dependency]
+                self._dependency = [name for name in dependency]
             else:
-                self._dependency = [dependency.lower()]
+                self._dependency = [dependency]
             self._window = 0
         self._returnSize = 1
         self._holderTemplate = None
@@ -188,6 +188,9 @@ class SecurityValueHolder(object):
     def __neg__(self):
         return SecurityNegValueHolder(self)
 
+    def __invert__(self):
+        return SecurityInvertValueHolder(self)
+
     def __and__(self, right):
         return SecurityAndOperatorValueHolder(self, right)
 
@@ -205,11 +208,12 @@ class SecurityValueHolder(object):
 
     def transform(self, data, name=None, category_field=None):
 
+        data = data.sort_index()
+
         for f in self._dependency:
             if f not in data:
                 raise ValueError('({0}) dependency is not in input data'.format(f))
 
-        data = data.sort_index()
         dummy_category = False
         if not category_field:
             category_field = 'dummy'
@@ -397,6 +401,12 @@ class SecurityNegValueHolder(SecurityUnitoryValueHolder):
     def __init__(self, right):
         super(SecurityNegValueHolder, self).__init__(
             right, operator.neg)
+
+
+class SecurityInvertValueHolder(SecurityUnitoryValueHolder):
+    def __init__(self, right):
+        super(SecurityInvertValueHolder, self).__init__(
+            right, operator.invert)
 
 
 class SecurityLatestValueHolder(SecurityValueHolder):

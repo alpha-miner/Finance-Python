@@ -373,8 +373,8 @@ class StatelessSingleValueAccumulator(Accumulator):
     def __init__(self, dependency='x'):
         super(StatelessSingleValueAccumulator, self).__init__(dependency)
         self._returnSize = 1
-        self._window = 1
-        self._containerSize = 1
+        self._window = 0
+        self._containerSize = 0
 
     def _push(self, data):
         if not self._isValueHolderContained:
@@ -391,9 +391,9 @@ class StatelessSingleValueAccumulator(Accumulator):
 class Latest(StatelessSingleValueAccumulator):
     def __init__(self, dependency='x'):
         super(Latest, self).__init__(dependency)
-        self._window = 1
+        self._window = 0
         self._returnSize = 1
-        self._containerSize = 1
+        self._containerSize = 0
         self._latest = np.nan
 
     def push(self, data):

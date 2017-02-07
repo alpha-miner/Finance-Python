@@ -35,6 +35,8 @@ def test():
     suite.addTests(tests)
     tests = unittest.TestLoader().loadTestsFromTestCase(Analysis.TestCrossSectionValueHolder)
     suite.addTests(tests)
+    tests = unittest.TestLoader().loadTestsFromTestCase(Analysis.TestSecurityValues)
+    suite.addTests(tests)
     tests = unittest.TestLoader().loadTestsFromTestCase(Analysis.TestTransformer)
     suite.addTest(tests)
     tests = unittest.TestLoader().loadTestsFromTestCase(Analysis.TechnicalAnalysis.TestStatelessTechnicalAnalysis)

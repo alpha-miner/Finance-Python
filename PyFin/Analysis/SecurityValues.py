@@ -39,6 +39,9 @@ class SecurityValues:
             self.name_array = np.array(list(self.name_mapping.keys()))
         return SecurityValues(self.values[flags], self.name_array[flags])
 
+    def __invert__(self):
+        return SecurityValues(~self.values, self.name_mapping)
+
     def __neg__(self):
         return SecurityValues(-self.values, self.name_mapping)
 
@@ -173,10 +176,12 @@ class SecurityValues:
         return self.values.__len__()
 
     def rank(self):
-        return SecurityValues(self.values.argsort().argsort() + 1., self.name_mapping)
+        data = self.values.argsort().argsort().astype(float)
+        data[np.isnan(self.values)] = np.nan
+        return SecurityValues(data + 1., self.name_mapping)
 
     def mean(self):
-        return self.values.mean()
+        return np.nanmean(self.values)
 
     def dot(self, right):
         return np.dot(self.values, right.values)

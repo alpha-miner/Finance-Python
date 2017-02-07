@@ -181,7 +181,6 @@ class NegativeValueHolder(Accumulator):
         self._valueHolder = build_holder(valueHolder)
         self._returnSize = valueHolder.valueSize
         self._window = valueHolder.window
-        self._containerSize = valueHolder._containerSize
         self._dependency = deepcopy(valueHolder.dependency)
         self._isFull = 0
 
@@ -205,7 +204,6 @@ class ListedValueHolder(Accumulator):
         self._right = build_holder(right)
         self._dependency = list(set(left.dependency).union(set(right.dependency)))
         self._window = max(self._left.window, self._right.window)
-        self._containerSize = max(self._left._containerSize, self._right._containerSize)
         self._isFull = 0
 
     def push(self, data):
@@ -246,7 +244,6 @@ class TruncatedValueHolder(Accumulator):
         self._valueHolder = build_holder(valueHolder)
         self._dependency = self._valueHolder.dependency
         self._window = valueHolder.window
-        self._containerSize = valueHolder._containerSize
         self._isFull = 0
 
     def push(self, data):
@@ -267,7 +264,6 @@ class CombinedValueHolder(Accumulator):
         self._right = build_holder(right)
         self._dependency = list(set(left.dependency).union(set(right.dependency)))
         self._window = max(self._left.window, self._right.window)
-        self._containerSize = max(self._left._containerSize, self._right._containerSize)
         self._isFull = 0
 
     def push(self, data):
@@ -349,9 +345,7 @@ class NeOperatorValueHolder(ArithmeticValueHolder):
 class Identity(Accumulator):
     def __init__(self, value):
         self._dependency = []
-        self._isValueHolder = False
         self._window = 0
-        self._containerSize = 1
         self._value = value
         self._returnSize = 1
         self._isFull = 0
@@ -368,7 +362,6 @@ class StatelessSingleValueAccumulator(Accumulator):
         super(StatelessSingleValueAccumulator, self).__init__(dependency)
         self._returnSize = 1
         self._window = 0
-        self._containerSize = 0
 
     def _push(self, data):
         if not self._isValueHolderContained:
@@ -387,7 +380,6 @@ class Latest(StatelessSingleValueAccumulator):
         super(Latest, self).__init__(dependency)
         self._window = 0
         self._returnSize = 1
-        self._containerSize = 0
         self._latest = np.nan
 
     def push(self, data):
@@ -416,7 +408,6 @@ class CompoundedValueHolder(Accumulator):
         self._left = build_holder(left)
         self._right = build_holder(right)
         self._window = self._left.window + self._right.window - 1
-        self._containerSize = self._right._containerSize
         self._dependency = deepcopy(left.dependency)
 
         if hasattr(right.dependency, '__iter__'):
@@ -455,7 +446,6 @@ class IIF(Accumulator):
         self._right = build_holder(right)
         self._dependency = list(set(self._cond.dependency).union(set(self._cond.dependency).union(set(self._cond.dependency))))
         self._window = max(self._cond.window, self._left.window, self._right.window)
-        self._containerSize = max(self._cond._containerSize, self._left._containerSize, self._right._containerSize)
         self._isFull = 0
 
     def push(self, data):
@@ -475,11 +465,9 @@ class BasicFunction(Accumulator):
         if self._isValueHolderContained:
             self._returnSize = self._dependency.valueSize
             self._window = self._dependency.window
-            self._containerSize = self._dependency._containerSize
         else:
             self._returnSize = 1
             self._window = 1
-            self._containerSize = 1
         self._func = func
         self._isFull = 0
         self._origValue = np.nan
@@ -526,11 +514,9 @@ class Pow(Accumulator):
         if self._isValueHolderContained:
             self._returnSize = self._dependency.valueSize
             self._window = self._dependency.window
-            self._containerSize = self._dependency._containerSize
         else:
             self._returnSize = 1
             self._window = 1
-            self._containerSize = 1
         self._isFull = 0
         self._origValue = np.nan
         self.n = n

@@ -36,7 +36,6 @@ class StatefulValueHolder(Accumulator):
         pyFinAssert(window > 0, ValueError, "window length should be greater than 0")
         self._returnSize = 1
         self._window = window
-        self._containerSize = window
         self._deque = Deque(window)
 
     @property
@@ -54,7 +53,6 @@ class Shift(StatefulValueHolder):
         pyFinAssert(N >= 1, ValueError, "shift value should always not be less than 1")
         self._valueHolder = build_holder(valueHolder)
         self._window = valueHolder.window + N
-        self._containerSize = N
         self._returnSize = valueHolder.valueSize
         self._dependency = deepcopy(valueHolder.dependency)
 

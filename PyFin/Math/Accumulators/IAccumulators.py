@@ -5,7 +5,6 @@ Created on 2015-7-26
 @author: cheng.li
 """
 
-from abc import ABCMeta
 from abc import abstractmethod
 import operator
 from copy import deepcopy

@@ -5,7 +5,6 @@ Created on 2015-7-26
 @author: cheng.li
 """
 
-from abc import abstractmethod
 import operator
 from copy import deepcopy
 import math
@@ -152,10 +151,6 @@ class Accumulator(IAccumulator):
 
         df = pd.Series(output_values, index=data.index, name=name)
         return df
-
-    @abstractmethod
-    def result(self):
-        raise NotImplementedError("result method is not implemented for Accumulator interface class")
 
     @property
     def value(self):

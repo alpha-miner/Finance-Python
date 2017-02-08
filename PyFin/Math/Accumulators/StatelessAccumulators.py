@@ -41,6 +41,9 @@ class Sign(StatelessSingleValueAccumulator):
     def result(self):
         return self._sign
 
+    def __deepcopy__(self, memo):
+        return Sign(self._dependency)
+
 
 class Diff(StatelessSingleValueAccumulator):
     def __init__(self, dependency='x'):
@@ -61,6 +64,9 @@ class Diff(StatelessSingleValueAccumulator):
 
     def result(self):
         return self._curr - self._previous
+
+    def __deepcopy__(self, memo):
+        return Diff(self._dependency)
 
 
 class SimpleReturn(StatelessSingleValueAccumulator):
@@ -86,6 +92,9 @@ class SimpleReturn(StatelessSingleValueAccumulator):
         except ValueError:
             return np.nan
 
+    def __deepcopy__(self, memo):
+        return SimpleReturn(self._dependency)
+
 
 class LogReturn(StatelessSingleValueAccumulator):
     def __init__(self, dependency='x'):
@@ -109,6 +118,9 @@ class LogReturn(StatelessSingleValueAccumulator):
             return math.log(self._curr / self._previous)
         except ValueError:
             return np.nan
+
+    def __deepcopy__(self, memo):
+        return LogReturn(self._dependency)
 
 
 class Positive(StatelessSingleValueAccumulator):
@@ -135,6 +147,9 @@ class Positive(StatelessSingleValueAccumulator):
     def result(self):
         return self._pos
 
+    def __deepcopy__(self, memo):
+        return Positive(self._dependency)
+
 
 class Negative(StatelessSingleValueAccumulator):
     def __init__(self, dependency='x'):
@@ -159,6 +174,9 @@ class Negative(StatelessSingleValueAccumulator):
 
     def result(self):
         return self._neg
+
+    def __deepcopy__(self, memo):
+        return Negative(self._dependency)
 
 
 class Max(StatelessSingleValueAccumulator):
@@ -186,6 +204,9 @@ class Max(StatelessSingleValueAccumulator):
     def result(self):
         return self._currentMax
 
+    def __deepcopy__(self, memo):
+        return Max(self._dependency)
+
 
 class Minimum(StatelessSingleValueAccumulator):
     def __init__(self, dependency='x'):
@@ -212,6 +233,9 @@ class Minimum(StatelessSingleValueAccumulator):
     def result(self):
         return self._currentMin
 
+    def __deepcopy__(self, memo):
+        return Minimum(self._dependency)
+
 
 class Sum(StatelessSingleValueAccumulator):
     def __init__(self, dependency='x'):
@@ -236,6 +260,9 @@ class Sum(StatelessSingleValueAccumulator):
 
     def result(self):
         return self._currentSum
+
+    def __deepcopy__(self, memo):
+        return Sum(self._dependency)
 
 
 class Average(StatelessSingleValueAccumulator):
@@ -265,6 +292,9 @@ class Average(StatelessSingleValueAccumulator):
         except ZeroDivisionError:
             return np.nan
 
+    def __deepcopy__(self, memo):
+        return Average(self._dependency)
+
 
 class XAverage(StatelessSingleValueAccumulator):
     def __init__(self, window, dependency='x'):
@@ -288,6 +318,9 @@ class XAverage(StatelessSingleValueAccumulator):
 
     def result(self):
         return self._average
+
+    def __deepcopy__(self, memo):
+        return XAverage(2.0 / self._exp - 1., self._dependency)
 
 
 class Variance(StatelessSingleValueAccumulator):
@@ -321,10 +354,13 @@ class Variance(StatelessSingleValueAccumulator):
         else:
             return np.nan
 
+    def __deepcopy__(self, memo):
+        return Variance(self._dependency, self._isPop)
+
 
 class Product(StatelessSingleValueAccumulator):
     def __init__(self, dependency='x'):
-        super(Product,self).__init__(dependency)
+        super(Product, self).__init__(dependency)
         self._product = 1.0
 
     def push(self, data):
@@ -338,6 +374,9 @@ class Product(StatelessSingleValueAccumulator):
 
     def result(self):
         return self._product
+
+    def __deepcopy__(self, memo):
+        return Product(self._dependency)
 
 
 class CenterMoment(StatelessSingleValueAccumulator):
@@ -360,6 +399,9 @@ class CenterMoment(StatelessSingleValueAccumulator):
     def result(self):
         return self._moment
 
+    def __deepcopy__(self, memo):
+        return CenterMoment(self._order, self._dependency)
+
 
 class Skewness(StatelessSingleValueAccumulator):
     def __init__(self, dependency='x'):
@@ -374,6 +416,9 @@ class Skewness(StatelessSingleValueAccumulator):
     def result(self):
         return self._skewness.result()
 
+    def __deepcopy__(self, memo):
+        return Skewness(self._dependency)
+
 
 class Kurtosis(StatelessSingleValueAccumulator):
     def __init__(self, dependency='x'):
@@ -387,6 +432,9 @@ class Kurtosis(StatelessSingleValueAccumulator):
 
     def result(self):
         return self._kurtosis.result()
+
+    def __deepcopy__(self, memo):
+        return Kurtosis(self._dependency)
 
 
 class Rank(StatelessSingleValueAccumulator):
@@ -409,6 +457,9 @@ class Rank(StatelessSingleValueAccumulator):
     def result(self):
         self._rank = [bisect.bisect_left(self._sortedList, x) for x in self._thisList]
         return self._rank
+
+    def __deepcopy__(self, memo):
+        return Rank(self._dependency)
 
 
 class LevelList(StatelessSingleValueAccumulator):
@@ -433,6 +484,9 @@ class LevelList(StatelessSingleValueAccumulator):
     def result(self):
         return self._levelList
 
+    def __deepcopy__(self, memo):
+        return LevelList(self._dependency)
+
 
 class LevelValue(StatelessSingleValueAccumulator):
     def __init__(self, dependency='x'):
@@ -454,6 +508,9 @@ class LevelValue(StatelessSingleValueAccumulator):
 
     def result(self):
         return self._levelValue
+
+    def __deepcopy__(self, memo):
+        return LevelValue(self._dependency)
 
 
 class AutoCorrelation(StatelessSingleValueAccumulator):
@@ -484,6 +541,9 @@ class AutoCorrelation(StatelessSingleValueAccumulator):
                 return np.nan
             return self._AutoCorrMatrix[0, 1]
 
+    def __deepcopy__(self, memo):
+        return AutoCorrelation(self._lags, self._dependency)
+
 
 class StatelessMultiValueAccumulator(Accumulator):
     def __init__(self, dependency):
@@ -502,6 +562,9 @@ class StatelessMultiValueAccumulator(Accumulator):
             self._dependency.push(data)
             value = self._dependency.result()
         return value
+
+    def __deepcopy__(self, memo):
+        return StatelessMultiValueAccumulator(self._dependency)
 
 
 class Correlation(StatelessMultiValueAccumulator):
@@ -539,3 +602,6 @@ class Correlation(StatelessMultiValueAccumulator):
             return nominator / denominator
         else:
             return np.nan
+
+    def __deepcopy__(self, memo):
+        return Correlation(self._dependency)

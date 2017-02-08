@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 u"""
-Created on 2015-7-26
+Created on 2015-2-8
 
 @author: cheng.li
 """
@@ -20,64 +20,36 @@ else:
     div_attr = "div"
 
 
-class IAccumulator(object):
-
-    def _binary_operator(self, right, operatorHolder):
-        if isinstance(right, IAccumulator):
-            return operatorHolder(self, right)
-        return operatorHolder(self, Identity(right))
+cdef class IAccumulator(object):
 
     def __add__(self, right):
-        return self._binary_operator(right, AddedValueHolder)
-
-    def __radd__(self, left):
-        return AddedValueHolder(self, Identity(left))
+        return AddedValueHolder(self, right)
 
     def __sub__(self, right):
-        return self._binary_operator(right, MinusedValueHolder)
-
-    def __rsub__(self, left):
-        return MinusedValueHolder(Identity(left), self)
+        return MinusedValueHolder(self, right)
 
     def __mul__(self, right):
-        return self._binary_operator(right, MultipliedValueHolder)
-
-    def __rmul__(self, left):
-        return MultipliedValueHolder(self, Identity(left))
+        return MultipliedValueHolder(self, right)
 
     def __div__(self, right):
-        return self._binary_operator(right, DividedValueHolder)
-
-    def __rdiv__(self, left):
-        return DividedValueHolder(Identity(left), self)
+        return DividedValueHolder(self, right)
 
     # only work for python 3
     def __truediv__(self, right):
-        return self.__div__(right)
+        return DividedValueHolder(self, right)
 
-    # only work for python 3
-    def __rtruediv__(self, left):
-        return self.__rdiv__(left)
-
-    def __le__(self, right):
-        return self._binary_operator(right, LeOperatorValueHolder)
-
-    def __lt__(self, right):
-        return self._binary_operator(right, LtOperatorValueHolder)
-
-    def __ge__(self, right):
-        return self._binary_operator(right, GeOperatorValueHolder)
-
-    def __gt__(self, right):
-        return self._binary_operator(right, GtOperatorValueHolder)
+    def __richcmp__(self, right, int op):
+        if op == 0:
+            return LtOperatorValueHolder(self, right)
+        elif op == 1:
+            return LeOperatorValueHolder(self, right)
+        elif op == 4:
+            return GtOperatorValueHolder(self, right)
+        elif op == 5:
+            return GeOperatorValueHolder(self, right)
 
     def __xor__(self, right):
-        if isinstance(right, IAccumulator):
-            return ListedValueHolder(self, right)
-        return ListedValueHolder(self, Identity(right))
-
-    def __rxor__(self, left):
-        return ListedValueHolder(Identity(left), self)
+        return ListedValueHolder(self, right)
 
     def __rshift__(self, right):
         if isinstance(right, IAccumulator):
@@ -95,14 +67,23 @@ class IAccumulator(object):
         return TruncatedValueHolder(self, item)
 
 
-class Accumulator(IAccumulator):
+cdef class Accumulator(IAccumulator):
+
+    cdef public int _isFull
+    cdef public object _dependency
+    cdef public int _isValueHolderContained
+    cdef public int _window
+    cdef public int _returnSize
 
     def __init__(self, dependency):
         self._isFull = 0
+        self._window = 0
+        self._returnSize = 1
+
         if isinstance(dependency, Accumulator):
-            self._isValueHolderContained = True
+            self._isValueHolderContained = 1
         else:
-            self._isValueHolderContained = False
+            self._isValueHolderContained = 0
         if hasattr(dependency, '__iter__') and len(dependency) >= 2:
             for name in dependency:
                 pyFinAssert(isinstance(name, str), ValueError, '{0} in pNames should be a plain string. But it is {1}'
@@ -175,8 +156,14 @@ class Accumulator(IAccumulator):
         else:
             return self._dependency.dependency
 
+    def __deepcopy__(self, memo):
+        return Accumulator(self._dependency)
 
-class NegativeValueHolder(Accumulator):
+
+cdef class NegativeValueHolder(Accumulator):
+
+    cdef public object _valueHolder
+
     def __init__(self, valueHolder):
         self._valueHolder = build_holder(valueHolder)
         self._returnSize = valueHolder.valueSize
@@ -196,13 +183,20 @@ class NegativeValueHolder(Accumulator):
         except TypeError:
             return [-r for r in res]
 
+    def __deepcopy__(self, memo):
+        return NegativeValueHolder(self._valueHolder)
 
-class ListedValueHolder(Accumulator):
+
+cdef class ListedValueHolder(Accumulator):
+
+    cdef public object _left
+    cdef public object _right
+
     def __init__(self, left, right):
-        self._returnSize = left.valueSize + right.valueSize
         self._left = build_holder(left)
         self._right = build_holder(right)
-        self._dependency = list(set(left.dependency).union(set(right.dependency)))
+        self._returnSize = self._left.valueSize + self._right.valueSize
+        self._dependency = list(set(self._left.dependency).union(set(self._right.dependency)))
         self._window = max(self._left.window, self._right.window)
         self._isFull = 0
 
@@ -222,8 +216,16 @@ class ListedValueHolder(Accumulator):
             resRight = np.array([resRight])
         return np.concatenate([resLeft, resRight])
 
+    def __deepcopy__(self, memo):
+        return ListedValueHolder(self._left, self._right)
 
-class TruncatedValueHolder(Accumulator):
+
+cdef class TruncatedValueHolder(Accumulator):
+
+    cdef public int _start
+    cdef public int _stop
+    cdef public object _valueHolder
+
     def __init__(self, valueHolder, item):
         if valueHolder.valueSize == 1:
             raise TypeError("scalar valued holder ({0}) can't be sliced".format(valueHolder))
@@ -238,7 +240,7 @@ class TruncatedValueHolder(Accumulator):
             self._returnSize = length
         else:
             self._start = item
-            self._stop = None
+            self._stop = -1
             self._returnSize = 1
 
         self._valueHolder = build_holder(valueHolder)
@@ -252,17 +254,28 @@ class TruncatedValueHolder(Accumulator):
             self._isFull = 1
 
     def result(self):
-        if self._stop is None:
+        if self._stop == -1:
             return self._valueHolder.result()[self._start]
         return self._valueHolder.result()[self._start:self._stop]
 
+    def __deepcopy__(self, memo):
+        if self._stop == -1:
+            item = self._start
+        else:
+            item = slice(self._start, self._stop)
+        return TruncatedValueHolder(self._valueHolder, item)
 
-class CombinedValueHolder(Accumulator):
+
+cdef class CombinedValueHolder(Accumulator):
+
+    cdef public object _left
+    cdef public object _right
+
     def __init__(self, left, right):
-        self._returnSize = left.valueSize
         self._left = build_holder(left)
         self._right = build_holder(right)
-        self._dependency = list(set(left.dependency).union(set(right.dependency)))
+        self._returnSize = self._left.valueSize
+        self._dependency = list(set(self._left.dependency).union(set(self._right.dependency)))
         self._window = max(self._left.window, self._right.window)
         self._isFull = 0
 
@@ -272,8 +285,14 @@ class CombinedValueHolder(Accumulator):
         if self._isFull == 0 and self._left.isFull and self._right.isFull:
             self._isFull = 1
 
+    def __deepcopy__(self, memo):
+        return CombinedValueHolder(self._left, self._right)
 
-class ArithmeticValueHolder(CombinedValueHolder):
+
+cdef class ArithmeticValueHolder(CombinedValueHolder):
+
+    cdef public object _op
+
     def __init__(self, left, right, op):
         super(ArithmeticValueHolder, self).__init__(left, right)
         self._op = op
@@ -291,58 +310,94 @@ class ArithmeticValueHolder(CombinedValueHolder):
         else:
             return False
 
+    def __deepcopy__(self, memo):
+        return ArithmeticValueHolder(self._left, self._right, self._op)
 
-class AddedValueHolder(ArithmeticValueHolder):
+
+cdef class AddedValueHolder(ArithmeticValueHolder):
     def __init__(self, left, right):
         super(AddedValueHolder, self).__init__(left, right, operator.add)
 
+    def __deepcopy__(self, memo):
+        return AddedValueHolder(self._left, self._right)
 
-class MinusedValueHolder(ArithmeticValueHolder):
+
+cdef class MinusedValueHolder(ArithmeticValueHolder):
     def __init__(self, left, right):
         super(MinusedValueHolder, self).__init__(left, right, operator.sub)
 
+    def __deepcopy__(self, memo):
+        return MinusedValueHolder(self._left, self._right)
 
-class MultipliedValueHolder(ArithmeticValueHolder):
+
+cdef class MultipliedValueHolder(ArithmeticValueHolder):
     def __init__(self, left, right):
         super(MultipliedValueHolder, self).__init__(left, right, operator.mul)
 
+    def __deepcopy__(self, memo):
+        return MultipliedValueHolder(self._left, self._right)
 
-class DividedValueHolder(ArithmeticValueHolder):
+
+cdef class DividedValueHolder(ArithmeticValueHolder):
     def __init__(self, left, right):
         super(DividedValueHolder, self).__init__(left, right, getattr(operator, div_attr))
 
+    def __deepcopy__(self, memo):
+        return DividedValueHolder(self._left, self._right)
 
-class LtOperatorValueHolder(ArithmeticValueHolder):
+
+cdef class LtOperatorValueHolder(ArithmeticValueHolder):
     def __init__(self, left, right):
         super(LtOperatorValueHolder, self).__init__(left, right, operator.lt)
 
+    def __deepcopy__(self, memo):
+        return LtOperatorValueHolder(self._left, self._right)
 
-class LeOperatorValueHolder(ArithmeticValueHolder):
+
+cdef class LeOperatorValueHolder(ArithmeticValueHolder):
     def __init__(self, left, right):
         super(LeOperatorValueHolder, self).__init__(left, right, operator.le)
 
+    def __deepcopy__(self, memo):
+        return LeOperatorValueHolder(self._left, self._right)
 
-class GtOperatorValueHolder(ArithmeticValueHolder):
+
+cdef class GtOperatorValueHolder(ArithmeticValueHolder):
     def __init__(self, left, right):
         super(GtOperatorValueHolder, self).__init__(left, right, operator.gt)
 
+    def __deepcopy__(self, memo):
+        return GtOperatorValueHolder(self._left, self._right)
 
-class GeOperatorValueHolder(ArithmeticValueHolder):
+
+cdef class GeOperatorValueHolder(ArithmeticValueHolder):
     def __init__(self, left, right):
         super(GeOperatorValueHolder, self).__init__(left, right, operator.ge)
+
+    def __deepcopy__(self, memo):
+        return GeOperatorValueHolder(self._left, self._right)
 
 
 class EqOperatorValueHolder(ArithmeticValueHolder):
     def __init__(self, left, right):
         super(EqOperatorValueHolder, self).__init__(left, right, operator.eq)
 
+    def __deepcopy__(self, memo):
+        return EqOperatorValueHolder(self._left, self._right)
 
-class NeOperatorValueHolder(ArithmeticValueHolder):
+
+cdef class NeOperatorValueHolder(ArithmeticValueHolder):
     def __init__(self, left, right):
         super(NeOperatorValueHolder, self).__init__(left, right, operator.ne)
 
+    def __deepcopy__(self, memo):
+        return NeOperatorValueHolder(self._left, self._right)
 
-class Identity(Accumulator):
+
+cdef class Identity(Accumulator):
+
+    cdef public double _value
+
     def __init__(self, value):
         self._dependency = []
         self._window = 0
@@ -356,8 +411,12 @@ class Identity(Accumulator):
     def result(self):
         return self._value
 
+    def __deepcopy__(self, memo):
+        return Identity(self._value)
 
-class StatelessSingleValueAccumulator(Accumulator):
+
+cdef class StatelessSingleValueAccumulator(Accumulator):
+
     def __init__(self, dependency='x'):
         super(StatelessSingleValueAccumulator, self).__init__(dependency)
         self._returnSize = 1
@@ -374,8 +433,14 @@ class StatelessSingleValueAccumulator(Accumulator):
             value = self._dependency.result()
         return value
 
+    def __deepcopy__(self, memo):
+        return StatelessSingleValueAccumulator(self._dependency)
 
-class Latest(StatelessSingleValueAccumulator):
+
+cdef class Latest(StatelessSingleValueAccumulator):
+
+    cdef public double _latest
+
     def __init__(self, dependency='x'):
         super(Latest, self).__init__(dependency)
         self._window = 0
@@ -392,23 +457,42 @@ class Latest(StatelessSingleValueAccumulator):
     def result(self):
         return self._latest
 
+    def __deepcopy__(self, memo):
+        return Latest(self._dependency)
 
-def build_holder(name):
+
+cdef int isanumber(a):
+    cdef int bool_a = 1
+    try:
+        float(repr(a))
+    except:
+        bool_a = 0
+
+    return bool_a
+
+
+cpdef build_holder(name):
     if isinstance(name, Accumulator):
         return deepcopy(name)
     elif isinstance(name, str):
         return Latest(name)
+    elif isanumber(name):
+        return Identity(float(name))
     elif hasattr(name, '__iter__'):
         return build_holder(name[0])
 
 
-class CompoundedValueHolder(Accumulator):
+cdef class CompoundedValueHolder(Accumulator):
+
+    cdef public object _left
+    cdef public object _right
+
     def __init__(self, left, right):
-        self._returnSize = right.valueSize
         self._left = build_holder(left)
         self._right = build_holder(right)
+        self._returnSize = self._right.valueSize
         self._window = self._left.window + self._right.window - 1
-        self._dependency = deepcopy(left.dependency)
+        self._dependency = deepcopy(self._left.dependency)
 
         if hasattr(right.dependency, '__iter__'):
             pyFinAssert(left.valueSize == len(right.dependency), ValueError, "left value size {0} "
@@ -437,8 +521,16 @@ class CompoundedValueHolder(Accumulator):
         else:
             return False
 
+    def __deepcopy__(self, memo):
+        return CompoundedValueHolder(self._left, self._right)
 
-class IIF(Accumulator):
+
+cdef class IIF(Accumulator):
+
+    cdef public object _cond
+    cdef public object _left
+    cdef public object _right
+
     def __init__(self, cond, left, right):
         self._cond = build_holder(cond)
         self._returnSize = self._cond.valueSize
@@ -458,8 +550,15 @@ class IIF(Accumulator):
     def result(self):
         return self._left.result() if self._cond.result() else self._right.result()
 
+    def __deepcopy__(self, memo):
+        return IIF(self._cond, self._left, self._right)
 
-class BasicFunction(Accumulator):
+
+cdef class BasicFunction(Accumulator):
+
+    cdef public object _origValue
+    cdef public object _func
+
     def __init__(self, dependency, func):
         super(BasicFunction, self).__init__(dependency)
         if self._isValueHolderContained:
@@ -491,24 +590,40 @@ class BasicFunction(Accumulator):
         except TypeError:
             return np.array([self._func(v) for v in self._origValue])
 
+    def __deepcopy__(self, memo):
+        return BasicFunction(self._dependency, self._func)
 
-class Exp(BasicFunction):
+
+cdef class Exp(BasicFunction):
     def __init__(self, dependency):
         super(Exp, self).__init__(dependency, math.exp)
 
+    def __deepcopy__(self, memo):
+        return Exp(self._dependency)
 
-class Log(BasicFunction):
+
+cdef class Log(BasicFunction):
     def __init__(self, dependency):
         super(Log, self).__init__(dependency, math.log)
 
+    def __deepcopy__(self, memo):
+        return Log(self._dependency)
 
-class Sqrt(BasicFunction):
+
+cdef class Sqrt(BasicFunction):
     def __init__(self, dependency):
         super(Sqrt, self).__init__(dependency, math.sqrt)
 
+    def __deepcopy__(self, memo):
+        return Sqrt(self._dependency)
+
 
 # due to the fact that pow function is much slower than ** operator
-class Pow(Accumulator):
+cdef class Pow(Accumulator):
+
+    cdef public object _origValue
+    cdef public double _n
+
     def __init__(self, dependency, n):
         super(Pow, self).__init__(dependency)
         if self._isValueHolderContained:
@@ -519,7 +634,7 @@ class Pow(Accumulator):
             self._window = 1
         self._isFull = 0
         self._origValue = np.nan
-        self.n = n
+        self._n = n
 
     def push(self, data):
         value = self.extract(data)
@@ -535,46 +650,66 @@ class Pow(Accumulator):
     def result(self):
 
         try:
-            return self._origValue ** self.n
+            return self._origValue ** self._n
         except TypeError:
-            return np.array(v ** self.n for v in self._origValue)
+            return np.array(v ** self._n for v in self._origValue)
+
+    def __deepcopy__(self, memo):
+        return Pow(self._dependency, self._n)
 
 
-class Abs(BasicFunction):
+cdef class Abs(BasicFunction):
     def __init__(self, dependency):
         super(Abs, self).__init__(dependency, abs)
 
+    def __deepcopy__(self, memo):
+        return Abs(self._dependency)
 
-class Sign(BasicFunction):
+
+cdef double sign(double x):
+    if x > 0.:
+        return 1.
+    elif x < 0.:
+        return -1.
+    else:
+        return 0.
+
+
+cdef class Sign(BasicFunction):
     def __init__(self, dependency):
-
-        def sign(x):
-            try:
-                if x >= 0:
-                    return 1
-                else:
-                    return -1
-            except ValueError:
-                raise TypeError
-
         super(Sign, self).__init__(dependency, sign)
 
+    def __deepcopy__(self, memo):
+        return Sign(self._dependency)
 
-class Acos(BasicFunction):
+
+cdef class Acos(BasicFunction):
     def __init__(self, dependency):
         super(Acos, self).__init__(dependency, math.acos)
 
+    def __deepcopy__(self, memo):
+        return Acos(self._dependency)
 
-class Acosh(BasicFunction):
+
+cdef class Acosh(BasicFunction):
     def __init__(self, dependency):
         super(Acosh, self).__init__(dependency, math.acosh)
 
+    def __deepcopy__(self, memo):
+        return Acosh(self._dependency)
 
-class Asin(BasicFunction):
+
+cdef class Asin(BasicFunction):
     def __init__(self, dependency):
         super(Asin, self).__init__(dependency, math.asin)
 
+    def __deepcopy__(self, memo):
+        return Asin(self._dependency)
 
-class Asinh(BasicFunction):
+
+cdef class Asinh(BasicFunction):
     def __init__(self, dependency):
         super(Asinh, self).__init__(dependency, math.asinh)
+
+    def __deepcopy__(self, memo):
+        return Asinh(self._dependency)

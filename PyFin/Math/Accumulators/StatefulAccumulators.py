@@ -46,6 +46,9 @@ class StatefulValueHolder(Accumulator):
     def isFull(self):
         return self._deque.isFull()
 
+    def __deepcopy__(self, memo):
+        return StatefulValueHolder(self._window, self._dependency)
+
 
 class Shift(StatefulValueHolder):
     def __init__(self, valueHolder, N=1):
@@ -66,6 +69,9 @@ class Shift(StatefulValueHolder):
         except AttributeError:
             return np.nan
 
+    def __deepcopy__(self, memo):
+        return Shift(self._valueHolder, self._window - self._valueHolder.window)
+
 
 class SingleValuedValueHolder(StatefulValueHolder):
     def __init__(self, window, dependency):
@@ -82,6 +88,9 @@ class SingleValuedValueHolder(StatefulValueHolder):
             self._dependency.push(data)
             value = self._dependency.result()
         return value
+
+    def __deepcopy__(self, memo):
+        return SingleValuedValueHolder(self._window, self._dependency)
 
 
 class SortedValueHolder(SingleValuedValueHolder):
@@ -102,6 +111,9 @@ class SortedValueHolder(SingleValuedValueHolder):
             self._deque.dump(value)
             bisect.insort_left(self._sortedArray, value)
 
+    def __deepcopy__(self, memo):
+        return SortedValueHolder(self._window, self._dependency)
+
 
 class MovingMax(SortedValueHolder):
     def __init__(self, window, dependency='x'):
@@ -112,6 +124,9 @@ class MovingMax(SortedValueHolder):
             return self._sortedArray[-1]
         else:
             return np.nan
+
+    def __deepcopy__(self, memo):
+        return MovingMax(self._window, self._dependency)
 
 
 class MovingMinimum(SortedValueHolder):
@@ -124,6 +139,9 @@ class MovingMinimum(SortedValueHolder):
         else:
             return np.nan
 
+    def __deepcopy__(self, memo):
+        return MovingMinimum(self._window, self._dependency)
+
 
 class MovingQuantile(SortedValueHolder):
     def __init__(self, window, dependency='x'):
@@ -135,6 +153,9 @@ class MovingQuantile(SortedValueHolder):
             return self._sortedArray.index(self._deque[n-1]) / (n - 1.)
         else:
             return np.nan
+
+    def __deepcopy__(self, memo):
+        return MovingQuantile(self._window, self._dependency)
 
 
 class MovingAllTrue(SingleValuedValueHolder):
@@ -159,6 +180,9 @@ class MovingAllTrue(SingleValuedValueHolder):
     def result(self):
         return self._countedTrue == self.size
 
+    def __deepcopy__(self, memo):
+        return MovingAllTrue(self._window, self._dependency)
+
 
 class MovingAnyTrue(SingleValuedValueHolder):
     def __init__(self, window, dependency='x'):
@@ -182,6 +206,9 @@ class MovingAnyTrue(SingleValuedValueHolder):
     def result(self):
         return self._countedTrue != 0
 
+    def __deepcopy__(self, memo):
+        return MovingAnyTrue(self._window, self._dependency)
+
 
 class MovingSum(SingleValuedValueHolder):
     def __init__(self, window, dependency='x'):
@@ -200,6 +227,9 @@ class MovingSum(SingleValuedValueHolder):
 
     def result(self):
         return self._runningSum
+
+    def __deepcopy__(self, memo):
+        return MovingSum(self._window, self._dependency)
 
 
 class MovingAverage(SingleValuedValueHolder):
@@ -222,6 +252,9 @@ class MovingAverage(SingleValuedValueHolder):
             return self._runningSum / self.size
         except ZeroDivisionError:
             return np.nan
+
+    def __deepcopy__(self, memo):
+        return MovingAverage(self._window, self._dependency)
 
 
 class MovingPositiveAverage(SingleValuedValueHolder):
@@ -249,6 +282,9 @@ class MovingPositiveAverage(SingleValuedValueHolder):
         else:
             return self._runningPositiveSum / self._runningPositiveCount
 
+    def __deepcopy__(self, memo):
+        return MovingPositiveAverage(self._window, self._dependency)
+
 
 class MovingPositiveDifferenceAverage(SingleValuedValueHolder):
     def __init__(self, window, dependency='x'):
@@ -264,6 +300,9 @@ class MovingPositiveDifferenceAverage(SingleValuedValueHolder):
     def result(self):
         return self._runningAverage.result()
 
+    def __deepcopy__(self, memo):
+        return MovingPositiveDifferenceAverage(self._window, self._dependency)
+
 
 class MovingNegativeDifferenceAverage(SingleValuedValueHolder):
     def __init__(self, window, dependency='x'):
@@ -278,6 +317,9 @@ class MovingNegativeDifferenceAverage(SingleValuedValueHolder):
 
     def result(self):
         return self._runningAverage.result()
+
+    def __deepcopy__(self, memo):
+        return MovingNegativeDifferenceAverage(self._window, self._dependency)
 
 
 class MovingRSI(SingleValuedValueHolder):
@@ -300,6 +342,9 @@ class MovingRSI(SingleValuedValueHolder):
             return 100. * nominator / denominator
         else:
             return 50.
+
+    def __deepcopy__(self, memo):
+        return MovingRSI(self._window, self._dependency)
 
 
 class MovingNegativeAverage(SingleValuedValueHolder):
@@ -326,6 +371,9 @@ class MovingNegativeAverage(SingleValuedValueHolder):
             return 0.0
         else:
             return self._runningNegativeSum / self._runningNegativeCount
+
+    def __deepcopy__(self, memo):
+        return MovingNegativeAverage(self._window, self._dependency)
 
 
 class MovingVariance(SingleValuedValueHolder):
@@ -364,6 +412,9 @@ class MovingVariance(SingleValuedValueHolder):
                 return tmp / (length - 1)
             else:
                 return np.nan
+
+    def __deepcopy__(self, memo):
+        return MovingVariance(self._window, self._dependency, self._isPop)
 
 
 class MovingNegativeVariance(SingleValuedValueHolder):
@@ -404,6 +455,9 @@ class MovingNegativeVariance(SingleValuedValueHolder):
             else:
                 return np.nan
 
+    def __deepcopy__(self, memo):
+        return MovingNegativeVariance(self._window, self._dependency, self._isPop)
+
 
 class MovingCountedPositive(SingleValuedValueHolder):
     def __init__(self, window, dependency='x'):
@@ -424,6 +478,9 @@ class MovingCountedPositive(SingleValuedValueHolder):
     def result(self):
         return self._counts
 
+    def __deepcopy__(self, memo):
+        return MovingCountedPositive(self._window, self._dependency)
+
 
 class MovingCountedNegative(SingleValuedValueHolder):
     def __init__(self, window, dependency='x'):
@@ -443,6 +500,9 @@ class MovingCountedNegative(SingleValuedValueHolder):
 
     def result(self):
         return self._counts
+
+    def __deepcopy__(self, memo):
+        return MovingCountedNegative(self._window, self._dependency)
 
 
 class MovingHistoricalWindow(StatefulValueHolder):
@@ -469,6 +529,9 @@ class MovingHistoricalWindow(StatefulValueHolder):
 
     def result(self):
         return [self.__getitem__(i) for i in range(self.size)]
+
+    def __deepcopy__(self, memo):
+        return MovingHistoricalWindow(self._window, self._dependency)
 
 
 # Calculator for one pair of series
@@ -518,6 +581,9 @@ class MovingCorrelation(StatefulValueHolder):
         else:
             return np.nan
 
+    def __deepcopy__(self, memo):
+        return MovingCorrelation(self._window, self._dependency)
+
 
 # Calculator for several series
 class MovingCorrelationMatrix(StatefulValueHolder):
@@ -557,6 +623,9 @@ class MovingCorrelationMatrix(StatefulValueHolder):
         else:
             return np.ones(len(self._runningSum)) * np.nan
 
+    def __deepcopy__(self, memo):
+        return MovingCorrelationMatrix(self._window, self._dependency)
+
 
 class MovingProduct(SingleValuedValueHolder):
     def __init__(self, window, dependency='x'):
@@ -576,6 +645,9 @@ class MovingProduct(SingleValuedValueHolder):
     def result(self):
         return self._runningProduct
 
+    def __deepcopy__(self, memo):
+        return MovingProduct(self._window, self._dependency)
+
 
 class MovingCenterMoment(SingleValuedValueHolder):
     def __init__(self, window, order, dependency='x'):
@@ -593,6 +665,9 @@ class MovingCenterMoment(SingleValuedValueHolder):
     def result(self):
         return self._runningMoment
 
+    def __deepcopy__(self, memo):
+        return MovingCenterMoment(self._window, self._order, self._dependency)
+
 
 class MovingSkewness(SingleValuedValueHolder):
     def __init__(self, window, dependency='x'):
@@ -606,6 +681,9 @@ class MovingSkewness(SingleValuedValueHolder):
 
     def result(self):
         return self._runningSkewness.result()
+
+    def __deepcopy__(self, memo):
+        return MovingSkewness(self._window, self._dependency)
 
 
 class MovingMaxPos(SortedValueHolder):
@@ -622,6 +700,9 @@ class MovingMaxPos(SortedValueHolder):
         self._runningTsMaxPos = tmpList.index(self._max)
         return self._runningTsMaxPos
 
+    def __deepcopy__(self, memo):
+        return MovingMaxPos(self._window, self._dependency)
+
 
 class MovingMinPos(SortedValueHolder):
     def __init__(self, window, dependency='x'):
@@ -637,6 +718,9 @@ class MovingMinPos(SortedValueHolder):
         self._runningTsMinPos = tmpList.index(self._min)
         return self._runningTsMinPos
 
+    def __deepcopy__(self, memo):
+        return MovingMinPos(self._window, self._dependency)
+
 
 class MovingKurtosis(SingleValuedValueHolder):
     def __init__(self, window, dependency='x'):
@@ -650,6 +734,9 @@ class MovingKurtosis(SingleValuedValueHolder):
 
     def result(self):
         return self._runningKurtosis.result()
+
+    def __deepcopy__(self, memo):
+        return MovingKurtosis(self._window, self._dependency)
 
 
 class MovingRSV(SingleValuedValueHolder):
@@ -669,6 +756,9 @@ class MovingRSV(SingleValuedValueHolder):
         con = self._deque.as_list()
         return (self._cached_value - min(con)) / (max(con) - min(con))
 
+    def __deepcopy__(self, memo):
+        return MovingRSV(self._window, self._dependency)
+
 
 class MACD(StatelessSingleValueAccumulator):
     def __init__(self, short, long, dependency='x', method=XAverage):
@@ -685,6 +775,9 @@ class MACD(StatelessSingleValueAccumulator):
     def result(self):
         return self._short_average.result() - self._long_average.result()
 
+    def __deepcopy__(self, memo):
+        return MACD(2. / self._short_average._exp - 1., 2. / self._long_average._exp - 1., self._dependency, type(self._short_average))
+
 
 class MovingRank(SortedValueHolder):
     def __init__(self, window, dependency='x'):
@@ -694,6 +787,9 @@ class MovingRank(SortedValueHolder):
     def result(self):
         self._runningRank = [bisect.bisect_left(self._sortedArray, x) for x in self._deque.as_list()]
         return self._runningRank
+
+    def __deepcopy__(self, memo):
+        return MovingRank(self._window, self._dependency)
 
 
 # runningJ can be more than 1 or less than 0.
@@ -723,6 +819,9 @@ class MovingKDJ(SingleValuedValueHolder):
     def result(self):
         return self._runningJ
 
+    def __deepcopy__(self, memo):
+        return MovingKDJ(self._window, self._k, self._d, self._dependency)
+
 
 class MovingAroon(SingleValuedValueHolder):
     def __init__(self, window, dependency='x'):
@@ -740,6 +839,9 @@ class MovingAroon(SingleValuedValueHolder):
         self._runningAroonOsc = (tmpList.index(np.max(tmpList)) - tmpList.index(np.min(tmpList))) / self.window
         return self._runningAroonOsc
 
+    def __deepcopy__(self, memo):
+        return MovingAroon(self._window, self._dependency)
+
 
 class MovingBias(SingleValuedValueHolder):
     def __init__(self, window, dependency='x'):
@@ -756,6 +858,9 @@ class MovingBias(SingleValuedValueHolder):
 
     def result(self):
         return self._runningBias
+
+    def __deepcopy__(self, memo):
+        return MovingBias(self._window, self._dependency)
 
 
 class MovingLevel(SingleValuedValueHolder):
@@ -775,6 +880,9 @@ class MovingLevel(SingleValuedValueHolder):
 
     def result(self):
         return self._runningLevel
+
+    def __deepcopy__(self, memo):
+        return MovingLevel(self._window, self._dependency)
 
 
 class MovingAutoCorrelation(SingleValuedValueHolder):
@@ -805,6 +913,9 @@ class MovingAutoCorrelation(SingleValuedValueHolder):
             except ZeroDivisionError:
                 return np.nan
             return self._runningAutoCorrMatrix[0, 1]
+
+    def __deepcopy__(self, memo):
+        return MovingAutoCorrelation(self._window, self._lags, self._dependency)
 
 
 if __name__ == '__main__':

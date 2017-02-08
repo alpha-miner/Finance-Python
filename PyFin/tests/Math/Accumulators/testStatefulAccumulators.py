@@ -332,7 +332,6 @@ class TestStatefulAccumulators(unittest.TestCase):
                                                    "Quantile expected:   {1}\n"
                                                    "Quantile calculated: {2}".format(i, expected, calculated))
 
-
     def testMovingCountedPositive(self):
         window = 120
         total = 2500
@@ -654,13 +653,11 @@ class TestStatefulAccumulators(unittest.TestCase):
         window = 10
         ms = MovingSkewness(window, dependency='x')
 
-        con = []
+        con = deque(maxlen=window)
         for i, value in enumerate(self.sample):
             con.append(value)
             ms.push(dict(x=value))
-            if i >= window:
-                con = con[1:]
-            if i >= window - 1:
+            if i >= 1:
                 calculated = ms.result()
                 this_moment3 = np.mean(np.power(np.abs(np.array(con) - np.mean(con)), 3))
                 expected = this_moment3 / np.power(np.std(con), 3)
@@ -709,13 +706,12 @@ class TestStatefulAccumulators(unittest.TestCase):
         window = 10
         mk = MovingKurtosis(window, dependency='x')
 
-        con = []
+        con = deque(maxlen=window)
         for i, value in enumerate(self.sample):
             con.append(value)
             mk.push(dict(x=value))
-            if i >= window:
-                con = con[1:]
-            if i >= window - 1:
+
+            if i >= 1:
                 calculated = mk.result()
                 this_moment4 = np.mean(np.power(np.abs(np.array(con) - np.mean(con)), 4))
                 expected = this_moment4 / np.power(np.std(con), 4)
@@ -776,9 +772,9 @@ class TestStatefulAccumulators(unittest.TestCase):
             expected = macd.value - ema_macd.value
             calculated = macd_diff.value
             self.assertAlmostEqual(expected, calculated, 10, "at index {0:d}\n"
-                                                             "expected ema macd diff:   {1:f}\n"
-                                                             "calculated ema macd diff: {2:f}".format(i, expected,
-                                                                                                      calculated))
+                                                            "expected ema macd diff:   {1:f}\n"
+                                                            "calculated ema macd diff: {2:f}".format(i, expected,
+                                                                                                     calculated))
 
     def testMovingRank(self):
         window = 10

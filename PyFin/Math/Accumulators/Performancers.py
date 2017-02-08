@@ -36,6 +36,9 @@ class MovingLogReturn(SingleValuedValueHolder):
         else:
             raise ArithmeticError("Container has less than 2 samples")
 
+    def __deepcopy__(self, memo):
+        return MovingLogReturn(self._window, self._dependency)
+
 
 class MovingSharp(StatefulValueHolder):
     def __init__(self, window, dependency=('ret', 'riskFree')):
@@ -60,6 +63,9 @@ class MovingSharp(StatefulValueHolder):
         else:
             return np.nan
 
+    def __deepcopy__(self, memo):
+        return MovingSharp(self._window, self._dependency)
+
 
 class MovingSortino(StatefulValueHolder):
     def __init__(self, window, dependency=('ret', 'riskFree')):
@@ -79,6 +85,9 @@ class MovingSortino(StatefulValueHolder):
 
     def result(self):
         return self._mean.result() / math.sqrt(self._negativeVar.result())
+
+    def __deepcopy__(self, memo):
+        return MovingSortino(self._window, self._dependency)
 
 
 class MovingAlphaBeta(StatefulValueHolder):
@@ -125,6 +134,9 @@ class MovingAlphaBeta(StatefulValueHolder):
         alpha = self._pReturnMean.result() - beta * self._mReturnMean.result()
         return alpha, beta
 
+    def __deepcopy__(self, memo):
+        return MovingAlphaBeta(self._window, self._dependency)
+
 
 class MovingDrawDown(StatefulValueHolder):
     def __init__(self, window, dependency='ret'):
@@ -150,6 +162,9 @@ class MovingDrawDown(StatefulValueHolder):
     def result(self):
         return self._runningCum - self._currentMax, self._runningIndex - self._highIndex, self._highIndex
 
+    def __deepcopy__(self, memo):
+        return MovingDrawDown(self._window, self._dependency)
+
 
 class MovingAverageDrawdown(StatefulValueHolder):
     def __init__(self, window, dependency='ret'):
@@ -171,6 +186,9 @@ class MovingAverageDrawdown(StatefulValueHolder):
     def result(self):
         return self._drawdownMean.result(), self._durationMean.result()
 
+    def __deepcopy__(self, memo):
+        return MovingAverageDrawdown(self._window, self._dependency)
+
 
 class MovingMaxDrawdown(StatefulValueHolder):
     def __init__(self, window, dependency='ret'):
@@ -189,3 +207,6 @@ class MovingMaxDrawdown(StatefulValueHolder):
     def result(self):
         sortedValue = sorted(range(self.size), key=lambda x: self._deque[x][0])
         return self._deque[sortedValue[0]]
+
+    def __deepcopy__(self, memo):
+        return MovingMaxDrawdown(self._window, self._dependency)

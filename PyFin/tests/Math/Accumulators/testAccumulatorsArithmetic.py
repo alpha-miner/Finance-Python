@@ -33,7 +33,7 @@ from PyFin.Math.Accumulators.StatelessAccumulators import Average
 from PyFin.Math.Accumulators.StatelessAccumulators import Minimum
 from PyFin.Math.Accumulators.StatelessAccumulators import Max
 from PyFin.Math.Accumulators.StatelessAccumulators import Correlation
-from PyFin.Math.Accumulators.Performancers import MovingAlphaBeta
+from PyFin.Math.Accumulators.StatefulAccumulators import MovingAlphaBeta
 
 
 class TestAccumulatorsArithmetic(unittest.TestCase):

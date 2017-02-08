@@ -75,14 +75,13 @@ from PyFin.Math.Accumulators.StatefulAccumulators import MovingLevel
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingAroon
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingBias
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingAutoCorrelation
-
-from PyFin.Math.Accumulators.Performancers import MovingLogReturn
-from PyFin.Math.Accumulators.Performancers import MovingAlphaBeta
-from PyFin.Math.Accumulators.Performancers import MovingDrawDown
-from PyFin.Math.Accumulators.Performancers import MovingAverageDrawdown
-from PyFin.Math.Accumulators.Performancers import MovingMaxDrawdown
-from PyFin.Math.Accumulators.Performancers import MovingSharp
-from PyFin.Math.Accumulators.Performancers import MovingSortino
+from PyFin.Math.Accumulators.StatefulAccumulators import MovingLogReturn
+from PyFin.Math.Accumulators.StatefulAccumulators import MovingAlphaBeta
+from PyFin.Math.Accumulators.StatefulAccumulators import MovingDrawDown
+from PyFin.Math.Accumulators.StatefulAccumulators import MovingAverageDrawdown
+from PyFin.Math.Accumulators.StatefulAccumulators import MovingMaxDrawdown
+from PyFin.Math.Accumulators.StatefulAccumulators import MovingSharp
+from PyFin.Math.Accumulators.StatefulAccumulators import MovingSortino
 
 __all__ = ["Exp",
            "Log",

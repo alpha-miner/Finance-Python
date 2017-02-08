@@ -13,11 +13,6 @@ cimport cython
 
 cdef class Deque:
 
-    cdef public int window
-    cdef public int is_full
-    cdef public list con
-    cdef public int start
-
     def __init__(self,
                  int window,
                  int is_full=0,
@@ -32,7 +27,7 @@ cdef class Deque:
         self.start = start
 
     @cython.boundscheck(False)
-    def dump(self, value):
+    cdef dump(self, value):
         cdef int n
         n = self.start
 
@@ -51,16 +46,16 @@ cdef class Deque:
                 self.is_full = 1
         return popout
 
-    def size(self):
+    cdef size(self):
         return len(self.con)
 
-    def isFull(self):
+    cdef isFull(self):
         return self.is_full == 1
 
-    def as_array(self):
+    cdef as_array(self):
         return np.array(self.as_list())
 
-    def as_list(self):
+    cdef as_list(self):
         return [self.con[(self.start + item) % self.window] for item in range(len(self.con))]
 
     def __getitem__(self, item):

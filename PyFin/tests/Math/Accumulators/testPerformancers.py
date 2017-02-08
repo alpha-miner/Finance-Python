@@ -9,12 +9,12 @@ import csv
 import unittest
 import os
 import numpy as np
-from PyFin.Math.Accumulators.Performancers import MovingSharp
-from PyFin.Math.Accumulators.Performancers import MovingSortino
-from PyFin.Math.Accumulators.Performancers import MovingAlphaBeta
-from PyFin.Math.Accumulators.Performancers import MovingDrawDown
-from PyFin.Math.Accumulators.Performancers import MovingAverageDrawdown
-from PyFin.Math.Accumulators.Performancers import MovingMaxDrawdown
+from PyFin.Math.Accumulators.StatefulAccumulators import MovingSharp
+from PyFin.Math.Accumulators.StatefulAccumulators import MovingSortino
+from PyFin.Math.Accumulators.StatefulAccumulators import MovingAlphaBeta
+from PyFin.Math.Accumulators.StatefulAccumulators import MovingDrawDown
+from PyFin.Math.Accumulators.StatefulAccumulators import MovingAverageDrawdown
+from PyFin.Math.Accumulators.StatefulAccumulators import MovingMaxDrawdown
 
 
 class TestPerformancers(unittest.TestCase):

@@ -47,8 +47,8 @@ class SecurityMACDValueHolder(SecurityStatelessSingleValueHolder):
     def __init__(self, short, long, dependency='x'):
         super(SecurityMACDValueHolder, self).__init__(holderType=MACD,
                                                       dependency=dependency,
-                                                      short=short,
-                                                      long=long)
+                                                      short_win=short,
+                                                      long_win=long)
 
 
 class SecuritySignValueHolder(SecurityStatelessSingleValueHolder):

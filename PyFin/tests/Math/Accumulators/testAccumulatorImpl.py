@@ -17,7 +17,6 @@ class TestAccumulatorImpl(unittest.TestCase):
 
     def testDequeDeepCopy(self):
         benchmark_deque = Deque(5)
-        benchmark_deque.dump(2.)
 
         copied_deque = copy.deepcopy(benchmark_deque)
 
@@ -25,7 +24,6 @@ class TestAccumulatorImpl(unittest.TestCase):
 
     def testDequePickle(self):
         benchmark_deque = Deque(5)
-        benchmark_deque.dump(2.)
 
         f = tempfile.NamedTemporaryFile('w+b', delete=False)
         pickle.dump(benchmark_deque, f)

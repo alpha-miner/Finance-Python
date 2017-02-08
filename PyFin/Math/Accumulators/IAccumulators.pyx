@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 u"""
-Created on 2015-2-8
+Created on 2017-2-8
 
 @author: cheng.li
 """
@@ -9,7 +9,9 @@ import operator
 from copy import deepcopy
 import math
 import sys
+cimport cython
 import numpy as np
+cimport numpy as np
 import pandas as pd
 from PyFin.Utilities import pyFinAssert
 
@@ -69,12 +71,6 @@ cdef class IAccumulator(object):
 
 cdef class Accumulator(IAccumulator):
 
-    cdef public int _isFull
-    cdef public object _dependency
-    cdef public int _isValueHolderContained
-    cdef public int _window
-    cdef public int _returnSize
-
     def __init__(self, dependency):
         self._isFull = 0
         self._window = 0
@@ -102,7 +98,9 @@ cdef class Accumulator(IAccumulator):
                         .format(dependency, type(dependency)))
             self._dependency = deepcopy(dependency)
 
-    def extract(self, data):
+    cdef extract(self, dict data):
+        cdef str p
+
         if not self._isValueHolderContained:
             try:
                 return data[self._dependency]
@@ -115,7 +113,15 @@ cdef class Accumulator(IAccumulator):
             self._dependency.push(data)
             return self._dependency.result()
 
-    def transform(self, data, name=None):
+    @cython.boundscheck(False)
+    @cython.wraparound(False)
+    def transform(self, data, str name=None):
+
+        cdef long i
+        cdef long n = len(data)
+        cdef np.ndarray[double, ndim=1] output_values = np.zeros(len(data))
+        cdef np.ndarray[double, ndim=2] matrix_values
+
         data.sort_index()
 
         if not name:
@@ -126,8 +132,8 @@ cdef class Accumulator(IAccumulator):
 
         output_values = np.zeros(len(data))
 
-        for i, row in enumerate(matrix_values):
-            self.push({k: v for k, v in zip(columns, row)})
+        for i in range(n):
+            self.push({k: v for k, v in zip(columns, matrix_values[i])})
             output_values[i] = self.result()
 
         df = pd.Series(output_values, index=data.index, name=name)
@@ -171,12 +177,12 @@ cdef class NegativeValueHolder(Accumulator):
         self._dependency = deepcopy(valueHolder.dependency)
         self._isFull = 0
 
-    def push(self, data):
+    cpdef push(self, data):
         self._valueHolder.push(data)
         if self._valueHolder.isFull:
             self._isFull = 1
 
-    def result(self):
+    cpdef result(self):
         res = self._valueHolder.result()
         try:
             return -res
@@ -200,13 +206,13 @@ cdef class ListedValueHolder(Accumulator):
         self._window = max(self._left.window, self._right.window)
         self._isFull = 0
 
-    def push(self, data):
+    cpdef push(self, data):
         self._left.push(data)
         self._right.push(data)
         if self._isFull == 0 and self._left.isFull and self._right.isFull:
             self._isFull = 1
 
-    def result(self):
+    cpdef result(self):
         resLeft = self._left.result()
         resRight = self._right.result()
 
@@ -248,12 +254,12 @@ cdef class TruncatedValueHolder(Accumulator):
         self._window = valueHolder.window
         self._isFull = 0
 
-    def push(self, data):
+    cpdef push(self, data):
         self._valueHolder.push(data)
         if self._valueHolder.isFull:
             self._isFull = 1
 
-    def result(self):
+    cpdef result(self):
         if self._stop == -1:
             return self._valueHolder.result()[self._start]
         return self._valueHolder.result()[self._start:self._stop]
@@ -279,7 +285,7 @@ cdef class CombinedValueHolder(Accumulator):
         self._window = max(self._left.window, self._right.window)
         self._isFull = 0
 
-    def push(self, data):
+    cpdef push(self, data):
         self._left.push(data)
         self._right.push(data)
         if self._isFull == 0 and self._left.isFull and self._right.isFull:
@@ -297,7 +303,7 @@ cdef class ArithmeticValueHolder(CombinedValueHolder):
         super(ArithmeticValueHolder, self).__init__(left, right)
         self._op = op
 
-    def result(self):
+    cpdef result(self):
         res1 = self._left.result()
         res2 = self._right.result()
 
@@ -405,10 +411,10 @@ cdef class Identity(Accumulator):
         self._returnSize = 1
         self._isFull = 0
 
-    def push(self, data):
+    cpdef push(self, data):
         pass
 
-    def result(self):
+    cpdef result(self):
         return self._value
 
     def __deepcopy__(self, memo):
@@ -422,7 +428,7 @@ cdef class StatelessSingleValueAccumulator(Accumulator):
         self._returnSize = 1
         self._window = 0
 
-    def _push(self, data):
+    cdef _push(self, dict data):
         if not self._isValueHolderContained:
             try:
                 value = data[self._dependency]
@@ -447,14 +453,14 @@ cdef class Latest(StatelessSingleValueAccumulator):
         self._returnSize = 1
         self._latest = np.nan
 
-    def push(self, data):
+    cpdef push(self, data):
         value = self._push(data)
         if math.isnan(value):
             return np.nan
         self._isFull = 1
         self._latest = value
 
-    def result(self):
+    cpdef result(self):
         return self._latest
 
     def __deepcopy__(self, memo):
@@ -502,16 +508,16 @@ cdef class CompoundedValueHolder(Accumulator):
             pyFinAssert(left.valueSize == 1, ValueError, "left value size {0} should be equal to right dependency size 1"
                      .format(left.valueSize))
 
-    def push(self, data):
+    cpdef push(self, data):
         self._left.push(data)
         values = self._left.result()
         if not hasattr(values, '__iter__'):
             parameters = {self._right.dependency: values}
         else:
-            parameters = dict((name, value) for name, value in zip(self._right.dependency, values))
+            parameters = {name: value for name, value in zip(self._right.dependency, values)}
         self._right.push(parameters)
 
-    def result(self):
+    cpdef result(self):
         return self._right.result()
 
     @property
@@ -540,14 +546,14 @@ cdef class IIF(Accumulator):
         self._window = max(self._cond.window, self._left.window, self._right.window)
         self._isFull = 0
 
-    def push(self, data):
+    cpdef push(self, data):
         self._cond.push(data)
         self._left.push(data)
         self._right.push(data)
         if self._isFull == 0 and self._cond.isFull and self._left.isFull and self._right.isFull:
             self._isFull = 1
 
-    def result(self):
+    cpdef result(self):
         return self._left.result() if self._cond.result() else self._right.result()
 
     def __deepcopy__(self, memo):
@@ -571,7 +577,7 @@ cdef class BasicFunction(Accumulator):
         self._isFull = 0
         self._origValue = np.nan
 
-    def push(self, data):
+    cpdef push(self, data):
         value = self.extract(data)
         if self._returnSize == 1:
             if math.isnan(value):
@@ -582,7 +588,7 @@ cdef class BasicFunction(Accumulator):
         self._origValue = value
         self._isFull = 1
 
-    def result(self):
+    cpdef result(self):
         try:
             return self._func(self._origValue)
         except ValueError:
@@ -636,7 +642,7 @@ cdef class Pow(Accumulator):
         self._origValue = np.nan
         self._n = n
 
-    def push(self, data):
+    cpdef push(self, data):
         value = self.extract(data)
         if self._returnSize == 1:
             if math.isnan(value):
@@ -647,12 +653,12 @@ cdef class Pow(Accumulator):
         self._origValue = value
         self._isFull = 1
 
-    def result(self):
+    cpdef result(self):
 
         try:
             return self._origValue ** self._n
         except TypeError:
-            return np.array(v ** self._n for v in self._origValue)
+            return np.array([v ** self._n for v in self._origValue])
 
     def __deepcopy__(self, memo):
         return Pow(self._dependency, self._n)

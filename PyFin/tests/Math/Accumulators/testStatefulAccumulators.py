@@ -739,7 +739,7 @@ class TestStatefulAccumulators(unittest.TestCase):
                                                                                                calculated))
 
     def testMACD(self):
-        macd = MACD(short=5, long=10, dependency='close')
+        macd = MACD(short_win=5, long_win=10, dependency='close')
         short_average = XAverage(window=5, dependency='close')
         long_average = XAverage(window=10, dependency='close')
 

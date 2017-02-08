@@ -25,7 +25,7 @@ from PyFin.Math.Accumulators.StatefulAccumulators import MovingPositiveDifferenc
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingNegativeDifferenceAverage
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingRSI
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingHistoricalWindow
-from PyFin.Math.Accumulators.Performancers import MovingLogReturn
+from PyFin.Math.Accumulators.StatefulAccumulators import MovingLogReturn
 
 
 class SecuritySingleValueHolder(SecurityValueHolder):

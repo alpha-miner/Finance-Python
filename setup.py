@@ -111,6 +111,8 @@ ext_modules = [
     "PyFin/Analysis/SecurityValues.pyx",
     "PyFin/Math/Accumulators/impl.pyx",
     "PyFin/Math/Accumulators/IAccumulators.pyx",
+    "PyFin/Math/Accumulators/StatefulAccumulators.pyx",
+    "PyFin/Math/Accumulators/StatelessAccumulators.pyx",
     "PyFin/Math/Distributions/NormalDistribution.pyx",
     "PyFin/Math/Distributions/norm.pyx",
     "PyFin/Math/ErrorFunction.pyx",

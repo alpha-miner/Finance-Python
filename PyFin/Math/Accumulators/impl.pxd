@@ -5,6 +5,8 @@ Created on 2017-2-8
 @author: cheng.li
 """
 
+cimport numpy as np
+
 cdef class Deque:
 
     cdef public int window
@@ -13,7 +15,7 @@ cdef class Deque:
     cdef public int start
 
     cdef dump(self, value)
-    cdef size(self)
-    cdef isFull(self)
-    cdef as_array(self)
-    cdef as_list(self)
+    cdef int size(self)
+    cdef int isFull(self)
+    cdef np.ndarray as_array(self)
+    cdef list as_list(self)

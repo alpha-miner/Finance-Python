@@ -22,12 +22,6 @@ cimport numpy as np
 import pandas as pd
 from PyFin.Utilities import pyFinAssert
 
-# get the correct attribute of div
-if sys.version_info > (3, 0, 0):
-    div_attr = "truediv"
-else:
-    div_attr = "div"
-
 
 cdef class IAccumulator(object):
 
@@ -122,29 +116,31 @@ cdef class Accumulator(IAccumulator):
 
     @cython.boundscheck(False)
     @cython.wraparound(False)
-    def transform(self, data, str name=None):
+    def transform(self, data, str name=None, to_sort=False):
 
-        cdef long i
-        cdef long n = len(data)
-        cdef np.ndarray[double, ndim=1] output_values = np.zeros(len(data))
+        cdef int i
+        cdef int k
         cdef np.ndarray[double, ndim=2] matrix_values
+        cdef long n = len(data)
+        cdef np.ndarray[double, ndim=1] output_values = np.zeros(n)
+        cdef list columns
+        cdef list column_index
 
-        data.sort_index()
+        if to_sort:
+            data.sort_index(inplace=True)
 
         if not name:
             name = 'transformed'
 
         matrix_values = data.as_matrix()
         columns = data.columns.tolist()
-
-        output_values = np.zeros(len(data))
+        column_index = list(range(len(columns)))
 
         for i in range(n):
-            self.push({k: v for k, v in zip(columns, matrix_values[i])})
+            self.push({columns[k]: matrix_values[i, k] for k in column_index})
             output_values[i] = self.result()
 
-        df = pd.Series(output_values, index=data.index, name=name)
-        return df
+        return pd.Series(output_values, index=data.index, name=name)
 
     @property
     def value(self):
@@ -1011,3 +1007,4 @@ cdef class Asinh(BasicFunction):
 
     def __setstate__(self, state):
         pass
+

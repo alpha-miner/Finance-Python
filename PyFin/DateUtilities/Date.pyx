@@ -9,8 +9,8 @@ import datetime as dt
 cimport cython
 from libc.math cimport floor
 from PyFin.Enums._TimeUnits cimport TimeUnits
-from PyFin.Utilities import pyFinAssert
-from PyFin.DateUtilities.Period import Period
+from PyFin.Utilities.Asserts cimport pyFinAssert
+from PyFin.DateUtilities.Period cimport Period
 
 
 @cython.boundscheck(False)
@@ -82,10 +82,6 @@ cdef Date _advance(Date date, int n, int units):
 
 @cython.embedsignature(True)
 cdef class Date(object):
-    cdef public int __serialNumber__
-    cdef public int _year
-    cdef public int _month
-    cdef public int _day
 
     def __init__(self, year=None, month=None, day=None, serialNumber=None):
         cdef int leap
@@ -102,7 +98,7 @@ cdef class Date(object):
 
             d = serialNumber - _YearOffset[y - 1900]
             m = int(d / 30) + 1
-            leap = self.isLeap(y)
+            leap = Date.isLeap(y)
             while d <= _monthOffset(m, leap):
                 m -= 1
 
@@ -118,24 +114,24 @@ cdef class Date(object):
 
         self._calculate_date(year, month, day)
 
-    def dayOfMonth(self):
+    cpdef dayOfMonth(self):
         return self._day
 
-    def dayOfYear(self):
+    cpdef dayOfYear(self):
         return self.__serialNumber__ - _YearOffset[self.year() - 1900]
 
-    def year(self):
+    cpdef year(self):
         return self._year
 
-    def month(self):
+    cpdef month(self):
         return self._month
 
-    def weekday(self):
+    cpdef weekday(self):
         cdef int w
         w = self.__serialNumber__ % 7
         return 7 if w == 0 else w
 
-    def toDateTime(self):
+    cpdef toDateTime(self):
         return dt.datetime(self.year(), self.month(), self.dayOfMonth())
 
     @property
@@ -238,37 +234,37 @@ cdef class Date(object):
         skip = nth - (1 if dayOfWeek >= first else 0)
         return Date(y, m, (1 + dayOfWeek + skip * 7) - first)
 
-    @classmethod
-    def todaysDate(cls):
+    @staticmethod
+    def todaysDate():
         today = dt.date.today()
-        return cls(today.year, today.month, today.day)
+        return Date(today.year, today.month, today.day)
 
     @staticmethod
     def isLeap(year):
         return _YearIsLeap[year - 1900]
 
-    @classmethod
-    def fromExcelSerialNumber(cls, serialNumber):
-        return cls(serialNumber=serialNumber)
+    @staticmethod
+    def fromExcelSerialNumber(serialNumber):
+        return Date(serialNumber=serialNumber)
 
-    @classmethod
-    def fromDateTime(cls, dateTime):
-        return cls(dateTime.year, dateTime.month, dateTime.day)
+    @staticmethod
+    def fromDateTime(dateTime):
+        return Date(dateTime.year, dateTime.month, dateTime.day)
 
-    @classmethod
-    def parseISO(cls, dateStr):
+    @staticmethod
+    def parseISO(dateStr):
         pyFinAssert(len(dateStr) == 10 and dateStr[4] == '-' and dateStr[7] == '-', ValueError,
                     "invalid format {0}".format(dateStr))
-        return cls(int(dateStr[0:4]), int(dateStr[5:7]), int(dateStr[8:10]))
+        return Date(int(dateStr[0:4]), int(dateStr[5:7]), int(dateStr[8:10]))
 
-    @classmethod
-    def strptime(cls, dateStr, dateFormat='%Y-%m-%d'):
+    @staticmethod
+    def strptime(str dateStr, str dateFormat='%Y-%m-%d'):
         pydt = dt.datetime.strptime(dateStr, dateFormat)
-        return cls(pydt.year, pydt.month, pydt.day)
+        return Date(pydt.year, pydt.month, pydt.day)
 
-    @classmethod
-    def westernStyle(cls, day, month, year):
-        return cls(year, month, day)
+    @staticmethod
+    def westernStyle(int day, int month, int year):
+        return Date(year, month, day)
 
     def __deepcopy__(self, memo):
         return Date(self._year, self._month, self._day)
@@ -286,7 +282,7 @@ cdef class Date(object):
         cdef int offset
         cdef int isLeap
 
-        isLeap = self.isLeap(year)
+        isLeap = Date.isLeap(year)
 
         length = _monthLength(month, isLeap)
         offset = _monthOffset(month, isLeap)
@@ -296,7 +292,7 @@ cdef class Date(object):
         self._month = month
         self._year = year
 
-def check_date(date):
+cpdef check_date(date):
     if isinstance(date, str):
         return Date.parseISO(date)
     else:

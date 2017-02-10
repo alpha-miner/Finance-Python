@@ -18,13 +18,14 @@ from PyFin.Math.Accumulators.IAccumulators import Asin
 from PyFin.Math.Accumulators.IAccumulators import Asinh
 from PyFin.Math.Accumulators.IAccumulators import Latest
 from PyFin.Math.Accumulators.IAccumulators import IIF
+from PyFin.Math.Accumulators.IAccumulators import Sign
+from PyFin.Math.Accumulators.IAccumulators import Negative
 
-from PyFin.Math.Accumulators.StatelessAccumulators import Sign
 from PyFin.Math.Accumulators.StatelessAccumulators import Diff
 from PyFin.Math.Accumulators.StatelessAccumulators import SimpleReturn
 from PyFin.Math.Accumulators.StatelessAccumulators import LogReturn
-from PyFin.Math.Accumulators.StatelessAccumulators import Positive
-from PyFin.Math.Accumulators.StatelessAccumulators import Negative
+from PyFin.Math.Accumulators.StatelessAccumulators import PositivePart
+from PyFin.Math.Accumulators.StatelessAccumulators import NegativePart
 from PyFin.Math.Accumulators.StatelessAccumulators import Max
 from PyFin.Math.Accumulators.StatelessAccumulators import Minimum
 from PyFin.Math.Accumulators.StatelessAccumulators import Sum
@@ -87,6 +88,7 @@ __all__ = ["Exp",
            "Log",
            "Sqrt",
            "Sign",
+           "Negative",
            "Abs",
            "Pow",
            "Acos",
@@ -98,8 +100,8 @@ __all__ = ["Exp",
            "Diff",
            "SimpleReturn",
            "LogReturn",
-           "Positive",
-           "Negative",
+           "PositivePart",
+           "NegativePart",
            "Max",
            "Minimum",
            "Sum",

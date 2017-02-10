@@ -157,7 +157,7 @@ cdef class SecurityValues:
     @cython.boundscheck(False)
     @cython.wraparound(False)
     def rank(self):
-        data = self.values.argsort().argsort().astype(float)
+        cdef np.ndarray[double, ndim=1] data = self.values.argsort().argsort().astype(float)
         data[np.isnan(self.values)] = np.nan
         return SecurityValues(data + 1., self.name_mapping)
 

@@ -9,7 +9,7 @@ import re
 cimport cython
 from libc.math cimport floor
 from PyFin.Enums._TimeUnits cimport TimeUnits
-from PyFin.Utilities import pyFinAssert
+from PyFin.Utilities.Asserts cimport pyFinAssert
 
 
 _unitPattern = re.compile('[BbDdMmWwYy]{1}')
@@ -24,9 +24,6 @@ _unitsDict = {'d': TimeUnits.Days,
 
 @cython.embedsignature(True)
 cdef class Period(object):
-
-    cdef public int _length
-    cdef public int _units
 
     def __init__(self, str reprStr=None, int length=0, int units=0):
 
@@ -52,7 +49,7 @@ cdef class Period(object):
     def units(self):
         return self._units
 
-    def normalize(self):
+    cpdef normalize(self):
         cdef int length = self.length
         cdef int units = self.units
         if length != 0:

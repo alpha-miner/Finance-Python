@@ -14,13 +14,12 @@ from libc.math cimport acos
 from libc.math cimport acosh
 from libc.math cimport asin
 from libc.math cimport asinh
-import sys
 cimport cython
 from libc.math cimport isnan
 import numpy as np
 cimport numpy as np
 import pandas as pd
-from PyFin.Utilities import pyFinAssert
+from PyFin.Utilities.Asserts cimport pyFinAssert
 
 
 cdef class IAccumulator(object):
@@ -64,7 +63,7 @@ cdef class IAccumulator(object):
             raise ValueError('{0} is not recognized as a valid operator'.format(right))
 
     def __neg__(self):
-        return NegativeValueHolder(self)
+        return Negative(self)
 
     def __getitem__(self, item):
         return TruncatedValueHolder(self, item)
@@ -113,6 +112,9 @@ cdef class Accumulator(IAccumulator):
         else:
             self._dependency.push(data)
             return self._dependency.result()
+
+    cpdef push(self, dict data):
+        pass
 
     @cython.boundscheck(False)
     @cython.wraparound(False)
@@ -177,9 +179,7 @@ cdef class Accumulator(IAccumulator):
         pass
 
 
-cdef class NegativeValueHolder(Accumulator):
-
-    cdef public object _valueHolder
+cdef class Negative(Accumulator):
 
     def __init__(self, valueHolder):
         self._valueHolder = build_holder(valueHolder)
@@ -188,7 +188,7 @@ cdef class NegativeValueHolder(Accumulator):
         self._dependency = deepcopy(valueHolder.dependency)
         self._isFull = 0
 
-    cpdef push(self, data):
+    cpdef push(self, dict data):
         self._valueHolder.push(data)
         if self._valueHolder.isFull:
             self._isFull = 1
@@ -201,21 +201,18 @@ cdef class NegativeValueHolder(Accumulator):
             return [-r for r in res]
 
     def __deepcopy__(self, memo):
-        return NegativeValueHolder(self._valueHolder)
+        return Negative(self._valueHolder)
 
     def __reduce__(self):
         d = {}
 
-        return NegativeValueHolder, (self._valueHolder, ), d
+        return Negative, (self._valueHolder, ), d
 
     def __setstate__(self, state):
         pass
 
 
 cdef class ListedValueHolder(Accumulator):
-
-    cdef public object _left
-    cdef public object _right
 
     def __init__(self, left, right):
         self._left = build_holder(left)
@@ -225,7 +222,7 @@ cdef class ListedValueHolder(Accumulator):
         self._window = max(self._left.window, self._right.window)
         self._isFull = 0
 
-    cpdef push(self, data):
+    cpdef push(self, dict data):
         self._left.push(data)
         self._right.push(data)
         if self._isFull == 0 and self._left.isFull and self._right.isFull:
@@ -255,10 +252,6 @@ cdef class ListedValueHolder(Accumulator):
 
 cdef class TruncatedValueHolder(Accumulator):
 
-    cdef public int _start
-    cdef public int _stop
-    cdef public object _valueHolder
-
     def __init__(self, valueHolder, item):
         if valueHolder.valueSize == 1:
             raise TypeError("scalar valued holder ({0}) can't be sliced".format(valueHolder))
@@ -281,7 +274,7 @@ cdef class TruncatedValueHolder(Accumulator):
         self._window = valueHolder.window
         self._isFull = 0
 
-    cpdef push(self, data):
+    cpdef push(self, dict data):
         self._valueHolder.push(data)
         if self._valueHolder.isFull:
             self._isFull = 1
@@ -314,9 +307,6 @@ cdef class TruncatedValueHolder(Accumulator):
 
 cdef class CombinedValueHolder(Accumulator):
 
-    cdef public object _left
-    cdef public object _right
-
     def __init__(self, left, right):
         self._left = build_holder(left)
         self._right = build_holder(right)
@@ -325,7 +315,7 @@ cdef class CombinedValueHolder(Accumulator):
         self._window = max(self._left.window, self._right.window)
         self._isFull = 0
 
-    cpdef push(self, data):
+    cpdef push(self, dict data):
         self._left.push(data)
         self._right.push(data)
         if self._isFull == 0 and self._left.isFull and self._right.isFull:
@@ -573,8 +563,6 @@ cdef class NeOperatorValueHolder(CombinedValueHolder):
 
 cdef class Identity(Accumulator):
 
-    cdef public double _value
-
     def __init__(self, value):
         self._dependency = []
         self._window = 0
@@ -582,7 +570,7 @@ cdef class Identity(Accumulator):
         self._returnSize = 1
         self._isFull = 0
 
-    cpdef push(self, data):
+    cpdef push(self, dict data):
         pass
 
     cpdef result(self):
@@ -632,15 +620,13 @@ cdef class StatelessSingleValueAccumulator(Accumulator):
 
 cdef class Latest(StatelessSingleValueAccumulator):
 
-    cdef public double _latest
-
     def __init__(self, dependency='x'):
         super(Latest, self).__init__(dependency)
         self._window = 0
         self._returnSize = 1
         self._latest = np.nan
 
-    cpdef push(self, data):
+    cpdef push(self, dict data):
         value = self._push(data)
         if isnan(value):
             return np.nan
@@ -685,9 +671,6 @@ cpdef build_holder(name):
 
 cdef class CompoundedValueHolder(Accumulator):
 
-    cdef public object _left
-    cdef public object _right
-
     def __init__(self, left, right):
         self._left = build_holder(left)
         self._right = build_holder(right)
@@ -703,7 +686,7 @@ cdef class CompoundedValueHolder(Accumulator):
             pyFinAssert(left.valueSize == 1, ValueError, "left value size {0} should be equal to right dependency size 1"
                      .format(left.valueSize))
 
-    cpdef push(self, data):
+    cpdef push(self, dict data):
         self._left.push(data)
         values = self._left.result()
         if not hasattr(values, '__iter__'):
@@ -736,10 +719,6 @@ cdef class CompoundedValueHolder(Accumulator):
 
 cdef class IIF(Accumulator):
 
-    cdef public object _cond
-    cdef public object _left
-    cdef public object _right
-
     def __init__(self, cond, left, right):
         self._cond = build_holder(cond)
         self._returnSize = self._cond.valueSize
@@ -749,7 +728,7 @@ cdef class IIF(Accumulator):
         self._window = max(self._cond.window, self._left.window, self._right.window)
         self._isFull = 0
 
-    cpdef push(self, data):
+    cpdef push(self, dict data):
         self._cond.push(data)
         self._left.push(data)
         self._right.push(data)
@@ -772,8 +751,6 @@ cdef class IIF(Accumulator):
 
 
 cdef class BasicFunction(Accumulator):
-
-    cdef public object _origValue
 
     def __init__(self, dependency):
         super(BasicFunction, self).__init__(dependency)
@@ -864,8 +841,6 @@ cdef class Sqrt(BasicFunction):
 
 # due to the fact that pow function is much slower than ** operator
 cdef class Pow(BasicFunction):
-
-    cdef public double _n
 
     def __init__(self, dependency, n):
         super(Pow, self).__init__(dependency)
@@ -1007,4 +982,3 @@ cdef class Asinh(BasicFunction):
 
     def __setstate__(self, state):
         pass
-

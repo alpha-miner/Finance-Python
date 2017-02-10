@@ -10,9 +10,9 @@ from PyFin.Enums._Weekdays cimport Weekdays
 from PyFin.Enums._TimeUnits cimport TimeUnits
 from PyFin.Enums._Months cimport Months
 from PyFin.Enums._BizDayConventions cimport BizDayConventions
-from PyFin.DateUtilities.Date import Date
-from PyFin.DateUtilities.Period import Period
-from PyFin.Utilities import pyFinAssert
+from PyFin.DateUtilities.Date cimport Date
+from PyFin.DateUtilities.Period cimport Period
+from PyFin.Utilities.Asserts cimport pyFinAssert
 
 
 @cython.embedsignature(True)
@@ -32,23 +32,25 @@ cdef class Calendar(object):
         else:
             raise ValueError("{0} is not a valid description of a holiday center".format(holCenter))
 
-    def isBizDay(self, d):
+    cpdef isBizDay(self, Date d):
         return self._impl.isBizDay(d)
 
-    def isHoliday(self, d):
+    cpdef isHoliday(self, Date d):
         return not self._impl.isBizDay(d)
 
-    def isWeekEnd(self, int weekday):
+    cpdef isWeekEnd(self, int weekday):
         return self._impl.isWeekEnd(weekday)
 
-    def isEndOfMonth(self, d):
+    cpdef isEndOfMonth(self, Date d):
         return d.month() != self.adjustDate(d + 1).month()
 
-    def endOfMonth(self, d):
+    cpdef endOfMonth(self, Date d):
         return self.adjustDate(Date.endOfMonth(d), BizDayConventions.Preceding)
 
-    def bizDaysBetween(self, fromDate, toDate, includeFirst=True, includeLast=False):
+    cpdef bizDaysBetween(self, Date fromDate, Date toDate, includeFirst=True, includeLast=False):
         cdef int wd = 0
+        cdef Date d
+
         if fromDate != toDate:
             if fromDate < toDate:
                 d = fromDate
@@ -72,7 +74,10 @@ cdef class Calendar(object):
                 wd -= 1
         return wd
 
-    def adjustDate(self, d, c=BizDayConventions.Following):
+    cpdef adjustDate(self, Date d, int c=BizDayConventions.Following):
+
+        cdef Date d1
+
         if c == BizDayConventions.Unadjusted:
             return d
         d1 = d
@@ -106,10 +111,11 @@ cdef class Calendar(object):
             raise ValueError("unknown business-day convention")
         return d1
 
-    def advanceDate(self, d, period, c=BizDayConventions.Following, endOfMonth=False):
+    cpdef advanceDate(self, Date d, period, c=BizDayConventions.Following, endOfMonth=False):
 
         cdef int n
         cdef int units
+        cdef Date d1
 
         if isinstance(period, str):
             period = Period(period)
@@ -143,7 +149,7 @@ cdef class Calendar(object):
                 return self.endOfMonth(d1)
             return self.adjustDate(d1, c)
 
-    def holDatesList(self, fromDate, toDate, includeWeekEnds=True):
+    cpdef holDatesList(self, Date fromDate, Date toDate, includeWeekEnds=True):
         pyFinAssert(fromDate <= toDate, ValueError, "from date ({0} must be earlier than to date {1}"
                     .format(fromDate, toDate))
         result = []
@@ -154,11 +160,11 @@ cdef class Calendar(object):
             d += 1
         return result
 
-    def bizDatesList(self, fromDate, toDate):
+    cpdef bizDatesList(self, Date fromDate, Date toDate):
         pyFinAssert(fromDate <= toDate, ValueError, "from date ({0} must be earlier than to date {1}"
                     .format(fromDate, toDate))
-        result = []
-        d = fromDate
+        cdef list result = []
+        cdef Date d = fromDate
         while d <= toDate:
             if self.isBizDay(d):
                 result.append(d)
@@ -425,13 +431,13 @@ cdef class ChinaSseImpl(object):
     def __init__(self):
         pass
 
-    def isBizDay(self, date):
+    cpdef isBizDay(self, Date date):
         cdef int w = date.weekday()
         if self.isWeekEnd(w) or date in ChinaSseImpl._holDays:
             return False
         return True
 
-    def isWeekEnd(self, int weekDay):
+    cpdef isWeekEnd(self, int weekDay):
         return weekDay == Weekdays.Saturday or weekDay == Weekdays.Sunday
 
     def __richcmp__(self, right, int op):
@@ -548,10 +554,10 @@ cdef class ChinaIBImpl(object):
     def __init__(self):
         pass
 
-    def isBizDay(self, date):
+    cpdef isBizDay(self, Date date):
         return ChinaIBImpl._sseImpl.isBizDay(date) or date in ChinaIBImpl._working_weekends
 
-    def isWeekEnd(self, int weekDay):
+    cpdef isWeekEnd(self, int weekDay):
         return weekDay == Weekdays.Saturday or weekDay == Weekdays.Sunday
 
     def __richcmp__(self, right, int op):
@@ -563,13 +569,14 @@ cdef class ChinaIBImpl(object):
 
 
 cdef class NullCalendar(object):
+
     def __init__(self):
         pass
 
-    def isBizDay(self, date):
+    cpdef isBizDay(self, Date date):
         return True
 
-    def isWeekEnd(self, int weekDay):
+    cpdef isWeekEnd(self, int weekDay):
         return weekDay == Weekdays.Saturday or weekDay == Weekdays.Sunday
 
     def __richcmp__(self, right, int op):
@@ -587,10 +594,10 @@ cdef class ChinaCFFEXImpl(object):
     def __init__(self):
         pass
 
-    def isBizDay(self, date):
+    cpdef isBizDay(self, Date date):
         return self.isBizDay(date)
 
-    def isWeekEnd(self, int weekDay):
+    cpdef isWeekEnd(self, int weekDay):
         return ChinaCFFEXImpl._sseImpl.isWeekEnd(weekDay)
 
     def __richcmp__(self, right, int op):
@@ -635,7 +642,7 @@ cdef class WestenImpl(object):
         116, 101, 93, 112, 97, 89, 109, 100, 85, 105  # 2190-2199
     ]
 
-    def isWeekEnd(self, int weekDay):
+    cpdef isWeekEnd(self, int weekDay):
         return weekDay == Weekdays.Saturday or weekDay == Weekdays.Sunday
 
     @classmethod
@@ -647,13 +654,13 @@ cdef class TargetImpl(WestenImpl):
     def __init__(self):
         pass
 
-    def isBizDay(self, date):
-        w = date.weekday()
-        d = date.dayOfMonth()
-        dd = date.dayOfYear()
-        m = date.month()
-        y = date.year()
-        em = self.easterMonday(y)
+    cpdef isBizDay(self, date):
+        cdef int w = date.weekday()
+        cdef int d = date.dayOfMonth()
+        cdef int dd = date.dayOfYear()
+        cdef int m = date.month()
+        cdef int y = date.year()
+        cdef int em = self.easterMonday(y)
 
         if (self.isWeekEnd(w)
             or (d == 1 and m == Months.January)

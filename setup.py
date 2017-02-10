@@ -28,11 +28,17 @@ datafiles = [
 files = glob.glob("PyFin/tests/POpt/data/*.csv")
 datafiles.append((os.path.join(packagePath, "PyFin/tests/POpt/data"), files))
 
+files = glob.glob("PyFin/DateUtilities/*.pxd")
+datafiles.append((os.path.join(packagePath, "PyFin/DateUtilities"), files))
+
 files = glob.glob("PyFin/Enums/*.pxd")
 datafiles.append((os.path.join(packagePath, "PyFin/Enums"), files))
 
 files = glob.glob("PyFin/Math/*.pxd")
 datafiles.append((os.path.join(packagePath, "PyFin/Math"), files))
+
+files = glob.glob("PyFin/Utilities/*.pxd")
+datafiles.append((os.path.join(packagePath, "PyFin/Utilities"), files))
 
 files = glob.glob("PyFin/Math/Accumulators/*.pxd")
 datafiles.append((os.path.join(packagePath, "PyFin/Math/Accumulators"), files))

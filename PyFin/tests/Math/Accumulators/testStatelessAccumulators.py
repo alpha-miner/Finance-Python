@@ -8,7 +8,7 @@ Created on 2015-7-29
 import unittest
 import math
 import numpy as np
-from PyFin.Math.Accumulators.StatelessAccumulators import Sign
+from PyFin.Math.Accumulators.IAccumulators import Sign
 from PyFin.Math.Accumulators.StatelessAccumulators import Average
 from PyFin.Math.Accumulators.StatelessAccumulators import XAverage
 from PyFin.Math.Accumulators.StatelessAccumulators import Max

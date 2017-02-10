@@ -16,17 +16,17 @@ from libc.math cimport sqrt
 from copy import deepcopy
 from PyFin.Math.Accumulators.IAccumulators cimport Accumulator
 from PyFin.Math.Accumulators.IAccumulators cimport StatelessSingleValueAccumulator
-from PyFin.Math.Accumulators.IAccumulators import build_holder
-from PyFin.Math.Accumulators.StatelessAccumulators import Positive
-from PyFin.Math.Accumulators.StatelessAccumulators import Negative
-from PyFin.Math.Accumulators.StatelessAccumulators import XAverage
-from PyFin.Math.Accumulators.IAccumulators import Pow
-from PyFin.Utilities import pyFinAssert
-from PyFin.Utilities import isClose
+from PyFin.Math.Accumulators.IAccumulators cimport build_holder
+from PyFin.Math.Accumulators.StatelessAccumulators cimport PositivePart
+from PyFin.Math.Accumulators.StatelessAccumulators cimport NegativePart
+from PyFin.Math.Accumulators.StatelessAccumulators cimport XAverage
+from PyFin.Math.Accumulators.IAccumulators cimport Pow
+from PyFin.Utilities.Asserts cimport pyFinAssert
+from PyFin.Utilities.Asserts cimport isClose
 from PyFin.Math.Accumulators.impl cimport Deque
 
 
-def _checkParameterList(dependency):
+cdef _checkParameterList(dependency):
     if not isinstance(dependency, Accumulator) and len(dependency) > 1 and not isinstance(dependency, str):
         raise ValueError("This value holder (e.g. Max or Minimum) can't hold more than 2 parameter names ({0})"
                          " provided".format(dependency))
@@ -64,7 +64,6 @@ cdef class StatefulValueHolder(Accumulator):
 
     def __setstate__(self, state):
         pass
-
 
 
 cdef class Shift(StatefulValueHolder):
@@ -452,7 +451,7 @@ cdef class MovingPositiveDifferenceAverage(SingleValuedValueHolder):
 
     def __init__(self, window, dependency='x'):
         super(MovingPositiveDifferenceAverage, self).__init__(window, dependency)
-        runningPositive = Positive(build_holder(dependency) - Shift(build_holder(dependency), 1))
+        runningPositive = PositivePart(build_holder(dependency) - Shift(build_holder(dependency), 1))
         self._runningAverage = MovingAverage(window, dependency=runningPositive)
 
     cpdef push(self, dict data):
@@ -481,7 +480,7 @@ cdef class MovingNegativeDifferenceAverage(SingleValuedValueHolder):
 
     def __init__(self, window, dependency='x'):
         super(MovingNegativeDifferenceAverage, self).__init__(window, dependency)
-        runningNegative = Negative(build_holder(dependency) - Shift(build_holder(dependency), 1))
+        runningNegative = NegativePart(build_holder(dependency) - Shift(build_holder(dependency), 1))
         self._runningAverage = MovingAverage(window, dependency=runningNegative)
 
     cpdef push(self, dict data):

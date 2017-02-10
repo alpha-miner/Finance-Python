@@ -12,51 +12,18 @@ cimport cython
 from libc.math cimport isnan
 from libc.math cimport log
 from PyFin.Math.Accumulators.IAccumulators cimport Accumulator
-from PyFin.Math.Accumulators.IAccumulators import Pow
+from PyFin.Math.Accumulators.IAccumulators cimport Pow
 from PyFin.Math.Accumulators.IAccumulators cimport StatelessSingleValueAccumulator
 import bisect
 
 
-def _checkParameterList(dependency):
+cdef _checkParameterList(dependency):
     if not isinstance(dependency, Accumulator) and len(dependency) > 1 and not isinstance(dependency, str):
         raise ValueError("This value holder (e.g. Max or Minimum) can't hold more than 2 parameter names ({0})"
                          " provided".format(dependency))
 
 
-cdef class Sign(StatelessSingleValueAccumulator):
-
-    cdef public double _sign
-
-    def __init__(self, dependency='x'):
-        super(Sign, self).__init__(dependency)
-        _checkParameterList(dependency)
-        self._returnSize = 1
-        self._sign = np.nan
-
-    cpdef push(self, dict data):
-        cdef double value = self._push(data)
-        if isnan(value):
-            return np.nan
-        self._isFull = 1
-        if value > 0.:
-            self._sign = 1.
-        elif value < 0.:
-            self._sign = -1.
-        else:
-            self._sign = 0.
-
-    cpdef double result(self):
-        return self._sign
-
-    def __deepcopy__(self, memo):
-        return Sign(self._dependency)
-
-
 cdef class Diff(StatelessSingleValueAccumulator):
-
-    cdef public double _diff
-    cdef public double _curr
-    cdef public double _previous
 
     def __init__(self, dependency='x'):
         super(Diff, self).__init__(dependency)
@@ -82,10 +49,6 @@ cdef class Diff(StatelessSingleValueAccumulator):
 
 
 cdef class SimpleReturn(StatelessSingleValueAccumulator):
-
-    cdef public double _diff
-    cdef public double _curr
-    cdef public double _previous
 
     def __init__(self, dependency='x'):
         super(SimpleReturn, self).__init__(dependency)
@@ -118,10 +81,6 @@ cdef class SimpleReturn(StatelessSingleValueAccumulator):
 
 cdef class LogReturn(StatelessSingleValueAccumulator):
 
-    cdef public double _diff
-    cdef public double _curr
-    cdef public double _previous
-
     def __init__(self, dependency='x'):
         super(LogReturn, self).__init__(dependency)
         _checkParameterList(dependency)
@@ -150,12 +109,10 @@ cdef class LogReturn(StatelessSingleValueAccumulator):
         return LogReturn(self._dependency)
 
 
-cdef class Positive(StatelessSingleValueAccumulator):
-
-    cdef public double _pos
+cdef class PositivePart(StatelessSingleValueAccumulator):
 
     def __init__(self, dependency='x'):
-        super(Positive, self).__init__(dependency)
+        super(PositivePart, self).__init__(dependency)
         _checkParameterList(dependency)
         self._returnSize = 1
         self._pos = np.nan
@@ -178,15 +135,13 @@ cdef class Positive(StatelessSingleValueAccumulator):
         return self._pos
 
     def __deepcopy__(self, memo):
-        return Positive(self._dependency)
+        return PositivePart(self._dependency)
 
 
-cdef class Negative(StatelessSingleValueAccumulator):
-
-    cdef public double _neg
+cdef class NegativePart(StatelessSingleValueAccumulator):
 
     def __init__(self, dependency='x'):
-        super(Negative, self).__init__(dependency)
+        super(NegativePart, self).__init__(dependency)
         _checkParameterList(dependency)
         self._returnSize = 1
         self._neg = np.nan
@@ -209,13 +164,10 @@ cdef class Negative(StatelessSingleValueAccumulator):
         return self._neg
 
     def __deepcopy__(self, memo):
-        return Negative(self._dependency)
+        return NegativePart(self._dependency)
 
 
 cdef class Max(StatelessSingleValueAccumulator):
-
-    cdef public double _currentMax
-    cdef public int _first
 
     def __init__(self, dependency='x'):
         super(Max, self).__init__(dependency)
@@ -247,9 +199,6 @@ cdef class Max(StatelessSingleValueAccumulator):
 
 cdef class Minimum(StatelessSingleValueAccumulator):
 
-    cdef public double _currentMin
-    cdef public int _first
-
     def __init__(self, dependency='x'):
         super(Minimum, self).__init__(dependency)
         _checkParameterList(dependency)
@@ -280,9 +229,6 @@ cdef class Minimum(StatelessSingleValueAccumulator):
 
 cdef class Sum(StatelessSingleValueAccumulator):
 
-    cdef public double _currentSum
-    cdef public int _first
-
     def __init__(self, dependency='x'):
         super(Sum, self).__init__(dependency)
         _checkParameterList(dependency)
@@ -311,9 +257,6 @@ cdef class Sum(StatelessSingleValueAccumulator):
 
 
 cdef class Average(StatelessSingleValueAccumulator):
-
-    cdef public double _currentSum
-    cdef public int _currentCount
 
     def __init__(self, dependency='x'):
         super(Average, self).__init__(dependency)
@@ -348,10 +291,6 @@ cdef class Average(StatelessSingleValueAccumulator):
 
 cdef class XAverage(StatelessSingleValueAccumulator):
 
-    cdef public double _average
-    cdef public double _exp
-    cdef public int _count
-
     def __init__(self, window, dependency='x'):
         super(XAverage, self).__init__(dependency)
         self._average = 0.0
@@ -380,11 +319,6 @@ cdef class XAverage(StatelessSingleValueAccumulator):
 
 cdef class Variance(StatelessSingleValueAccumulator):
 
-    cdef public double _currentSum
-    cdef public double _currentSumSquare
-    cdef public int _currentCount
-    cdef public int _isPop
-
     def __init__(self, dependency='x', isPopulation=0):
         super(Variance, self).__init__(dependency)
         _checkParameterList(dependency)
@@ -406,7 +340,7 @@ cdef class Variance(StatelessSingleValueAccumulator):
         self._currentCount += 1
 
     @cython.cdivision(True)
-    cpdef result(self):
+    cpdef double result(self):
 
         cdef double tmp = self._currentSumSquare - self._currentSum * self._currentSum / self._currentCount
 
@@ -422,8 +356,6 @@ cdef class Variance(StatelessSingleValueAccumulator):
 
 
 cdef class Product(StatelessSingleValueAccumulator):
-
-    cdef public double _product
 
     def __init__(self, dependency='x'):
         super(Product, self).__init__(dependency)
@@ -445,10 +377,6 @@ cdef class Product(StatelessSingleValueAccumulator):
 
 
 cdef class CenterMoment(StatelessSingleValueAccumulator):
-
-    cdef public list _this_list
-    cdef public double _order
-    cdef public double _moment
 
     def __init__(self, order, dependency='x'):
         super(CenterMoment, self).__init__(dependency)
@@ -475,10 +403,6 @@ cdef class CenterMoment(StatelessSingleValueAccumulator):
 
 cdef class Skewness(StatelessSingleValueAccumulator):
 
-    cdef public object _std3
-    cdef public object _moment3
-    cdef public object _skewness
-
     def __init__(self, dependency='x'):
         super(Skewness, self).__init__(dependency)
         self._std3 = Pow(Variance(dependency, isPopulation=1), 1.5)
@@ -500,10 +424,6 @@ cdef class Skewness(StatelessSingleValueAccumulator):
 
 cdef class Kurtosis(StatelessSingleValueAccumulator):
 
-    cdef public object _std4
-    cdef public object _moment4
-    cdef public object _kurtosis
-
     def __init__(self, dependency='x'):
         super(Kurtosis, self).__init__(dependency)
         self._std4 = Pow(Variance(dependency, isPopulation=1), 2)
@@ -524,10 +444,6 @@ cdef class Kurtosis(StatelessSingleValueAccumulator):
 
 
 cdef class Rank(StatelessSingleValueAccumulator):
-
-    cdef public list _thisList
-    cdef public list _sortedList
-    cdef public list _rank
 
     def __init__(self, dependency='x'):
         super(Rank, self).__init__(dependency)
@@ -554,9 +470,6 @@ cdef class Rank(StatelessSingleValueAccumulator):
 
 
 cdef class LevelList(StatelessSingleValueAccumulator):
-
-    cdef public list _levelList
-    cdef public list _thisList
 
     def __init__(self, dependency='x', ):
         super(LevelList, self).__init__(dependency)
@@ -585,9 +498,6 @@ cdef class LevelList(StatelessSingleValueAccumulator):
 
 cdef class LevelValue(StatelessSingleValueAccumulator):
 
-    cdef public list _thisList
-    cdef public double _levelValue
-
     def __init__(self, dependency='x'):
         super(LevelValue, self).__init__(dependency)
         self._thisList = []
@@ -614,12 +524,6 @@ cdef class LevelValue(StatelessSingleValueAccumulator):
 
 
 cdef class AutoCorrelation(StatelessSingleValueAccumulator):
-
-    cdef public int _lags
-    cdef public list _thisList
-    cdef public list _VecForward
-    cdef public list _VecBackward
-    cdef public np.ndarray _AutoCorrMatrix
 
     def __init__(self, lags, dependency='x'):
         super(AutoCorrelation, self).__init__(dependency)
@@ -662,7 +566,7 @@ cdef class StatelessMultiValueAccumulator(Accumulator):
         self._returnSize = 1
         self._window = 1
 
-    cdef _push(self, data):
+    cdef _push(self, dict data):
         if not self._isValueHolderContained:
             try:
                 value = [data[name] for name in self._dependency]
@@ -679,13 +583,6 @@ cdef class StatelessMultiValueAccumulator(Accumulator):
 
 cdef class Correlation(StatelessMultiValueAccumulator):
 
-    cdef public double _runningSumLeft
-    cdef public double _runningSumRight
-    cdef public double _runningSumSquareLeft
-    cdef public double _runningSumSquareRight
-    cdef public double _runningSumCrossSquare
-    cdef public int _currentCount
-
     def __init__(self, dependency=('x', 'y')):
         super(Correlation, self).__init__(dependency)
         self._runningSumLeft = 0.0
@@ -696,7 +593,7 @@ cdef class Correlation(StatelessMultiValueAccumulator):
         self._currentCount = 0
         self._returnSize = 1
 
-    cpdef push(self, data):
+    cpdef push(self, dict data):
         value = self._push(data)
         if isnan(value[0]) or isnan(value[1]):
             return np.nan
@@ -710,7 +607,7 @@ cdef class Correlation(StatelessMultiValueAccumulator):
         self._runningSumCrossSquare = self._runningSumCrossSquare + value[0] * value[1]
         self._currentCount += 1
 
-    cpdef result(self):
+    cpdef double result(self):
         n = self._currentCount
         nominator = n * self._runningSumCrossSquare - self._runningSumLeft * self._runningSumRight
         denominator = (n * self._runningSumSquareLeft - self._runningSumLeft * self._runningSumLeft) \

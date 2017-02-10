@@ -67,7 +67,6 @@ cdef class StatefulValueHolder(Accumulator):
 
 
 
-
 cdef class Shift(StatefulValueHolder):
 
     cdef public Accumulator _valueHolder

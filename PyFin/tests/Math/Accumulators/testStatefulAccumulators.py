@@ -670,13 +670,13 @@ class TestStatefulAccumulators(unittest.TestCase):
         window = 10
         maxPos = MovingMaxPos(window, dependency='x')
 
-        con = deque(maxlen=window)
+        con = []
         for i, value in enumerate(self.sample):
             con.append(value)
             maxPos.push(dict(x=value))
             if i >= window - 1:
                 calculated = maxPos.result()
-                expected = con.index(np.max(con))
+                expected = con.index(np.max(con[i - window + 1: i + 1]))
                 self.assertEqual(expected, calculated, "at index {0:d}\n"
                                                        "maxPos expected:   {1:f}\n"
                                                        "maxPos calculated: {2:f}".format(i, expected,
@@ -686,13 +686,13 @@ class TestStatefulAccumulators(unittest.TestCase):
         window = 10
         minPos = MovingMinPos(window, dependency='x')
 
-        con = deque(maxlen=window)
+        con = []
         for i, value in enumerate(self.sample):
             con.append(value)
             minPos.push(dict(x=value))
             if i >= window - 1:
                 calculated = minPos.result()
-                expected = con.index(np.min(con))
+                expected = con.index(np.min(con[i - window + 1: i + 1]))
                 self.assertEqual(expected, calculated, "at index {0:d}\n"
                                                        "minPos expected:   {1:f}\n"
                                                        "minPos calculated: {2:f}".format(i, expected,

@@ -670,12 +670,10 @@ class TestStatefulAccumulators(unittest.TestCase):
         window = 10
         maxPos = MovingMaxPos(window, dependency='x')
 
-        con = []
+        con = deque(maxlen=window)
         for i, value in enumerate(self.sample):
             con.append(value)
             maxPos.push(dict(x=value))
-            if i >= window:
-                con = con[1:]
             if i >= window - 1:
                 calculated = maxPos.result()
                 expected = con.index(np.max(con))
@@ -688,12 +686,10 @@ class TestStatefulAccumulators(unittest.TestCase):
         window = 10
         minPos = MovingMinPos(window, dependency='x')
 
-        con = []
+        con = deque(maxlen=window)
         for i, value in enumerate(self.sample):
             con.append(value)
             minPos.push(dict(x=value))
-            if i >= window:
-                con = con[1:]
             if i >= window - 1:
                 calculated = minPos.result()
                 expected = con.index(np.min(con))
@@ -799,13 +795,11 @@ class TestStatefulAccumulators(unittest.TestCase):
         d = 3
         mk = MovingKDJ(window, dependency='x')
 
-        con = []
+        con = deque(maxlen=window)
         this_j = []
         for i, value in enumerate(self.sample):
             con.append(value)
             mk.push(dict(x=value))
-            if i >= window:
-                con = con[1:]
             if len(con) == 1:
                 this_j.append(np.nan)
             else:

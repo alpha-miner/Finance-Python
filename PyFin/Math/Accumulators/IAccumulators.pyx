@@ -5,11 +5,18 @@ Created on 2017-2-8
 @author: cheng.li
 """
 
-import operator
 from copy import deepcopy
-import math
+from libc.math cimport sqrt
+from libc.math cimport fabs
+from libc.math cimport log
+from libc.math cimport exp
+from libc.math cimport acos
+from libc.math cimport acosh
+from libc.math cimport asin
+from libc.math cimport asinh
 import sys
 cimport cython
+from libc.math cimport isnan
 import numpy as np
 cimport numpy as np
 import pandas as pd
@@ -165,6 +172,14 @@ cdef class Accumulator(IAccumulator):
     def __deepcopy__(self, memo):
         return Accumulator(self._dependency)
 
+    def __reduce__(self):
+        d = {}
+
+        return Accumulator, (self._dependency,), d
+
+    def __setstate__(self, state):
+        pass
+
 
 cdef class NegativeValueHolder(Accumulator):
 
@@ -191,6 +206,14 @@ cdef class NegativeValueHolder(Accumulator):
 
     def __deepcopy__(self, memo):
         return NegativeValueHolder(self._valueHolder)
+
+    def __reduce__(self):
+        d = {}
+
+        return NegativeValueHolder, (self._valueHolder, ), d
+
+    def __setstate__(self, state):
+        pass
 
 
 cdef class ListedValueHolder(Accumulator):
@@ -224,6 +247,14 @@ cdef class ListedValueHolder(Accumulator):
 
     def __deepcopy__(self, memo):
         return ListedValueHolder(self._left, self._right)
+
+    def __reduce__(self):
+        d = {}
+
+        return ListedValueHolder, (self._left, self._right), d
+
+    def __setstate__(self, state):
+        pass
 
 
 cdef class TruncatedValueHolder(Accumulator):
@@ -271,6 +302,19 @@ cdef class TruncatedValueHolder(Accumulator):
             item = slice(self._start, self._stop)
         return TruncatedValueHolder(self._valueHolder, item)
 
+    def __reduce__(self):
+        d = {}
+
+        if self._stop == -1:
+            item = self._start
+        else:
+            item = slice(self._start, self._stop)
+
+        return TruncatedValueHolder, (self._valueHolder, item), d
+
+    def __setstate__(self, state):
+        pass
+
 
 cdef class CombinedValueHolder(Accumulator):
 
@@ -291,24 +335,6 @@ cdef class CombinedValueHolder(Accumulator):
         if self._isFull == 0 and self._left.isFull and self._right.isFull:
             self._isFull = 1
 
-    def __deepcopy__(self, memo):
-        return CombinedValueHolder(self._left, self._right)
-
-
-cdef class ArithmeticValueHolder(CombinedValueHolder):
-
-    cdef public object _op
-
-    def __init__(self, left, right, op):
-        super(ArithmeticValueHolder, self).__init__(left, right)
-        self._op = op
-
-    cpdef result(self):
-        res1 = self._left.result()
-        res2 = self._right.result()
-
-        return self._op(res1, res2)
-
     @property
     def isFull(self):
         if self._left.isFull and self._right.isFull:
@@ -317,87 +343,236 @@ cdef class ArithmeticValueHolder(CombinedValueHolder):
             return False
 
     def __deepcopy__(self, memo):
-        return ArithmeticValueHolder(self._left, self._right, self._op)
+        return CombinedValueHolder(self._left, self._right)
+
+    def __reduce__(self):
+        d = {}
+
+        return CombinedValueHolder, (self._left, self._right), d
+
+    def __setstate__(self, state):
+        pass
 
 
-cdef class AddedValueHolder(ArithmeticValueHolder):
+cdef class AddedValueHolder(CombinedValueHolder):
     def __init__(self, left, right):
-        super(AddedValueHolder, self).__init__(left, right, operator.add)
+        super(AddedValueHolder, self).__init__(left, right)
+
+    cpdef result(self):
+        cdef double res1 = self._left.result()
+        cdef double res2 = self._right.result()
+
+        return res1 + res2
 
     def __deepcopy__(self, memo):
         return AddedValueHolder(self._left, self._right)
 
+    def __reduce__(self):
+        d = {}
 
-cdef class MinusedValueHolder(ArithmeticValueHolder):
+        return AddedValueHolder, (self._left, self._right), d
+
+    def __setstate__(self, state):
+        pass
+
+
+cdef class MinusedValueHolder(CombinedValueHolder):
     def __init__(self, left, right):
-        super(MinusedValueHolder, self).__init__(left, right, operator.sub)
+        super(MinusedValueHolder, self).__init__(left, right)
+
+    cpdef result(self):
+        cdef double res1 = self._left.result()
+        cdef double res2 = self._right.result()
+
+        return res1 - res2
 
     def __deepcopy__(self, memo):
         return MinusedValueHolder(self._left, self._right)
 
+    def __reduce__(self):
+        d = {}
 
-cdef class MultipliedValueHolder(ArithmeticValueHolder):
+        return MinusedValueHolder, (self._left, self._right), d
+
+    def __setstate__(self, state):
+        pass
+
+
+cdef class MultipliedValueHolder(CombinedValueHolder):
     def __init__(self, left, right):
-        super(MultipliedValueHolder, self).__init__(left, right, operator.mul)
+        super(MultipliedValueHolder, self).__init__(left, right)
+
+    cpdef result(self):
+        cdef double res1 = self._left.result()
+        cdef double res2 = self._right.result()
+
+        return res1 * res2
 
     def __deepcopy__(self, memo):
         return MultipliedValueHolder(self._left, self._right)
 
+    def __reduce__(self):
+        d = {}
 
-cdef class DividedValueHolder(ArithmeticValueHolder):
+        return MultipliedValueHolder, (self._left, self._right), d
+
+    def __setstate__(self, state):
+        pass
+
+
+cdef class DividedValueHolder(CombinedValueHolder):
     def __init__(self, left, right):
-        super(DividedValueHolder, self).__init__(left, right, getattr(operator, div_attr))
+        super(DividedValueHolder, self).__init__(left, right)
+
+    @cython.cdivision(True)
+    cpdef result(self):
+        cdef double res1 = self._left.result()
+        cdef double res2 = self._right.result()
+
+        return res1 / res2
 
     def __deepcopy__(self, memo):
         return DividedValueHolder(self._left, self._right)
 
+    def __reduce__(self):
+        d = {}
 
-cdef class LtOperatorValueHolder(ArithmeticValueHolder):
+        return DividedValueHolder, (self._left, self._right), d
+
+    def __setstate__(self, state):
+        pass
+
+
+cdef class LtOperatorValueHolder(CombinedValueHolder):
     def __init__(self, left, right):
-        super(LtOperatorValueHolder, self).__init__(left, right, operator.lt)
+        super(LtOperatorValueHolder, self).__init__(left, right)
+
+    cpdef result(self):
+        cdef double res1 = self._left.result()
+        cdef double res2 = self._right.result()
+
+        return res1 < res2
 
     def __deepcopy__(self, memo):
         return LtOperatorValueHolder(self._left, self._right)
 
+    def __reduce__(self):
+        d = {}
 
-cdef class LeOperatorValueHolder(ArithmeticValueHolder):
+        return LtOperatorValueHolder, (self._left, self._right), d
+
+    def __setstate__(self, state):
+        pass
+
+
+cdef class LeOperatorValueHolder(CombinedValueHolder):
     def __init__(self, left, right):
-        super(LeOperatorValueHolder, self).__init__(left, right, operator.le)
+        super(LeOperatorValueHolder, self).__init__(left, right)
+
+    cpdef result(self):
+        cdef double res1 = self._left.result()
+        cdef double res2 = self._right.result()
+
+        return res1 <= res2
 
     def __deepcopy__(self, memo):
         return LeOperatorValueHolder(self._left, self._right)
 
+    def __reduce__(self):
+        d = {}
 
-cdef class GtOperatorValueHolder(ArithmeticValueHolder):
+        return LeOperatorValueHolder, (self._left, self._right), d
+
+    def __setstate__(self, state):
+        pass
+
+
+cdef class GtOperatorValueHolder(CombinedValueHolder):
     def __init__(self, left, right):
-        super(GtOperatorValueHolder, self).__init__(left, right, operator.gt)
+        super(GtOperatorValueHolder, self).__init__(left, right)
+
+    cpdef result(self):
+        cdef double res1 = self._left.result()
+        cdef double res2 = self._right.result()
+
+        return res1 > res2
 
     def __deepcopy__(self, memo):
         return GtOperatorValueHolder(self._left, self._right)
 
+    def __reduce__(self):
+        d = {}
 
-cdef class GeOperatorValueHolder(ArithmeticValueHolder):
+        return GtOperatorValueHolder, (self._left, self._right), d
+
+    def __setstate__(self, state):
+        pass
+
+
+cdef class GeOperatorValueHolder(CombinedValueHolder):
     def __init__(self, left, right):
-        super(GeOperatorValueHolder, self).__init__(left, right, operator.ge)
+        super(GeOperatorValueHolder, self).__init__(left, right)
+
+    cpdef result(self):
+        cdef double res1 = self._left.result()
+        cdef double res2 = self._right.result()
+
+        return res1 >= res2
 
     def __deepcopy__(self, memo):
         return GeOperatorValueHolder(self._left, self._right)
 
+    def __reduce__(self):
+        d = {}
 
-class EqOperatorValueHolder(ArithmeticValueHolder):
+        return GeOperatorValueHolder, (self._left, self._right), d
+
+    def __setstate__(self, state):
+        pass
+
+
+cdef class EqOperatorValueHolder(CombinedValueHolder):
     def __init__(self, left, right):
-        super(EqOperatorValueHolder, self).__init__(left, right, operator.eq)
+        super(EqOperatorValueHolder, self).__init__(left, right)
+
+    cpdef result(self):
+        cdef double res1 = self._left.result()
+        cdef double res2 = self._right.result()
+
+        return res1 == res2
 
     def __deepcopy__(self, memo):
         return EqOperatorValueHolder(self._left, self._right)
 
+    def __reduce__(self):
+        d = {}
 
-cdef class NeOperatorValueHolder(ArithmeticValueHolder):
+        return EqOperatorValueHolder, (self._left, self._right), d
+
+    def __setstate__(self, state):
+        pass
+
+
+cdef class NeOperatorValueHolder(CombinedValueHolder):
     def __init__(self, left, right):
-        super(NeOperatorValueHolder, self).__init__(left, right, operator.ne)
+        super(NeOperatorValueHolder, self).__init__(left, right)
+
+    cpdef result(self):
+        cdef double res1 = self._left.result()
+        cdef double res2 = self._right.result()
+
+        return res1 != res2
 
     def __deepcopy__(self, memo):
         return NeOperatorValueHolder(self._left, self._right)
+
+    def __reduce__(self):
+        d = {}
+
+        return NeOperatorValueHolder, (self._left, self._right), d
+
+    def __setstate__(self, state):
+        pass
 
 
 cdef class Identity(Accumulator):
@@ -419,6 +594,14 @@ cdef class Identity(Accumulator):
 
     def __deepcopy__(self, memo):
         return Identity(self._value)
+
+    def __reduce__(self):
+        d = {}
+
+        return Identity, (self._value,), d
+
+    def __setstate__(self, state):
+        pass
 
 
 cdef class StatelessSingleValueAccumulator(Accumulator):
@@ -442,6 +625,14 @@ cdef class StatelessSingleValueAccumulator(Accumulator):
     def __deepcopy__(self, memo):
         return StatelessSingleValueAccumulator(self._dependency)
 
+    def __reduce__(self):
+        d = {}
+
+        return StatelessSingleValueAccumulator, (self._dependency,), d
+
+    def __setstate__(self, state):
+        pass
+
 
 cdef class Latest(StatelessSingleValueAccumulator):
 
@@ -455,7 +646,7 @@ cdef class Latest(StatelessSingleValueAccumulator):
 
     cpdef push(self, data):
         value = self._push(data)
-        if math.isnan(value):
+        if isnan(value):
             return np.nan
         self._isFull = 1
         self._latest = value
@@ -465,6 +656,14 @@ cdef class Latest(StatelessSingleValueAccumulator):
 
     def __deepcopy__(self, memo):
         return Latest(self._dependency)
+
+    def __reduce__(self):
+        d = {}
+
+        return Latest, (self._dependency,), d
+
+    def __setstate__(self, state):
+        pass
 
 
 cdef int isanumber(a):
@@ -530,6 +729,14 @@ cdef class CompoundedValueHolder(Accumulator):
     def __deepcopy__(self, memo):
         return CompoundedValueHolder(self._left, self._right)
 
+    def __reduce__(self):
+        d = {}
+
+        return CompoundedValueHolder, (self._left, self._right), d
+
+    def __setstate__(self, state):
+        pass
+
 
 cdef class IIF(Accumulator):
 
@@ -559,117 +766,147 @@ cdef class IIF(Accumulator):
     def __deepcopy__(self, memo):
         return IIF(self._cond, self._left, self._right)
 
+    def __reduce__(self):
+        d = {}
+
+        return IIF, (self._cond, self._left, self._right), d
+
+    def __setstate__(self, state):
+        pass
+
 
 cdef class BasicFunction(Accumulator):
 
     cdef public object _origValue
-    cdef public object _func
 
-    def __init__(self, dependency, func):
+    def __init__(self, dependency):
         super(BasicFunction, self).__init__(dependency)
         if self._isValueHolderContained:
-            self._returnSize = self._dependency.valueSize
             self._window = self._dependency.window
         else:
-            self._returnSize = 1
             self._window = 1
-        self._func = func
+        self._returnSize = 1
         self._isFull = 0
         self._origValue = np.nan
 
-    cpdef push(self, data):
-        value = self.extract(data)
-        if self._returnSize == 1:
-            if math.isnan(value):
-                return np.nan
-        else:
-            if np.any(np.isnan(value)):
-                return np.nan
+    cpdef push(self, dict data):
+
+        cdef double value = self.extract(data)
+        if isnan(value):
+            return np.nan
         self._origValue = value
         self._isFull = 1
 
-    cpdef result(self):
-        try:
-            return self._func(self._origValue)
-        except ValueError:
-            return np.nan
-        except TypeError:
-            return np.array([self._func(v) for v in self._origValue])
-
     def __deepcopy__(self, memo):
-        return BasicFunction(self._dependency, self._func)
+        return BasicFunction(self._dependency)
+
+    def __reduce__(self):
+        d = {}
+
+        return BasicFunction, (self._dependency,), d
+
+    def __setstate__(self, state):
+        pass
 
 
 cdef class Exp(BasicFunction):
     def __init__(self, dependency):
-        super(Exp, self).__init__(dependency, math.exp)
+        super(Exp, self).__init__(dependency)
+
+    cpdef double result(self):
+        return exp(self._origValue)
 
     def __deepcopy__(self, memo):
         return Exp(self._dependency)
 
+    def __reduce__(self):
+        d = {}
+
+        return Exp, (self._dependency,), d
+
+    def __setstate__(self, state):
+        pass
+
 
 cdef class Log(BasicFunction):
     def __init__(self, dependency):
-        super(Log, self).__init__(dependency, math.log)
+        super(Log, self).__init__(dependency)
+
+    cpdef double result(self):
+        return log(self._origValue)
 
     def __deepcopy__(self, memo):
         return Log(self._dependency)
 
+    def __reduce__(self):
+        d = {}
+
+        return Log, (self._dependency,), d
+
+    def __setstate__(self, state):
+        pass
+
 
 cdef class Sqrt(BasicFunction):
     def __init__(self, dependency):
-        super(Sqrt, self).__init__(dependency, math.sqrt)
+        super(Sqrt, self).__init__(dependency)
+
+    cpdef double result(self):
+        return sqrt(self._origValue)
 
     def __deepcopy__(self, memo):
         return Sqrt(self._dependency)
 
+    def __reduce__(self):
+        d = {}
+
+        return Sqrt, (self._dependency,), d
+
+    def __setstate__(self, state):
+        pass
+
 
 # due to the fact that pow function is much slower than ** operator
-cdef class Pow(Accumulator):
+cdef class Pow(BasicFunction):
 
-    cdef public object _origValue
     cdef public double _n
 
     def __init__(self, dependency, n):
         super(Pow, self).__init__(dependency)
-        if self._isValueHolderContained:
-            self._returnSize = self._dependency.valueSize
-            self._window = self._dependency.window
-        else:
-            self._returnSize = 1
-            self._window = 1
-        self._isFull = 0
-        self._origValue = np.nan
         self._n = n
 
-    cpdef push(self, data):
-        value = self.extract(data)
-        if self._returnSize == 1:
-            if math.isnan(value):
-                return np.nan
-        else:
-            if np.any(np.isnan(value)):
-                return np.nan
-        self._origValue = value
-        self._isFull = 1
-
-    cpdef result(self):
-
-        try:
-            return self._origValue ** self._n
-        except TypeError:
-            return np.array([v ** self._n for v in self._origValue])
+    cpdef double result(self):
+        return self._origValue ** self._n
 
     def __deepcopy__(self, memo):
         return Pow(self._dependency, self._n)
 
+    def __reduce__(self):
+        d = {}
+
+        return Pow, (self._dependency, self._n), d
+
+    def __setstate__(self, state):
+        pass
+
 
 cdef class Abs(BasicFunction):
     def __init__(self, dependency):
-        super(Abs, self).__init__(dependency, abs)
+        super(Abs, self).__init__(dependency)
+
+    cpdef double result(self):
+        return fabs(self._origValue)
 
     def __deepcopy__(self, memo):
         return Abs(self._dependency)
+
+    def __reduce__(self):
+        d = {}
+
+        return Abs, (self._dependency,), d
+
+    def __setstate__(self, state):
+        pass
 
 
 cdef double sign(double x):
@@ -683,39 +920,94 @@ cdef double sign(double x):
 
 cdef class Sign(BasicFunction):
     def __init__(self, dependency):
-        super(Sign, self).__init__(dependency, sign)
+        super(Sign, self).__init__(dependency)
+
+    cpdef double result(self):
+        return sign(self._origValue)
 
     def __deepcopy__(self, memo):
         return Sign(self._dependency)
 
+    def __reduce__(self):
+        d = {}
+
+        return Sign, (self._dependency,), d
+
+    def __setstate__(self, state):
+        pass
+
 
 cdef class Acos(BasicFunction):
     def __init__(self, dependency):
-        super(Acos, self).__init__(dependency, math.acos)
+        super(Acos, self).__init__(dependency)
+
+    cpdef double result(self):
+        return acos(self._origValue)
 
     def __deepcopy__(self, memo):
         return Acos(self._dependency)
 
+    def __reduce__(self):
+        d = {}
+
+        return Acos, (self._dependency,), d
+
+    def __setstate__(self, state):
+        pass
+
 
 cdef class Acosh(BasicFunction):
     def __init__(self, dependency):
-        super(Acosh, self).__init__(dependency, math.acosh)
+        super(Acosh, self).__init__(dependency)
+
+    cpdef double result(self):
+        return acosh(self._origValue)
 
     def __deepcopy__(self, memo):
         return Acosh(self._dependency)
 
+    def __reduce__(self):
+        d = {}
+
+        return Acosh, (self._dependency,), d
+
+    def __setstate__(self, state):
+        pass
+
 
 cdef class Asin(BasicFunction):
     def __init__(self, dependency):
-        super(Asin, self).__init__(dependency, math.asin)
+        super(Asin, self).__init__(dependency)
+
+    cpdef double result(self):
+        return asin(self._origValue)
 
     def __deepcopy__(self, memo):
         return Asin(self._dependency)
 
+    def __reduce__(self):
+        d = {}
+
+        return Asin, (self._dependency,), d
+
+    def __setstate__(self, state):
+        pass
+
 
 cdef class Asinh(BasicFunction):
     def __init__(self, dependency):
-        super(Asinh, self).__init__(dependency, math.asinh)
+        super(Asinh, self).__init__(dependency)
+
+    cpdef double result(self):
+        return asinh(self._origValue)
 
     def __deepcopy__(self, memo):
         return Asinh(self._dependency)
+
+    def __reduce__(self):
+        d = {}
+
+        return Asinh, (self._dependency,), d
+
+    def __setstate__(self, state):
+        pass

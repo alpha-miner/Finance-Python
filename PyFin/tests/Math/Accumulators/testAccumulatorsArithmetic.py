@@ -62,16 +62,12 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
         ma5 = MovingAverage(5, 'close')
         ma20 = MovingAverage(20, 'open')
         plusRes = ma5 + ma20
-        concated = (ma5 ^ ma20) + 2.0
-        concated2 = ma5 + (ma5 ^ ma20)
 
         for i, (open, close) in enumerate(zip(self.sampleOpen, self.sampleClose)):
             data = {'close': close, 'open': open}
             ma5.push(data)
             ma20.push(data)
             plusRes.push(data)
-            concated.push(data)
-            concated2.push(data)
 
             expected = ma5.result() + ma20.result()
             calculated = plusRes.result()
@@ -79,91 +75,32 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
                                                              "expected:   {1:f}\n"
                                                              "calculated: {2:f}".format(i, expected, calculated))
 
-            expected = (ma5.result() + 2.0, ma20.result() + 2.0)
-            calculated = concated.result()
-            self.assertAlmostEqual(calculated[0], expected[0], 12, "at index {0:d}\n"
-                                                                   "expected:   {1:f}\n"
-                                                                   "calculated: {2:f}".format(i, expected[0],
-                                                                                              calculated[0]))
-            self.assertAlmostEqual(calculated[1], expected[1], 12, "at index {0:d}\n"
-                                                                   "expected:   {1:f}\n"
-                                                                   "calculated: {2:f}".format(i, expected[1],
-                                                                                              calculated[1]))
-
-            expected = (ma5.result() + ma5.result(), ma20.result() + ma5.result())
-            calculated = concated2.result()
-            self.assertAlmostEqual(calculated[0], expected[0], 12, "at index {0:d}\n"
-                                                                   "expected:   {1:f}\n"
-                                                                   "calculated: {2:f}".format(i, expected[0],
-                                                                                              calculated[0]))
-            self.assertAlmostEqual(calculated[1], expected[1], 12, "at index {0:d}\n"
-                                                                   "expected:   {1:f}\n"
-                                                                   "calculated: {2:f}".format(i, expected[1],
-                                                                                              calculated[1]))
-
     def testRPlusOperator(self):
         ma5 = MovingAverage(5, 'close')
         ma20 = MovingAverage(20, 'close')
         plusRes = 5.0 + MovingAverage(20, 'close')
-        concated = 2.0 + (ma5 ^ ma20)
-        concated2 = ma5 + ma20
-        concated3 = (ma5 ^ ma20) + ma5
 
         for i, close in enumerate(self.sampleClose):
             data = {'close': close}
             ma5.push(data)
             ma20.push(data)
             plusRes.push(data)
-            concated.push(data)
-            concated2.push(data)
-            concated3.push(data)
-
             expected = 5.0 + ma20.result()
             calculated = plusRes.result()
             self.assertAlmostEqual(calculated, expected, 12, "at index {0:d}\n"
                                                              "expected:   {1:f}\n"
                                                              "calculated: {2:f}".format(i, expected, calculated))
 
-            expected = (ma5.result() + 2.0, ma20.result() + 2.0)
-            calculated = concated.result()
-            self.assertAlmostEqual(calculated[0], expected[0], 12, "at index {0:d}\n"
-                                                                   "expected:   {1:f}\n"
-                                                                   "calculated: {2:f}".format(i, expected[0],
-                                                                                              calculated[0]))
-            self.assertAlmostEqual(calculated[1], expected[1], 12, "at index {0:d}\n"
-                                                                   "expected:   {1:f}\n"
-                                                                   "calculated: {2:f}".format(i, expected[1],
-                                                                                              calculated[1]))
-
-            expected = ma5.result() + ma20.result()
-            calculated = concated2.result()
-            self.assertAlmostEqual(calculated, expected, 12, "at index {0:d}\n"
-                                                             "expected:   {1:f}\n"
-                                                             "calculated: {2:f}".format(i, expected, calculated))
-
-            expected = (ma5.result() + ma5.result(), ma5.result() + ma20.result())
-            calculated = concated3.result()
-            self.assertAlmostEqual(calculated[0], expected[0], 12, "at index {0:d}\n"
-                                                                   "expected:   {1:f}\n"
-                                                                   "calculated: {2:f}".format(i, expected[0],
-                                                                                              calculated[0]))
-            self.assertAlmostEqual(calculated[1], expected[1], 12, "at index {0:d}\n"
-                                                                   "expected:   {1:f}\n"
-                                                                   "calculated: {2:f}".format(i, expected[1],
-                                                                                              calculated[1]))
-
     def testSubOperator(self):
         ma5 = MovingAverage(5, 'close')
         sumTotal = Sum('open')
         subRes = MovingAverage(5, 'close') - Sum('open')
-        concated = (MovingAverage(5, 'close') ^ Sum('open')) - Sum('open')
 
         for i, (open, close) in enumerate(zip(self.sampleOpen, self.sampleClose)):
             data = {'close': close, 'open': open}
             ma5.push(data)
             sumTotal.push(data)
             subRes.push(data)
-            concated.push(data)
 
             expected = ma5.result() - sumTotal.result()
             calculated = subRes.result()
@@ -171,29 +108,16 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
                                                              "expected:   {1:f}\n"
                                                              "calculated: {2:f}".format(i, expected, calculated))
 
-            expected = (ma5.result() - sumTotal.result(), 0.0)
-            calculated = concated.result()
-            self.assertAlmostEqual(calculated[0], expected[0], 12, "at index {0:d}\n"
-                                                                   "expected:   {1:f}\n"
-                                                                   "calculated: {2:f}".format(i, expected[0],
-                                                                                              calculated[0]))
-            self.assertAlmostEqual(calculated[1], expected[1], 12, "at index {0:d}\n"
-                                                                   "expected:   {1:f}\n"
-                                                                   "calculated: {2:f}".format(i, expected[1],
-                                                                                              calculated[1]))
-
     def testRSubOperator(self):
         ma20 = MovingAverage(20, 'close')
         sumTotal = Sum('close')
         subRes = 5.0 - MovingAverage(20, 'close')
-        concated = sumTotal - (ma20 ^ sumTotal)
 
         for i, close in enumerate(self.sampleClose):
             data = {'close': close}
             ma20.push(data)
             sumTotal.push(data)
             subRes.push(data)
-            concated.push(data)
 
             expected = 5.0 - ma20.result()
             calculated = subRes.result()
@@ -201,31 +125,16 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
                                                              "expected:   {1:f}\n"
                                                              "calculated: {2:f}".format(i, expected, calculated))
 
-            expected = (sumTotal.result() - ma20.result(), 0.0)
-            calculated = concated.result()
-            self.assertAlmostEqual(calculated[0], expected[0], 12, "at index {0:d}\n"
-                                                                   "expected:   {1:f}\n"
-                                                                   "calculated: {2:f}".format(i, expected[0],
-                                                                                              calculated[0]))
-            self.assertAlmostEqual(calculated[1], expected[1], 12, "at index {0:d}\n"
-                                                                   "expected:   {1:f}\n"
-                                                                   "calculated: {2:f}".format(i, expected[1],
-                                                                                              calculated[1]))
-
     def testMultiplyOperator(self):
         mv5 = MovingVariance(5, 'close')
         average = Average('open')
         mulRes = MovingVariance(5, 'close') * Average('open')
-        concated = (Average('open') ^ mv5) * Average('open')
-        concated2 = Average('open') * (Average('open') ^ mv5)
 
         for i, (open, close) in enumerate(zip(self.sampleOpen, self.sampleClose)):
             data = {'close': close, 'open': open}
             mv5.push(data)
             average.push(data)
             mulRes.push(data)
-            concated.push(data)
-            concated2.push(data)
 
             if i >= 1:
                 expected = mv5.result() * average.result()
@@ -234,39 +143,16 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
                                                                  "expected:   {1:f}\n"
                                                                  "calculated: {2:f}".format(i, expected, calculated))
 
-                expected = (average.result() * average.result(), mv5.result() * average.result())
-                calculated = concated.result()
-                self.assertAlmostEqual(calculated[0], expected[0], 12, "at index {0:d}\n"
-                                                                       "expected:   {1:f}\n"
-                                                                       "calculated: {2:f}".format(i, expected[0],
-                                                                                                  calculated[0]))
-                self.assertAlmostEqual(calculated[1], expected[1], 12, "at index {0:d}\n"
-                                                                       "expected:   {1:f}\n"
-                                                                       "calculated: {2:f}".format(i, expected[1],
-                                                                                                  calculated[1]))
-
-                calculated = concated2.result()
-                self.assertAlmostEqual(calculated[0], expected[0], 12, "at index {0:d}\n"
-                                                                       "expected:   {1:f}\n"
-                                                                       "calculated: {2:f}".format(i, expected[0],
-                                                                                                  calculated[0]))
-                self.assertAlmostEqual(calculated[1], expected[1], 12, "at index {0:d}\n"
-                                                                       "expected:   {1:f}\n"
-                                                                       "calculated: {2:f}".format(i, expected[1],
-                                                                                                  calculated[1]))
-
     def testRMultiplyOperator(self):
         ma20 = MovingAverage(20, 'close')
         average = Average('open')
         mulRes = 5.0 * MovingAverage(20, 'close')
-        concated = 5.0 * (MovingAverage(20, 'close') ^ Average('open'))
 
         for i, (open, close) in enumerate(zip(self.sampleOpen, self.sampleClose)):
             data = {'close': close, 'open': open}
             average.push(data)
             ma20.push(data)
             mulRes.push(data)
-            concated.push(data)
 
             expected = 5.0 * ma20.result()
             calculated = mulRes.result()
@@ -274,32 +160,16 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
                                                              "expected:   {1:f}\n"
                                                              "calculated: {2:f}".format(i, expected, calculated))
 
-            expected = (5.0 * ma20.result(), 5.0 * average.result())
-            calculated = concated.result()
-            self.assertAlmostEqual(calculated[0], expected[0], 12, "at index {0:d}\n"
-                                                                   "expected:   {1:f}\n"
-                                                                   "calculated: {2:f}".format(i, expected[0],
-                                                                                              calculated[0]))
-            self.assertAlmostEqual(calculated[1], expected[1], 12, "at index {0:d}\n"
-                                                                   "expected:   {1:f}\n"
-                                                                   "calculated: {2:f}".format(i, expected[1],
-                                                                                              calculated[1]))
-
     def testDivOperator(self):
         mc5 = MovingCorrelation(5, ['open', 'close'])
         minum = Minimum('open')
         divRes = Minimum('open') / MovingCorrelation(5, ['open', 'close'])
-        concated = (Minimum('open') ^ MovingCorrelation(5, ['open', 'close'])) / MovingCorrelation(5, ['open', 'close'])
-        concated2 = MovingCorrelation(5, ['open', 'close']) / (
-        Minimum('open') ^ MovingCorrelation(5, ['open', 'close']))
 
         for i, (open, close) in enumerate(zip(self.sampleOpen, self.sampleClose)):
             data = {'close': close, 'open': open}
             mc5.push(data)
             minum.push(data)
             divRes.push(data)
-            concated.push(data)
-            concated2.push(data)
 
             if i >= 1:
                 expected = minum.result() / mc5.result()
@@ -308,55 +178,20 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
                                                                  "expected:   {1:f}\n"
                                                                  "calculated: {2:f}".format(i, expected, calculated))
 
-                expected = (minum.result() / mc5.result(), mc5.result() / mc5.result())
-                calculated = concated.result()
-                self.assertAlmostEqual(calculated[0], expected[0], 12, "at index {0:d}\n"
-                                                                       "expected:   {1:f}\n"
-                                                                       "calculated: {2:f}".format(i, expected[0],
-                                                                                                  calculated[0]))
-                self.assertAlmostEqual(calculated[1], expected[1], 12, "at index {0:d}\n"
-                                                                       "expected:   {1:f}\n"
-                                                                       "calculated: {2:f}".format(i, expected[1],
-                                                                                                  calculated[1]))
-
-                expected = (mc5.result() / minum.result(), mc5.result() / mc5.result())
-                calculated = concated2.result()
-                self.assertAlmostEqual(calculated[0], expected[0], 12, "at index {0:d}\n"
-                                                                       "expected:   {1:f}\n"
-                                                                       "calculated: {2:f}".format(i, expected[0],
-                                                                                                  calculated[0]))
-                self.assertAlmostEqual(calculated[1], expected[1], 12, "at index {0:d}\n"
-                                                                       "expected:   {1:f}\n"
-                                                                       "calculated: {2:f}".format(i, expected[1],
-                                                                                                  calculated[1]))
-
     def testRDivOperator(self):
         ma20 = MovingAverage(20, 'close')
         divRes = 5.0 / MovingAverage(20, 'close')
-        concated = (5.0 ^ MovingAverage(20, 'close')) / MovingAverage(20, 'close')
 
         for i, close in enumerate(self.sampleClose):
             data = {'close': close}
             ma20.push(data)
             divRes.push(data)
-            concated.push(data)
 
             expected = 5.0 / ma20.result()
             calculated = divRes.result()
             self.assertAlmostEqual(calculated, expected, 12, "at index {0:d}\n"
                                                              "expected:   {1:f}\n"
                                                              "calculated: {2:f}".format(i, expected, calculated))
-
-            expected = (5.0 / ma20.result(), 1.0)
-            calculated = concated.result()
-            self.assertAlmostEqual(calculated[0], expected[0], 12, "at index {0:d}\n"
-                                                                   "expected:   {1:f}\n"
-                                                                   "calculated: {2:f}".format(i, expected[0],
-                                                                                              calculated[0]))
-            self.assertAlmostEqual(calculated[1], expected[1], 12, "at index {0:d}\n"
-                                                                   "expected:   {1:f}\n"
-                                                                   "calculated: {2:f}".format(i, expected[1],
-                                                                                              calculated[1]))
 
     def testMultipleOperators(self):
         ma20 = MovingAverage(20, 'close')
@@ -585,18 +420,6 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
         cmp.push(dict(x=2.0))
         self.assertEqual(False, cmp.result())
 
-        cmp = (m1 ^ m2) <= m2
-        cmp.push(dict(x=1.0))
-        np.testing.assert_array_equal([True, True], cmp.result())
-        cmp.push(dict(x=2.0))
-        np.testing.assert_array_equal([False, True], cmp.result())
-
-        cmp = m1 <= (m1 ^ m2)
-        cmp.push(dict(x=1.0))
-        np.testing.assert_array_equal([True, True], cmp.result())
-        cmp.push(dict(x=2.0))
-        np.testing.assert_array_equal([True, False], cmp.result())
-
     def testLessOperator(self):
         m1 = Minimum('x')
         m2 = Max('x')
@@ -606,18 +429,6 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
         self.assertEqual(False, cmp.result())
         cmp.push(dict(x=2.0))
         self.assertEqual(True, cmp.result())
-
-        cmp = (m1 ^ m2) < m2
-        cmp.push(dict(x=1.0))
-        np.testing.assert_array_equal([False, False], cmp.result())
-        cmp.push(dict(x=2.0))
-        np.testing.assert_array_equal([True, False], cmp.result())
-
-        cmp = m1 < (m1 ^ m2)
-        cmp.push(dict(x=1.0))
-        np.testing.assert_array_equal([False, False], cmp.result())
-        cmp.push(dict(x=2.0))
-        np.testing.assert_array_equal([False, True], cmp.result())
 
     def testGreaterOrEqualOperator(self):
         m1 = Minimum('x')
@@ -629,18 +440,6 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
         cmp.push(dict(x=2.0))
         self.assertEqual(False, cmp.result())
 
-        cmp = (m1 ^ m2) >= m2
-        cmp.push(dict(x=1.0))
-        np.testing.assert_array_equal(np.array([True, True]), cmp.result())
-        cmp.push(dict(x=2.0))
-        np.testing.assert_array_equal(np.array([False, True]), cmp.result())
-
-        cmp = m1 >= (m1 ^ m2)
-        cmp.push(dict(x=1.0))
-        np.testing.assert_array_equal(np.array([True, True]), cmp.result())
-        cmp.push(dict(x=2.0))
-        np.testing.assert_array_equal(np.array([True, False]), cmp.result())
-
     def testGreaterOperator(self):
         m1 = Max('x')
         m2 = Minimum('x')
@@ -650,18 +449,6 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
         self.assertEqual(False, cmp.result())
         cmp.push(dict(x=2.0))
         self.assertEqual(True, cmp.result())
-
-        cmp = (m1 ^ m2) > m2
-        cmp.push(dict(x=1.0))
-        np.testing.assert_array_equal(np.array([False, False]), cmp.result())
-        cmp.push(dict(x=2.0))
-        np.testing.assert_array_equal(np.array([True, False]), cmp.result())
-
-        cmp = m1 > (m1 ^ m2)
-        cmp.push(dict(x=1.0))
-        np.testing.assert_array_equal(np.array([False, False]), cmp.result())
-        cmp.push(dict(x=2.0))
-        np.testing.assert_array_equal(np.array([False, True]), cmp.result())
 
     def testExpFunction(self):
         ma5 = MovingAverage(5, 'close')
@@ -688,15 +475,12 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
     def testLogFunction(self):
         ma5 = MovingAverage(5, 'close')
         holder = Log(ma5)
-        holder2 = (ma5 ^ ma5) >> Log
-
         sampleClose = np.exp(self.sampleClose)
 
         for i, close in enumerate(sampleClose):
             data = {'close': close}
             ma5.push(data)
             holder.push(data)
-            holder2.push(data)
 
             expected = math.log(ma5.result())
             calculated = holder.result()
@@ -704,22 +488,14 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
                                                              "expected:   {1:f}\n"
                                                              "calculated: {2:f}".format(i, expected, calculated))
 
-            calculated = holder2.result()
-            for cal in calculated:
-                self.assertAlmostEqual(cal, expected, 12, "at index {0:d}\n"
-                                                          "expected:   {1:f}\n"
-                                                          "calculated: {2:f}".format(i, expected, cal))
-
     def testSignFunction(self):
         ma5 = MovingAverage(5, 'close')
         holder = Sign(ma5)
-        holder2 = (ma5 ^ (-ma5)) >> Sign
 
         for i, close in enumerate(self.sampleClose):
             data = {'close': close}
             ma5.push(data)
             holder.push(data)
-            holder2.push(data)
 
             expected = 1 if ma5.result() >= 0 else -1
             calculated = holder.result()
@@ -727,15 +503,6 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
             self.assertEqual(calculated, expected, "at index {0:d}\n"
                                                    "expected:   {1:f}\n"
                                                    "calculated: {2:f}".format(i, expected, calculated))
-
-            calculated = holder2.result()
-            self.assertEqual(calculated[0], expected, "at index {0:d}\n"
-                                                      "expected:   {1:f}\n"
-                                                      "calculated: {2:f}".format(i, expected, calculated[0]))
-
-            self.assertEqual(calculated[1], -expected, "at index {0:d}\n"
-                                                       "expected:   {1:f}\n"
-                                                       "calculated: {2:f}".format(i, expected, calculated[1]))
 
     def testSqrtFunction(self):
         ma5 = MovingAverage(5, 'close')
@@ -772,25 +539,17 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
     def testPowFunction(self):
         ma5min = MovingAverage(5, 'close') >> Minimum
         holder = Pow(ma5min, 3)
-        holder2 = Pow(ma5min ^ ma5min, 3)
 
         for i, close in enumerate(self.sampleClose):
             data = {'close': close}
             ma5min.push(data)
             holder.push(data)
-            holder2.push(data)
 
             expected = math.pow(ma5min.result(), 3)
             calculated = holder.result()
             self.assertAlmostEqual(calculated, expected, 12, "at index {0:d}\n"
                                                              "expected:   {1:f}\n"
                                                              "calculated: {2:f}".format(i, expected, calculated))
-
-            calculated = holder2.result()
-            for cal in calculated:
-                self.assertAlmostEqual(cal, expected, 12, "at index {0:d}\n"
-                                                          "expected:   {1:f}\n"
-                                                          "calculated: {2:f}".format(i, expected, cal))
 
     def testAcosFunction(self):
         ma5 = MovingAverage(5, 'close')

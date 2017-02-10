@@ -34,6 +34,9 @@ datafiles.append((os.path.join(packagePath, "PyFin/Enums"), files))
 files = glob.glob("PyFin/Math/*.pxd")
 datafiles.append((os.path.join(packagePath, "PyFin/Math"), files))
 
+files = glob.glob("PyFin/Math/Accumulators/*.pxd")
+datafiles.append((os.path.join(packagePath, "PyFin/Math/Accumulators"), files))
+
 files = glob.glob("PyFin/Math/Distributions/*.pxd")
 datafiles.append((os.path.join(packagePath, "PyFin/Math/Distributions"), files))
 

@@ -8,6 +8,9 @@ Created on 2015-7-25
 import math
 import numpy as np
 cimport numpy as np
+cimport cython
+from libc.math cimport isnan
+from libc.math cimport log
 from PyFin.Math.Accumulators.IAccumulators cimport Accumulator
 from PyFin.Math.Accumulators.IAccumulators import Pow
 from PyFin.Math.Accumulators.IAccumulators cimport StatelessSingleValueAccumulator
@@ -30,9 +33,9 @@ cdef class Sign(StatelessSingleValueAccumulator):
         self._returnSize = 1
         self._sign = np.nan
 
-    cpdef push(self, data):
-        value = self._push(data)
-        if math.isnan(value):
+    cpdef push(self, dict data):
+        cdef double value = self._push(data)
+        if isnan(value):
             return np.nan
         self._isFull = 1
         if value > 0.:
@@ -42,7 +45,7 @@ cdef class Sign(StatelessSingleValueAccumulator):
         else:
             self._sign = 0.
 
-    cpdef result(self):
+    cpdef double result(self):
         return self._sign
 
     def __deepcopy__(self, memo):
@@ -63,15 +66,15 @@ cdef class Diff(StatelessSingleValueAccumulator):
         self._curr = np.nan
         self._previous = np.nan
 
-    cpdef push(self, data):
-        value = self._push(data)
-        if math.isnan(value):
-            return math.isnan
+    cpdef push(self, dict data):
+        cdef double value = self._push(data)
+        if isnan(value):
+            return np.nan
         self._isFull = 1
         self._previous = self._curr
         self._curr = value
 
-    cpdef result(self):
+    cpdef double result(self):
         return self._curr - self._previous
 
     def __deepcopy__(self, memo):
@@ -92,18 +95,21 @@ cdef class SimpleReturn(StatelessSingleValueAccumulator):
         self._curr = np.nan
         self._previous = np.nan
 
-    cpdef push(self, data):
-        value = self._push(data)
-        if math.isnan(value):
+    cpdef push(self, dict data):
+        cdef double value = self._push(data)
+        if isnan(value):
             return np.nan
         self._isFull = 1
         self._previous = self._curr
         self._curr = value
 
-    cpdef result(self):
-        try:
-            return self._curr / self._previous - 1.
-        except ValueError:
+    @cython.cdivision(True)
+    cpdef double result(self):
+
+        cdef double denorm = self._previous
+        if denorm:
+            return self._curr / denorm - 1.
+        else:
             return np.nan
 
     def __deepcopy__(self, memo):
@@ -124,18 +130,20 @@ cdef class LogReturn(StatelessSingleValueAccumulator):
         self._curr = np.nan
         self._previous = np.nan
 
-    cpdef push(self, data):
-        value = self._push(data)
-        if math.isnan(value):
+    cpdef push(self, dict data):
+        cdef double value = self._push(data)
+        if isnan(value):
             return np.nan
         self._isFull = 1
         self._previous = self._curr
         self._curr = value
 
-    cpdef result(self):
-        try:
-            return math.log(self._curr / self._previous)
-        except ValueError:
+    @cython.cdivision(True)
+    cpdef double result(self):
+        cdef double denorm = self._previous
+        if denorm:
+            return log(self._curr / denorm)
+        else:
             return np.nan
 
     def __deepcopy__(self, memo):
@@ -152,9 +160,9 @@ cdef class Positive(StatelessSingleValueAccumulator):
         self._returnSize = 1
         self._pos = np.nan
 
-    cpdef push(self, data):
-        value = self._push(data)
-        if math.isnan(value):
+    cpdef push(self, dict data):
+        cdef double value = self._push(data)
+        if isnan(value):
             return np.nan
 
         self._isFull = 1
@@ -166,7 +174,7 @@ cdef class Positive(StatelessSingleValueAccumulator):
         else:
             self._pos = np.nan
 
-    cpdef result(self):
+    cpdef double result(self):
         return self._pos
 
     def __deepcopy__(self, memo):
@@ -183,9 +191,9 @@ cdef class Negative(StatelessSingleValueAccumulator):
         self._returnSize = 1
         self._neg = np.nan
 
-    cpdef push(self, data):
-        value = self._push(data)
-        if math.isnan(value):
+    cpdef push(self, dict data):
+        cdef double value = self._push(data)
+        if isnan(value):
             return np.nan
 
         self._isFull = 1
@@ -197,7 +205,7 @@ cdef class Negative(StatelessSingleValueAccumulator):
         else:
             self._neg = np.nan
 
-    cpdef result(self):
+    cpdef double result(self):
         return self._neg
 
     def __deepcopy__(self, memo):
@@ -216,9 +224,9 @@ cdef class Max(StatelessSingleValueAccumulator):
         self._returnSize = 1
         self._first = 1
 
-    cpdef push(self, data):
-        value = self._push(data)
-        if math.isnan(value):
+    cpdef push(self, dict data):
+        cdef double value = self._push(data)
+        if isnan(value):
             return np.nan
 
         self._isFull = 1
@@ -230,7 +238,7 @@ cdef class Max(StatelessSingleValueAccumulator):
             if self._currentMax < value:
                 self._currentMax = value
 
-    cpdef result(self):
+    cpdef double result(self):
         return self._currentMax
 
     def __deepcopy__(self, memo):
@@ -249,9 +257,9 @@ cdef class Minimum(StatelessSingleValueAccumulator):
         self._returnSize = 1
         self._first = 1
 
-    cpdef push(self, data):
-        value = self._push(data)
-        if math.isnan(value):
+    cpdef push(self, dict data):
+        cdef double value = self._push(data)
+        if isnan(value):
             return np.nan
 
         self._isFull = 1
@@ -263,7 +271,7 @@ cdef class Minimum(StatelessSingleValueAccumulator):
             if self._currentMin > value:
                 self._currentMin = value
 
-    cpdef result(self):
+    cpdef double result(self):
         return self._currentMin
 
     def __deepcopy__(self, memo):
@@ -282,9 +290,9 @@ cdef class Sum(StatelessSingleValueAccumulator):
         self._returnSize = 1
         self._first = 1
 
-    cpdef push(self, data):
-        value = self._push(data)
-        if math.isnan(value):
+    cpdef push(self, dict data):
+        cdef double value = self._push(data)
+        if isnan(value):
             return np.nan
 
         self._isFull = 1
@@ -295,7 +303,7 @@ cdef class Sum(StatelessSingleValueAccumulator):
         else:
             self._currentSum += value
 
-    cpdef result(self):
+    cpdef double result(self):
         return self._currentSum
 
     def __deepcopy__(self, memo):
@@ -314,9 +322,9 @@ cdef class Average(StatelessSingleValueAccumulator):
         self._currentCount = 0
         self._returnSize = 1
 
-    cpdef push(self, data):
-        value = self._push(data)
-        if math.isnan(value):
+    cpdef push(self, dict data):
+        cdef double value = self._push(data)
+        if isnan(value):
             return np.nan
 
         self._isFull = 1
@@ -327,10 +335,11 @@ cdef class Average(StatelessSingleValueAccumulator):
             self._currentSum += value
         self._currentCount += 1
 
-    cpdef result(self):
-        try:
+    @cython.cdivision(True)
+    cpdef double result(self):
+        if self._currentCount:
             return self._currentSum / self._currentCount
-        except ZeroDivisionError:
+        else:
             return np.nan
 
     def __deepcopy__(self, memo):
@@ -349,9 +358,9 @@ cdef class XAverage(StatelessSingleValueAccumulator):
         self._exp = 2.0 / (window + 1.)
         self._count = 0
 
-    cpdef push(self, data):
-        value = self._push(data)
-        if math.isnan(value):
+    cpdef push(self, dict data):
+        cdef double value = self._push(data)
+        if isnan(value):
             return np.nan
 
         self._isFull = 1
@@ -362,7 +371,7 @@ cdef class XAverage(StatelessSingleValueAccumulator):
             self._average += self._exp * (value - self._average)
         self._count += 1
 
-    cpdef result(self):
+    cpdef double result(self):
         return self._average
 
     def __deepcopy__(self, memo):
@@ -385,9 +394,9 @@ cdef class Variance(StatelessSingleValueAccumulator):
         self._isPop = isPopulation
         self._returnSize = 1
 
-    cpdef push(self, data):
-        value = self._push(data)
-        if math.isnan(value):
+    cpdef push(self, dict data):
+        cdef double value = self._push(data)
+        if isnan(value):
             return np.nan
 
         self._isFull = 1
@@ -396,10 +405,12 @@ cdef class Variance(StatelessSingleValueAccumulator):
         self._currentSumSquare += value * value
         self._currentCount += 1
 
+    @cython.cdivision(True)
     cpdef result(self):
-        tmp = self._currentSumSquare - self._currentSum * self._currentSum / self._currentCount
 
-        pop_num = self._currentCount if self._isPop else self._currentCount - 1
+        cdef double tmp = self._currentSumSquare - self._currentSum * self._currentSum / self._currentCount
+
+        cdef double pop_num = self._currentCount if self._isPop else self._currentCount - 1
 
         if pop_num:
             return tmp / pop_num
@@ -418,16 +429,15 @@ cdef class Product(StatelessSingleValueAccumulator):
         super(Product, self).__init__(dependency)
         self._product = 1.0
 
-    cpdef push(self, data):
-        value = self._push(data)
-        if math.isnan(value):
+    cpdef push(self, dict data):
+        cdef double value = self._push(data)
+        if isnan(value):
             return np.nan
 
         self._isFull = 1
-
         self._product *= value
 
-    cpdef result(self):
+    cpdef double result(self):
         return self._product
 
     def __deepcopy__(self, memo):
@@ -446,9 +456,9 @@ cdef class CenterMoment(StatelessSingleValueAccumulator):
         self._order = order
         self._moment = np.nan
 
-    cpdef push(self, data):
-        value = self._push(data)
-        if math.isnan(value):
+    cpdef push(self, dict data):
+        cdef double value = self._push(data)
+        if isnan(value):
             return np.nan
 
         self._isFull = 1
@@ -456,7 +466,7 @@ cdef class CenterMoment(StatelessSingleValueAccumulator):
         self._this_list.append(value)
         self._moment = np.mean(np.power(np.abs(np.array(self._this_list) - np.mean(self._this_list)), self._order))
 
-    cpdef result(self):
+    cpdef double result(self):
         return self._moment
 
     def __deepcopy__(self, memo):
@@ -471,14 +481,14 @@ cdef class Skewness(StatelessSingleValueAccumulator):
 
     def __init__(self, dependency='x'):
         super(Skewness, self).__init__(dependency)
-        self._std3 = Pow(Variance(dependency, isPopulation=True), 1.5)
+        self._std3 = Pow(Variance(dependency, isPopulation=1), 1.5)
         self._moment3 = CenterMoment(3, dependency)
         self._skewness = self._moment3 / self._std3
 
-    cpdef push(self, data):
+    cpdef push(self, dict data):
         self._skewness.push(data)
 
-    cpdef result(self):
+    cpdef double result(self):
         try:
             return self._skewness.result()
         except ZeroDivisionError:
@@ -496,14 +506,14 @@ cdef class Kurtosis(StatelessSingleValueAccumulator):
 
     def __init__(self, dependency='x'):
         super(Kurtosis, self).__init__(dependency)
-        self._std4 = Pow(Variance(dependency, isPopulation=True), 2)
+        self._std4 = Pow(Variance(dependency, isPopulation=1), 2)
         self._moment4 = CenterMoment(4, dependency)
         self._kurtosis = self._moment4 / self._std4
 
-    cpdef push(self, data):
+    cpdef push(self, dict data):
         self._kurtosis.push(data)
 
-    cpdef result(self):
+    cpdef double result(self):
         try:
             return self._kurtosis.result()
         except ZeroDivisionError:
@@ -525,9 +535,9 @@ cdef class Rank(StatelessSingleValueAccumulator):
         self._sortedList = []
         self._rank = []
 
-    cpdef push(self, data):
-        value = self._push(data)
-        if math.isnan(value):
+    cpdef push(self, dict data):
+        cdef double value = self._push(data)
+        if isnan(value):
             return np.nan
 
         self._isFull = 1
@@ -553,9 +563,9 @@ cdef class LevelList(StatelessSingleValueAccumulator):
         self._levelList = []
         self._thisList = []
 
-    cpdef push(self, data):
-        value = self._push(data)
-        if math.isnan(value):
+    cpdef push(self, dict data):
+        cdef double value = self._push(data)
+        if isnan(value):
             return np.nan
 
         self._isFull = 1
@@ -583,9 +593,9 @@ cdef class LevelValue(StatelessSingleValueAccumulator):
         self._thisList = []
         self._levelValue = np.nan
 
-    cpdef push(self, data):
+    cpdef push(self, dict data):
         value = self._push(data)
-        if math.isnan(value):
+        if isnan(value):
             return np.nan
 
         self._isFull = 1
@@ -596,7 +606,7 @@ cdef class LevelValue(StatelessSingleValueAccumulator):
         else:
             self._levelValue = self._thisList[-1] / self._thisList[0]
 
-    cpdef result(self):
+    cpdef double result(self):
         return self._levelValue
 
     def __deepcopy__(self, memo):
@@ -619,15 +629,15 @@ cdef class AutoCorrelation(StatelessSingleValueAccumulator):
         self._VecBackward = []
         self._AutoCorrMatrix = None
 
-    cpdef push(self, data):
-        value = self._push(data)
-        if math.isnan(value):
+    cpdef push(self, dict data):
+        cdef double value = self._push(data)
+        if isnan(value):
             return np.nan
 
         self._isFull = 1
         self._thisList.append(value)
 
-    cpdef result(self):
+    cpdef double result(self):
         if len(self._thisList) <= self._lags:
             raise ValueError ("time-series length should be more than lags however\n"
                               "time-series length is: {0} while lags is: {1}".format(len(self._thisList), self._lags))
@@ -688,7 +698,7 @@ cdef class Correlation(StatelessMultiValueAccumulator):
 
     cpdef push(self, data):
         value = self._push(data)
-        if math.isnan(value[0]) or math.isnan(value[1]):
+        if isnan(value[0]) or isnan(value[1]):
             return np.nan
 
         self._isFull = 1

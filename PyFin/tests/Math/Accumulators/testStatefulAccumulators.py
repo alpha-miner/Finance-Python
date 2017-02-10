@@ -497,8 +497,8 @@ class TestStatefulAccumulators(unittest.TestCase):
                 with self.assertRaises(ValueError):
                     _ = mh[1]
 
-            for k in range(mh.size):
-                expected = benchmarkContainer[mh.size - 1 - k]
+            for k in range(mh.size()):
+                expected = benchmarkContainer[mh.size() - 1 - k]
                 calculated = mh[k]
                 self.assertAlmostEqual(expected, calculated)
 
@@ -515,8 +515,8 @@ class TestStatefulAccumulators(unittest.TestCase):
                 with self.assertRaises(ValueError):
                     _ = mh[1]
 
-            for k in range(mh.size):
-                expected = benchmarkContainer[mh.size - 1 - k]
+            for k in range(mh.size()):
+                expected = benchmarkContainer[mh.size() - 1 - k]
                 calculated = mh[k]
                 self.assertAlmostEqual(expected, calculated, 12, "at index {0} and position {1}\n"
                                                                  "expected:   {2}\n"

@@ -116,6 +116,9 @@ cdef class Accumulator(IAccumulator):
     cpdef push(self, dict data):
         pass
 
+    cpdef object result(self):
+        pass
+
     @cython.boundscheck(False)
     @cython.wraparound(False)
     def transform(self, data, str name=None, to_sort=False):
@@ -126,7 +129,8 @@ cdef class Accumulator(IAccumulator):
         cdef long n = len(data)
         cdef np.ndarray[double, ndim=1] output_values = np.zeros(n)
         cdef list columns
-        cdef list column_index
+        cdef int column_length
+        cdef dict data_dict
 
         if to_sort:
             data.sort_index(inplace=True)
@@ -136,10 +140,14 @@ cdef class Accumulator(IAccumulator):
 
         matrix_values = data.as_matrix()
         columns = data.columns.tolist()
-        column_index = list(range(len(columns)))
+        column_length = len(columns)
+
+        data_dict = {columns[k]: 0 for k in range(column_length)}
 
         for i in range(n):
-            self.push({columns[k]: matrix_values[i, k] for k in column_index})
+            for k in range(column_length):
+                data_dict[columns[k]] = matrix_values[i, k]
+            self.push(data_dict)
             output_values[i] = self.result()
 
         return pd.Series(output_values, index=data.index, name=name)
@@ -148,8 +156,7 @@ cdef class Accumulator(IAccumulator):
     def value(self):
         return self.result()
 
-    @property
-    def isFull(self):
+    cpdef int isFull(self):
         return self._isFull == 1
 
     @property
@@ -190,10 +197,10 @@ cdef class Negative(Accumulator):
 
     cpdef push(self, dict data):
         self._valueHolder.push(data)
-        if self._valueHolder.isFull:
+        if self._valueHolder.isFull():
             self._isFull = 1
 
-    cpdef result(self):
+    cpdef object result(self):
         res = self._valueHolder.result()
         try:
             return -res
@@ -225,10 +232,10 @@ cdef class ListedValueHolder(Accumulator):
     cpdef push(self, dict data):
         self._left.push(data)
         self._right.push(data)
-        if self._isFull == 0 and self._left.isFull and self._right.isFull:
+        if self._isFull == 0 and self._left.isFull() and self._right.isFull():
             self._isFull = 1
 
-    cpdef result(self):
+    cpdef object result(self):
         resLeft = self._left.result()
         resRight = self._right.result()
 
@@ -276,10 +283,10 @@ cdef class TruncatedValueHolder(Accumulator):
 
     cpdef push(self, dict data):
         self._valueHolder.push(data)
-        if self._valueHolder.isFull:
+        if self._valueHolder.isFull():
             self._isFull = 1
 
-    cpdef result(self):
+    cpdef object result(self):
         if self._stop == -1:
             return self._valueHolder.result()[self._start]
         return self._valueHolder.result()[self._start:self._stop]
@@ -318,12 +325,11 @@ cdef class CombinedValueHolder(Accumulator):
     cpdef push(self, dict data):
         self._left.push(data)
         self._right.push(data)
-        if self._isFull == 0 and self._left.isFull and self._right.isFull:
+        if self._isFull == 0 and self._left.isFull() and self._right.isFull():
             self._isFull = 1
 
-    @property
-    def isFull(self):
-        if self._left.isFull and self._right.isFull:
+    cpdef int isFull(self):
+        if self._left.isFull() and self._right.isFull():
             return True
         else:
             return False
@@ -344,7 +350,7 @@ cdef class AddedValueHolder(CombinedValueHolder):
     def __init__(self, left, right):
         super(AddedValueHolder, self).__init__(left, right)
 
-    cpdef result(self):
+    cpdef object result(self):
         cdef double res1 = self._left.result()
         cdef double res2 = self._right.result()
 
@@ -366,7 +372,7 @@ cdef class MinusedValueHolder(CombinedValueHolder):
     def __init__(self, left, right):
         super(MinusedValueHolder, self).__init__(left, right)
 
-    cpdef result(self):
+    cpdef object result(self):
         cdef double res1 = self._left.result()
         cdef double res2 = self._right.result()
 
@@ -388,7 +394,7 @@ cdef class MultipliedValueHolder(CombinedValueHolder):
     def __init__(self, left, right):
         super(MultipliedValueHolder, self).__init__(left, right)
 
-    cpdef result(self):
+    cpdef object result(self):
         cdef double res1 = self._left.result()
         cdef double res2 = self._right.result()
 
@@ -411,7 +417,7 @@ cdef class DividedValueHolder(CombinedValueHolder):
         super(DividedValueHolder, self).__init__(left, right)
 
     @cython.cdivision(True)
-    cpdef result(self):
+    cpdef object result(self):
         cdef double res1 = self._left.result()
         cdef double res2 = self._right.result()
 
@@ -433,7 +439,7 @@ cdef class LtOperatorValueHolder(CombinedValueHolder):
     def __init__(self, left, right):
         super(LtOperatorValueHolder, self).__init__(left, right)
 
-    cpdef result(self):
+    cpdef object result(self):
         cdef double res1 = self._left.result()
         cdef double res2 = self._right.result()
 
@@ -455,7 +461,7 @@ cdef class LeOperatorValueHolder(CombinedValueHolder):
     def __init__(self, left, right):
         super(LeOperatorValueHolder, self).__init__(left, right)
 
-    cpdef result(self):
+    cpdef object result(self):
         cdef double res1 = self._left.result()
         cdef double res2 = self._right.result()
 
@@ -477,7 +483,7 @@ cdef class GtOperatorValueHolder(CombinedValueHolder):
     def __init__(self, left, right):
         super(GtOperatorValueHolder, self).__init__(left, right)
 
-    cpdef result(self):
+    cpdef object result(self):
         cdef double res1 = self._left.result()
         cdef double res2 = self._right.result()
 
@@ -499,7 +505,7 @@ cdef class GeOperatorValueHolder(CombinedValueHolder):
     def __init__(self, left, right):
         super(GeOperatorValueHolder, self).__init__(left, right)
 
-    cpdef result(self):
+    cpdef object result(self):
         cdef double res1 = self._left.result()
         cdef double res2 = self._right.result()
 
@@ -521,7 +527,7 @@ cdef class EqOperatorValueHolder(CombinedValueHolder):
     def __init__(self, left, right):
         super(EqOperatorValueHolder, self).__init__(left, right)
 
-    cpdef result(self):
+    cpdef object result(self):
         cdef double res1 = self._left.result()
         cdef double res2 = self._right.result()
 
@@ -543,7 +549,7 @@ cdef class NeOperatorValueHolder(CombinedValueHolder):
     def __init__(self, left, right):
         super(NeOperatorValueHolder, self).__init__(left, right)
 
-    cpdef result(self):
+    cpdef object result(self):
         cdef double res1 = self._left.result()
         cdef double res2 = self._right.result()
 
@@ -573,7 +579,7 @@ cdef class Identity(Accumulator):
     cpdef push(self, dict data):
         pass
 
-    cpdef result(self):
+    cpdef object result(self):
         return self._value
 
     def __deepcopy__(self, memo):
@@ -633,7 +639,7 @@ cdef class Latest(StatelessSingleValueAccumulator):
         self._isFull = 1
         self._latest = value
 
-    cpdef result(self):
+    cpdef object result(self):
         return self._latest
 
     def __deepcopy__(self, memo):
@@ -695,15 +701,14 @@ cdef class CompoundedValueHolder(Accumulator):
             parameters = {name: value for name, value in zip(self._right.dependency, values)}
         self._right.push(parameters)
 
-    cpdef result(self):
+    cpdef object result(self):
         return self._right.result()
 
-    @property
-    def isFull(self):
-        if self._left.isFull and self._right.isFull:
-            return True
+    cpdef int isFull(self):
+        if self._left.isFull() and self._right.isFull():
+            return 1
         else:
-            return False
+            return 0
 
     def __deepcopy__(self, memo):
         return CompoundedValueHolder(self._left, self._right)
@@ -732,10 +737,10 @@ cdef class IIF(Accumulator):
         self._cond.push(data)
         self._left.push(data)
         self._right.push(data)
-        if self._isFull == 0 and self._cond.isFull and self._left.isFull and self._right.isFull:
+        if self._isFull == 0 and self._cond.isFull() and self._left.isFull() and self._right.isFull():
             self._isFull = 1
 
-    cpdef result(self):
+    cpdef object result(self):
         return self._left.result() if self._cond.result() else self._right.result()
 
     def __deepcopy__(self, memo):
@@ -786,7 +791,7 @@ cdef class Exp(BasicFunction):
     def __init__(self, dependency):
         super(Exp, self).__init__(dependency)
 
-    cpdef double result(self):
+    cpdef object result(self):
         return exp(self._origValue)
 
     def __deepcopy__(self, memo):
@@ -805,7 +810,7 @@ cdef class Log(BasicFunction):
     def __init__(self, dependency):
         super(Log, self).__init__(dependency)
 
-    cpdef double result(self):
+    cpdef object result(self):
         return log(self._origValue)
 
     def __deepcopy__(self, memo):
@@ -824,7 +829,7 @@ cdef class Sqrt(BasicFunction):
     def __init__(self, dependency):
         super(Sqrt, self).__init__(dependency)
 
-    cpdef double result(self):
+    cpdef object result(self):
         return sqrt(self._origValue)
 
     def __deepcopy__(self, memo):
@@ -846,7 +851,7 @@ cdef class Pow(BasicFunction):
         super(Pow, self).__init__(dependency)
         self._n = n
 
-    cpdef double result(self):
+    cpdef object result(self):
         return self._origValue ** self._n
 
     def __deepcopy__(self, memo):
@@ -865,7 +870,7 @@ cdef class Abs(BasicFunction):
     def __init__(self, dependency):
         super(Abs, self).__init__(dependency)
 
-    cpdef double result(self):
+    cpdef object result(self):
         return fabs(self._origValue)
 
     def __deepcopy__(self, memo):
@@ -893,7 +898,7 @@ cdef class Sign(BasicFunction):
     def __init__(self, dependency):
         super(Sign, self).__init__(dependency)
 
-    cpdef double result(self):
+    cpdef object result(self):
         return sign(self._origValue)
 
     def __deepcopy__(self, memo):
@@ -912,7 +917,7 @@ cdef class Acos(BasicFunction):
     def __init__(self, dependency):
         super(Acos, self).__init__(dependency)
 
-    cpdef double result(self):
+    cpdef object result(self):
         return acos(self._origValue)
 
     def __deepcopy__(self, memo):
@@ -931,7 +936,7 @@ cdef class Acosh(BasicFunction):
     def __init__(self, dependency):
         super(Acosh, self).__init__(dependency)
 
-    cpdef double result(self):
+    cpdef object result(self):
         return acosh(self._origValue)
 
     def __deepcopy__(self, memo):
@@ -950,7 +955,7 @@ cdef class Asin(BasicFunction):
     def __init__(self, dependency):
         super(Asin, self).__init__(dependency)
 
-    cpdef double result(self):
+    cpdef object result(self):
         return asin(self._origValue)
 
     def __deepcopy__(self, memo):
@@ -969,7 +974,7 @@ cdef class Asinh(BasicFunction):
     def __init__(self, dependency):
         super(Asinh, self).__init__(dependency)
 
-    cpdef double result(self):
+    cpdef object result(self):
         return asinh(self._origValue)
 
     def __deepcopy__(self, memo):

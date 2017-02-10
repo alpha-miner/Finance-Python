@@ -41,7 +41,7 @@ cdef class Diff(StatelessSingleValueAccumulator):
         self._previous = self._curr
         self._curr = value
 
-    cpdef double result(self):
+    cpdef object result(self):
         return self._curr - self._previous
 
     def __deepcopy__(self, memo):
@@ -67,7 +67,7 @@ cdef class SimpleReturn(StatelessSingleValueAccumulator):
         self._curr = value
 
     @cython.cdivision(True)
-    cpdef double result(self):
+    cpdef object result(self):
 
         cdef double denorm = self._previous
         if denorm:
@@ -98,7 +98,7 @@ cdef class LogReturn(StatelessSingleValueAccumulator):
         self._curr = value
 
     @cython.cdivision(True)
-    cpdef double result(self):
+    cpdef object result(self):
         cdef double denorm = self._previous
         if denorm:
             return log(self._curr / denorm)
@@ -131,7 +131,7 @@ cdef class PositivePart(StatelessSingleValueAccumulator):
         else:
             self._pos = np.nan
 
-    cpdef double result(self):
+    cpdef object result(self):
         return self._pos
 
     def __deepcopy__(self, memo):
@@ -160,7 +160,7 @@ cdef class NegativePart(StatelessSingleValueAccumulator):
         else:
             self._neg = np.nan
 
-    cpdef double result(self):
+    cpdef object result(self):
         return self._neg
 
     def __deepcopy__(self, memo):
@@ -190,7 +190,7 @@ cdef class Max(StatelessSingleValueAccumulator):
             if self._currentMax < value:
                 self._currentMax = value
 
-    cpdef double result(self):
+    cpdef object result(self):
         return self._currentMax
 
     def __deepcopy__(self, memo):
@@ -220,7 +220,7 @@ cdef class Minimum(StatelessSingleValueAccumulator):
             if self._currentMin > value:
                 self._currentMin = value
 
-    cpdef double result(self):
+    cpdef object result(self):
         return self._currentMin
 
     def __deepcopy__(self, memo):
@@ -249,7 +249,7 @@ cdef class Sum(StatelessSingleValueAccumulator):
         else:
             self._currentSum += value
 
-    cpdef double result(self):
+    cpdef object result(self):
         return self._currentSum
 
     def __deepcopy__(self, memo):
@@ -279,7 +279,7 @@ cdef class Average(StatelessSingleValueAccumulator):
         self._currentCount += 1
 
     @cython.cdivision(True)
-    cpdef double result(self):
+    cpdef object result(self):
         if self._currentCount:
             return self._currentSum / self._currentCount
         else:
@@ -310,7 +310,7 @@ cdef class XAverage(StatelessSingleValueAccumulator):
             self._average += self._exp * (value - self._average)
         self._count += 1
 
-    cpdef double result(self):
+    cpdef object result(self):
         return self._average
 
     def __deepcopy__(self, memo):
@@ -340,7 +340,7 @@ cdef class Variance(StatelessSingleValueAccumulator):
         self._currentCount += 1
 
     @cython.cdivision(True)
-    cpdef double result(self):
+    cpdef object result(self):
 
         cdef double tmp = self._currentSumSquare - self._currentSum * self._currentSum / self._currentCount
 
@@ -369,7 +369,7 @@ cdef class Product(StatelessSingleValueAccumulator):
         self._isFull = 1
         self._product *= value
 
-    cpdef double result(self):
+    cpdef object result(self):
         return self._product
 
     def __deepcopy__(self, memo):
@@ -394,7 +394,7 @@ cdef class CenterMoment(StatelessSingleValueAccumulator):
         self._this_list.append(value)
         self._moment = np.mean(np.power(np.abs(np.array(self._this_list) - np.mean(self._this_list)), self._order))
 
-    cpdef double result(self):
+    cpdef object result(self):
         return self._moment
 
     def __deepcopy__(self, memo):
@@ -412,7 +412,7 @@ cdef class Skewness(StatelessSingleValueAccumulator):
     cpdef push(self, dict data):
         self._skewness.push(data)
 
-    cpdef double result(self):
+    cpdef object result(self):
         try:
             return self._skewness.result()
         except ZeroDivisionError:
@@ -433,7 +433,7 @@ cdef class Kurtosis(StatelessSingleValueAccumulator):
     cpdef push(self, dict data):
         self._kurtosis.push(data)
 
-    cpdef double result(self):
+    cpdef object result(self):
         try:
             return self._kurtosis.result()
         except ZeroDivisionError:
@@ -461,7 +461,7 @@ cdef class Rank(StatelessSingleValueAccumulator):
         self._thisList.append(value)
         self._sortedList = sorted(self._thisList)
 
-    cpdef result(self):
+    cpdef object result(self):
         self._rank = [bisect.bisect_left(self._sortedList, x) for x in self._thisList]
         return self._rank
 
@@ -489,7 +489,7 @@ cdef class LevelList(StatelessSingleValueAccumulator):
         else:
             self._levelList.append(self._thisList[-1] / self._thisList[0])
 
-    cpdef result(self):
+    cpdef object result(self):
         return self._levelList
 
     def __deepcopy__(self, memo):
@@ -516,7 +516,7 @@ cdef class LevelValue(StatelessSingleValueAccumulator):
         else:
             self._levelValue = self._thisList[-1] / self._thisList[0]
 
-    cpdef double result(self):
+    cpdef object result(self):
         return self._levelValue
 
     def __deepcopy__(self, memo):
@@ -541,7 +541,7 @@ cdef class AutoCorrelation(StatelessSingleValueAccumulator):
         self._isFull = 1
         self._thisList.append(value)
 
-    cpdef double result(self):
+    cpdef object result(self):
         if len(self._thisList) <= self._lags:
             raise ValueError ("time-series length should be more than lags however\n"
                               "time-series length is: {0} while lags is: {1}".format(len(self._thisList), self._lags))
@@ -607,7 +607,7 @@ cdef class Correlation(StatelessMultiValueAccumulator):
         self._runningSumCrossSquare = self._runningSumCrossSquare + value[0] * value[1]
         self._currentCount += 1
 
-    cpdef double result(self):
+    cpdef object result(self):
         n = self._currentCount
         nominator = n * self._runningSumCrossSquare - self._runningSumLeft * self._runningSumRight
         denominator = (n * self._runningSumSquareLeft - self._runningSumLeft * self._runningSumLeft) \

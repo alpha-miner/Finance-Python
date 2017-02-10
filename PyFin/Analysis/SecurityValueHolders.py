@@ -124,12 +124,12 @@ class SecurityValueHolder(object):
         return self._innerHolders
 
     def isFullByName(self, name):
-        return self._innerHolders[name].isFull
+        return self._innerHolders[name].isFull()
 
     @property
     def isFull(self):
         for name in self._innerHolders:
-            if not self._innerHolders[name].isFull:
+            if not self._innerHolders[name].isFull():
                 return False
         return True
 

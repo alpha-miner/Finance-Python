@@ -45,12 +45,10 @@ cdef class StatefulValueHolder(Accumulator):
         self._window = window
         self._deque = Deque(window)
 
-    @property
-    def size(self):
+    cpdef int size(self):
         return self._deque.size()
 
-    @property
-    def isFull(self):
+    cpdef int isFull(self):
         return self._deque.isFull()
 
     def __deepcopy__(self, memo):
@@ -83,7 +81,7 @@ cdef class Shift(StatefulValueHolder):
         self._valueHolder.push(data)
         self._popout = self._deque.dump(self._valueHolder.result())
 
-    cpdef result(self):
+    cpdef object result(self):
         return self._popout
 
     def __deepcopy__(self, memo):
@@ -107,16 +105,15 @@ cdef class SingleValuedValueHolder(StatefulValueHolder):
     cdef double _push(self, dict data):
 
         cdef double value
+        cdef int isValueHolder = self._isValueHolderContained
 
-        if not self._isValueHolderContained:
-            try:
-                value = data[self._dependency]
-            except KeyError:
-                value = np.nan
-        else:
+        if not isValueHolder and self._dependency in data:
+            return data[self._dependency]
+        elif isValueHolder:
             self._dependency.push(data)
-            value = self._dependency.result()
-        return value
+            return self._dependency.result()
+        else:
+            return np.nan
 
     def __deepcopy__(self, memo):
         return SingleValuedValueHolder(self._window, self._dependency)
@@ -171,7 +168,7 @@ cdef class MovingMax(SortedValueHolder):
     def __init__(self, window, dependency='x'):
         super(MovingMax, self).__init__(window, dependency)
 
-    cpdef double result(self):
+    cpdef object result(self):
         if self._sortedArray:
             return self._sortedArray[-1]
         else:
@@ -193,7 +190,7 @@ cdef class MovingMinimum(SortedValueHolder):
     def __init__(self, window, dependency='x'):
         super(MovingMinimum, self).__init__(window, dependency)
 
-    cpdef result(self):
+    cpdef object result(self):
         if self._sortedArray:
             return self._sortedArray[0]
         else:
@@ -216,7 +213,7 @@ cdef class MovingQuantile(SortedValueHolder):
         super(MovingQuantile, self).__init__(window, dependency)
 
     @cython.cdivision(True)
-    cpdef double result(self):
+    cpdef object result(self):
         cdef int n = len(self._sortedArray)
         if n > 1:
             return self._sortedArray.index(self._deque[n-1]) / (n - 1.)
@@ -262,8 +259,8 @@ cdef class MovingAllTrue(SingleValuedValueHolder):
 
         self._countedTrue += addedTrue
 
-    cpdef result(self):
-        return self._countedTrue == self.size
+    cpdef object result(self):
+        return self._countedTrue == self.size()
 
     def __deepcopy__(self, memo):
         return MovingAllTrue(self._window, self._dependency)
@@ -304,7 +301,7 @@ cdef class MovingAnyTrue(SingleValuedValueHolder):
 
         self._countedTrue += addedTrue
 
-    cpdef result(self):
+    cpdef object result(self):
         return self._countedTrue != 0
 
     def __deepcopy__(self, memo):
@@ -341,7 +338,7 @@ cdef class MovingSum(SingleValuedValueHolder):
         else:
             self._runningSum = self._runningSum + value
 
-    cpdef double result(self):
+    cpdef object result(self):
         return self._runningSum
 
     def __deepcopy__(self, memo):
@@ -366,10 +363,9 @@ cdef class MovingAverage(SingleValuedValueHolder):
 
     cpdef push(self, dict data):
 
-        cdef double value
+        cdef double value = self._push(data)
         cdef double popout
 
-        value = self._push(data)
         if isnan(value):
             return np.nan
         popout = self._deque.dump(value)
@@ -379,8 +375,8 @@ cdef class MovingAverage(SingleValuedValueHolder):
             self._runningSum += value
 
     @cython.cdivision(True)
-    cpdef double result(self):
-        cdef int size = self.size
+    cpdef object result(self):
+        cdef int size = self.size()
         if size:
             return self._runningSum / size
         else:
@@ -426,7 +422,7 @@ cdef class MovingPositiveAverage(SingleValuedValueHolder):
             self._runningPositiveSum -= popout
 
     @cython.cdivision(True)
-    cpdef double result(self):
+    cpdef object result(self):
         if self._runningPositiveCount == 0:
             return 0.0
         else:
@@ -455,10 +451,10 @@ cdef class MovingPositiveDifferenceAverage(SingleValuedValueHolder):
 
     cpdef push(self, dict data):
         self._runningAverage.push(data)
-        if self._isFull == 0 and self._runningAverage.isFull == 1:
+        if self._isFull == 0 and self._runningAverage.isFull() == 1:
             self._isFull = 1
 
-    cpdef double result(self):
+    cpdef object result(self):
         return self._runningAverage.result()
 
     def __deepcopy__(self, memo):
@@ -484,10 +480,10 @@ cdef class MovingNegativeDifferenceAverage(SingleValuedValueHolder):
 
     cpdef push(self, dict data):
         self._runningAverage.push(data)
-        if self._isFull == 0 and self._runningAverage.isFull:
+        if self._isFull == 0 and self._runningAverage.isFull():
             self._isFull = 1
 
-    cpdef double result(self):
+    cpdef object result(self):
         return self._runningAverage.result()
 
     def __deepcopy__(self, memo):
@@ -516,11 +512,11 @@ cdef class MovingRSI(SingleValuedValueHolder):
         self._posDiffAvg.push(data)
         self._negDiffAvg.push(data)
 
-        if self._isFull == 0 and self._posDiffAvg.isFull and self._negDiffAvg.isFull:
+        if self._isFull == 0 and self._posDiffAvg.isFull() and self._negDiffAvg.isFull():
             self._isFull = 1
 
     @cython.cdivision(True)
-    cpdef double result(self):
+    cpdef object result(self):
         cdef double nominator = self._posDiffAvg.result()
         cdef double denominator = nominator - self._negDiffAvg.result()
         if denominator != 0.:
@@ -567,7 +563,7 @@ cdef class MovingNegativeAverage(SingleValuedValueHolder):
             self._runningNegativeSum -= popout
 
     @cython.cdivision(True)
-    cpdef double result(self):
+    cpdef object result(self):
         if self._runningNegativeCount == 0:
             return 0.0
         else:
@@ -616,7 +612,7 @@ cdef class MovingVariance(SingleValuedValueHolder):
             self._runningSumSquare += value * value
 
     @cython.cdivision(True)
-    cpdef double result(self):
+    cpdef object result(self):
         cdef int length = self._deque.size()
         cdef double tmp
 
@@ -678,7 +674,7 @@ cdef class MovingNegativeVariance(SingleValuedValueHolder):
             self._runningNegativeCount -= 1
 
     @cython.cdivision(True)
-    cpdef double result(self):
+    cpdef object result(self):
 
         cdef int length
         cdef double tmp
@@ -733,7 +729,7 @@ cdef class MovingCountedPositive(SingleValuedValueHolder):
         if popout > 0:
             self._counts -= 1
 
-    cpdef double result(self):
+    cpdef object result(self):
         return self._counts
 
     def __deepcopy__(self, memo):
@@ -771,7 +767,7 @@ cdef class MovingCountedNegative(SingleValuedValueHolder):
         if popout < 0:
             self._counts -= 1
 
-    cpdef double result(self):
+    cpdef object result(self):
         return self._counts
 
     def __deepcopy__(self, memo):
@@ -805,14 +801,14 @@ cdef class MovingHistoricalWindow(StatefulValueHolder):
         _ = self._deque.dump(value)
 
     def __getitem__(self, item):
-        cdef int length = self.size
+        cdef int length = self.size()
         if item >= length:
             raise ValueError("index {0} is out of the bound of the historical current length {1}".format(item, length))
 
         return self._deque[length - 1 - item]
 
-    cpdef result(self):
-        return [self.__getitem__(i) for i in range(self.size)]
+    cpdef object result(self):
+        return [self.__getitem__(i) for i in range(self.size())]
 
     def __deepcopy__(self, memo):
         return MovingHistoricalWindow(self._window, self._dependency)
@@ -866,8 +862,8 @@ cdef class MovingCorrelation(StatefulValueHolder):
             self._runningSumSquareRight = self._runningSumSquareRight + value[1] * value[1]
             self._runningSumCrossSquare = self._runningSumCrossSquare + value[0] * value[1]
 
-    cpdef double result(self):
-        cdef int n = self.size
+    cpdef object result(self):
+        cdef int n = self.size()
         if n >= 2:
             nominator = n * self._runningSumCrossSquare - self._runningSumLeft * self._runningSumRight
             denominator = (n * self._runningSumSquareLeft - self._runningSumLeft * self._runningSumLeft) \
@@ -926,8 +922,8 @@ cdef class MovingCorrelationMatrix(StatefulValueHolder):
             self._runningSum += reshapeValues
             self._runningSumCrossSquare += reshapeValues * reshapeValues.T
 
-    cpdef result(self):
-        n = self.size
+    cpdef object result(self):
+        n = self.size()
         if n >= 2:
             nominator = n * self._runningSumCrossSquare - self._runningSum * self._runningSum.T
             denominator = n * np.diag(self._runningSumCrossSquare) - self._runningSum * self._runningSum
@@ -970,7 +966,7 @@ cdef class MovingProduct(SingleValuedValueHolder):
         else:
             self._runningProduct *= value
 
-    cpdef double result(self):
+    cpdef object result(self):
         return self._runningProduct
 
     def __deepcopy__(self, memo):
@@ -1006,7 +1002,7 @@ cdef class MovingCenterMoment(SingleValuedValueHolder):
         else:
             self._runningMoment = np.mean(np.power(np.abs(self._deque.as_array() - np.mean(self._deque.as_array())), self._order))
 
-    cpdef double result(self):
+    cpdef object result(self):
         return self._runningMoment
 
     def __deepcopy__(self, memo):
@@ -1034,7 +1030,7 @@ cdef class MovingSkewness(SingleValuedValueHolder):
     cpdef push(self, dict data):
         self._runningSkewness.push(data)
 
-    cpdef double result(self):
+    cpdef object result(self):
         return self._runningSkewness.result()
 
     def __deepcopy__(self, memo):
@@ -1066,7 +1062,7 @@ cdef class MovingMaxPos(SortedValueHolder):
         super(MovingMaxPos, self).push(data)
         self._max = self._sortedArray[-1]
 
-    cpdef double result(self):
+    cpdef object result(self):
         cdef list tmpList = self._deque.as_list()
         self._runningTsMaxPos = tmpList.index(self._max)
         return self._runningTsMaxPos
@@ -1097,7 +1093,7 @@ cdef class MovingMinPos(SortedValueHolder):
         super(MovingMinPos, self).push(data)
         self._min = self._sortedArray[0]
 
-    cpdef double result(self):
+    cpdef object result(self):
         cdef list tmpList = self._deque.as_list()
         self._runningTsMinPos = tmpList.index(self._min)
         return self._runningTsMinPos
@@ -1127,7 +1123,7 @@ cdef class MovingKurtosis(SingleValuedValueHolder):
     cpdef push(self, dict data):
         self._runningKurtosis.push(data)
 
-    cpdef double result(self):
+    cpdef object result(self):
         try:
             return self._runningKurtosis.result()
         except ZeroDivisionError:
@@ -1162,7 +1158,7 @@ cdef class MovingRSV(SingleValuedValueHolder):
             self._cached_value = value
 
     @cython.cdivision(True)
-    cpdef double result(self):
+    cpdef object result(self):
         cdef list con = self._deque.as_list()
         return (self._cached_value - min(con)) / (max(con) - min(con))
 
@@ -1191,10 +1187,10 @@ cdef class MACD(StatelessSingleValueAccumulator):
     cpdef push(self, dict data):
         self._short_average.push(data)
         self._long_average.push(data)
-        if self._isFull == 0 and self._short_average.isFull and self._long_average.isFull:
+        if self._isFull == 0 and self._short_average.isFull() and self._long_average.isFull():
             self._isFull = 1
 
-    cpdef double result(self):
+    cpdef object result(self):
         return self._short_average.result() - self._long_average.result()
 
     def __deepcopy__(self, memo):
@@ -1217,7 +1213,7 @@ cdef class MovingRank(SortedValueHolder):
         super(MovingRank, self).__init__(window, dependency)
         self._runningRank = []
 
-    cpdef result(self):
+    cpdef object result(self):
         self._runningRank = [bisect.bisect_left(self._sortedArray, x) for x in self._deque.as_list()]
         return self._runningRank
 
@@ -1255,13 +1251,13 @@ cdef class MovingKDJ(StatefulValueHolder):
     @cython.cdivision(True)
     cpdef push(self, dict data):
         self._runningRsv.push(data)
-        if self._runningRsv.size == 1:
+        if self._runningRsv.size() == 1:
             self._deque.dump(np.nan)
             self._runningJ = np.nan
         else:
             rsv = self._runningRsv.value
             self._deque.dump(rsv)
-            if self._runningRsv.size == 2:
+            if self._runningRsv.size() == 2:
                 self._runningK = (0.5 * (self._k - 1) + rsv) / self._k
                 self._runningD = (0.5 * (self._d - 1) + self._runningK) / self._d
             else:
@@ -1269,7 +1265,7 @@ cdef class MovingKDJ(StatefulValueHolder):
                 self._runningD = (self._runningD * (self._d - 1) + self._runningK) / self._d
             self._runningJ = 3 * self._runningK - 2 * self._runningD
 
-    cpdef result(self):
+    cpdef object result(self):
         return self._runningJ
 
     def __deepcopy__(self, memo):
@@ -1297,7 +1293,7 @@ cdef class MovingAroon(SingleValuedValueHolder):
             self._deque.dump(value)
 
     @cython.cdivision(True)
-    cpdef double result(self):
+    cpdef object result(self):
         cdef list tmpList = self._deque.as_list()
         cdef double runningAroonOsc = (tmpList.index(np.max(tmpList)) - tmpList.index(np.min(tmpList))) / self.window
         return runningAroonOsc
@@ -1331,7 +1327,7 @@ cdef class MovingBias(SingleValuedValueHolder):
             self._deque.dump(value)
             self._runningBias = value / np.mean(self._deque.as_array()) - 1
 
-    cpdef double result(self):
+    cpdef object result(self):
         return self._runningBias
 
     def __deepcopy__(self, memo):
@@ -1362,11 +1358,11 @@ cdef class MovingLevel(SingleValuedValueHolder):
             return np.nan
         else:
             self._deque.dump(value)
-            if self.size > 1:
+            if self.size() > 1:
                 con = self._deque.as_list()
                 self._runningLevel = con[-1] / con[0]
 
-    cpdef double result(self):
+    cpdef object result(self):
         return self._runningLevel
 
     def __deepcopy__(self, memo):
@@ -1406,7 +1402,7 @@ cdef class MovingAutoCorrelation(SingleValuedValueHolder):
             self._deque.dump(value)
 
     @cython.cdivision(True)
-    cpdef double result(self):
+    cpdef object result(self):
         cdef list tmp_list = self._deque.as_list()
         if len(tmp_list) < self.window:
             return np.nan
@@ -1455,8 +1451,8 @@ cdef class MovingLogReturn(SingleValuedValueHolder):
         if popout is not np.nan and popout != 0.0:
             self._runningReturn = log(value / popout)
 
-    cpdef double result(self):
-        if self.size >= self.window:
+    cpdef object result(self):
+        if self.size() >= self.window:
             return self._runningReturn
         else:
             return np.nan
@@ -1499,7 +1495,7 @@ cdef class MovingSharp(StatefulValueHolder):
         self._var.push(data)
 
     @cython.cdivision(True)
-    cpdef double result(self):
+    cpdef object result(self):
         cdef double tmp = self._var.result()
         if not isClose(tmp, 0.):
             return self._mean.result() / sqrt(self._var.result())
@@ -1543,7 +1539,7 @@ cdef class MovingSortino(StatefulValueHolder):
         self._negativeVar.push(data)
 
     @cython.cdivision(True)
-    cpdef double result(self):
+    cpdef object result(self):
         return self._mean.result() /sqrt(self._negativeVar.result())
 
     def __deepcopy__(self, memo):
@@ -1595,7 +1591,7 @@ cdef class MovingAlphaBeta(StatefulValueHolder):
         self._correlationHolder.push(data)
 
     @cython.cdivision(True)
-    cpdef result(self):
+    cpdef object result(self):
         cdef double corr
         cdef double tmp
         cdef double pStd
@@ -1665,7 +1661,7 @@ cdef class MovingDrawDown(StatefulValueHolder):
         if self._runningCum >= self._currentMax:
             self._highIndex = self._runningIndex
 
-    cpdef result(self):
+    cpdef object result(self):
         return self._runningCum - self._currentMax, self._runningIndex - self._highIndex, self._highIndex
 
     def __deepcopy__(self, memo):
@@ -1707,7 +1703,7 @@ cdef class MovingAverageDrawdown(StatefulValueHolder):
         self._drawdownMean.push(dict(drawdown=drawdown))
         self._durationMean.push(dict(duration=duration))
 
-    cpdef result(self):
+    cpdef object result(self):
         return self._drawdownMean.result(), self._durationMean.result()
 
     def __deepcopy__(self, memo):
@@ -1744,8 +1740,8 @@ cdef class MovingMaxDrawdown(StatefulValueHolder):
         drawdown, duration, lastHighIndex = self._drawdownCalculator.result()
         self._deque.dump((drawdown, duration, lastHighIndex))
 
-    cpdef result(self):
-        cdef np.ndarray[double, ndim=1] values = np.array([self._deque[i][0] for i in range(self.size)])
+    cpdef object result(self):
+        cdef np.ndarray[double, ndim=1] values = np.array([self._deque[i][0] for i in range(self.size())])
         return self._deque[values.argmin()]
 
     def __deepcopy__(self, memo):

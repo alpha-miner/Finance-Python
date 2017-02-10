@@ -18,9 +18,10 @@ cdef class Accumulator(IAccumulator):
     cdef public int _window
     cdef public int _returnSize
 
+    cpdef int isFull(self)
     cdef extract(self, dict data)
     cpdef push(self, dict data)
-
+    cpdef object result(self)
 
 cdef class StatelessSingleValueAccumulator(Accumulator):
 
@@ -35,7 +36,7 @@ cdef class Negative(Accumulator):
     cdef public Accumulator _valueHolder
 
     cpdef push(self, dict data)
-    cpdef result(self)
+    cpdef object result(self)
 
 
 cdef class ListedValueHolder(Accumulator):
@@ -44,7 +45,7 @@ cdef class ListedValueHolder(Accumulator):
     cdef public Accumulator _right
 
     cpdef push(self, dict data)
-    cpdef result(self)
+    cpdef object result(self)
 
 
 cdef class TruncatedValueHolder(Accumulator):
@@ -54,7 +55,7 @@ cdef class TruncatedValueHolder(Accumulator):
     cdef public Accumulator _valueHolder
 
     cpdef push(self, dict data)
-    cpdef result(self)
+    cpdef object result(self)
 
 
 cdef class CombinedValueHolder(Accumulator):
@@ -63,56 +64,57 @@ cdef class CombinedValueHolder(Accumulator):
     cdef public Accumulator _right
 
     cpdef push(self, dict data)
+    cpdef int isFull(self)
 
 
 cdef class AddedValueHolder(CombinedValueHolder):
 
-    cpdef result(self)
+    cpdef object result(self)
 
 
 cdef class MinusedValueHolder(CombinedValueHolder):
 
-    cpdef result(self)
+    cpdef object result(self)
 
 
 cdef class MultipliedValueHolder(CombinedValueHolder):
 
-    cpdef result(self)
+    cpdef object result(self)
 
 
 cdef class DividedValueHolder(CombinedValueHolder):
 
-    cpdef result(self)
+    cpdef object result(self)
 
 
 cdef class LtOperatorValueHolder(CombinedValueHolder):
 
-    cpdef result(self)
+    cpdef object result(self)
 
 
 cdef class LeOperatorValueHolder(CombinedValueHolder):
 
-    cpdef result(self)
+    cpdef object result(self)
 
 
 cdef class GtOperatorValueHolder(CombinedValueHolder):
 
-    cpdef result(self)
+    cpdef object result(self)
 
 
 cdef class GeOperatorValueHolder(CombinedValueHolder):
 
-    cpdef result(self)
+    cpdef object result(self)
 
 
 cdef class EqOperatorValueHolder(CombinedValueHolder):
 
-    cpdef result(self)
+    cpdef object result(self)
 
 
 cdef class NeOperatorValueHolder(CombinedValueHolder):
 
-    cpdef result(self)
+    cpdef object result(self)
 
 
 cdef class Identity(Accumulator):
@@ -120,7 +122,7 @@ cdef class Identity(Accumulator):
     cdef public double _value
 
     cpdef push(self, dict data)
-    cpdef result(self)
+    cpdef object result(self)
 
 
 cdef class Latest(StatelessSingleValueAccumulator):
@@ -128,7 +130,7 @@ cdef class Latest(StatelessSingleValueAccumulator):
     cdef public double _latest
 
     cpdef push(self, dict data)
-    cpdef result(self)
+    cpdef object result(self)
 
 
 cdef class CompoundedValueHolder(Accumulator):
@@ -137,7 +139,8 @@ cdef class CompoundedValueHolder(Accumulator):
     cdef public Accumulator _right
 
     cpdef push(self, dict data)
-    cpdef result(self)
+    cpdef int isFull(self)
+    cpdef object result(self)
 
 
 cdef class IIF(Accumulator):
@@ -147,7 +150,7 @@ cdef class IIF(Accumulator):
     cdef public Accumulator _right
 
     cpdef push(self, dict data)
-    cpdef result(self)
+    cpdef object result(self)
 
 
 cdef class BasicFunction(Accumulator):
@@ -159,51 +162,51 @@ cdef class BasicFunction(Accumulator):
 
 cdef class Exp(BasicFunction):
 
-    cpdef double result(self)
+    cpdef object result(self)
 
 
 cdef class Log(BasicFunction):
 
-    cpdef double result(self)
+    cpdef object result(self)
 
 
 cdef class Sqrt(BasicFunction):
 
-    cpdef double result(self)
+    cpdef object result(self)
 
 
 cdef class Pow(BasicFunction):
 
     cdef public double _n
 
-    cpdef double result(self)
+    cpdef object result(self)
 
 
 cdef class Abs(BasicFunction):
 
-    cpdef double result(self)
+    cpdef object result(self)
 
 
 cdef class Sign(BasicFunction):
 
-    cpdef double result(self)
+    cpdef object result(self)
 
 
 cdef class Acos(BasicFunction):
 
-    cpdef double result(self)
+    cpdef object result(self)
 
 
 cdef class Acosh(BasicFunction):
 
-    cpdef double result(self)
+    cpdef object result(self)
 
 
 cdef class Asin(BasicFunction):
 
-    cpdef double result(self)
+    cpdef object result(self)
 
 
 cdef class Asinh(BasicFunction):
 
-    cpdef double result(self)
+    cpdef object result(self)

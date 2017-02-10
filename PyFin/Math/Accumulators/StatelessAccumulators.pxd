@@ -17,7 +17,7 @@ cdef class Diff(StatelessSingleValueAccumulator):
     cdef public double _previous
 
     cpdef push(self, dict data)
-    cpdef double result(self)
+    cpdef object result(self)
 
 
 cdef class SimpleReturn(StatelessSingleValueAccumulator):
@@ -27,7 +27,7 @@ cdef class SimpleReturn(StatelessSingleValueAccumulator):
     cdef public double _previous
 
     cpdef push(self, dict data)
-    cpdef double result(self)
+    cpdef object result(self)
 
 
 cdef class LogReturn(StatelessSingleValueAccumulator):
@@ -37,7 +37,7 @@ cdef class LogReturn(StatelessSingleValueAccumulator):
     cdef public double _previous
 
     cpdef push(self, dict data)
-    cpdef double result(self)
+    cpdef object result(self)
 
 
 cdef class PositivePart(StatelessSingleValueAccumulator):
@@ -45,7 +45,7 @@ cdef class PositivePart(StatelessSingleValueAccumulator):
     cdef public double _pos
 
     cpdef push(self, dict data)
-    cpdef double result(self)
+    cpdef object result(self)
 
 
 cdef class NegativePart(StatelessSingleValueAccumulator):
@@ -53,7 +53,7 @@ cdef class NegativePart(StatelessSingleValueAccumulator):
     cdef public double _neg
 
     cpdef push(self, dict data)
-    cpdef double result(self)
+    cpdef object result(self)
 
 
 cdef class Max(StatelessSingleValueAccumulator):
@@ -62,7 +62,7 @@ cdef class Max(StatelessSingleValueAccumulator):
     cdef public int _first
 
     cpdef push(self, dict data)
-    cpdef double result(self)
+    cpdef object result(self)
 
 
 cdef class Minimum(StatelessSingleValueAccumulator):
@@ -71,7 +71,7 @@ cdef class Minimum(StatelessSingleValueAccumulator):
     cdef public int _first
 
     cpdef push(self, dict data)
-    cpdef double result(self)
+    cpdef object result(self)
 
 
 cdef class Sum(StatelessSingleValueAccumulator):
@@ -80,7 +80,7 @@ cdef class Sum(StatelessSingleValueAccumulator):
     cdef public int _first
 
     cpdef push(self, dict data)
-    cpdef double result(self)
+    cpdef object result(self)
 
 
 cdef class Average(StatelessSingleValueAccumulator):
@@ -89,7 +89,7 @@ cdef class Average(StatelessSingleValueAccumulator):
     cdef public int _currentCount
 
     cpdef push(self, dict data)
-    cpdef double result(self)
+    cpdef object result(self)
 
 
 cdef class XAverage(StatelessSingleValueAccumulator):
@@ -99,7 +99,7 @@ cdef class XAverage(StatelessSingleValueAccumulator):
     cdef public int _count
 
     cpdef push(self, dict data)
-    cpdef double result(self)
+    cpdef object result(self)
 
 
 cdef class Variance(StatelessSingleValueAccumulator):
@@ -110,7 +110,7 @@ cdef class Variance(StatelessSingleValueAccumulator):
     cdef public int _isPop
 
     cpdef push(self, dict data)
-    cpdef double result(self)
+    cpdef object result(self)
 
 
 cdef class Product(StatelessSingleValueAccumulator):
@@ -118,7 +118,7 @@ cdef class Product(StatelessSingleValueAccumulator):
     cdef public double _product
 
     cpdef push(self, dict data)
-    cpdef double result(self)
+    cpdef object result(self)
 
 
 cdef class CenterMoment(StatelessSingleValueAccumulator):
@@ -128,7 +128,7 @@ cdef class CenterMoment(StatelessSingleValueAccumulator):
     cdef public double _moment
 
     cpdef push(self, dict data)
-    cpdef double result(self)
+    cpdef object result(self)
 
 
 cdef class Skewness(StatelessSingleValueAccumulator):
@@ -138,7 +138,7 @@ cdef class Skewness(StatelessSingleValueAccumulator):
     cdef public Accumulator _skewness
 
     cpdef push(self, dict data)
-    cpdef double result(self)
+    cpdef object result(self)
 
 
 cdef class Kurtosis(StatelessSingleValueAccumulator):
@@ -148,7 +148,7 @@ cdef class Kurtosis(StatelessSingleValueAccumulator):
     cdef public Accumulator _kurtosis
 
     cpdef push(self, dict data)
-    cpdef double result(self)
+    cpdef object result(self)
 
 
 cdef class Rank(StatelessSingleValueAccumulator):
@@ -158,7 +158,7 @@ cdef class Rank(StatelessSingleValueAccumulator):
     cdef public list _rank
 
     cpdef push(self, dict data)
-    cpdef result(self)
+    cpdef object result(self)
 
 
 cdef class LevelList(StatelessSingleValueAccumulator):
@@ -167,7 +167,7 @@ cdef class LevelList(StatelessSingleValueAccumulator):
     cdef public list _thisList
 
     cpdef push(self, dict data)
-    cpdef result(self)
+    cpdef object result(self)
 
 
 cdef class LevelValue(StatelessSingleValueAccumulator):
@@ -176,7 +176,7 @@ cdef class LevelValue(StatelessSingleValueAccumulator):
     cdef public double _levelValue
 
     cpdef push(self, dict data)
-    cpdef double result(self)
+    cpdef object result(self)
 
 
 cdef class AutoCorrelation(StatelessSingleValueAccumulator):
@@ -188,7 +188,7 @@ cdef class AutoCorrelation(StatelessSingleValueAccumulator):
     cdef public np.ndarray _AutoCorrMatrix
 
     cpdef push(self, dict data)
-    cpdef double result(self)
+    cpdef object result(self)
 
 
 cdef class StatelessMultiValueAccumulator(Accumulator):
@@ -206,4 +206,4 @@ cdef class Correlation(StatelessMultiValueAccumulator):
     cdef public int _currentCount
 
     cpdef push(self, dict data)
-    cpdef double result(self)
+    cpdef object result(self)

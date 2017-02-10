@@ -5,7 +5,6 @@ Created on 2017-2-8
 @author: cheng.li
 """
 
-import math
 import bisect
 import numpy as np
 cimport numpy as np
@@ -874,7 +873,7 @@ cdef class MovingCorrelation(StatefulValueHolder):
             denominator = (n * self._runningSumSquareLeft - self._runningSumLeft * self._runningSumLeft) \
                           * (n * self._runningSumSquareRight - self._runningSumRight * self._runningSumRight)
             if not isClose(denominator, 0.):
-                denominator = math.sqrt(denominator)
+                denominator = sqrt(denominator)
                 return nominator / denominator
             else:
                 return 0.0

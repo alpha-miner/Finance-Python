@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+#cython: embedsignature=True
 u"""
 Created on 2017-2-7
 
@@ -11,7 +12,6 @@ import numpy as np
 cimport numpy as np
 
 
-@cython.embedsignature(True)
 cdef class SecurityValues(object):
 
     def __init__(self, data, index=None):

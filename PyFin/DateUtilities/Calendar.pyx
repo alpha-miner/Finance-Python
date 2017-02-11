@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+#cython: embedsignature=True
 u"""
 Created on 2017-2-1
 
@@ -15,7 +16,6 @@ from PyFin.DateUtilities.Period cimport Period
 from PyFin.Utilities.Asserts cimport pyFinAssert
 
 
-@cython.embedsignature(True)
 cdef class Calendar(object):
 
     cdef public object _impl

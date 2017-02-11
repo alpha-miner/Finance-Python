@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+#cython: embedsignature=True
 u"""
 Created on 2017-2-4
 
@@ -89,7 +90,6 @@ cdef double _bsImplWithDerivative(double* dStdDev,
     return discount * optionType * (forward * nd1 - strike * nd2)
 
 
-@cython.embedsignature(True)
 def blackFormula(int optionType,
                  double strike,
                  double forward,
@@ -100,7 +100,6 @@ def blackFormula(int optionType,
     return _bsImpl(optionType, strike, forward, stdDev, discount, displacement)
 
 
-@cython.embedsignature(True)
 def blackFormula2(int optionType,
                   double strike,
                   double forward,
@@ -189,7 +188,6 @@ cdef double _bsImplStdDev(int optionType, double strike, double forward, double 
     return stdDev
 
 
-@cython.embedsignature(True)
 def blackFormulaImpliedStdDev(int optionType,
                               double strike,
                               double forward,
@@ -206,7 +204,6 @@ def blackFormulaImpliedStdDev(int optionType,
                          xAccuracy)
 
 
-@cython.embedsignature(True)
 def blackFormulaImpliedVol(int optionType,
                            double strike,
                            double forward,
@@ -224,7 +221,6 @@ def blackFormulaImpliedVol(int optionType,
     return stdDev / sqrt(tte)
 
 
-@cython.embedsignature(True)
 @cython.cdivision(True)
 def bachelierFormula(int optionType,
                      double strike,
@@ -279,7 +275,6 @@ cdef double _hcalculate(double eta):
     return sqrt(eta) * (num / den)
 
 
-@cython.embedsignature(True)
 @cython.cdivision(True)
 def bachelierFormulaImpliedVol(int optionType,
                                double strike,

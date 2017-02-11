@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+#cython: embedsignature=True
 u"""
 Created on 2017-1-3
 
@@ -80,7 +81,7 @@ cdef Date _advance(Date date, int n, int units):
 
         return Date(y, m, d)
 
-@cython.embedsignature(True)
+
 cdef class Date(object):
 
     def __init__(self, year=None, month=None, day=None, serialNumber=None):

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+#cython: embedsignature=True
 u"""
 Created on 2017-1-30
 
@@ -22,7 +23,6 @@ _unitsDict = {'d': TimeUnits.Days,
               'y': TimeUnits.Years}
 
 
-@cython.embedsignature(True)
 cdef class Period(object):
 
     def __init__(self, str reprStr=None, int length=0, int units=0):

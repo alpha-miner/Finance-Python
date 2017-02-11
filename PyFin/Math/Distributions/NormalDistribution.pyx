@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+#cython: embedsignature=True
 cimport cython
 from PyFin.Math.Distributions.norm cimport pdf
 from PyFin.Math.Distributions.norm cimport cdf
@@ -14,7 +16,7 @@ cdef double _QL_EPSILON = MathConstants.QL_EPSILON
 cdef double _M_SQRT2 = MathConstants.M_SQRT2
 cdef double _M_SQRTPI = MathConstants.M_SQRTPI
 
-@cython.embedsignature(True)
+
 cdef class NormalDistribution(object):
 
     cdef double _average
@@ -66,7 +68,6 @@ cdef class NormalDistribution(object):
             return self._average == other.average and self._sigma == other.sigma
 
 
-@cython.embedsignature(True)
 cdef class CumulativeNormalDistribution(object):
 
     cdef double _average
@@ -157,7 +158,6 @@ cdef double _tail_value(double x):
     return z
 
 
-@cython.embedsignature(True)
 cdef class InverseCumulativeNormal(object):
 
     cdef double _average

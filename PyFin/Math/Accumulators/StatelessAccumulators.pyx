@@ -405,9 +405,9 @@ cdef class Skewness(StatelessSingleValueAccumulator):
 
     def __init__(self, dependency='x'):
         super(Skewness, self).__init__(dependency)
-        self._std3 = Pow(Variance(dependency, isPopulation=1), 1.5)
-        self._moment3 = CenterMoment(3, dependency)
-        self._skewness = self._moment3 / self._std3
+        cdef Pow std3 = Pow(Variance(dependency, isPopulation=1), 1.5)
+        cdef CenterMoment moment3 = CenterMoment(3, dependency)
+        self._skewness = moment3 / std3
 
     cpdef push(self, dict data):
         self._skewness.push(data)
@@ -426,9 +426,9 @@ cdef class Kurtosis(StatelessSingleValueAccumulator):
 
     def __init__(self, dependency='x'):
         super(Kurtosis, self).__init__(dependency)
-        self._std4 = Pow(Variance(dependency, isPopulation=1), 2)
-        self._moment4 = CenterMoment(4, dependency)
-        self._kurtosis = self._moment4 / self._std4
+        cdef Pow std4 = Pow(Variance(dependency, isPopulation=1), 2)
+        cdef CenterMoment moment4 = CenterMoment(4, dependency)
+        self._kurtosis = moment4 / std4
 
     cpdef push(self, dict data):
         self._kurtosis.push(data)

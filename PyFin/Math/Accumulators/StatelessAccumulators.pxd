@@ -133,8 +133,6 @@ cdef class CenterMoment(StatelessSingleValueAccumulator):
 
 cdef class Skewness(StatelessSingleValueAccumulator):
 
-    cdef public Accumulator _std3
-    cdef public Accumulator _moment3
     cdef public Accumulator _skewness
 
     cpdef push(self, dict data)
@@ -143,8 +141,6 @@ cdef class Skewness(StatelessSingleValueAccumulator):
 
 cdef class Kurtosis(StatelessSingleValueAccumulator):
 
-    cdef public Accumulator _std4
-    cdef public Accumulator _moment4
     cdef public Accumulator _kurtosis
 
     cpdef push(self, dict data)

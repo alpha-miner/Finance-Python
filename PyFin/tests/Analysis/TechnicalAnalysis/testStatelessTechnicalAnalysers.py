@@ -43,7 +43,7 @@ class TestStatelessTechnicalAnalysis(unittest.TestCase):
             sign.push(data)
 
             value = sign.value
-            for name in value.index:
+            for name in value.index():
                 expected[name] = np.sign(self.dataSet[name]['close'][i])
                 calculated = value[name]
                 self.assertAlmostEqual(expected[name], calculated, 12, 'at index {0}\n'
@@ -65,7 +65,7 @@ class TestStatelessTechnicalAnalysis(unittest.TestCase):
             xav.push(data)
 
             value = xav.value
-            for name in value.index:
+            for name in value.index():
                 if i == 0:
                     expected[name] = self.dataSet[name]['close'][i]
                 else:
@@ -88,7 +88,7 @@ class TestStatelessTechnicalAnalysis(unittest.TestCase):
             exp.push(data)
 
             value = exp.value
-            for name in value.index:
+            for name in value.index():
                 expected[name] = np.exp(self.dataSet[name]['close'][i])
                 calculated = value[name]
                 self.assertAlmostEqual(expected[name], calculated, 12, 'at index {0}\n'
@@ -108,7 +108,7 @@ class TestStatelessTechnicalAnalysis(unittest.TestCase):
             logExp.push(data)
 
             value = logExp.value
-            for name in value.index:
+            for name in value.index():
                 expected[name] = self.dataSet[name]['close'][i]
                 calculated = value[name]
                 self.assertAlmostEqual(expected[name], calculated, 12, 'at index {0}\n'
@@ -129,7 +129,7 @@ class TestStatelessTechnicalAnalysis(unittest.TestCase):
             pow.push(data)
 
             value = pow.value
-            for name in value.index:
+            for name in value.index():
                 expected[name] = math.pow(self.dataSet[name]['close'][i], n)
                 calculated = value[name]
                 self.assertAlmostEqual(expected[name], calculated, 12, 'at index {0}\n'
@@ -150,7 +150,7 @@ class TestStatelessTechnicalAnalysis(unittest.TestCase):
             sqrtPow.push(data)
 
             value = sqrtPow.value
-            for name in value.index:
+            for name in value.index():
                 expected[name] = math.sqrt(math.pow(self.dataSet[name]['close'][i], n))
                 calculated = value[name]
                 self.assertAlmostEqual(expected[name], calculated, 12, 'at index {0}\n'
@@ -170,7 +170,7 @@ class TestStatelessTechnicalAnalysis(unittest.TestCase):
             absHolder.push(data)
 
             value = absHolder.value
-            for name in value.index:
+            for name in value.index():
                 expected[name] = abs(self.dataSet[name]['close'][i])
                 calculated = value[name]
                 self.assertAlmostEqual(expected[name], calculated, 12, 'at index {0}\n'
@@ -195,7 +195,7 @@ class TestStatelessTechnicalAnalysis(unittest.TestCase):
             long_average.push(data)
 
             value = macd.value
-            for name in value.index:
+            for name in value.index():
                 expected = short_average.value[name] - long_average.value[name]
                 calculated = value[name]
                 self.assertAlmostEqual(expected, calculated, 12, 'at index {0}\n'

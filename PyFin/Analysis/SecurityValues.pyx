@@ -39,7 +39,7 @@ cdef class SecurityValues:
 
     @cython.boundscheck(False)
     @cython.wraparound(False)
-    def mask(self, flags):
+    cpdef SecurityValues mask(self, flags):
         if not self.name_array:
             self.name_array = np.array(list(self.name_mapping.keys()))
 
@@ -144,8 +144,7 @@ cdef class SecurityValues:
             elif op == 5:
                 return SecurityValues(self.values >= right, self.name_mapping)
 
-    @property
-    def index(self):
+    cpdef object index(self):
         return self.name_mapping.keys()
 
     def __contains__(self, key):
@@ -156,15 +155,15 @@ cdef class SecurityValues:
 
     @cython.boundscheck(False)
     @cython.wraparound(False)
-    def rank(self):
+    cpdef SecurityValues rank(self):
         cdef np.ndarray[double, ndim=1] data = self.values.argsort().argsort().astype(float)
         data[np.isnan(self.values)] = np.nan
         return SecurityValues(data + 1., self.name_mapping)
 
-    def mean(self):
+    cpdef double mean(self):
         return np.nanmean(self.values)
 
-    def dot(self, right):
+    cpdef double dot(self, right):
         return np.dot(self.values, right.values)
 
     def __deepcopy__(self, memo):

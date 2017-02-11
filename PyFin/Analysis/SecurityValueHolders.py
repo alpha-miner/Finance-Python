@@ -75,7 +75,7 @@ class SecurityValueHolder(object):
             self._compHolder.push(data)
             data = self._compHolder.value
 
-            for name in data.index:
+            for name in data.index():
                 try:
                     self._innerHolders[name].push({'x': data[name]})
                 except KeyError:

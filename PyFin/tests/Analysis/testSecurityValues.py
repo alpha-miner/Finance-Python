@@ -24,7 +24,7 @@ class TestSecurityValues(unittest.TestCase):
         test = SecurityValues(data, OrderedDict(zip(index, range(len(index)))))
         expected = dict(zip(index, data))
 
-        for name in test.index:
+        for name in test.index():
             self.assertEqual(test[name], expected[name])
 
     def testSecurityValuesRank(self):
@@ -36,7 +36,7 @@ class TestSecurityValues(unittest.TestCase):
         test = data.rank()
 
         expected = SecurityValues(np.array([2, 1, np.nan, np.nan, 3, 4]), OrderedDict(zip(index, range(len(index)))))
-        for name in test.index:
+        for name in test.index():
             if np.isnan(test[name]):
                 self.assertTrue(np.isnan(expected[name]))
             else:

@@ -12,11 +12,7 @@ cimport numpy as np
 
 
 @cython.embedsignature(True)
-cdef class SecurityValues:
-
-    cdef public object name_mapping
-    cdef public np.ndarray values
-    cdef public np.ndarray name_array
+cdef class SecurityValues(object):
 
     def __init__(self, data, index=None):
         if isinstance(data, dict):

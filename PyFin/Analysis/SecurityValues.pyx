@@ -23,7 +23,6 @@ cdef class SecurityValues(object):
         self.name_mapping = index
         self.name_array = None
 
-
     @cython.boundscheck(False)
     @cython.wraparound(False)
     def __getitem__(self, name):

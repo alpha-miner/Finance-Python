@@ -42,6 +42,14 @@ class SecurityXAverageValueHolder(SecurityStatelessSingleValueHolder):
                                                           dependency=dependency,
                                                           window=window)
 
+    def __deepcopy__(self, memo):
+        if self._compHolder:
+            return SecurityXAverageValueHolder(2.0 / self._holderTemplate.self._exp - 1,
+                                               self._compHolder)
+        else:
+            return SecurityXAverageValueHolder(2.0 / self._holderTemplate.self._exp - 1,
+                                               self._dependency)
+
 
 class SecurityMACDValueHolder(SecurityStatelessSingleValueHolder):
     def __init__(self, short, long, dependency='x'):
@@ -50,11 +58,27 @@ class SecurityMACDValueHolder(SecurityStatelessSingleValueHolder):
                                                       short_win=short,
                                                       long_win=long)
 
+    def __deepcopy__(self, memo):
+        if self._compHolder:
+            return SecurityMACDValueHolder(2. / self._holderTemplate._short_average._exp - 1.,
+                                           2. / self._holderTemplate._long_average._exp - 1.,
+                                           self._compHolder)
+        else:
+            return SecurityMACDValueHolder(2. / self._holderTemplate._short_average._exp - 1.,
+                                           2. / self._holderTemplate._long_average._exp - 1.,
+                                           self._dependency)
+
 
 class SecuritySignValueHolder(SecurityStatelessSingleValueHolder):
     def __init__(self, dependency='x'):
         super(SecuritySignValueHolder, self).__init__(holderType=Sign,
                                                       dependency=dependency)
+
+    def __deepcopy__(self, memo):
+        if self._compHolder:
+            return SecuritySignValueHolder(self._compHolder)
+        else:
+            return SecuritySignValueHolder(self._dependency)
 
 
 class SecurityExpValueHolder(SecurityStatelessSingleValueHolder):
@@ -62,11 +86,23 @@ class SecurityExpValueHolder(SecurityStatelessSingleValueHolder):
         super(SecurityExpValueHolder, self).__init__(holderType=Exp,
                                                      dependency=dependency)
 
+    def __deepcopy__(self, memo):
+        if self._compHolder:
+            return SecurityExpValueHolder(self._compHolder)
+        else:
+            return SecurityExpValueHolder(self._dependency)
+
 
 class SecurityLogValueHolder(SecurityStatelessSingleValueHolder):
     def __init__(self, dependency='x'):
         super(SecurityLogValueHolder, self).__init__(holderType=Log,
                                                      dependency=dependency)
+
+    def __deepcopy__(self, memo):
+        if self._compHolder:
+            return SecurityLogValueHolder(self._compHolder)
+        else:
+            return SecurityLogValueHolder(self._dependency)
 
 
 class SecurityPowValueHolder(SecurityStatelessSingleValueHolder):
@@ -75,11 +111,23 @@ class SecurityPowValueHolder(SecurityStatelessSingleValueHolder):
                                                      dependency=dependency,
                                                      n=n)
 
+    def __deepcopy__(self, memo):
+        if self._compHolder:
+            return SecurityPowValueHolder(self._compHolder, self._holderTemplate._n)
+        else:
+            return SecurityPowValueHolder(self._dependency, self._holderTemplate._n)
+
 
 class SecuritySqrtValueHolder(SecurityStatelessSingleValueHolder):
     def __init__(self, dependency='x'):
         super(SecuritySqrtValueHolder, self).__init__(holderType=Sqrt,
                                                       dependency=dependency)
+
+    def __deepcopy__(self, memo):
+        if self._compHolder:
+            return SecuritySqrtValueHolder(self._compHolder)
+        else:
+            return SecuritySqrtValueHolder(self._dependency)
 
 
 class SecurityAbsValueHolder(SecurityStatelessSingleValueHolder):
@@ -87,11 +135,23 @@ class SecurityAbsValueHolder(SecurityStatelessSingleValueHolder):
         super(SecurityAbsValueHolder, self).__init__(holderType=Abs,
                                                      dependency=dependency)
 
+    def __deepcopy__(self, memo):
+        if self._compHolder:
+            return SecurityAbsValueHolder(self._compHolder)
+        else:
+            return SecurityAbsValueHolder(self._dependency)
+
 
 class SecurityAcosValueHolder(SecurityStatelessSingleValueHolder):
     def __init__(self, dependency='x'):
         super(SecurityAcosValueHolder, self).__init__(holderType=Acos,
                                                       dependency=dependency)
+
+    def __deepcopy__(self, memo):
+        if self._compHolder:
+            return SecurityAcosValueHolder(self._compHolder)
+        else:
+            return SecurityAcosValueHolder(self._dependency)
 
 
 class SecurityAcoshValueHolder(SecurityStatelessSingleValueHolder):
@@ -99,11 +159,23 @@ class SecurityAcoshValueHolder(SecurityStatelessSingleValueHolder):
         super(SecurityAcoshValueHolder, self).__init__(holderType=Acosh,
                                                        dependency=dependency)
 
+    def __deepcopy__(self, memo):
+        if self._compHolder:
+            return SecurityAcoshValueHolder(self._compHolder)
+        else:
+            return SecurityAcoshValueHolder(self._dependency)
+
 
 class SecurityAsinValueHolder(SecurityStatelessSingleValueHolder):
     def __init__(self, dependency='x'):
         super(SecurityAsinValueHolder, self).__init__(holderType=Asin,
                                                       dependency=dependency)
+
+    def __deepcopy__(self, memo):
+        if self._compHolder:
+            return SecurityAsinValueHolder(self._compHolder)
+        else:
+            return SecurityAsinValueHolder(self._dependency)
 
 
 class SecurityAsinhValueHolder(SecurityStatelessSingleValueHolder):
@@ -111,11 +183,23 @@ class SecurityAsinhValueHolder(SecurityStatelessSingleValueHolder):
         super(SecurityAsinhValueHolder, self).__init__(holderType=Asinh,
                                                        dependency=dependency)
 
+    def __deepcopy__(self, memo):
+        if self._compHolder:
+            return SecurityAsinhValueHolder(self._compHolder)
+        else:
+            return SecurityAsinhValueHolder(self._dependency)
+
 
 class SecurityDiffValueHolder(SecurityStatelessSingleValueHolder):
     def __init__(self, dependency='x'):
         super(SecurityDiffValueHolder, self).__init__(holderType=Diff,
                                                       dependency=dependency)
+
+    def __deepcopy__(self, memo):
+        if self._compHolder:
+            return SecurityDiffValueHolder(self._compHolder)
+        else:
+            return SecurityDiffValueHolder(self._dependency)
 
 
 class SecuritySimpleReturnValueHolder(SecurityStatelessSingleValueHolder):
@@ -123,8 +207,20 @@ class SecuritySimpleReturnValueHolder(SecurityStatelessSingleValueHolder):
         super(SecuritySimpleReturnValueHolder, self).__init__(holderType=SimpleReturn,
                                                               dependency=dependency)
 
+    def __deepcopy__(self, memo):
+        if self._compHolder:
+            return SecuritySimpleReturnValueHolder(self._compHolder)
+        else:
+            return SecuritySimpleReturnValueHolder(self._dependency)
+
 
 class SecurityLogReturnValueHolder(SecurityStatelessSingleValueHolder):
     def __init__(self, dependency='x'):
         super(SecurityLogReturnValueHolder, self).__init__(holderType=LogReturn,
                                                            dependency=dependency)
+
+    def __deepcopy__(self, memo):
+        if self._compHolder:
+            return SecurityLogReturnValueHolder(self._compHolder)
+        else:
+            return SecurityLogReturnValueHolder(self._dependency)

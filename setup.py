@@ -31,6 +31,9 @@ datafiles.append((os.path.join(packagePath, "PyFin/tests/POpt/data"), files))
 files = glob.glob("PyFin/DateUtilities/*.pxd")
 datafiles.append((os.path.join(packagePath, "PyFin/DateUtilities"), files))
 
+files = glob.glob("PyFin/Analysis/*.pxd")
+datafiles.append((os.path.join(packagePath, "PyFin/Analysis"), files))
+
 files = glob.glob("PyFin/Enums/*.pxd")
 datafiles.append((os.path.join(packagePath, "PyFin/Enums"), files))
 
@@ -118,6 +121,7 @@ else:
 
 ext_modules = [
     "PyFin/Analysis/SecurityValues.pyx",
+    "PyFin/Analysis/SecurityValueHolders.pyx",
     "PyFin/Math/Accumulators/impl.pyx",
     "PyFin/Math/Accumulators/IAccumulators.pyx",
     "PyFin/Math/Accumulators/StatefulAccumulators.pyx",

@@ -13,7 +13,6 @@ from PyFin.Analysis.CrossSectionValueHolders import CSAverageSecurityValueHolder
 from PyFin.Analysis.CrossSectionValueHolders import CSAverageAdjustedSecurityValueHolder
 from PyFin.Analysis.CrossSectionValueHolders import CSQuantileSecurityValueHolder
 from PyFin.Analysis.SecurityValueHolders import SecurityLatestValueHolder
-from PyFin.Analysis.SecurityValueHolders import dependencyCalculator
 from PyFin.Analysis import TechnicalAnalysis
 from PyFin.Analysis.transformer import transform
 
@@ -25,6 +24,5 @@ __all__ = ['DataProvider',
            'CSAverageAdjustedSecurityValueHolder',
            'CSQuantileSecurityValueHolder',
            'SecurityLatestValueHolder',
-           'dependencyCalculator',
            'TechnicalAnalysis',
            'transform']

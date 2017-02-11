@@ -24,6 +24,7 @@ cdef class Shift(StatefulValueHolder):
     cdef public Accumulator _valueHolder
     cdef public double _popout
 
+    cpdef int lag(self)
     cpdef push(self, dict data)
     cpdef object result(self)
 

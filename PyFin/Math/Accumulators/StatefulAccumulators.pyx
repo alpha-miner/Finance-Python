@@ -79,13 +79,16 @@ cdef class Shift(StatefulValueHolder):
     cpdef object result(self):
         return self._popout
 
+    cpdef int lag(self):
+        return self._window - self._valueHolder.window
+
     def __deepcopy__(self, memo):
-        return Shift(self._valueHolder, self._window - self._valueHolder.window)
+        return Shift(self._valueHolder, self.lag())
 
     def __reduce__(self):
         d = {}
 
-        return Shift, (self._valueHolder, self._window - self._valueHolder.window), d
+        return Shift, (self._valueHolder, self.lag()), d
 
     def __setstate__(self, state):
         pass

@@ -7,7 +7,7 @@ Created on 2017-1-6
 
 import copy
 import numpy as np
-from PyFin.Analysis.SecurityValueHolders import SecurityValues
+from PyFin.Analysis.SecurityValues import SecurityValues
 from PyFin.Analysis.SecurityValueHolders import SecurityValueHolder
 from PyFin.Analysis.SecurityValueHolders import SecurityLatestValueHolder
 
@@ -69,6 +69,9 @@ class CSRankedSecurityValueHolder(CrossSectionValueHolder):
         raw_values = raw_values.rank()
         return raw_values
 
+    def __deepcopy__(self, memo):
+        return CSRankedSecurityValueHolder(self._inner)
+
 
 class CSAverageSecurityValueHolder(CrossSectionValueHolder):
     def __init__(self, innerValue):
@@ -104,6 +107,9 @@ class CSAverageSecurityValueHolder(CrossSectionValueHolder):
         raw_values = SecurityValues(mean_value, raw_values.name_mapping)
         return raw_values[names]
 
+    def __deepcopy__(self, memo):
+        return CSRankedSecurityValueHolder(self._inner)
+
 
 class CSAverageAdjustedSecurityValueHolder(CrossSectionValueHolder):
     def __init__(self, innerValue):
@@ -133,6 +139,9 @@ class CSAverageAdjustedSecurityValueHolder(CrossSectionValueHolder):
         raw_values = raw_values - raw_values.mean()
         return raw_values[names]
 
+    def __deepcopy__(self, memo):
+        return CSRankedSecurityValueHolder(self._inner)
+
 
 class CSQuantileSecurityValueHolder(CrossSectionValueHolder):
     def __init__(self, innerValue):
@@ -161,3 +170,6 @@ class CSQuantileSecurityValueHolder(CrossSectionValueHolder):
         raw_values = self._inner.value_by_names(names)
         raw_values = (raw_values.rank() - 1.) / (len(raw_values) - 1.)
         return raw_values[names]
+
+    def __deepcopy__(self, memo):
+        return CSRankedSecurityValueHolder(self._inner)

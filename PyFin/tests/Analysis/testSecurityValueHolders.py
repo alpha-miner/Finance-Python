@@ -9,7 +9,7 @@ import unittest
 import numpy as np
 import pandas as pd
 from PyFin.Enums import Factors
-from PyFin.Analysis.SecurityValueHolders import SecurityValues
+from PyFin.Analysis.SecurityValues import SecurityValues
 from PyFin.Analysis.SecurityValueHolders import dependencyCalculator
 from PyFin.Analysis.SecurityValueHolders import FilteredSecurityValueHolder
 from PyFin.Analysis.SecurityValueHolders import SecurityLatestValueHolder
@@ -377,20 +377,16 @@ class TestSecurityValueHolders(unittest.TestCase):
         test2 = SecurityMovingMax(window2, pNames2)
         binaryValueHolder = testValueHolder + test2
 
-        self.assertEqual(set(binaryValueHolder.symbolList), set(symbolList))
-
         self.assertEqual(binaryValueHolder.valueSize, 1)
         self.assertEqual(binaryValueHolder.window, max(window, window2))
 
         # test compounded operated value holder
         test3 = SecurityMovingMax(window2, testValueHolder)
-        self.assertEqual(set(test3.symbolList), set(symbolList))
         self.assertEqual(test3.valueSize, 1)
         self.assertEqual(test3.window, window + window2)
 
         # test compounded twice
         test4 = SecurityMovingMax(window2, test3)
-        self.assertEqual(set(test4.symbolList), set(symbolList))
         self.assertEqual(test4.valueSize, 1)
         self.assertEqual(test4.window, window + 2 * window2)
 

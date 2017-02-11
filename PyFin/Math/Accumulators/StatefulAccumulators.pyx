@@ -33,8 +33,6 @@ cdef _checkParameterList(dependency):
 
 cdef class StatefulValueHolder(Accumulator):
 
-    cdef public Deque _deque
-
     def __init__(self, window, dependency):
         super(StatefulValueHolder, self).__init__(dependency)
         if not isinstance(window, int):
@@ -64,9 +62,6 @@ cdef class StatefulValueHolder(Accumulator):
 
 
 cdef class Shift(StatefulValueHolder):
-
-    cdef public Accumulator _valueHolder
-    cdef public double _popout
 
     def __init__(self, valueHolder, N=1):
         super(Shift, self).__init__(N, valueHolder._dependency)
@@ -128,8 +123,6 @@ cdef class SingleValuedValueHolder(StatefulValueHolder):
 
 
 cdef class SortedValueHolder(SingleValuedValueHolder):
-
-    cdef public list _sortedArray
 
     def __init__(self, window, dependency='x'):
         super(SortedValueHolder, self).__init__(window, dependency)
@@ -234,8 +227,6 @@ cdef class MovingQuantile(SortedValueHolder):
 
 cdef class MovingAllTrue(SingleValuedValueHolder):
 
-    cdef public int _countedTrue
-
     def __init__(self, window, dependency='x'):
         super(MovingAllTrue, self).__init__(window, dependency)
         self._countedTrue = 0
@@ -275,8 +266,6 @@ cdef class MovingAllTrue(SingleValuedValueHolder):
 
 
 cdef class MovingAnyTrue(SingleValuedValueHolder):
-
-    cdef public int _countedTrue
 
     def __init__(self, window, dependency='x'):
         super(MovingAnyTrue, self).__init__(window, dependency)
@@ -318,8 +307,6 @@ cdef class MovingAnyTrue(SingleValuedValueHolder):
 
 cdef class MovingSum(SingleValuedValueHolder):
 
-    cdef public double _runningSum
-
     def __init__(self, window, dependency='x'):
         super(MovingSum, self).__init__(window, dependency)
         self._runningSum = 0.0
@@ -354,8 +341,6 @@ cdef class MovingSum(SingleValuedValueHolder):
 
 
 cdef class MovingAverage(SingleValuedValueHolder):
-
-    cdef public double _runningSum
 
     def __init__(self, window, dependency='x'):
         super(MovingAverage, self).__init__(window, dependency)
@@ -395,9 +380,6 @@ cdef class MovingAverage(SingleValuedValueHolder):
 
 
 cdef class MovingPositiveAverage(SingleValuedValueHolder):
-
-    cdef public double _runningPositiveSum
-    cdef public int _runningPositiveCount
 
     def __init__(self, window, dependency='x'):
         super(MovingPositiveAverage, self).__init__(window, dependency)
@@ -442,8 +424,6 @@ cdef class MovingPositiveAverage(SingleValuedValueHolder):
 
 cdef class MovingPositiveDifferenceAverage(SingleValuedValueHolder):
 
-    cdef public object _runningAverage
-
     def __init__(self, window, dependency='x'):
         super(MovingPositiveDifferenceAverage, self).__init__(window, dependency)
         runningPositive = PositivePart(build_holder(dependency) - Shift(build_holder(dependency), 1))
@@ -471,8 +451,6 @@ cdef class MovingPositiveDifferenceAverage(SingleValuedValueHolder):
 
 cdef class MovingNegativeDifferenceAverage(SingleValuedValueHolder):
 
-    cdef public object _runningAverage
-
     def __init__(self, window, dependency='x'):
         super(MovingNegativeDifferenceAverage, self).__init__(window, dependency)
         runningNegative = NegativePart(build_holder(dependency) - Shift(build_holder(dependency), 1))
@@ -499,9 +477,6 @@ cdef class MovingNegativeDifferenceAverage(SingleValuedValueHolder):
 
 
 cdef class MovingRSI(SingleValuedValueHolder):
-
-    cdef public object _posDiffAvg
-    cdef public object _negDiffAvg
 
     def __init__(self, window, dependency='x'):
         super(MovingRSI, self).__init__(window, dependency)
@@ -537,9 +512,6 @@ cdef class MovingRSI(SingleValuedValueHolder):
 
 
 cdef class MovingNegativeAverage(SingleValuedValueHolder):
-
-    cdef public double _runningNegativeSum
-    cdef public int _runningNegativeCount
 
     def __init__(self, window, dependency='x'):
         super(MovingNegativeAverage, self).__init__(window, dependency)
@@ -582,10 +554,6 @@ cdef class MovingNegativeAverage(SingleValuedValueHolder):
 
 
 cdef class MovingVariance(SingleValuedValueHolder):
-
-    cdef public double _runningSum
-    cdef public double _runningSumSquare
-    cdef public int _isPop
 
     def __init__(self, window, dependency='x', isPopulation=False):
         super(MovingVariance, self).__init__(window, dependency)
@@ -642,11 +610,6 @@ cdef class MovingVariance(SingleValuedValueHolder):
 
 
 cdef class MovingNegativeVariance(SingleValuedValueHolder):
-
-    cdef public double _runningNegativeSum
-    cdef public double _runningNegativeSumSquare
-    cdef public int _runningNegativeCount
-    cdef public int _isPop
 
     def __init__(self, window, dependency='x', isPopulation=0):
         super(MovingNegativeVariance, self).__init__(window, dependency)
@@ -708,8 +671,6 @@ cdef class MovingNegativeVariance(SingleValuedValueHolder):
 
 cdef class MovingCountedPositive(SingleValuedValueHolder):
 
-    cdef public int _counts
-
     def __init__(self, window, dependency='x'):
         super(MovingCountedPositive, self).__init__(window, dependency)
         self._counts = 0
@@ -745,8 +706,6 @@ cdef class MovingCountedPositive(SingleValuedValueHolder):
 
 
 cdef class MovingCountedNegative(SingleValuedValueHolder):
-
-    cdef public int _counts
 
     def __init__(self, window, dependency='x'):
         super(MovingCountedNegative, self).__init__(window, dependency)
@@ -825,12 +784,6 @@ cdef class MovingHistoricalWindow(StatefulValueHolder):
 # Calculator for one pair of series
 cdef class MovingCorrelation(StatefulValueHolder):
 
-    cdef public double _runningSumLeft
-    cdef public double _runningSumRight
-    cdef public double _runningSumSquareLeft
-    cdef public double _runningSumSquareRight
-    cdef public double _runningSumCrossSquare
-
     def __init__(self, window, dependency=('x', 'y')):
         super(MovingCorrelation, self).__init__(window, dependency)
         self._runningSumLeft = 0.0
@@ -891,11 +844,6 @@ cdef class MovingCorrelation(StatefulValueHolder):
 # Calculator for several series
 cdef class MovingCorrelationMatrix(StatefulValueHolder):
 
-    cdef public int _isFirst
-    cdef public np.ndarray _runningSum
-    cdef public np.ndarray _runningSumSquare
-    cdef public np.ndarray _runningSumCrossSquare
-
     def __init__(self, window, dependency='values'):
         super(MovingCorrelationMatrix, self).__init__(window, dependency)
         self._isFirst = 1
@@ -946,8 +894,6 @@ cdef class MovingCorrelationMatrix(StatefulValueHolder):
 
 cdef class MovingProduct(SingleValuedValueHolder):
 
-    cdef public double _runningProduct
-
     def __init__(self, window, dependency='x'):
         super(MovingProduct, self).__init__(window, dependency)
         self._runningProduct = 1.0
@@ -983,9 +929,6 @@ cdef class MovingProduct(SingleValuedValueHolder):
 
 cdef class MovingCenterMoment(SingleValuedValueHolder):
 
-    cdef public double _order
-    cdef public double _runningMoment
-
     def __init__(self, window, order, dependency='x'):
         super(MovingCenterMoment, self).__init__(window, dependency)
         self._order = order
@@ -1019,8 +962,6 @@ cdef class MovingCenterMoment(SingleValuedValueHolder):
 
 cdef class MovingSkewness(SingleValuedValueHolder):
 
-    cdef public object _runningSkewness
-
     def __init__(self, window, dependency='x'):
         super(MovingSkewness, self).__init__(window, dependency)
         runningStd3 = Pow(MovingVariance(window, dependency, isPopulation=1), 1.5)
@@ -1049,10 +990,6 @@ cdef class MovingSkewness(SingleValuedValueHolder):
 
 
 cdef class MovingMaxPos(SortedValueHolder):
-
-    cdef public double _runningTsMaxPos
-    cdef public double _max
-
     def __init__(self, window, dependency='x'):
         super(MovingMaxPos, self).__init__(window, dependency)
         self._runningTsMaxPos = np.nan
@@ -1080,9 +1017,6 @@ cdef class MovingMaxPos(SortedValueHolder):
 
 
 cdef class MovingMinPos(SortedValueHolder):
-
-    cdef public double _runningTsMinPos
-    cdef public double _min
 
     def __init__(self, window, dependency='x'):
         super(MovingMinPos, self).__init__(window, dependency)
@@ -1112,8 +1046,6 @@ cdef class MovingMinPos(SortedValueHolder):
 
 cdef class MovingKurtosis(SingleValuedValueHolder):
 
-    cdef public object _runningKurtosis
-
     def __init__(self, window, dependency='x'):
         super(MovingKurtosis, self).__init__(window, dependency)
         runningStd4 = Pow(MovingVariance(window, dependency, isPopulation=True), 2)
@@ -1142,8 +1074,6 @@ cdef class MovingKurtosis(SingleValuedValueHolder):
 
 
 cdef class MovingRSV(SingleValuedValueHolder):
-
-    cdef public double _cached_value
 
     def __init__(self, window, dependency='x'):
         super(MovingRSV, self).__init__(window, dependency)
@@ -1176,9 +1106,6 @@ cdef class MovingRSV(SingleValuedValueHolder):
 
 cdef class MACD(StatelessSingleValueAccumulator):
 
-    cdef public Accumulator _short_average
-    cdef public Accumulator _long_average
-
     def __init__(self, short_win, long_win, dependency='x', method=XAverage):
         super(MACD, self).__init__(dependency)
         self._short_average = method(window=short_win, dependency=dependency)
@@ -1206,9 +1133,6 @@ cdef class MACD(StatelessSingleValueAccumulator):
 
 
 cdef class MovingRank(SortedValueHolder):
-
-    cdef public list _runningRank
-
     def __init__(self, window, dependency='x'):
         super(MovingRank, self).__init__(window, dependency)
         self._runningRank = []
@@ -1231,13 +1155,6 @@ cdef class MovingRank(SortedValueHolder):
 
 # runningJ can be more than 1 or less than 0.
 cdef class MovingKDJ(StatefulValueHolder):
-
-    cdef public object _runningRsv
-    cdef public int _k
-    cdef public int _d
-    cdef public double _runningJ
-    cdef public double _runningD
-    cdef public double _runningK
 
     def __init__(self, window, k=3, d=3, dependency='x'):
         super(MovingKDJ, self).__init__(window, dependency)
@@ -1312,8 +1229,6 @@ cdef class MovingAroon(SingleValuedValueHolder):
 
 cdef class MovingBias(SingleValuedValueHolder):
 
-    cdef public double _runningBias
-
     def __init__(self, window, dependency='x'):
         super(MovingBias, self).__init__(window, dependency)
         self._runningBias = np.nan
@@ -1343,8 +1258,6 @@ cdef class MovingBias(SingleValuedValueHolder):
 
 
 cdef class MovingLevel(SingleValuedValueHolder):
-
-    cdef public double _runningLevel
 
     def __init__(self, window, dependency='x'):
         super(MovingLevel, self).__init__(window, dependency)
@@ -1378,11 +1291,6 @@ cdef class MovingLevel(SingleValuedValueHolder):
 
 
 cdef class MovingAutoCorrelation(SingleValuedValueHolder):
-
-    cdef public int _lags
-    cdef public list _runningVecForward
-    cdef public list _runningVecBackward
-    cdef public np.ndarray _runningAutoCorrMatrix
 
     def __init__(self, window, lags, dependency='x'):
         super(MovingAutoCorrelation, self).__init__(window, dependency)
@@ -1433,8 +1341,6 @@ performancer
 
 cdef class MovingLogReturn(SingleValuedValueHolder):
 
-    cdef public double _runningReturn
-
     def __init__(self, window=1, dependency='price'):
         super(MovingLogReturn, self).__init__(window, dependency)
         self._runningReturn = np.nan
@@ -1470,9 +1376,6 @@ cdef class MovingLogReturn(SingleValuedValueHolder):
 
 
 cdef class MovingSharp(StatefulValueHolder):
-
-    cdef public object _mean
-    cdef public object _var
 
     def __init__(self, window, dependency=('ret', 'riskFree')):
         super(MovingSharp, self).__init__(window, dependency)
@@ -1516,9 +1419,6 @@ cdef class MovingSharp(StatefulValueHolder):
 
 cdef class MovingSortino(StatefulValueHolder):
 
-    cdef public object _mean
-    cdef public object _negativeVar
-
     def __init__(self, window, dependency=('ret', 'riskFree')):
         super(MovingSortino, self).__init__(window, dependency)
         self._mean = MovingAverage(window, dependency='x')
@@ -1555,12 +1455,6 @@ cdef class MovingSortino(StatefulValueHolder):
 
 
 cdef class MovingAlphaBeta(StatefulValueHolder):
-
-    cdef public object _pReturnMean
-    cdef public object _mReturnMean
-    cdef public object _pReturnVar
-    cdef public object _mReturnVar
-    cdef public object _correlationHolder
 
     def __init__(self, window, dependency=('pRet', 'mRet', 'riskFree')):
         super(MovingAlphaBeta, self).__init__(window, dependency)
@@ -1632,12 +1526,6 @@ cdef class MovingAlphaBeta(StatefulValueHolder):
 
 cdef class MovingDrawDown(StatefulValueHolder):
 
-    cdef public object _maxer
-    cdef public double _runningCum
-    cdef public double _currentMax
-    cdef public int _highIndex
-    cdef public int _runningIndex
-
     def __init__(self, window, dependency='ret'):
         super(MovingDrawDown, self).__init__(window, dependency)
         self._returnSize = 3
@@ -1678,10 +1566,6 @@ cdef class MovingDrawDown(StatefulValueHolder):
 
 cdef class MovingAverageDrawdown(StatefulValueHolder):
 
-    cdef public object _drawdownCalculator
-    cdef public object _drawdownMean
-    cdef public object _durationMean
-
     def __init__(self, window, dependency='ret'):
         super(MovingAverageDrawdown, self).__init__(window, dependency)
         self._returnSize = 2
@@ -1719,8 +1603,6 @@ cdef class MovingAverageDrawdown(StatefulValueHolder):
 
 
 cdef class MovingMaxDrawdown(StatefulValueHolder):
-
-    cdef public object _drawdownCalculator
 
     def __init__(self, window, dependency='ret'):
         super(MovingMaxDrawdown, self).__init__(window, dependency)

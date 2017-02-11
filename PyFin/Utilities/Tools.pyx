@@ -20,19 +20,22 @@ def to_dict(total_index, list total_category, double[:, :] matrix_values, list c
 
     cdef dict current_dict
     cdef list index_diff_loc = list(np.where(np.diff(total_index))[0])
-    cdef list splited_values = []
-    cdef list splited_category = []
-    cdef list column_index = list(range(len(columns)))
+    cdef int index_diff_length = len(index_diff_loc)
+    cdef list splited_values = [None] * (index_diff_length + 1)
+    cdef list splited_category = [None] * (index_diff_length + 1)
+    cdef int column_length = len(columns)
 
-    for i, end in enumerate(index_diff_loc):
-        splited_category.append(total_category[start:end+1])
-        current_dict = {total_category[j]: {columns[k]: matrix_values[j, k] for k in column_index} for j in range(start, end+1)}
-        splited_values.append(current_dict)
+    for i in range(index_diff_length):
+        end = index_diff_loc[i]
+        splited_category[i] = total_category[start:end+1]
+        current_dict = {total_category[j]: {columns[k]: matrix_values[j, k] for k in range(column_length)} for j in
+                        range(start, end+1)}
+        splited_values[i] = current_dict
         start = end + 1
 
-    splited_category.append(total_category[start:])
-    current_dict = {total_category[j]: {columns[k]: matrix_values[j, k] for k in column_index} for j in
+    splited_category[index_diff_length] = total_category[start:]
+    current_dict = {total_category[j]: {columns[k]: matrix_values[j, k] for k in range(column_length)} for j in
                     range(start, len(total_category))}
-    splited_values.append(current_dict)
+    splited_values[index_diff_length] = current_dict
 
     return splited_category, splited_values

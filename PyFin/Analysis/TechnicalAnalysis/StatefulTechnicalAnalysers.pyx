@@ -6,29 +6,29 @@ Created on 2015-8-8
 """
 
 import copy
-import numpy as np
-from PyFin.Analysis.SecurityValues import SecurityValues
-from PyFin.Analysis.SecurityValueHolders import SecurityValueHolder
-from PyFin.Math.Accumulators.StatefulAccumulators import MovingAverage
-from PyFin.Math.Accumulators.StatefulAccumulators import MovingMax
-from PyFin.Math.Accumulators.StatefulAccumulators import MovingMinimum
-from PyFin.Math.Accumulators.StatefulAccumulators import MovingQuantile
-from PyFin.Math.Accumulators.StatefulAccumulators import MovingAllTrue
-from PyFin.Math.Accumulators.StatefulAccumulators import MovingAnyTrue
-from PyFin.Math.Accumulators.StatefulAccumulators import MovingSum
-from PyFin.Math.Accumulators.StatefulAccumulators import MovingVariance
-from PyFin.Math.Accumulators.StatefulAccumulators import MovingCountedPositive
-from PyFin.Math.Accumulators.StatefulAccumulators import MovingPositiveAverage
-from PyFin.Math.Accumulators.StatefulAccumulators import MovingCountedNegative
-from PyFin.Math.Accumulators.StatefulAccumulators import MovingNegativeAverage
-from PyFin.Math.Accumulators.StatefulAccumulators import MovingPositiveDifferenceAverage
-from PyFin.Math.Accumulators.StatefulAccumulators import MovingNegativeDifferenceAverage
-from PyFin.Math.Accumulators.StatefulAccumulators import MovingRSI
-from PyFin.Math.Accumulators.StatefulAccumulators import MovingHistoricalWindow
-from PyFin.Math.Accumulators.StatefulAccumulators import MovingLogReturn
+cimport numpy as np
+from PyFin.Analysis.SecurityValues cimport SecurityValues
+from PyFin.Analysis.SecurityValueHolders cimport SecurityValueHolder
+from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingAverage
+from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingMax
+from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingMinimum
+from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingQuantile
+from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingAllTrue
+from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingAnyTrue
+from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingSum
+from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingVariance
+from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingCountedPositive
+from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingPositiveAverage
+from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingCountedNegative
+from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingNegativeAverage
+from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingPositiveDifferenceAverage
+from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingNegativeDifferenceAverage
+from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingRSI
+from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingHistoricalWindow
+from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingLogReturn
 
 
-class SecuritySingleValueHolder(SecurityValueHolder):
+cdef class SecuritySingleValueHolder(SecurityValueHolder):
     def __init__(self, window, HolderType, dependency='x'):
         super(SecuritySingleValueHolder, self).__init__(dependency)
         self._window += window
@@ -41,7 +41,7 @@ class SecuritySingleValueHolder(SecurityValueHolder):
             self._holderTemplate = HolderType(window=window, dependency=self._dependency)
 
 
-class SecurityMovingAverage(SecuritySingleValueHolder):
+cdef class SecurityMovingAverage(SecuritySingleValueHolder):
     def __init__(self, window, dependency='x'):
         super(SecurityMovingAverage, self).__init__(window, MovingAverage, dependency)
 
@@ -52,7 +52,7 @@ class SecurityMovingAverage(SecuritySingleValueHolder):
             return SecurityMovingAverage(self._window, self._dependency)
 
 
-class SecurityMovingMax(SecuritySingleValueHolder):
+cdef class SecurityMovingMax(SecuritySingleValueHolder):
     def __init__(self, window, dependency='x'):
         super(SecurityMovingMax, self).__init__(window, MovingMax, dependency)
 
@@ -63,7 +63,7 @@ class SecurityMovingMax(SecuritySingleValueHolder):
             return SecurityMovingMax(self._window, self._dependency)
 
 
-class SecurityMovingMinimum(SecuritySingleValueHolder):
+cdef class SecurityMovingMinimum(SecuritySingleValueHolder):
     def __init__(self, window, dependency='x'):
         super(SecurityMovingMinimum, self).__init__(window, MovingMinimum, dependency)
 
@@ -74,7 +74,7 @@ class SecurityMovingMinimum(SecuritySingleValueHolder):
             return SecurityMovingMinimum(self._window, self._dependency)
 
 
-class SecurityMovingQuantile(SecuritySingleValueHolder):
+cdef class SecurityMovingQuantile(SecuritySingleValueHolder):
     def __init__(self, window, dependency='x'):
         super(SecurityMovingQuantile, self).__init__(window, MovingQuantile, dependency)
 
@@ -85,7 +85,7 @@ class SecurityMovingQuantile(SecuritySingleValueHolder):
             return SecurityMovingQuantile(self._window, self._dependency)
 
 
-class SecurityMovingAllTrue(SecuritySingleValueHolder):
+cdef class SecurityMovingAllTrue(SecuritySingleValueHolder):
     def __init__(self, window, dependency='x'):
         super(SecurityMovingAllTrue, self).__init__(window, MovingAllTrue, dependency)
 
@@ -96,7 +96,7 @@ class SecurityMovingAllTrue(SecuritySingleValueHolder):
             return SecurityMovingAllTrue(self._window, self._dependency)
 
 
-class SecurityMovingAnyTrue(SecuritySingleValueHolder):
+cdef class SecurityMovingAnyTrue(SecuritySingleValueHolder):
     def __init__(self, window, dependency='x'):
         super(SecurityMovingAnyTrue, self).__init__(window, MovingAnyTrue, dependency)
 
@@ -107,7 +107,7 @@ class SecurityMovingAnyTrue(SecuritySingleValueHolder):
             return SecurityMovingAnyTrue(self._window, self._dependency)
 
 
-class SecurityMovingSum(SecuritySingleValueHolder):
+cdef class SecurityMovingSum(SecuritySingleValueHolder):
     def __init__(self, window, dependency='x'):
         super(SecurityMovingSum, self).__init__(window, MovingSum, dependency)
 
@@ -118,7 +118,7 @@ class SecurityMovingSum(SecuritySingleValueHolder):
             return SecurityMovingSum(self._window, self._dependency)
 
 
-class SecurityMovingVariance(SecuritySingleValueHolder):
+cdef class SecurityMovingVariance(SecuritySingleValueHolder):
     def __init__(self, window, dependency='x'):
         super(SecurityMovingVariance, self).__init__(window, MovingVariance, dependency)
 
@@ -129,7 +129,7 @@ class SecurityMovingVariance(SecuritySingleValueHolder):
             return SecurityMovingVariance(self._window, self._dependency)
 
 
-class SecurityMovingCountedPositive(SecuritySingleValueHolder):
+cdef class SecurityMovingCountedPositive(SecuritySingleValueHolder):
     def __init__(self, window, dependency='x'):
         super(SecurityMovingCountedPositive, self).__init__(window, MovingCountedPositive, dependency)
 
@@ -140,7 +140,7 @@ class SecurityMovingCountedPositive(SecuritySingleValueHolder):
             return SecurityMovingCountedPositive(self._window, self._dependency)
 
 
-class SecurityMovingPositiveAverage(SecuritySingleValueHolder):
+cdef class SecurityMovingPositiveAverage(SecuritySingleValueHolder):
     def __init__(self, window, dependency='x'):
         super(SecurityMovingPositiveAverage, self).__init__(window, MovingPositiveAverage, dependency)
 
@@ -151,7 +151,7 @@ class SecurityMovingPositiveAverage(SecuritySingleValueHolder):
             return SecurityMovingPositiveAverage(self._window, self._dependency)
 
 
-class SecurityMovingCountedNegative(SecuritySingleValueHolder):
+cdef class SecurityMovingCountedNegative(SecuritySingleValueHolder):
     def __init__(self, window, dependency='x'):
         super(SecurityMovingCountedNegative, self).__init__(window, MovingCountedNegative, dependency)
 
@@ -162,7 +162,7 @@ class SecurityMovingCountedNegative(SecuritySingleValueHolder):
             return SecurityMovingCountedNegative(self._window, self._dependency)
 
 
-class SecurityMovingNegativeAverage(SecuritySingleValueHolder):
+cdef class SecurityMovingNegativeAverage(SecuritySingleValueHolder):
     def __init__(self, window, dependency='x'):
         super(SecurityMovingNegativeAverage, self).__init__(window, MovingNegativeAverage, dependency)
 
@@ -173,7 +173,7 @@ class SecurityMovingNegativeAverage(SecuritySingleValueHolder):
             return SecurityMovingNegativeAverage(self._window, self._dependency)
 
 
-class SecurityMovingPositiveDifferenceAverage(SecuritySingleValueHolder):
+cdef class SecurityMovingPositiveDifferenceAverage(SecuritySingleValueHolder):
     def __init__(self, window, dependency='x'):
         super(SecurityMovingPositiveDifferenceAverage, self).__init__(window, MovingPositiveDifferenceAverage, dependency)
 
@@ -184,7 +184,7 @@ class SecurityMovingPositiveDifferenceAverage(SecuritySingleValueHolder):
             return SecurityMovingPositiveDifferenceAverage(self._window, self._dependency)
 
 
-class SecurityMovingNegativeDifferenceAverage(SecuritySingleValueHolder):
+cdef class SecurityMovingNegativeDifferenceAverage(SecuritySingleValueHolder):
     def __init__(self, window, dependency='x'):
         super(SecurityMovingNegativeDifferenceAverage, self).__init__(window, MovingNegativeDifferenceAverage, dependency)
 
@@ -195,7 +195,7 @@ class SecurityMovingNegativeDifferenceAverage(SecuritySingleValueHolder):
             return SecurityMovingNegativeDifferenceAverage(self._window, self._dependency)
 
 
-class SecurityMovingRSI(SecuritySingleValueHolder):
+cdef class SecurityMovingRSI(SecuritySingleValueHolder):
     def __init__(self, window, dependency='x'):
         super(SecurityMovingRSI, self).__init__(window, MovingRSI, dependency)
 
@@ -206,7 +206,7 @@ class SecurityMovingRSI(SecuritySingleValueHolder):
             return SecurityMovingRSI(self._window, self._dependency)
 
 
-class SecurityMovingLogReturn(SecuritySingleValueHolder):
+cdef class SecurityMovingLogReturn(SecuritySingleValueHolder):
     def __init__(self, window, dependency='x'):
         super(SecurityMovingLogReturn, self).__init__(window, MovingLogReturn, dependency)
 
@@ -217,7 +217,7 @@ class SecurityMovingLogReturn(SecuritySingleValueHolder):
             return SecurityMovingLogReturn(self._window, self._dependency)
 
 
-class SecurityMovingHistoricalWindow(SecuritySingleValueHolder):
+cdef class SecurityMovingHistoricalWindow(SecuritySingleValueHolder):
     def __init__(self, window, dependency='x'):
         super(SecurityMovingHistoricalWindow, self).__init__(window, MovingHistoricalWindow, dependency)
 
@@ -240,22 +240,3 @@ class SecurityMovingHistoricalWindow(SecuritySingleValueHolder):
             return SecurityMovingHistoricalWindow(self._window - self._compHolder._window, self._compHolder)
         else:
             return SecurityMovingHistoricalWindow(self._window, self._dependency)
-
-
-if __name__ == '__main__':
-
-    from PyFin.api import MA
-
-    t = MA(1, 'x') < MA(1, 'y')
-
-    data = {'aapl': {'x': 4, 'y': 3},
-            'goog': {'x': 1, 'y': 4}
-            }
-
-    t.push(data)
-
-    print(t.value)
-    print(t._dependency)
-
-    for k, v in t.value.iteritems():
-        print(k, v)

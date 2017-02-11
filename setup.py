@@ -122,6 +122,7 @@ else:
 ext_modules = [
     "PyFin/Analysis/SecurityValues.pyx",
     "PyFin/Analysis/SecurityValueHolders.pyx",
+    "PyFin/Analysis/TechnicalAnalysis/StatefulTechnicalAnalysers.pyx",
     "PyFin/Math/Accumulators/impl.pyx",
     "PyFin/Math/Accumulators/IAccumulators.pyx",
     "PyFin/Math/Accumulators/StatefulAccumulators.pyx",

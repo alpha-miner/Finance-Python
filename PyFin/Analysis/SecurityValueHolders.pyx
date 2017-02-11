@@ -11,10 +11,10 @@ from collections import OrderedDict
 import sys
 import operator
 import numpy as np
+cimport numpy as np
 import pandas as pd
 from PyFin.Analysis.SecurityValues cimport SecurityValues
 from PyFin.Utilities import to_dict
-from PyFin.Math.Accumulators.IAccumulators cimport Accumulator
 from PyFin.Math.Accumulators.StatefulAccumulators cimport Shift
 from PyFin.Math.Accumulators.IAccumulators cimport Latest
 from PyFin.Math.Accumulators.IAccumulators cimport Identity
@@ -26,15 +26,6 @@ else:
 
 
 cdef class SecurityValueHolder(object):
-
-    cdef public list _dependency
-    cdef public SecurityValueHolder _compHolder
-    cdef public int _window
-    cdef public int _returnSize
-    cdef public Accumulator _holderTemplate
-    cdef public int updated
-    cdef public dict _innerHolders
-    cdef public SecurityValues cached
 
     def __init__(self, dependency='x'):
         if isinstance(dependency, SecurityValueHolder):
@@ -77,29 +68,40 @@ cdef class SecurityValueHolder(object):
         return self._window
 
     cpdef push(self, dict data):
+
+        cdef SecurityValues sec_values
+        cdef Accumulator holder
         self.updated = 0
 
         if self._compHolder:
             self._compHolder.push(data)
-            data = self._compHolder.value
+            sec_values = self._compHolder.value
 
-            for name in data.index():
+            for name in sec_values.index():
                 try:
-                    self._innerHolders[name].push({'x': data[name]})
+                    holder = self._innerHolders[name]
+                    holder.push({'x': sec_values[name]})
                 except KeyError:
-                    self._innerHolders[name] = copy.deepcopy(self._holderTemplate)
-                    self._innerHolders[name].push({'x':  data[name]})
+                    holder = copy.deepcopy(self._holderTemplate)
+                    holder.push({'x':  sec_values[name]})
+                    self._innerHolders[name] = holder
 
         else:
             for name in data:
                 try:
-                    self._innerHolders[name].push(data[name])
+                    holder = self._innerHolders[name]
+                    holder.push(data[name])
                 except KeyError:
-                    self._innerHolders[name] = copy.deepcopy(self._holderTemplate)
-                    self._innerHolders[name].push(data[name])
+                    holder = copy.deepcopy(self._holderTemplate)
+                    holder.push(data[name])
+                    self._innerHolders[name] = holder
 
     @property
     def value(self):
+
+        cdef list values
+        cdef Accumulator holder
+
         if self.updated:
             return SecurityValues(self.cached.values, self.cached.name_mapping)
         else:
@@ -107,7 +109,8 @@ cdef class SecurityValueHolder(object):
             values = []
             for name in keys:
                 try:
-                    values.append(self._innerHolders[name].result())
+                    holder = self._innerHolders[name]
+                    values.append(holder.result())
                 except ArithmeticError:
                     values.append(np.nan)
             self.cached = SecurityValues(np.array(values), index=OrderedDict(zip(keys, range(len(keys)))))
@@ -115,17 +118,24 @@ cdef class SecurityValueHolder(object):
             return self.cached
 
     cpdef value_by_names(self, list names):
+        cdef Accumulator holder
         if self.updated:
             return self.cached[names]
         else:
-            return SecurityValues(np.array([self._innerHolders[name].result() for name in names]),
+            res = []
+            for name in names:
+                holder = self._innerHolders[name]
+                res.append(holder.result())
+            return SecurityValues(np.array(res),
                                   index=OrderedDict(zip(names, range(len(names)))))
 
     cpdef value_by_name(self, name):
+        cdef Accumulator holder
         if self.updated:
             return self.cached[name]
         else:
-            return self._innerHolders[name].result()
+            holder = self._innerHolders[name]
+            return holder.result()
 
     @property
     def holders(self):
@@ -195,22 +205,30 @@ cdef class SecurityValueHolder(object):
     def __ror__(self, left):
         return SecurityOrOperatorValueHolder(left, self)
 
-    cpdef shift(self, n):
+    cpdef shift(self, int n):
         return SecurityShiftedValueHolder(self, n)
 
-    cpdef transform(self, data, name=None, category_field=None):
+    cpdef transform(self, data, str name=None, str category_field=None):
 
-        data = data.sort_index()
+        cdef str f
+        cdef int dummy_category
+        cdef np.ndarray total_category
+        cdef np.ndarray[double, ndim=2] matrix_values
+        cdef list columns
+        cdef np.ndarray[double, ndim=1] output_values
+        cdef int j
+        cdef int start_count
+        cdef int end_count
 
         for f in self._dependency:
             if f not in data:
                 raise ValueError('({0}) dependency is not in input data'.format(f))
 
-        dummy_category = False
+        dummy_category = 0
         if not category_field:
             category_field = 'dummy'
             data[category_field] = 1
-            dummy_category = True
+            dummy_category = 1
             total_index = list(range(len(data)))
         else:
             total_index = data.index
@@ -218,41 +236,35 @@ cdef class SecurityValueHolder(object):
         if not name:
             name = 'transformed'
 
-        total_category = data[category_field].tolist()
+        total_category = data[category_field].values
         data = data.select_dtypes([np.number])
         matrix_values = data.as_matrix().astype(np.float64)
         columns = data.columns.tolist()
-        split_category, split_values = to_dict(total_index, total_category, matrix_values, columns)
+        split_category, split_values = to_dict(total_index, total_category.tolist(), matrix_values, columns)
 
-        output_values = np.zeros((len(data), 1))
+        output_values = np.zeros(len(data))
 
         start_count = 0
         if not dummy_category:
             for j, dict_data in enumerate(split_values):
                 self.push(dict_data)
                 end_count = start_count + len(dict_data)
-                output_values[start_count:end_count, 0] = self.value_by_names(split_category[j]).values
+                output_values[start_count:end_count] = self.value_by_names(split_category[j]).values
                 start_count = end_count
         else:
             for j, dict_data in enumerate(split_values):
                 self.push(dict_data)
-                output_values[j, 0] = self.value_by_name(split_category[j][0])
+                output_values[j] = self.value_by_name(split_category[j][0])
 
-        df = pd.DataFrame(output_values, index=total_category, columns=[name])
-        if dummy_category:
-            df.index = data.index
-        else:
-            df[category_field] = df.index
-            df.index = data.index
+        df = pd.DataFrame(output_values, index=data.index, columns=[name])
+        if not dummy_category:
+            df[category_field] = total_category
 
         df.dropna(inplace=True)
         return df
 
 
 cdef class FilteredSecurityValueHolder(SecurityValueHolder):
-
-    cdef public SecurityValueHolder _filter
-    cdef public SecurityValueHolder _computer
 
     def __init__(self, computer, filtering):
         self._filter = copy.deepcopy(filtering)
@@ -292,6 +304,9 @@ cdef class FilteredSecurityValueHolder(SecurityValueHolder):
             return self.cached
 
     cpdef value_by_name(self, name):
+
+        cdef double filter_value
+
         if self.updated:
             return self.cached[name]
         else:
@@ -301,7 +316,11 @@ cdef class FilteredSecurityValueHolder(SecurityValueHolder):
             else:
                 return np.nan
 
-    cpdef value_by_names(self, names):
+    cpdef value_by_names(self, list names):
+
+        cdef SecurityValues filter_value
+        cdef SecurityValues orig_values
+
         if self.updated:
             return self.cached[names]
         else:
@@ -309,7 +328,7 @@ cdef class FilteredSecurityValueHolder(SecurityValueHolder):
             orig_values = self._computer.value_by_names(names)
             return SecurityValues(np.where(filter_value.values, orig_values.values, np.nan), filter_value.name_mapping)
 
-    cpdef push(self, data):
+    cpdef push(self, dict data):
         self._computer.push(data)
         self._filter.push(data)
         self.updated = 0
@@ -319,8 +338,6 @@ cdef class FilteredSecurityValueHolder(SecurityValueHolder):
 
 
 cdef class IdentitySecurityValueHolder(SecurityValueHolder):
-
-    cdef public double _value
 
     def __init__(self, value):
         self._value = value
@@ -339,13 +356,18 @@ cdef class IdentitySecurityValueHolder(SecurityValueHolder):
     def isFull(self):
         return True
 
-    cpdef push(self, data):
+    cpdef push(self, dict data):
+
+        cdef Identity holder
+
         for name in data:
             try:
-                self._innerHolders[name].push(data)
+                holder = self._innerHolders[name]
+                holder.push(data)
             except KeyError:
-                self._innerHolders[name] = copy.deepcopy(self._holderTemplate)
-                self._innerHolders[name].push(data)
+                holder = copy.deepcopy(self._holderTemplate)
+                holder.push(data)
+                self._innerHolders[name] = holder
 
         self.updated = 0
 
@@ -354,9 +376,6 @@ cdef class IdentitySecurityValueHolder(SecurityValueHolder):
 
 
 cdef class SecurityUnitoryValueHolder(SecurityValueHolder):
-
-    cdef public SecurityValueHolder _right
-    cdef public object _op
 
     def __init__(self, right, op):
         self._right = copy.deepcopy(right)
@@ -379,7 +398,7 @@ cdef class SecurityUnitoryValueHolder(SecurityValueHolder):
     def symbolList(self):
         return self._right.symbolList
 
-    cpdef push(self, data):
+    cpdef push(self, dict data):
         self._right.push(data)
         self.updated = 0
 
@@ -398,7 +417,7 @@ cdef class SecurityUnitoryValueHolder(SecurityValueHolder):
         else:
             return self._op(self._right.value_by_name(name))
 
-    cpdef value_by_names(self, names):
+    cpdef value_by_names(self, list names):
         if self.updated:
             return self.cached[names]
         else:
@@ -446,10 +465,6 @@ cdef class SecurityLatestValueHolder(SecurityValueHolder):
 
 cdef class SecurityCombinedValueHolder(SecurityValueHolder):
 
-    cdef public SecurityValueHolder _left
-    cdef public SecurityValueHolder _right
-    cdef public object _op
-
     def __init__(self, left, right, op):
         if isinstance(left, SecurityValueHolder):
             self._left = copy.deepcopy(left)
@@ -485,7 +500,7 @@ cdef class SecurityCombinedValueHolder(SecurityValueHolder):
     def symbolList(self):
         return self._left.symbolList.union(self._right.symbolList)
 
-    cpdef push(self, data):
+    cpdef push(self, dict data):
         self._left.push(data)
         self._right.push(data)
         self.updated = 0
@@ -505,7 +520,7 @@ cdef class SecurityCombinedValueHolder(SecurityValueHolder):
         else:
             return self._op(self._left.value_by_name(name), self._right.value_by_name(name))
 
-    cpdef value_by_names(self, names):
+    cpdef value_by_names(self, list names):
         if self.updated:
             return self.cached[names]
         else:
@@ -645,10 +660,6 @@ cdef class SecurityShiftedValueHolder(SecurityValueHolder):
 
 cdef class SecurityIIFValueHolder(SecurityValueHolder):
 
-    cdef public SecurityValueHolder _flag
-    cdef public SecurityValueHolder _left
-    cdef public SecurityValueHolder _right
-
     def __init__(self, flag, left, right):
 
         if not isinstance(flag, SecurityValueHolder):
@@ -682,7 +693,7 @@ cdef class SecurityIIFValueHolder(SecurityValueHolder):
         self.updated = 0
         self.cached = None
 
-    cpdef isFullByName(self, name):
+    def isFullByName(self, name):
         return self._flag.isFullByName(name) and self._left.isFullByName(name) and self._right.isFullByName(name)
 
     @property
@@ -693,7 +704,7 @@ cdef class SecurityIIFValueHolder(SecurityValueHolder):
     def symbolList(self):
         return self._flag.symbolList
 
-    cpdef push(self, data):
+    cpdef push(self, dict data):
         self._flag.push(data)
         self._left.push(data)
         self._right.push(data)
@@ -720,7 +731,7 @@ cdef class SecurityIIFValueHolder(SecurityValueHolder):
             else:
                 return self._right.value_by_name(name)
 
-    cpdef value_by_names(self, names):
+    cpdef value_by_names(self, list names):
         if self.updated:
             return self.cached[names]
         else:

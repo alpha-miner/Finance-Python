@@ -159,7 +159,7 @@ cdef class SecurityValues(object):
     cpdef double mean(self):
         return np.nanmean(self.values)
 
-    cpdef double dot(self, right):
+    cpdef double dot(self, SecurityValues right):
         return np.dot(self.values, right.values)
 
     def __deepcopy__(self, memo):

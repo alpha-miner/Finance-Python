@@ -44,10 +44,10 @@ class SecurityXAverageValueHolder(SecurityStatelessSingleValueHolder):
 
     def __deepcopy__(self, memo):
         if self._compHolder:
-            return SecurityXAverageValueHolder(2.0 / self._holderTemplate.self._exp - 1,
+            return SecurityXAverageValueHolder(2.0 / self._holderTemplate._exp - 1,
                                                self._compHolder)
         else:
-            return SecurityXAverageValueHolder(2.0 / self._holderTemplate.self._exp - 1,
+            return SecurityXAverageValueHolder(2.0 / self._holderTemplate._exp - 1,
                                                self._dependency)
 
 

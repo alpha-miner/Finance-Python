@@ -72,6 +72,13 @@ class CSRankedSecurityValueHolder(CrossSectionValueHolder):
     def __deepcopy__(self, memo):
         return CSRankedSecurityValueHolder(self._inner)
 
+    def __reduce__(self):
+        d = {}
+        return CSRankedSecurityValueHolder, (self._inner, ), d
+
+    def __setstate__(self, state):
+        pass
+
 
 class CSAverageSecurityValueHolder(CrossSectionValueHolder):
     def __init__(self, innerValue):
@@ -108,7 +115,14 @@ class CSAverageSecurityValueHolder(CrossSectionValueHolder):
         return raw_values[names]
 
     def __deepcopy__(self, memo):
-        return CSRankedSecurityValueHolder(self._inner)
+        return CSAverageSecurityValueHolder(self._inner)
+
+    def __reduce__(self):
+        d = {}
+        return CSAverageSecurityValueHolder, (self._inner, ), d
+
+    def __setstate__(self, state):
+        pass
 
 
 class CSAverageAdjustedSecurityValueHolder(CrossSectionValueHolder):
@@ -140,7 +154,14 @@ class CSAverageAdjustedSecurityValueHolder(CrossSectionValueHolder):
         return raw_values[names]
 
     def __deepcopy__(self, memo):
-        return CSRankedSecurityValueHolder(self._inner)
+        return CSAverageAdjustedSecurityValueHolder(self._inner)
+
+    def __reduce__(self):
+        d = {}
+        return CSAverageAdjustedSecurityValueHolder, (self._inner, ), d
+
+    def __setstate__(self, state):
+        pass
 
 
 class CSQuantileSecurityValueHolder(CrossSectionValueHolder):
@@ -172,4 +193,11 @@ class CSQuantileSecurityValueHolder(CrossSectionValueHolder):
         return raw_values[names]
 
     def __deepcopy__(self, memo):
-        return CSRankedSecurityValueHolder(self._inner)
+        return CSQuantileSecurityValueHolder(self._inner)
+
+    def __reduce__(self):
+        d = {}
+        return CSQuantileSecurityValueHolder, (self._inner, ), d
+
+    def __setstate__(self, state):
+        pass

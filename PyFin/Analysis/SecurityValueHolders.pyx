@@ -337,6 +337,15 @@ cdef class FilteredSecurityValueHolder(SecurityValueHolder):
     def __deepcopy__(self, memo):
         return FilteredSecurityValueHolder(self._computer, self._filter)
 
+    def __reduce__(self):
+        d = {}
+
+        return FilteredSecurityValueHolder, (self._computer, self._filter), d
+
+    def __setstate__(self, state):
+        pass
+
+
 
 cdef class IdentitySecurityValueHolder(SecurityValueHolder):
 
@@ -374,6 +383,15 @@ cdef class IdentitySecurityValueHolder(SecurityValueHolder):
 
     def __deepcopy__(self, memo):
         return IdentitySecurityValueHolder(self._value)
+
+    def __reduce__(self):
+        d = {}
+
+        return IdentitySecurityValueHolder, (self._value,), d
+
+    def __setstate__(self, state):
+        pass
+
 
 
 cdef class SecurityUnitoryValueHolder(SecurityValueHolder):
@@ -424,9 +442,6 @@ cdef class SecurityUnitoryValueHolder(SecurityValueHolder):
         else:
             return self._op(self._right.value_by_names(names))
 
-    def __deepcopy__(self, memo):
-        return SecurityUnitoryValueHolder(self._right, self._op)
-
 
 cdef class SecurityNegValueHolder(SecurityUnitoryValueHolder):
     def __init__(self, right):
@@ -436,6 +451,14 @@ cdef class SecurityNegValueHolder(SecurityUnitoryValueHolder):
     def __deepcopy__(self, memo):
         return SecurityNegValueHolder(self._right)
 
+    def __reduce__(self):
+        d = {}
+
+        return SecurityNegValueHolder, (self._right,), d
+
+    def __setstate__(self, state):
+        pass
+
 
 cdef class SecurityInvertValueHolder(SecurityUnitoryValueHolder):
     def __init__(self, right):
@@ -444,6 +467,14 @@ cdef class SecurityInvertValueHolder(SecurityUnitoryValueHolder):
 
     def __deepcopy__(self, memo):
         return SecurityInvertValueHolder(self._right)
+
+    def __reduce__(self):
+        d = {}
+
+        return SecurityInvertValueHolder, (self._right,), d
+
+    def __setstate__(self, state):
+        pass
 
 
 cdef class SecurityLatestValueHolder(SecurityValueHolder):
@@ -462,6 +493,16 @@ cdef class SecurityLatestValueHolder(SecurityValueHolder):
             return SecurityLatestValueHolder(self._compHolder)
         else:
             return SecurityLatestValueHolder(self._dependency)
+
+    def __reduce__(self):
+        d = {}
+        if self._compHolder:
+            return SecurityLatestValueHolder, (self._compHolder,), d
+        else:
+            return SecurityLatestValueHolder, (self._dependency,), d
+
+    def __setstate__(self, state):
+        pass
 
 
 cdef class SecurityCombinedValueHolder(SecurityValueHolder):
@@ -539,6 +580,13 @@ cdef class SecurityAddedValueHolder(SecurityCombinedValueHolder):
     def __deepcopy__(self, memo):
         return SecurityAddedValueHolder(self._left, self._right)
 
+    def __reduce__(self):
+        d = {}
+        return SecurityAddedValueHolder, (self._left, self._right), d
+
+    def __setstate__(self, state):
+        pass
+
 
 cdef class SecuritySubbedValueHolder(SecurityCombinedValueHolder):
     def __init__(self, left, right):
@@ -547,6 +595,13 @@ cdef class SecuritySubbedValueHolder(SecurityCombinedValueHolder):
 
     def __deepcopy__(self, memo):
         return SecuritySubbedValueHolder(self._left, self._right)
+
+    def __reduce__(self):
+        d = {}
+        return SecuritySubbedValueHolder, (self._left, self._right), d
+
+    def __setstate__(self, state):
+        pass
 
 
 cdef class SecurityMultipliedValueHolder(SecurityCombinedValueHolder):
@@ -557,6 +612,13 @@ cdef class SecurityMultipliedValueHolder(SecurityCombinedValueHolder):
     def __deepcopy__(self, memo):
         return SecurityMultipliedValueHolder(self._left, self._right)
 
+    def __reduce__(self):
+        d = {}
+        return SecurityMultipliedValueHolder, (self._left, self._right), d
+
+    def __setstate__(self, state):
+        pass
+
 
 cdef class SecurityDividedValueHolder(SecurityCombinedValueHolder):
     def __init__(self, left, right):
@@ -565,6 +627,13 @@ cdef class SecurityDividedValueHolder(SecurityCombinedValueHolder):
 
     def __deepcopy__(self, memo):
         return SecurityDividedValueHolder(self._left, self._right)
+
+    def __reduce__(self):
+        d = {}
+        return SecurityDividedValueHolder, (self._left, self._right), d
+
+    def __setstate__(self, state):
+        pass
 
 
 cdef class SecurityLtOperatorValueHolder(SecurityCombinedValueHolder):
@@ -575,6 +644,13 @@ cdef class SecurityLtOperatorValueHolder(SecurityCombinedValueHolder):
     def __deepcopy__(self, memo):
         return SecurityLtOperatorValueHolder(self._left, self._right)
 
+    def __reduce__(self):
+        d = {}
+        return SecurityLtOperatorValueHolder, (self._left, self._right), d
+
+    def __setstate__(self, state):
+        pass
+
 
 cdef class SecurityLeOperatorValueHolder(SecurityCombinedValueHolder):
     def __init__(self, left, right):
@@ -583,6 +659,13 @@ cdef class SecurityLeOperatorValueHolder(SecurityCombinedValueHolder):
 
     def __deepcopy__(self, memo):
         return SecurityLeOperatorValueHolder(self._left, self._right)
+
+    def __reduce__(self):
+        d = {}
+        return SecurityLeOperatorValueHolder, (self._left, self._right), d
+
+    def __setstate__(self, state):
+        pass
 
 
 cdef class SecurityGtOperatorValueHolder(SecurityCombinedValueHolder):
@@ -602,6 +685,13 @@ cdef class SecurityGeOperatorValueHolder(SecurityCombinedValueHolder):
     def __deepcopy__(self, memo):
         return SecurityGeOperatorValueHolder(self._left, self._right)
 
+    def __reduce__(self):
+        d = {}
+        return SecurityGeOperatorValueHolder, (self._left, self._right), d
+
+    def __setstate__(self, state):
+        pass
+
 
 cdef class SecurityEqOperatorValueHolder(SecurityCombinedValueHolder):
     def __init__(self, left, right):
@@ -610,6 +700,13 @@ cdef class SecurityEqOperatorValueHolder(SecurityCombinedValueHolder):
 
     def __deepcopy__(self, memo):
         return SecurityEqOperatorValueHolder(self._left, self._right)
+
+    def __reduce__(self):
+        d = {}
+        return SecurityEqOperatorValueHolder, (self._left, self._right), d
+
+    def __setstate__(self, state):
+        pass
 
 
 cdef class SecurityNeOperatorValueHolder(SecurityCombinedValueHolder):
@@ -620,6 +717,13 @@ cdef class SecurityNeOperatorValueHolder(SecurityCombinedValueHolder):
     def __deepcopy__(self, memo):
         return SecurityNeOperatorValueHolder(self._left, self._right)
 
+    def __reduce__(self):
+        d = {}
+        return SecurityNeOperatorValueHolder, (self._left, self._right), d
+
+    def __setstate__(self, state):
+        pass
+
 
 cdef class SecurityAndOperatorValueHolder(SecurityCombinedValueHolder):
     def __init__(self, left, right):
@@ -629,6 +733,13 @@ cdef class SecurityAndOperatorValueHolder(SecurityCombinedValueHolder):
     def __deepcopy__(self, memo):
         return SecurityAndOperatorValueHolder(self._left, self._right)
 
+    def __reduce__(self):
+        d = {}
+        return SecurityAndOperatorValueHolder, (self._left, self._right), d
+
+    def __setstate__(self, state):
+        pass
+
 
 cdef class SecurityOrOperatorValueHolder(SecurityCombinedValueHolder):
     def __init__(self, left, right):
@@ -637,6 +748,13 @@ cdef class SecurityOrOperatorValueHolder(SecurityCombinedValueHolder):
 
     def __deepcopy__(self, memo):
         return SecurityOrOperatorValueHolder(self._left, self._right)
+
+    def __reduce__(self):
+        d = {}
+        return SecurityOrOperatorValueHolder, (self._left, self._right), d
+
+    def __setstate__(self, state):
+        pass
 
 
 cdef class SecurityShiftedValueHolder(SecurityValueHolder):
@@ -657,6 +775,16 @@ cdef class SecurityShiftedValueHolder(SecurityValueHolder):
             return SecurityShiftedValueHolder(self._compHolder, self._holderTemplate.lag())
         else:
             return SecurityShiftedValueHolder(self._dependency, self._holderTemplate.lag())
+
+    def __reduce__(self):
+        d = {}
+        if self._compHolder:
+            return SecurityShiftedValueHolder, (self._compHolder, self._holderTemplate.lag()), d
+        else:
+            return SecurityShiftedValueHolder, (self._dependency, self._holderTemplate.lag()), d
+
+    def __setstate__(self, state):
+        pass
 
 
 cdef class SecurityIIFValueHolder(SecurityValueHolder):
@@ -746,6 +874,13 @@ cdef class SecurityIIFValueHolder(SecurityValueHolder):
 
     def __deepcopy__(self, memo):
         return SecurityIIFValueHolder(self._flag, self._left, self._right)
+
+    def __reduce__(self):
+        d = {}
+        return SecurityIIFValueHolder, (self._flag, self._left, self._right), d
+
+    def __setstate__(self, state):
+        pass
 
 
 def dependencyCalculator(*args):

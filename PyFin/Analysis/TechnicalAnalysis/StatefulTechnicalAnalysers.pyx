@@ -52,6 +52,16 @@ cdef class SecurityMovingAverage(SecuritySingleValueHolder):
         else:
             return SecurityMovingAverage(self._window, self._dependency)
 
+    def __reduce__(self):
+        d = {}
+        if self._compHolder:
+            return SecurityMovingAverage, (self._window - self._compHolder._window, self._compHolder), d
+        else:
+            return SecurityMovingAverage, (self._window, self._dependency), d
+
+    def __setstate__(self, state):
+        pass
+
 
 cdef class SecurityMovingMax(SecuritySingleValueHolder):
     def __init__(self, window, dependency='x'):
@@ -62,6 +72,16 @@ cdef class SecurityMovingMax(SecuritySingleValueHolder):
             return SecurityMovingMax(self._window - self._compHolder._window, self._compHolder)
         else:
             return SecurityMovingMax(self._window, self._dependency)
+
+    def __reduce__(self):
+        d = {}
+        if self._compHolder:
+            return SecurityMovingMax, (self._window - self._compHolder._window, self._compHolder), d
+        else:
+            return SecurityMovingMax, (self._window, self._dependency), d
+
+    def __setstate__(self, state):
+        pass
 
 
 cdef class SecurityMovingMinimum(SecuritySingleValueHolder):
@@ -74,6 +94,16 @@ cdef class SecurityMovingMinimum(SecuritySingleValueHolder):
         else:
             return SecurityMovingMinimum(self._window, self._dependency)
 
+    def __reduce__(self):
+        d = {}
+        if self._compHolder:
+            return SecurityMovingMinimum, (self._window - self._compHolder._window, self._compHolder), d
+        else:
+            return SecurityMovingMinimum, (self._window, self._dependency), d
+
+    def __setstate__(self, state):
+        pass
+
 
 cdef class SecurityMovingQuantile(SecuritySingleValueHolder):
     def __init__(self, window, dependency='x'):
@@ -84,6 +114,16 @@ cdef class SecurityMovingQuantile(SecuritySingleValueHolder):
             return SecurityMovingQuantile(self._window - self._compHolder._window, self._compHolder)
         else:
             return SecurityMovingQuantile(self._window, self._dependency)
+
+    def __reduce__(self):
+        d = {}
+        if self._compHolder:
+            return SecurityMovingQuantile, (self._window - self._compHolder._window, self._compHolder), d
+        else:
+            return SecurityMovingQuantile, (self._window, self._dependency), d
+
+    def __setstate__(self, state):
+        pass
 
 
 cdef class SecurityMovingAllTrue(SecuritySingleValueHolder):
@@ -96,6 +136,16 @@ cdef class SecurityMovingAllTrue(SecuritySingleValueHolder):
         else:
             return SecurityMovingAllTrue(self._window, self._dependency)
 
+    def __reduce__(self):
+        d = {}
+        if self._compHolder:
+            return SecurityMovingAllTrue, (self._window - self._compHolder._window, self._compHolder), d
+        else:
+            return SecurityMovingAllTrue, (self._window, self._dependency), d
+
+    def __setstate__(self, state):
+        pass
+
 
 cdef class SecurityMovingAnyTrue(SecuritySingleValueHolder):
     def __init__(self, window, dependency='x'):
@@ -106,6 +156,16 @@ cdef class SecurityMovingAnyTrue(SecuritySingleValueHolder):
             return SecurityMovingAnyTrue(self._window - self._compHolder._window, self._compHolder)
         else:
             return SecurityMovingAnyTrue(self._window, self._dependency)
+
+    def __reduce__(self):
+        d = {}
+        if self._compHolder:
+            return SecurityMovingAnyTrue, (self._window - self._compHolder._window, self._compHolder), d
+        else:
+            return SecurityMovingAnyTrue, (self._window, self._dependency), d
+
+    def __setstate__(self, state):
+        pass
 
 
 cdef class SecurityMovingSum(SecuritySingleValueHolder):
@@ -118,6 +178,16 @@ cdef class SecurityMovingSum(SecuritySingleValueHolder):
         else:
             return SecurityMovingSum(self._window, self._dependency)
 
+    def __reduce__(self):
+        d = {}
+        if self._compHolder:
+            return SecurityMovingSum, (self._window - self._compHolder._window, self._compHolder), d
+        else:
+            return SecurityMovingSum, (self._window, self._dependency), d
+
+    def __setstate__(self, state):
+        pass
+
 
 cdef class SecurityMovingVariance(SecuritySingleValueHolder):
     def __init__(self, window, dependency='x'):
@@ -128,6 +198,16 @@ cdef class SecurityMovingVariance(SecuritySingleValueHolder):
             return SecurityMovingVariance(self._window - self._compHolder._window, self._compHolder)
         else:
             return SecurityMovingVariance(self._window, self._dependency)
+
+    def __reduce__(self):
+        d = {}
+        if self._compHolder:
+            return SecurityMovingVariance, (self._window - self._compHolder._window, self._compHolder), d
+        else:
+            return SecurityMovingVariance, (self._window, self._dependency), d
+
+    def __setstate__(self, state):
+        pass
 
 
 cdef class SecurityMovingCountedPositive(SecuritySingleValueHolder):
@@ -140,6 +220,16 @@ cdef class SecurityMovingCountedPositive(SecuritySingleValueHolder):
         else:
             return SecurityMovingCountedPositive(self._window, self._dependency)
 
+    def __reduce__(self):
+        d = {}
+        if self._compHolder:
+            return SecurityMovingCountedPositive, (self._window - self._compHolder._window, self._compHolder), d
+        else:
+            return SecurityMovingCountedPositive, (self._window, self._dependency), d
+
+    def __setstate__(self, state):
+        pass
+
 
 cdef class SecurityMovingPositiveAverage(SecuritySingleValueHolder):
     def __init__(self, window, dependency='x'):
@@ -150,6 +240,16 @@ cdef class SecurityMovingPositiveAverage(SecuritySingleValueHolder):
             return SecurityMovingPositiveAverage(self._window - self._compHolder._window, self._compHolder)
         else:
             return SecurityMovingPositiveAverage(self._window, self._dependency)
+
+    def __reduce__(self):
+        d = {}
+        if self._compHolder:
+            return SecurityMovingPositiveAverage, (self._window - self._compHolder._window, self._compHolder), d
+        else:
+            return SecurityMovingPositiveAverage, (self._window, self._dependency), d
+
+    def __setstate__(self, state):
+        pass
 
 
 cdef class SecurityMovingCountedNegative(SecuritySingleValueHolder):
@@ -162,6 +262,16 @@ cdef class SecurityMovingCountedNegative(SecuritySingleValueHolder):
         else:
             return SecurityMovingCountedNegative(self._window, self._dependency)
 
+    def __reduce__(self):
+        d = {}
+        if self._compHolder:
+            return SecurityMovingCountedNegative, (self._window - self._compHolder._window, self._compHolder), d
+        else:
+            return SecurityMovingCountedNegative, (self._window, self._dependency), d
+
+    def __setstate__(self, state):
+        pass
+
 
 cdef class SecurityMovingNegativeAverage(SecuritySingleValueHolder):
     def __init__(self, window, dependency='x'):
@@ -172,6 +282,16 @@ cdef class SecurityMovingNegativeAverage(SecuritySingleValueHolder):
             return SecurityMovingNegativeAverage(self._window - self._compHolder._window, self._compHolder)
         else:
             return SecurityMovingNegativeAverage(self._window, self._dependency)
+
+    def __reduce__(self):
+        d = {}
+        if self._compHolder:
+            return SecurityMovingNegativeAverage, (self._window - self._compHolder._window, self._compHolder), d
+        else:
+            return SecurityMovingNegativeAverage, (self._window, self._dependency), d
+
+    def __setstate__(self, state):
+        pass
 
 
 cdef class SecurityMovingPositiveDifferenceAverage(SecuritySingleValueHolder):
@@ -184,6 +304,16 @@ cdef class SecurityMovingPositiveDifferenceAverage(SecuritySingleValueHolder):
         else:
             return SecurityMovingPositiveDifferenceAverage(self._window, self._dependency)
 
+    def __reduce__(self):
+        d = {}
+        if self._compHolder:
+            return SecurityMovingPositiveDifferenceAverage, (self._window - self._compHolder._window, self._compHolder), d
+        else:
+            return SecurityMovingPositiveDifferenceAverage, (self._window, self._dependency), d
+
+    def __setstate__(self, state):
+        pass
+
 
 cdef class SecurityMovingNegativeDifferenceAverage(SecuritySingleValueHolder):
     def __init__(self, window, dependency='x'):
@@ -194,6 +324,16 @@ cdef class SecurityMovingNegativeDifferenceAverage(SecuritySingleValueHolder):
             return SecurityMovingNegativeDifferenceAverage(self._window - self._compHolder._window, self._compHolder)
         else:
             return SecurityMovingNegativeDifferenceAverage(self._window, self._dependency)
+
+    def __reduce__(self):
+        d = {}
+        if self._compHolder:
+            return SecurityMovingNegativeDifferenceAverage, (self._window - self._compHolder._window, self._compHolder), d
+        else:
+            return SecurityMovingNegativeDifferenceAverage, (self._window, self._dependency), d
+
+    def __setstate__(self, state):
+        pass
 
 
 cdef class SecurityMovingRSI(SecuritySingleValueHolder):
@@ -206,6 +346,16 @@ cdef class SecurityMovingRSI(SecuritySingleValueHolder):
         else:
             return SecurityMovingRSI(self._window, self._dependency)
 
+    def __reduce__(self):
+        d = {}
+        if self._compHolder:
+            return SecurityMovingRSI, (self._window - self._compHolder._window, self._compHolder), d
+        else:
+            return SecurityMovingRSI, (self._window, self._dependency), d
+
+    def __setstate__(self, state):
+        pass
+
 
 cdef class SecurityMovingLogReturn(SecuritySingleValueHolder):
     def __init__(self, window, dependency='x'):
@@ -216,6 +366,16 @@ cdef class SecurityMovingLogReturn(SecuritySingleValueHolder):
             return SecurityMovingLogReturn(self._window - self._compHolder._window, self._compHolder)
         else:
             return SecurityMovingLogReturn(self._window, self._dependency)
+
+    def __reduce__(self):
+        d = {}
+        if self._compHolder:
+            return SecurityMovingLogReturn, (self._window - self._compHolder._window, self._compHolder), d
+        else:
+            return SecurityMovingLogReturn, (self._window, self._dependency), d
+
+    def __setstate__(self, state):
+        pass
 
 
 cdef class SecurityMovingHistoricalWindow(SecuritySingleValueHolder):
@@ -241,3 +401,13 @@ cdef class SecurityMovingHistoricalWindow(SecuritySingleValueHolder):
             return SecurityMovingHistoricalWindow(self._window - self._compHolder._window, self._compHolder)
         else:
             return SecurityMovingHistoricalWindow(self._window, self._dependency)
+
+    def __reduce__(self):
+        d = {}
+        if self._compHolder:
+            return SecurityMovingHistoricalWindow, (self._window - self._compHolder._window, self._compHolder), d
+        else:
+            return SecurityMovingHistoricalWindow, (self._window, self._dependency), d
+
+    def __setstate__(self, state):
+        pass

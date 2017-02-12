@@ -74,6 +74,7 @@ cdef class SecurityValues(object):
         else:
             return SecurityValues(self.values * right, self.name_mapping)
 
+    @cython.cdivision(True)
     def __truediv__(self, right):
         if isinstance(right, SecurityValues):
             if isinstance(self, SecurityValues):
@@ -83,6 +84,7 @@ cdef class SecurityValues(object):
         else:
             return SecurityValues(self.values / right, self.name_mapping)
 
+    @cython.cdivision(True)
     def __div__(self, right):
         if isinstance(right, SecurityValues):
             if isinstance(self, SecurityValues):

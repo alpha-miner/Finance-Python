@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+#cython: embedsignature=True
 u"""
 Created on 2015-2-12
 

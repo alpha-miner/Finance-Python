@@ -676,6 +676,13 @@ cdef class SecurityGtOperatorValueHolder(SecurityCombinedValueHolder):
     def __deepcopy__(self, memo):
         return SecurityGtOperatorValueHolder(self._left, self._right)
 
+    def __reduce__(self):
+        d = {}
+        return SecurityGtOperatorValueHolder, (self._left, self._right), d
+
+    def __setstate__(self, state):
+        pass
+
 
 cdef class SecurityGeOperatorValueHolder(SecurityCombinedValueHolder):
     def __init__(self, left, right):

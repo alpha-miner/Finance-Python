@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-#cython: embedsignature=True
 u"""
 Created on 2017-2-8
 
@@ -103,14 +102,17 @@ cdef class SingleValuedValueHolder(StatefulValueHolder):
 
     cdef double _push(self, dict data):
 
+        cdef Accumulator comp
+
         cdef double value
         cdef int isValueHolder = self._isValueHolderContained
 
         if not isValueHolder and self._dependency in data:
             return data[self._dependency]
         elif isValueHolder:
-            self._dependency.push(data)
-            return self._dependency.result()
+            comp = self._dependency
+            comp.push(data)
+            return comp.result()
         else:
             return np.nan
 

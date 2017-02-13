@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-#cython: embedsignature=True
 u"""
 Created on 2015-8-8
 
@@ -7,7 +6,11 @@ Created on 2015-8-8
 """
 
 import copy
+from collections import OrderedDict
+import numpy as np
 cimport numpy as np
+cimport cython
+from PyFin.Math.Accumulators.IAccumulators cimport Accumulator
 from PyFin.Analysis.SecurityValues cimport SecurityValues
 from PyFin.Analysis.SecurityValueHolders cimport SecurityValueHolder
 from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingAverage
@@ -395,6 +398,59 @@ cdef class SecurityMovingHistoricalWindow(SecuritySingleValueHolder):
             return SecurityValues(res)
         else:
             raise ValueError("{0} is not recognized as valid int or string".format(item))
+
+    @property
+    @cython.boundscheck(False)
+    @cython.wraparound(False)
+    def value(self):
+
+        cdef list values
+        cdef Accumulator holder
+        cdef int n
+        cdef int i
+
+        if self.updated:
+            return SecurityValues(self.cached.values, self.cached.name_mapping)
+        else:
+            keys = self._innerHolders.keys()
+            n = len(keys)
+            values = [None] * n
+            for i, name in enumerate(keys):
+                try:
+                    holder = self._innerHolders[name]
+                    values[i] = holder.result()
+                except ArithmeticError:
+                    values[i] = np.nan
+            self.cached = SecurityValues(np.array(values), index=OrderedDict(zip(keys, range(n))))
+            self.updated = 1
+            return self.cached
+
+    @cython.boundscheck(False)
+    @cython.wraparound(False)
+    cpdef value_by_names(self, list names):
+        cdef Accumulator holder
+        cdef list res
+        cdef int i
+        cdef int n
+
+        if self.updated:
+            return self.cached[names]
+        else:
+            n = len(names)
+            res = [None] * n
+            for i, name in enumerate(names):
+                holder = self._innerHolders[name]
+                res[i] = holder.result()
+            return SecurityValues(np.array(res),
+                                  index=OrderedDict(zip(names, range(n))))
+
+    cpdef value_by_name(self, name):
+        cdef Accumulator holder
+        if self.updated:
+            return self.cached[name]
+        else:
+            holder = self._innerHolders[name]
+            return holder.result()
 
     def __deepcopy__(self, memo):
         if self._compHolder:

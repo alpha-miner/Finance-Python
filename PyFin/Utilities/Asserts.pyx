@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-#cython: embedsignature=True
 u"""
 Created on 2017-1-3
 
@@ -8,6 +7,8 @@ Created on 2017-1-3
 
 import warnings
 cimport cython
+from libc.math cimport fabs
+from libc.math cimport fmax
 
 
 cpdef pyFinAssert(condition, exception, str msg=""):
@@ -19,6 +20,5 @@ cpdef pyFinWarning(condition, warn_type, str msg=""):
     if not condition:
         warnings.warn(msg, warn_type)
 
-
-cpdef isClose(float a, float b=0., float rel_tol=1e-09, float abs_tol=1e-12):
-    return abs(a-b) <= max(rel_tol * max(abs(a), abs(b)), abs_tol)
+cpdef bint isClose(double a, double b=0., double rel_tol=1e-09, double abs_tol=1e-12) nogil:
+    return fabs(a-b) <= fmax(rel_tol * fmax(fabs(a), fabs(b)), abs_tol)

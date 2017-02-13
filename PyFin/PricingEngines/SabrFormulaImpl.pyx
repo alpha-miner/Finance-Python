@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-#cython: embedsignature=True
 u"""
 Created on 2017-1-6
 
@@ -9,6 +8,7 @@ Created on 2017-1-6
 cimport cython
 from libc.math cimport sqrt
 from libc.math cimport log
+from libc.math cimport fabs
 import numpy as np
 cimport numpy as np
 from PyFin.Math.MathConstants import MathConstants
@@ -17,12 +17,12 @@ cdef double QL_EPSILON = MathConstants.QL_EPSILON
 
 @cython.cdivision(True)
 cpdef double sabrVolatilityImpl(double strike,
-                        double forward,
-                        double expiryTime,
-                        double alpha,
-                        double beta,
-                        double nu,
-                        double rho):
+                                double forward,
+                                double expiryTime,
+                                double alpha,
+                                double beta,
+                                double nu,
+                                double rho):
     cdef double oneMinusBeta = 1.0 - beta
     cdef double A = (forward * strike) ** oneMinusBeta
     cdef double sqrtA = sqrt(A)
@@ -37,7 +37,7 @@ cpdef double sabrVolatilityImpl(double strike,
     cdef double d
     cdef double multiplier
 
-    if not abs(forward - strike) < 1e-10:
+    if not fabs(forward - strike) < 1e-10:
         logM = log(forward / strike)
     else:
         epsilon = (forward - strike) / strike
@@ -52,7 +52,7 @@ cpdef double sabrVolatilityImpl(double strike,
                + 0.25 * rho * beta * nu * alpha / sqrtA
                + (2.0 - 3.0 * rho * rho) * (nu * nu / 24.0))
 
-    if abs(z * z) > QL_EPSILON * 10:
+    if fabs(z * z) > QL_EPSILON * 10:
         multiplier = z / xx
     else:
         multiplier = 1.0 - 0.5 * rho * z - (3.0 * rho * rho - 2.0) * z * z / 12.0

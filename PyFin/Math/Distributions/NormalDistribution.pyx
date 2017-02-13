@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-#cython: embedsignature=True
 cimport cython
 from PyFin.Math.Distributions.norm cimport pdf
 from PyFin.Math.Distributions.norm cimport cdf

@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-#cython: embedsignature=True
 u"""
 Created on 2017-1-3
 
@@ -8,6 +7,7 @@ Created on 2017-1-3
 
 cimport cython
 from libc.math cimport exp
+from libc.math cimport fabs
 
 cdef double _DBL_MIN = 2.2250738585072014e-308
 
@@ -87,7 +87,7 @@ cdef double errorFunction(double x):
     cdef double R
     cdef double S
 
-    ax = abs(x)
+    ax = fabs(x)
 
     if ax < 0.84375:
         if ax < 3.7252902984e-09:

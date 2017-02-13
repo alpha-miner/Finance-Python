@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-#cython: embedsignature=True
 u"""
 Created on 2017-2-4
 
@@ -11,6 +10,8 @@ from libc.math cimport log
 from libc.math cimport exp
 from libc.math cimport sqrt
 from libc.math cimport fabs
+from libc.math cimport fmax
+from libc.math cimport fmin
 from libc.math cimport atanh
 from PyFin.Enums._OptionType cimport OptionType
 from libc.stdlib cimport malloc
@@ -43,7 +44,7 @@ cdef double _bsImpl(int optionType,
     cdef double nd2
 
     if stdDev == 0.0:
-        return max((forward - strike) * optionType, 0.0) * discount
+        return fmax((forward - strike) * optionType, 0.0) * discount
 
     forward += displacement
     strike += displacement
@@ -73,7 +74,7 @@ cdef double _bsImplWithDerivative(double* dStdDev,
     cdef double nd2
 
     if stdDev == 0.0:
-        return max((forward - strike) * optionType, 0.0) * discount
+        return fmax((forward - strike) * optionType, 0.0) * discount
 
     forward += displacement
     strike += displacement
@@ -112,7 +113,7 @@ def blackFormula2(int optionType,
     cdef int flag = _checkParameters(strike, forward, displacement)
 
     if tte == 0.0:
-        return max((forward - strike) * optionType, 0.0)
+        return fmax((forward - strike) * optionType, 0.0)
 
     discount = exp(-riskFree * tte)
     stdDev = sqrt(tte) * vol
@@ -162,7 +163,13 @@ cdef double _bsImplStdDevAppr(int optionType, double strike, double forward, dou
 
 
 @cython.cdivision(True)
-cdef double _bsImplStdDev(int optionType, double strike, double forward, double blackPrice, double discount=1.0, double displacement=0.0, double xAccuracy=1e-5):
+cdef double _bsImplStdDev(int optionType,
+                          double strike,
+                          double forward,
+                          double blackPrice,
+                          double discount=1.0,
+                          double displacement=0.0,
+                          double xAccuracy=1e-5):
     cdef double stdDev
     cdef double stdDevOld
     cdef double err
@@ -222,21 +229,20 @@ def blackFormulaImpliedVol(int optionType,
 
 
 @cython.cdivision(True)
-def bachelierFormula(int optionType,
-                     double strike,
-                     double forward,
-                     double stdDev,
-                     double discount=1.0):
+cpdef double bachelierFormula(int optionType,
+                       double strike,
+                       double forward,
+                       double stdDev,
+                       double discount=1.0):
     cdef double d
-
     d = (forward - strike) * optionType
     if stdDev == 0:
-        return discount * max(d, 0.0)
+        return discount * fmax(d, 0.0)
 
     h = d / stdDev
     result = discount * (stdDev * cdf_derivative(h) + d * cdf(h))
-
     return result
+
 
 cdef double _A0 = 3.994961687345134e-1
 cdef double _A1 = 2.100960795068497e+1
@@ -276,12 +282,12 @@ cdef double _hcalculate(double eta):
 
 
 @cython.cdivision(True)
-def bachelierFormulaImpliedVol(int optionType,
-                               double strike,
-                               double forward,
-                               double tte,
-                               double bachelierPrice,
-                               double discount=1.0):
+cpdef double bachelierFormulaImpliedVol(int optionType,
+                                 double strike,
+                                 double forward,
+                                 double tte,
+                                 double bachelierPrice,
+                                 double discount=1.0):
     cdef double SQRT_QL_EPSILON
     cdef double forwardPremium
     cdef double straddlePremium
@@ -299,8 +305,8 @@ def bachelierFormulaImpliedVol(int optionType,
         straddlePremium = 2.0 * forwardPremium + (forward - strike)
 
     nu = (forward - strike) / straddlePremium
-    nu = max(-1.0, min(nu, 1.0))
-    eta = 1.0 if (abs(nu) < SQRT_QL_EPSILON) else (nu / atanh(nu))
+    nu = fmax(-1.0, fmin(nu, 1.0))
+    eta = 1.0 if (fabs(nu) < SQRT_QL_EPSILON) else (nu / atanh(nu))
 
     heta = _hcalculate(eta)
-    return sqrt(_M_PI / (2. * tte)) * straddlePremium * heta
+    return sqrt(_M_PI / (2. * tte)) * straddlePremium* heta

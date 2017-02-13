@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-#cython: embedsignature=True
 u"""
 Created on 2017-2-7
 
@@ -20,16 +19,27 @@ cdef class SecurityValues(object):
             data = np.array(list(data.values()))
 
         self.values = data
-        self.name_mapping = index
+        if isinstance(index, OrderedDict):
+            self.name_mapping = index
+        else:
+            raise ValueError("name mapping {0} is not Ordered dict".format(index))
         self.name_array = None
 
     @cython.boundscheck(False)
     @cython.wraparound(False)
     def __getitem__(self, name):
+
+        cdef np.ndarray data
+        cdef np.ndarray values
+
         if not isinstance(name, list):
             return self.values[self.name_mapping[name]]
         else:
-            data = np.array([self.values[self.name_mapping[n]] for n in name])
+
+            values = self.values
+            name_mapping = self.name_mapping
+
+            data = np.array([values[name_mapping[n]] for n in name])
             return SecurityValues(data, OrderedDict(zip(name, range(len(name)))))
 
     @cython.boundscheck(False)

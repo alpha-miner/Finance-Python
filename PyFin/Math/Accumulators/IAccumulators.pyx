@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-#cython: embedsignature=True
 u"""
 Created on 2017-2-8
 
@@ -101,6 +100,7 @@ cdef class Accumulator(IAccumulator):
 
     cdef extract(self, dict data):
         cdef str p
+        cdef Accumulator comp
 
         if not self._isValueHolderContained:
             try:
@@ -111,8 +111,9 @@ cdef class Accumulator(IAccumulator):
                 except KeyError:
                     return np.nan
         else:
-            self._dependency.push(data)
-            return self._dependency.result()
+            comp = self._dependency
+            comp.push(data)
+            return comp.result()
 
     cpdef push(self, dict data):
         pass
@@ -603,14 +604,18 @@ cdef class StatelessSingleValueAccumulator(Accumulator):
         self._window = 0
 
     cdef _push(self, dict data):
+
+        cdef Accumulator comp
+
         if not self._isValueHolderContained:
             try:
                 value = data[self._dependency]
             except KeyError:
                 value = np.nan
         else:
-            self._dependency.push(data)
-            value = self._dependency.result()
+            comp = self._dependency
+            comp.push(data)
+            value = comp.result()
         return value
 
     def __deepcopy__(self, memo):

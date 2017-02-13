@@ -37,9 +37,9 @@ install:
   - pip install coveralls
 # command to run tests
 script:
-  - python setup.py build_ext --inplace
-  - coverage run PyFin/tests/testSuite.py
-  - coverage report
-  - coverage html
+  - python setup.py build_ext --line_trace --inplace
+  - coverage run --rcfile=./.coveragerc PyFin/tests/testSuite.py
+  - coverage report --rcfile=./.coveragerc -i
+  - coverage html --rcfile=./.coveragerc -i
 after_success:
   - coveralls

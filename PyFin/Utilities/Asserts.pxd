@@ -9,4 +9,4 @@ cpdef pyFinAssert(condition, exception, str msg=*)
 
 cpdef pyFinWarning(condition, warn_type, str msg=*)
 
-cpdef isClose(float a, float b=*, float rel_tol=*, float abs_tol=*)
+cpdef bint isClose(double a, double b=*, double rel_tol=*, double abs_tol=*) nogil

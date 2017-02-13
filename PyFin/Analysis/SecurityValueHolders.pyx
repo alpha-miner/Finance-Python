@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-#cython: embedsignature=True
 u"""
 Created on 2015-8-7
 
@@ -14,6 +13,7 @@ import operator
 import numpy as np
 cimport numpy as np
 import pandas as pd
+cimport cython
 from PyFin.Analysis.SecurityValues cimport SecurityValues
 from PyFin.Utilities import to_dict
 from PyFin.Math.Accumulators.StatefulAccumulators cimport Shift
@@ -98,37 +98,49 @@ cdef class SecurityValueHolder(object):
                     self._innerHolders[name] = holder
 
     @property
+    @cython.boundscheck(False)
+    @cython.wraparound(False)
     def value(self):
 
-        cdef list values
+        cdef np.ndarray[double, ndim=1] values
         cdef Accumulator holder
+        cdef int n
+        cdef int i
 
         if self.updated:
             return SecurityValues(self.cached.values, self.cached.name_mapping)
         else:
             keys = self._innerHolders.keys()
-            values = []
-            for name in keys:
+            n = len(keys)
+            values = np.zeros(n)
+            for i, name in enumerate(keys):
                 try:
                     holder = self._innerHolders[name]
-                    values.append(holder.result())
+                    values[i] = holder.result()
                 except ArithmeticError:
-                    values.append(np.nan)
-            self.cached = SecurityValues(np.array(values), index=OrderedDict(zip(keys, range(len(keys)))))
+                    values[i] = np.nan
+            self.cached = SecurityValues(values, index=OrderedDict(zip(keys, range(n))))
             self.updated = 1
             return self.cached
 
+    @cython.boundscheck(False)
+    @cython.wraparound(False)
     cpdef value_by_names(self, list names):
         cdef Accumulator holder
+        cdef np.ndarray[double, ndim=1] res
+        cdef int i
+        cdef int n
+
         if self.updated:
             return self.cached[names]
         else:
-            res = []
-            for name in names:
+            n = len(names)
+            res = np.zeros(n)
+            for i, name in enumerate(names):
                 holder = self._innerHolders[name]
-                res.append(holder.result())
-            return SecurityValues(np.array(res),
-                                  index=OrderedDict(zip(names, range(len(names)))))
+                res[i] = holder.result()
+            return SecurityValues(res,
+                                  index=OrderedDict(zip(names, range(n))))
 
     cpdef value_by_name(self, name):
         cdef Accumulator holder
@@ -296,11 +308,13 @@ cdef class FilteredSecurityValueHolder(SecurityValueHolder):
 
     @property
     def value(self):
+        cdef SecurityValues filter_value
+
         if self.updated:
             return self.cached
         else:
-            filter_value = self._filter.value.values
-            self.cached = self._computer.value.mask(filter_value)
+            filter_value = self._filter.value
+            self.cached = self._computer.value.mask(filter_value.values)
             self.updated = 1
             return self.cached
 

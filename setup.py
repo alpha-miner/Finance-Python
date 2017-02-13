@@ -3,6 +3,7 @@
 from setuptools import setup
 from distutils.cmd import Command
 from distutils import sysconfig
+from distutils.extension import Extension
 import os
 import sys
 import io
@@ -12,6 +13,13 @@ import numpy as np
 from Cython.Build import cythonize
 import Cython.Compiler.Options
 Cython.Compiler.Options.annotate = True
+
+if "--line_trace" in sys.argv:
+    line_trace = True
+    print("Build with line trace enabled ...")
+    sys.argv.remove("--line_trace")
+else:
+    line_trace = False
 
 PACKAGE = "PyFin"
 NAME = "Finance-Python"
@@ -151,6 +159,25 @@ ext_modules = [
     "PyFin/Enums/Weekdays.pyx"
 ]
 
+
+def generate_extensions(ext_modules, line_trace=False):
+
+    extensions = []
+
+    if line_trace:
+        print("define cython trace to True ...")
+        define_macros = [('CYTHON_TRACE', 1)]
+    else:
+        define_macros = []
+
+    for pyxfile in ext_modules:
+        ext = Extension(name='.'.join(pyxfile.split('/'))[:-4],
+                        sources=[pyxfile],
+                        define_macros=define_macros)
+        extensions.append(ext)
+    return extensions
+
+
 setup(
     name=NAME,
     version=VERSION,
@@ -194,6 +221,8 @@ setup(
     classifiers=[],
     cmdclass={"test": test,
               "version_build": version_build},
-    ext_modules=cythonize(ext_modules),
-    include_dirs=[np.get_include()]
+    ext_modules=cythonize(generate_extensions(ext_modules, line_trace),
+                          compiler_directives={'embedsignature': True,
+                                               'linetrace': line_trace}),
+    include_dirs=[np.get_include()],
 )

@@ -76,7 +76,7 @@ cdef double sb7 = -2.24409524465858183362e+01
 
 
 @cython.cdivision(True)
-cdef double errorFunction(double x):
+cdef double errorFunction(double x) nogil:
     cdef double ax
     cdef double z
     cdef double r

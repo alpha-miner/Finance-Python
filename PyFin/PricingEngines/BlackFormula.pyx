@@ -25,7 +25,7 @@ cdef double _M_SQRT_2 = 0.7071067811865475244008443621048490392848359376887
 cdef double _M_1_SQRTPI = 0.564189583547756286948
 cdef double _QL_EPSILON = 2.2250738585072014e-308
 
-cdef int _checkParameters(double strike, double forward, double displacement):
+cdef int _checkParameters(double strike, double forward, double displacement) nogil:
     if displacement >= 0 and strike + displacement >= 0 and forward + displacement >= 0:
         return 0
     else:
@@ -37,7 +37,7 @@ cdef double _bsImpl(int optionType,
                     double forward,
                     double stdDev,
                     double discount=1.0,
-                    double displacement=0.0):
+                    double displacement=0.0) nogil:
     cdef double d1
     cdef double d2
     cdef double nd1
@@ -59,15 +59,14 @@ cdef double _bsImpl(int optionType,
 
     return discount * optionType * (forward * nd1 - strike * nd2)
 
-
 @cython.cdivision(True)
-cdef double _bsImplWithDerivative(double* dStdDev,
-                    int optionType,
-                    double strike,
-                    double forward,
-                    double stdDev,
-                    double discount=1.0,
-                    double displacement=0.0):
+cdef double _bsImplWithDerivative(double*dStdDev,
+                                  int optionType,
+                                  double strike,
+                                  double forward,
+                                  double stdDev,
+                                  double discount=1.0,
+                                  double displacement=0.0) nogil:
     cdef double d1
     cdef double d2
     cdef double nd1
@@ -90,7 +89,6 @@ cdef double _bsImplWithDerivative(double* dStdDev,
     dStdDev[0] = discount * strike * pdf(optionType * d2, 2.0, _M_SQRT_2 * _M_1_SQRTPI)
     return discount * optionType * (forward * nd1 - strike * nd2)
 
-
 def blackFormula(int optionType,
                  double strike,
                  double forward,
@@ -99,7 +97,6 @@ def blackFormula(int optionType,
                  double displacement=0.0):
     cdef int flag = _checkParameters(strike, forward, displacement)
     return _bsImpl(optionType, strike, forward, stdDev, discount, displacement)
-
 
 def blackFormula2(int optionType,
                   double strike,
@@ -124,10 +121,9 @@ def blackFormula2(int optionType,
                    discount,
                    displacement)
 
-
 @cython.cdivision(True)
 cdef double _bsImplStdDevAppr(int optionType, double strike, double forward, double blackPrice, double discount=1.0,
-                              double displacement=0.0):
+                              double displacement=0.0) nogil:
     cdef double result0
     cdef double moneynessDelta
     cdef double moneynessDelta_2
@@ -161,7 +157,6 @@ cdef double _bsImplStdDevAppr(int optionType, double strike, double forward, dou
         temp *= sqrt(2.0 * _M_PI)
         return temp / (forward + strike)
 
-
 @cython.cdivision(True)
 cdef double _bsImplStdDev(int optionType,
                           double strike,
@@ -175,7 +170,7 @@ cdef double _bsImplStdDev(int optionType,
     cdef double err
     cdef double diff
     cdef int count = 0
-    cdef double* dStdDev = <double *>malloc(sizeof(double))
+    cdef double*dStdDev = <double *> malloc(sizeof(double))
 
     # using newton step to fine tune the stdDev
     stdDev = _bsImplStdDevAppr(optionType, strike, forward, blackPrice, discount, displacement)
@@ -194,14 +189,13 @@ cdef double _bsImplStdDev(int optionType,
     free(dStdDev)
     return stdDev
 
-
-def blackFormulaImpliedStdDev(int optionType,
-                              double strike,
-                              double forward,
-                              double blackPrice,
-                              double discount=1.0,
-                              double displacement=0.0,
-                              double xAccuracy=1e-5):
+cpdef blackFormulaImpliedStdDev(int optionType,
+                                double strike,
+                                double forward,
+                                double blackPrice,
+                                double discount=1.0,
+                                double displacement=0.0,
+                                double xAccuracy=1e-5):
     return _bsImplStdDev(optionType,
                          strike,
                          forward,
@@ -210,14 +204,13 @@ def blackFormulaImpliedStdDev(int optionType,
                          displacement,
                          xAccuracy)
 
-
-def blackFormulaImpliedVol(int optionType,
-                           double strike,
-                           double forward,
-                           double tte,
-                           double blackPrice,
-                           double riskFree=0.0,
-                           double displacement=0.0):
+cpdef blackFormulaImpliedVol(int optionType,
+                             double strike,
+                             double forward,
+                             double tte,
+                             double blackPrice,
+                             double riskFree=0.0,
+                             double displacement=0.0):
     cdef double discount = exp(-riskFree * tte)
     stdDev = _bsImplStdDev(optionType,
                            strike,
@@ -227,13 +220,12 @@ def blackFormulaImpliedVol(int optionType,
                            displacement)
     return stdDev / sqrt(tte)
 
-
 @cython.cdivision(True)
 cpdef double bachelierFormula(int optionType,
-                       double strike,
-                       double forward,
-                       double stdDev,
-                       double discount=1.0):
+                              double strike,
+                              double forward,
+                              double stdDev,
+                              double discount=1.0):
     cdef double d
     d = (forward - strike) * optionType
     if stdDev == 0:
@@ -242,7 +234,6 @@ cpdef double bachelierFormula(int optionType,
     h = d / stdDev
     result = discount * (stdDev * cdf_derivative(h) + d * cdf(h))
     return result
-
 
 cdef double _A0 = 3.994961687345134e-1
 cdef double _A1 = 2.100960795068497e+1
@@ -264,9 +255,8 @@ cdef double _B7 = 3.608817108375034e+3
 cdef double _B8 = -2.067719486400926e+2
 cdef double _B9 = 1.174240599306013e+1
 
-
 @cython.cdivision(True)
-cdef double _hcalculate(double eta):
+cdef double _hcalculate(double eta) nogil:
     cdef double num
     cdef double den
 
@@ -280,14 +270,13 @@ cdef double _hcalculate(double eta):
 
     return sqrt(eta) * (num / den)
 
-
 @cython.cdivision(True)
 cpdef double bachelierFormulaImpliedVol(int optionType,
-                                 double strike,
-                                 double forward,
-                                 double tte,
-                                 double bachelierPrice,
-                                 double discount=1.0):
+                                        double strike,
+                                        double forward,
+                                        double tte,
+                                        double bachelierPrice,
+                                        double discount=1.0):
     cdef double SQRT_QL_EPSILON
     cdef double forwardPremium
     cdef double straddlePremium
@@ -309,4 +298,4 @@ cpdef double bachelierFormulaImpliedVol(int optionType,
     eta = 1.0 if (fabs(nu) < SQRT_QL_EPSILON) else (nu / atanh(nu))
 
     heta = _hcalculate(eta)
-    return sqrt(_M_PI / (2. * tte)) * straddlePremium* heta
+    return sqrt(_M_PI / (2. * tte)) * straddlePremium * heta

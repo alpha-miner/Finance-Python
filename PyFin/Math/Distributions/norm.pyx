@@ -16,7 +16,7 @@ cdef double _QL_EPSILON = 2.2250738585072014e-308
 
 
 @cython.cdivision(True)
-cdef double cdf(double z):
+cdef double cdf(double z) nogil:
     cdef double sumRes
     cdef double zsqr
     cdef double i

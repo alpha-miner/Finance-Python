@@ -59,7 +59,7 @@ cdef Date _advance(Date date, int n, int units):
         leapFlag = Date.isLeap(y)
 
         if y <= 1900 or y >= 2200:
-            raise ValueError('year {0:d} is out of bound. It must be in [1901, 2199]'.format(y))
+            return Date(1900, 1, 1)
 
         length = _MonthLeapLength[monthLeft - 1] if leapFlag else _MonthLength[monthLeft - 1]
         if d > length:
@@ -73,7 +73,7 @@ cdef Date _advance(Date date, int n, int units):
         leapFlag = Date.isLeap(y)
 
         if y <= 1900 or y >= 2200:
-            raise ValueError('year {0:d} is out of bound. It must be in [1901, 2199]'.format(y))
+            return Date(1900, 1, 1)
 
         if d == 29 and m == 2 and not leapFlag:
             d = 28
@@ -83,6 +83,7 @@ cdef Date _advance(Date date, int n, int units):
 
 cdef class Date(object):
 
+    @cython.cdivision(True)
     def __init__(self, year=None, month=None, day=None, serialNumber=None):
         cdef int leap
         cdef int y
@@ -102,6 +103,8 @@ cdef class Date(object):
             while d <= _monthOffset(m, leap):
                 m -= 1
 
+            if y <= 1900 or y >= 2200:
+                raise  ValueError('year {0:d} is out of bound. It must be in [1901, 2199]'.format(y))
             self._year = y
             self._month = m
             self._day = d - _monthOffset(m, leap)

@@ -160,6 +160,15 @@ class TestDate(unittest.TestCase):
                                                         "expected:   {0}\n"
                                                         "calculated: {1}".format(expectedDate, fiveMonthsAfter))
 
+    def testDateAdvanceOutOfBounds(self):
+        testDate = Date(2199, 12, 30)
+        with self.assertRaises(ValueError):
+            _ = testDate + '1w'
+
+        testDate = Date(1901, 1, 1)
+        with self.assertRaises(ValueError):
+            _ = testDate - '1w'
+
     def testConsistency(self):
         minDate = Date.minDate().serialNumber + 1
         maxDate = Date.maxDate().serialNumber

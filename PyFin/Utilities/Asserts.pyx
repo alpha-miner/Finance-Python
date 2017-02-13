@@ -6,7 +6,6 @@ Created on 2017-1-3
 """
 
 import warnings
-cimport cython
 from libc.math cimport fabs
 from libc.math cimport fmax
 

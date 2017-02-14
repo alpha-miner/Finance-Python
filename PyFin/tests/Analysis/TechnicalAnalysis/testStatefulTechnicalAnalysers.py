@@ -11,6 +11,8 @@ import numpy as np
 import copy
 from collections import deque
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingAverage
+from PyFin.Analysis.TechnicalAnalysis import SecurityMovingVariance
+from PyFin.Analysis.TechnicalAnalysis import SecurityMovingStandardDeviation
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingMax
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingMinimum
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingQuantile
@@ -62,6 +64,64 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
 
         with self.assertRaises(ValueError):
             _ = SecurityMovingAverage(window, ['close', 'open'])
+
+    def testSecurityMovingVariance(self):
+        window = 10
+        var = SecurityMovingVariance(window, ['close'])
+
+        for i in range(len(self.aapl['close'])):
+            data = {'aapl': {'close': self.aapl['close'][i], 'open': self.aapl['open'][i]}}
+            data['ibm'] = {'close': self.ibm['close'][i], 'open': self.ibm['open'][i]}
+
+            var.push(data)
+
+            if i <= 1:
+                continue
+
+            if i < window:
+                start = 0
+            else:
+                start = i + 1 - window
+
+            value = var.value
+            for name in value.index():
+                expected = np.var(self.dataSet[name]['close'][start:(i + 1)]) * (i + 1. - start) / (i - start)
+                calculated = value[name]
+                self.assertAlmostEqual(expected, calculated, 12, 'at index {0}\n'
+                                                                 'expected:   {1:.12f}\n'
+                                                                 'calculated: {2:.12f}'.format(i, expected, calculated))
+        with self.assertRaises(ValueError):
+            _ = SecurityMovingVariance(window, ['close', 'open'])
+
+    def testSecurityMovingStandardDeviation(self):
+        window = 10
+        std = SecurityMovingStandardDeviation(window, ['close'])
+
+        for i in range(len(self.aapl['close'])):
+            data = {'aapl': {'close': self.aapl['close'][i], 'open': self.aapl['open'][i]}}
+            data['ibm'] = {'close': self.ibm['close'][i], 'open': self.ibm['open'][i]}
+
+            std.push(data)
+
+            if i <= 1:
+                continue
+
+            if i < window:
+                start = 0
+            else:
+                start = i + 1 - window
+
+            value = std.value
+            for name in value.index():
+                expected = math.sqrt(
+                    np.var(self.dataSet[name]['close'][start:(i + 1)]) * (i + 1. - start) / (i - start))
+                calculated = value[name]
+                self.assertAlmostEqual(expected, calculated, 12, 'at index {0}\n'
+                                                                 'expected:   {1:.12f}\n'
+                                                                 'calculated: {2:.12f}'.format(i, expected,
+                                                                                               calculated))
+        with self.assertRaises(ValueError):
+            _ = SecurityMovingStandardDeviation(window, ['close', 'open'])
 
     def testSecurityMovingMax(self):
         window = 10

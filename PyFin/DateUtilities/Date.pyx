@@ -58,8 +58,7 @@ cdef Date _advance(Date date, int n, int units):
         y += addedYear
         leapFlag = Date.isLeap(y)
 
-        if y <= 1900 or y >= 2200:
-            return Date(1900, 1, 1)
+        pyFinAssert(1900 < y < 2200, ValueError, 'year {0:d} is out of bound. It must be in [1901, 2199]'.format(y))
 
         length = _MonthLeapLength[monthLeft - 1] if leapFlag else _MonthLength[monthLeft - 1]
         if d > length:
@@ -104,7 +103,7 @@ cdef class Date(object):
                 m -= 1
 
             if y <= 1900 or y >= 2200:
-                raise  ValueError('year {0:d} is out of bound. It must be in [1901, 2199]'.format(y))
+                pyFinAssert(1900 < y < 2200, ValueError, 'year {0:d} is out of bound. It must be in [1901, 2199]'.format(y))
             self._year = y
             self._month = m
             self._day = d - _monthOffset(m, leap)

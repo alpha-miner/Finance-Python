@@ -21,6 +21,7 @@ from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingAllTrue
 from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingAnyTrue
 from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingSum
 from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingVariance
+from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingStandardDeviation
 from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingCountedPositive
 from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingPositiveAverage
 from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingCountedNegative
@@ -208,6 +209,27 @@ cdef class SecurityMovingVariance(SecuritySingleValueHolder):
             return SecurityMovingVariance, (self._window - self._compHolder._window, self._compHolder), d
         else:
             return SecurityMovingVariance, (self._window, self._dependency), d
+
+    def __setstate__(self, state):
+        pass
+
+
+cdef class SecurityMovingStandardDeviation(SecuritySingleValueHolder):
+    def __init__(self, window, dependency='x'):
+        super(SecurityMovingStandardDeviation, self).__init__(window, MovingStandardDeviation, dependency)
+
+    def __deepcopy__(self, memo):
+        if self._compHolder:
+            return SecurityMovingStandardDeviation(self._window - self._compHolder._window, self._compHolder)
+        else:
+            return SecurityMovingStandardDeviation(self._window, self._dependency)
+
+    def __reduce__(self):
+        d = {}
+        if self._compHolder:
+            return SecurityMovingStandardDeviation, (self._window - self._compHolder._window, self._compHolder), d
+        else:
+            return SecurityMovingStandardDeviation, (self._window, self._dependency), d
 
     def __setstate__(self, state):
         pass

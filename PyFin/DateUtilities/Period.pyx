@@ -10,6 +10,7 @@ cimport cython
 from libc.math cimport floor
 from PyFin.Enums._TimeUnits cimport TimeUnits
 from PyFin.Utilities.Asserts cimport pyFinAssert
+from PyFin.Utilities.Asserts cimport pyEnsureRaise
 
 
 _unitPattern = re.compile('[BbDdMmWwYy]{1}')
@@ -48,7 +49,7 @@ cdef class Period(object):
     def units(self):
         return self._units
 
-    cpdef normalize(self):
+    cpdef Period normalize(self):
         cdef int length = self.length
         cdef int units = self.units
         if length != 0:
@@ -65,7 +66,7 @@ cdef class Period(object):
                     units = TimeUnits.Weeks
                 return Period(length=length, units=units)
             else:
-                raise TypeError("unknown time unit ({0:d})".format(self.units))
+                pyEnsureRaise(TypeError, "wrong period units type {0}".format(units))
 
     def __div__(self, int n):
 
@@ -226,7 +227,7 @@ cdef class Period(object):
 
 # implementation detail
 
-cdef _lt_cmp(Period p1, Period p2):
+cdef bint _lt_cmp(Period p1, Period p2) except -1:
 
     cdef tuple p1lim
     cdef tuple p2lim
@@ -263,7 +264,7 @@ cdef _lt_cmp(Period p1, Period p2):
     elif p1lim[0] >= p2lim[1]:
         return False
     else:
-        raise ValueError("undecidable comparison between {0} and {1}".format(p1, p2))
+        pyEnsureRaise(ValueError, "undecidable comparison between {0} and {1}".format(p1, p2))
 
 
 cdef tuple _daysMinMax(Period p):
@@ -280,4 +281,4 @@ cdef tuple _daysMinMax(Period p):
     elif units == TimeUnits.Years:
         return 365 * length, 366 * length
     elif units == TimeUnits.BDays:
-        raise ValueError("Business days unit has not min max days")
+        pyEnsureRaise(ValueError, "Business days unit has not min max days")

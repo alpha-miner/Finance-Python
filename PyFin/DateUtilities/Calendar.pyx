@@ -21,15 +21,15 @@ cdef class Calendar(object):
     cdef public str name
 
     def __init__(self, holCenter):
-        if isinstance(holCenter, str):
-            holCenter = holCenter.lower()
-            try:
-                self._impl = _holDict[holCenter]()
-            except KeyError:
-                raise ValueError("{0} is not a valid description of a holiday center".format(holCenter))
-            self.name = holCenter
-        else:
+        pyFinAssert(isinstance(holCenter, str),
+                    ValueError,
+                    "{0} is not a valid description of a holiday center".format(holCenter))
+        holCenter = holCenter.lower()
+        try:
+            self._impl = _holDict[holCenter]()
+        except KeyError:
             raise ValueError("{0} is not a valid description of a holiday center".format(holCenter))
+        self.name = holCenter
 
     cpdef isBizDay(self, Date d):
         return self._impl.isBizDay(d)
@@ -186,8 +186,7 @@ cdef class Calendar(object):
         pass
 
 
-cdef class ChinaSseImpl(object):
-    _holDays = {Date(2005, 1, 3),
+sse_holDays = { Date(2005, 1, 3),
                 Date(2005, 2, 7),
                 Date(2005, 2, 8),
                 Date(2005, 2, 9),
@@ -427,12 +426,15 @@ cdef class ChinaSseImpl(object):
                 Date(2017, 10, 5),
                 Date(2017, 10, 6)}
 
+
+cdef class ChinaSseImpl(object):
+
     def __init__(self):
         pass
 
     cpdef isBizDay(self, Date date):
         cdef int w = date.weekday()
-        if self.isWeekEnd(w) or date in ChinaSseImpl._holDays:
+        if self.isWeekEnd(w) or date in sse_holDays:
             return False
         return True
 
@@ -447,8 +449,7 @@ cdef class ChinaSseImpl(object):
                 return False
 
 
-cdef class ChinaIBImpl(object):
-    _working_weekends = {
+cdef set ib_working_weekends = {
         # 2005
         Date.westernStyle(5, Months.February, 2005),
         Date.westernStyle(6, Months.February, 2005),
@@ -548,13 +549,17 @@ cdef class ChinaIBImpl(object):
         Date.westernStyle(30, Months.September, 2017),
     }
 
-    _sseImpl = ChinaSseImpl()
+
+cdef ChinaSseImpl _sseImpl = ChinaSseImpl()
+
+
+cdef class ChinaIBImpl(object):
 
     def __init__(self):
         pass
 
     cpdef isBizDay(self, Date date):
-        return ChinaIBImpl._sseImpl.isBizDay(date) or date in ChinaIBImpl._working_weekends
+        return _sseImpl.isBizDay(date) or date in ib_working_weekends
 
     cpdef isWeekEnd(self, int weekDay):
         return weekDay == Weekdays.Saturday or weekDay == Weekdays.Sunday
@@ -588,8 +593,6 @@ cdef class NullCalendar(object):
 
 cdef class ChinaCFFEXImpl(object):
 
-    _sseImpl = ChinaSseImpl()
-
     def __init__(self):
         pass
 
@@ -597,7 +600,7 @@ cdef class ChinaCFFEXImpl(object):
         return self.isBizDay(date)
 
     cpdef isWeekEnd(self, int weekDay):
-        return ChinaCFFEXImpl._sseImpl.isWeekEnd(weekDay)
+        return _sseImpl.isWeekEnd(weekDay)
 
     def __richcmp__(self, right, int op):
         if op == 2:
@@ -606,9 +609,8 @@ cdef class ChinaCFFEXImpl(object):
             else:
                 return False
 
-
-cdef class WestenImpl(object):
-    EasterMonday = [
+cdef int EasterMonday[299]
+EasterMonday[:] = [
         98, 90, 103, 95, 114, 106, 91, 111, 102,  # 1901-1909
         87, 107, 99, 83, 103, 95, 115, 99, 91, 111,  # 1910-1919
         96, 87, 107, 92, 112, 103, 95, 108, 100, 91,  # 1920-1929
@@ -641,12 +643,14 @@ cdef class WestenImpl(object):
         116, 101, 93, 112, 97, 89, 109, 100, 85, 105  # 2190-2199
     ]
 
-    cpdef isWeekEnd(self, int weekDay):
+
+cdef class WestenImpl(object):
+
+    cpdef bint isWeekEnd(self, int weekDay):
         return weekDay == Weekdays.Saturday or weekDay == Weekdays.Sunday
 
-    @classmethod
-    def easterMonday(cls, int year):
-        return cls.EasterMonday[year - 1901]
+    cpdef int easterMonday(self, int year):
+        return EasterMonday[year - 1901]
 
 
 cdef class TargetImpl(WestenImpl):

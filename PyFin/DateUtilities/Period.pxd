@@ -10,4 +10,4 @@ cdef class Period(object):
     cdef public int _length
     cdef public int _units
 
-    cpdef normalize(self)
+    cpdef Period normalize(self)

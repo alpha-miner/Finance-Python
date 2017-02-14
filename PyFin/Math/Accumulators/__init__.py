@@ -53,6 +53,7 @@ from PyFin.Math.Accumulators.StatefulAccumulators import MovingSum
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingCountedPositive
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingCountedNegative
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingVariance
+from PyFin.Math.Accumulators.StatefulAccumulators import MovingStandardDeviation
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingNegativeVariance
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingCorrelation
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingCorrelationMatrix
@@ -132,6 +133,7 @@ __all__ = ["Exp",
            "MovingAllTrue",
            "MovingAnyTrue",
            "MovingVariance",
+           "MovingStandardDeviation",
            "MovingLogReturn",
            "MovingAlphaBeta",
            "MovingDrawDown",

@@ -5,7 +5,9 @@ Created on 2017-2-10
 @author: cheng.li
 """
 
-cpdef pyFinAssert(condition, exception, str msg=*)
+cpdef int pyFinAssert(condition, exception, str msg=*) except -1
+
+cpdef int pyEnsureRaise(exception, str msg=*) except -1
 
 cpdef pyFinWarning(condition, warn_type, str msg=*)
 

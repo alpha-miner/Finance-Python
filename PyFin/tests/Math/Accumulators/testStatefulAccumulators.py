@@ -8,6 +8,7 @@ Created on 2015-7-16
 import unittest
 import csv
 import os
+import math
 import numpy as np
 from collections import deque
 from PyFin.Math.Accumulators import Latest
@@ -27,6 +28,7 @@ from PyFin.Math.Accumulators import MovingSum
 from PyFin.Math.Accumulators import MovingCountedPositive
 from PyFin.Math.Accumulators import MovingCountedNegative
 from PyFin.Math.Accumulators import MovingVariance
+from PyFin.Math.Accumulators import MovingStandardDeviation
 from PyFin.Math.Accumulators import MovingNegativeVariance
 from PyFin.Math.Accumulators import MovingHistoricalWindow
 from PyFin.Math.Accumulators import MovingCorrelation
@@ -411,6 +413,64 @@ class TestStatefulAccumulators(unittest.TestCase):
 
             if i >= window - 1:
                 expected = (runningSumSquare - runningSum * runningSum / window) / window
+                calculated = mv.result()
+                self.assertAlmostEqual(calculated, expected, 15, "at index {0:d}\n"
+                                                                 "Var expected:   {1:f}\n"
+                                                                 "Var calculated: {2:f}".format(i, expected,
+                                                                                                calculated))
+
+        # Test moving sample variance
+        mv = MovingVariance(window, dependency='z', isPopulation=False)
+        runningSum = 0.0
+        runningSumSquare = 0.0
+        con = []
+        for i in range(total):
+            value = float(i)
+            con.append(value)
+            mv.push(dict(z=value))
+            runningSum += value
+            runningSumSquare += value * value
+
+            if i == 0:
+                self.assertTrue(np.isnan(mv.result()))
+
+            if i >= window:
+                runningSum -= con[0]
+                runningSumSquare -= con[0] * con[0]
+                con = con[1:]
+
+            length = window if i >= window else (i + 1)
+            if i >= window - 1:
+                expected = (runningSumSquare - runningSum * runningSum / length) / (length - 1)
+                calculated = mv.result()
+                self.assertAlmostEqual(calculated, expected, 15, "at index {0:d}\n"
+                                                                 "Var expected:   {1:f}\n"
+                                                                 "Var calculated: {2:f}".format(i, expected,
+                                                                                                calculated))
+
+    def testMovingStandardDeviation(self):
+        window = 120
+        total = 2500
+
+        # Test moving population variance
+        mv = MovingStandardDeviation(window, dependency='z', isPopulation=True)
+        runningSum = 0.0
+        runningSumSquare = 0.0
+        con = []
+        for i in range(total):
+            value = float(i)
+            con.append(value)
+            mv.push(dict(z=value))
+            runningSum += value
+            runningSumSquare += value * value
+
+            if i >= window:
+                runningSum -= con[0]
+                runningSumSquare -= con[0] * con[0]
+                con = con[1:]
+
+            if i >= window - 1:
+                expected = math.sqrt((runningSumSquare - runningSum * runningSum / window) / window)
                 calculated = mv.result()
                 self.assertAlmostEqual(calculated, expected, 15, "at index {0:d}\n"
                                                                  "Var expected:   {1:f}\n"

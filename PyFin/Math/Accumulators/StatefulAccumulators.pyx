@@ -615,6 +615,62 @@ cdef class MovingVariance(SingleValuedValueHolder):
         pass
 
 
+cdef class MovingStandardDeviation(SingleValuedValueHolder):
+
+    def __init__(self, window, dependency='x', isPopulation=False):
+        super(MovingStandardDeviation, self).__init__(window, dependency)
+        self._runningSum = 0.0
+        self._runningSumSquare = 0.0
+        self._isPop = isPopulation
+        if not self._isPop:
+            pyFinAssert(window >= 2, ValueError, "sampling standard deviation can't be calculated with window size < 2")
+
+    cpdef push(self, dict data):
+
+        cdef double value
+        cdef double popout
+
+        value = self._push(data)
+        if isnan(value):
+            return np.nan
+        popout = self._deque.dump(value)
+        if not isnan(popout):
+            self._runningSum += value - popout
+            self._runningSumSquare += value * value - popout * popout
+        else:
+            self._runningSum += value
+            self._runningSumSquare += value * value
+
+    @cython.cdivision(True)
+    cpdef object result(self):
+        cdef int length = self._deque.size()
+        cdef double tmp
+
+        if length == 0:
+            return np.nan
+
+        tmp = self._runningSumSquare - self._runningSum * self._runningSum / length
+
+        if self._isPop:
+            return sqrt(tmp / length)
+        else:
+            if length >= 2:
+                return sqrt(tmp / (length - 1))
+            else:
+                return np.nan
+
+    def __deepcopy__(self, memo):
+        return MovingStandardDeviation(self._window, self._dependency, self._isPop)
+
+    def __reduce__(self):
+        d = {}
+
+        return MovingStandardDeviation, (self._window, self._dependency, self._isPop), d
+
+    def __setstate__(self, state):
+        pass
+
+
 cdef class MovingNegativeVariance(SingleValuedValueHolder):
 
     def __init__(self, window, dependency='x', isPopulation=0):

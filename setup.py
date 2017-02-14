@@ -166,7 +166,7 @@ def generate_extensions(ext_modules, line_trace=False):
 
     if line_trace:
         print("define cython trace to True ...")
-        define_macros = [('CYTHON_TRACE', 1)]
+        define_macros = [('CYTHON_TRACE', 1), ('CYTHON_TRACE_NOGIL', 1)]
     else:
         define_macros = []
 

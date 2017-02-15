@@ -127,7 +127,7 @@ cdef class Identity(Accumulator):
 
 cdef class Latest(StatelessSingleValueAccumulator):
 
-    cdef public double _latest
+    cdef public object _latest
 
     cpdef push(self, dict data)
     cpdef object result(self)

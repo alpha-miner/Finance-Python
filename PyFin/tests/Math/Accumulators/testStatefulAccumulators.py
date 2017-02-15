@@ -13,6 +13,7 @@ import numpy as np
 from collections import deque
 from PyFin.Math.Accumulators import Latest
 from PyFin.Math.Accumulators import Shift
+from PyFin.Math.Accumulators import Exp
 from PyFin.Math.Accumulators import MovingMax
 from PyFin.Math.Accumulators import MovingMinimum
 from PyFin.Math.Accumulators import MovingQuantile
@@ -54,6 +55,20 @@ class TestStatefulAccumulators(unittest.TestCase):
     def setUp(self):
         np.random.seed(0)
         self.sample = np.random.randn(10000)
+
+    def testLatestValueHolderWithStringValue(self):
+        latest = Latest('x')
+        latest.push({'x': 'aaa'})
+
+        self.assertEqual(latest.value, 'aaa')
+
+    def testLatestValueHolderWithOtherValueHolder(self):
+        test1 = Exp(Latest('x'))
+        test1.push({'x': 2.0})
+        self.assertAlmostEqual(test1.value, math.exp(2.0))
+
+        test1.push({'x': np.nan})
+        self.assertTrue(math.isnan(test1.value))
 
     def testShiftValueHolder(self):
         ma = MovingAverage(10, 'close')

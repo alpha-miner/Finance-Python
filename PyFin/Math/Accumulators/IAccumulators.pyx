@@ -140,7 +140,8 @@ cdef class Accumulator(IAccumulator):
         if not name:
             name = 'transformed'
 
-        matrix_values = data.as_matrix()
+        data = data.select_dtypes([np.number])
+        matrix_values = data.as_matrix().astype(np.float64)
         columns = data.columns.tolist()
         column_length = len(columns)
 
@@ -636,14 +637,11 @@ cdef class Latest(StatelessSingleValueAccumulator):
         super(Latest, self).__init__(dependency)
         self._window = 0
         self._returnSize = 1
+        self._isFull = 1
         self._latest = np.nan
 
     cpdef push(self, dict data):
-        value = self._push(data)
-        if isnan(value):
-            return np.nan
-        self._isFull = 1
-        self._latest = value
+        self._latest = self._push(data)
 
     cpdef object result(self):
         return self._latest
@@ -770,16 +768,13 @@ cdef class BasicFunction(Accumulator):
         else:
             self._window = 1
         self._returnSize = 1
-        self._isFull = 0
+        self._isFull = 1
         self._origValue = np.nan
 
     cpdef push(self, dict data):
 
         cdef double value = self.extract(data)
-        if isnan(value):
-            return np.nan
         self._origValue = value
-        self._isFull = 1
 
     def __deepcopy__(self, memo):
         return BasicFunction(self._dependency)

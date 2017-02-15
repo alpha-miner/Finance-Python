@@ -10,7 +10,9 @@ import numpy as np
 import numpy.matlib as matlib
 import pandas as pd
 from PyFin.api import MA
+from PyFin.api import LAST
 from PyFin.Math.Accumulators import MovingAverage
+from PyFin.Math.Accumulators import Latest
 
 n = 3000
 m = 3000
@@ -22,7 +24,7 @@ df = pd.DataFrame(np.random.randn(n*m, 3), columns=['x', 'y', 'z'], index=index)
 df['c'] = matlib.repmat(np.linspace(0, m-1, m, dtype=int), 1, n)[0]
 
 start = dt.datetime.now()
-t = MA(20, 'x') / MA(30, 'y')
+t = MA(20, LAST('x')) / MA(30, LAST('y'))
 res = t.transform(df, category_field='c')
 print("Finance-Python (analysis): {0}s".format(dt.datetime.now() - start))
 
@@ -32,7 +34,7 @@ res = groups['x'].rolling(20).mean() / groups['y'].rolling(30).mean()
 print("Pandas (group by): {0}s".format(dt.datetime.now() - start))
 
 start = dt.datetime.now()
-t = MovingAverage(20, 'x') / MovingAverage(30, 'x')
+t = MovingAverage(20, Latest('x')) / MovingAverage(30, Latest('x'))
 res = t.transform(df)
 print("Finance-Python (accumulator): {0}s".format(dt.datetime.now() - start))
 

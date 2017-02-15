@@ -11,6 +11,8 @@ cimport numpy as np
 cimport cython
 from libc.math cimport isnan
 from libc.math cimport log
+from libc.math cimport fmax
+from libc.math cimport fmin
 from PyFin.Math.Accumulators.IAccumulators cimport Accumulator
 from PyFin.Math.Accumulators.IAccumulators cimport Pow
 from PyFin.Math.Accumulators.IAccumulators cimport StatelessSingleValueAccumulator
@@ -116,20 +118,14 @@ cdef class PositivePart(StatelessSingleValueAccumulator):
         _checkParameterList(dependency)
         self._returnSize = 1
         self._pos = np.nan
+        self._isFull = 1
 
     cpdef push(self, dict data):
         cdef double value = self._push(data)
         if isnan(value):
-            return np.nan
-
-        self._isFull = 1
-
-        if value > 0.:
-            self._pos = value
-        elif value <= 0.:
-            self._pos = 0.
-        else:
             self._pos = np.nan
+        else:
+            self._pos = fmax(value, 0.)
 
     cpdef object result(self):
         return self._pos
@@ -145,20 +141,14 @@ cdef class NegativePart(StatelessSingleValueAccumulator):
         _checkParameterList(dependency)
         self._returnSize = 1
         self._neg = np.nan
+        self._isFull = 1
 
     cpdef push(self, dict data):
         cdef double value = self._push(data)
         if isnan(value):
-            return np.nan
-
-        self._isFull = 1
-
-        if value < 0.:
-            self._neg = value
-        elif value >= 0.:
-            self._neg = 0.
-        else:
             self._neg = np.nan
+        else:
+            self._neg = fmin(value, 0.)
 
     cpdef object result(self):
         return self._neg
@@ -172,23 +162,17 @@ cdef class Max(StatelessSingleValueAccumulator):
     def __init__(self, dependency='x'):
         super(Max, self).__init__(dependency)
         _checkParameterList(dependency)
-        self._currentMax = np.nan
+        self._currentMax = -np.inf
         self._returnSize = 1
-        self._first = 1
+        self._isFull = 0
 
     cpdef push(self, dict data):
         cdef double value = self._push(data)
         if isnan(value):
             return np.nan
 
+        self._currentMax = fmax(value, self._currentMax)
         self._isFull = 1
-
-        if self._first:
-            self._currentMax = value
-            self._first = 0
-        else:
-            if self._currentMax < value:
-                self._currentMax = value
 
     cpdef object result(self):
         return self._currentMax
@@ -202,23 +186,17 @@ cdef class Minimum(StatelessSingleValueAccumulator):
     def __init__(self, dependency='x'):
         super(Minimum, self).__init__(dependency)
         _checkParameterList(dependency)
-        self._currentMin = np.nan
+        self._currentMin = np.inf
         self._returnSize = 1
-        self._first = 1
+        self._isFull = 0
 
     cpdef push(self, dict data):
         cdef double value = self._push(data)
         if isnan(value):
             return np.nan
 
+        self._currentMin = fmin(value, self._currentMin)
         self._isFull = 1
-
-        if self._first:
-            self._currentMin = value
-            self._first = 0
-        else:
-            if self._currentMin > value:
-                self._currentMin = value
 
     cpdef object result(self):
         return self._currentMin
@@ -232,9 +210,9 @@ cdef class Sum(StatelessSingleValueAccumulator):
     def __init__(self, dependency='x'):
         super(Sum, self).__init__(dependency)
         _checkParameterList(dependency)
-        self._currentSum = np.nan
+        self._currentSum = 0.
         self._returnSize = 1
-        self._first = 1
+        self._isFull = 0
 
     cpdef push(self, dict data):
         cdef double value = self._push(data)
@@ -242,12 +220,7 @@ cdef class Sum(StatelessSingleValueAccumulator):
             return np.nan
 
         self._isFull = 1
-
-        if self._first:
-            self._currentSum = value
-            self._first = 0
-        else:
-            self._currentSum += value
+        self._currentSum += value
 
     cpdef object result(self):
         return self._currentSum
@@ -261,9 +234,10 @@ cdef class Average(StatelessSingleValueAccumulator):
     def __init__(self, dependency='x'):
         super(Average, self).__init__(dependency)
         _checkParameterList(dependency)
-        self._currentSum = np.nan
+        self._currentSum = 0.
         self._currentCount = 0
         self._returnSize = 1
+        self._isFull = 0
 
     cpdef push(self, dict data):
         cdef double value = self._push(data)
@@ -271,12 +245,8 @@ cdef class Average(StatelessSingleValueAccumulator):
             return np.nan
 
         self._isFull = 1
-
-        if self._currentCount == 0:
-            self._currentSum = value
-        else:
-            self._currentSum += value
         self._currentCount += 1
+        self._currentSum += value
 
     @cython.cdivision(True)
     cpdef object result(self):

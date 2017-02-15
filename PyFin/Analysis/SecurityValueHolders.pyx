@@ -232,6 +232,9 @@ cdef class SecurityValueHolder(object):
         cdef int j
         cdef int start_count
         cdef int end_count
+        cdef list split_category
+        cdef list split_values
+        cdef dict dict_data
 
         for f in self._dependency:
             if f not in data:

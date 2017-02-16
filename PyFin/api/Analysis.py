@@ -15,6 +15,7 @@ from PyFin.Analysis.TechnicalAnalysis import SecurityMovingAllTrue
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingAnyTrue
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingSum
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingVariance
+from PyFin.Analysis.TechnicalAnalysis import SecurityMovingStandardDeviation
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingCountedPositive
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingPositiveAverage
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingRSI
@@ -42,6 +43,7 @@ from PyFin.Analysis.SecurityValueHolders import SecurityIIFValueHolder
 from PyFin.Analysis.CrossSectionValueHolders import CSRankedSecurityValueHolder
 from PyFin.Analysis.CrossSectionValueHolders import CSAverageSecurityValueHolder
 from PyFin.Analysis.CrossSectionValueHolders import CSAverageAdjustedSecurityValueHolder
+from PyFin.Analysis.CrossSectionValueHolders import CSZScoreSecurityValueHolder
 from PyFin.Analysis.CrossSectionValueHolders import CSQuantileSecurityValueHolder
 
 
@@ -58,6 +60,10 @@ def CSMeanAdjusted(dependency):
 
 
 def CSQuantile(dependency):
+    return CSZScoreSecurityValueHolder(dependency)
+
+
+def CSZScore(dependency):
     return CSQuantileSecurityValueHolder(dependency)
 
 
@@ -107,6 +113,10 @@ def SUM(window, dependency='x'):
 
 def VARIANCE(window, dependency='x'):
     return SecurityMovingVariance(window, dependency)
+
+
+def STD(window, dependency='x'):
+    return SecurityMovingStandardDeviation(window, dependency)
 
 
 def NPOSITIVE(window, dependency='x'):

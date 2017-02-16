@@ -28,6 +28,7 @@ from PyFin.api.Analysis import QUANTILE
 from PyFin.api.Analysis import ALLTRUE
 from PyFin.api.Analysis import ANYTRUE
 from PyFin.api.Analysis import VARIANCE
+from PyFin.api.Analysis import STD
 from PyFin.api.Analysis import NPOSITIVE
 from PyFin.api.Analysis import MAPOSITIVE
 from PyFin.api.Analysis import HIST
@@ -55,6 +56,7 @@ from PyFin.api.Analysis import CSRank
 from PyFin.api.Analysis import CSMean
 from PyFin.api.Analysis import CSMeanAdjusted
 from PyFin.api.Analysis import CSQuantile
+from PyFin.api.Analysis import CSZScore
 
 
 __all__ = ["datesList",
@@ -79,6 +81,7 @@ __all__ = ["datesList",
            "ALLTRUE",
            "ANYTRUE",
            "VARIANCE",
+           "STD",
            "NPOSITIVE",
            "MAPOSITIVE",
            "HIST",
@@ -104,4 +107,5 @@ __all__ = ["datesList",
            "CSRank",
            "CSMean",
            "CSMeanAdjusted",
-           "CSQuantile"]
+           "CSQuantile",
+           "CSZScore"]

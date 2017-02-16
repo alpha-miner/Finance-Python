@@ -167,6 +167,10 @@ cdef class SecurityValues(object):
         data[np.isnan(self.values)] = np.nan
         return SecurityValues(data + 1., self.name_mapping)
 
+    cpdef SecurityValues zscore(self):
+        cdef np.ndarray[double, ndim=1] data = self.values
+        return SecurityValues((data - data.mean()) / data.std(), self.name_mapping)
+
     cpdef double mean(self):
         return np.nanmean(self.values)
 

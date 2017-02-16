@@ -14,6 +14,7 @@ from PyFin.Analysis.CrossSectionValueHolders import CSRankedSecurityValueHolder
 from PyFin.Analysis.CrossSectionValueHolders import CSAverageSecurityValueHolder
 from PyFin.Analysis.CrossSectionValueHolders import CSAverageAdjustedSecurityValueHolder
 from PyFin.Analysis.CrossSectionValueHolders import CSQuantileSecurityValueHolder
+from PyFin.Analysis.CrossSectionValueHolders import CSZScoreSecurityValueHolder
 
 
 class TestCrossSectionValueHolder(unittest.TestCase):
@@ -102,3 +103,23 @@ class TestCrossSectionValueHolder(unittest.TestCase):
         expected = pd.Series(data=data, index=[x for x in range(1, 11)])
 
         np.testing.assert_array_almost_equal(expected.values, calculated.values)
+
+    def testCSZscoreSecurityValueHolder(self):
+        keys = list(range(1, 11))
+        values = list(range(10, 0, -1))
+
+        data = {}
+
+        for i, k in enumerate(keys):
+            data[k] = {}
+            data[k]['close'] = values[i]
+
+        quantile_value = CSZScoreSecurityValueHolder('close')
+        quantile_value.push(data)
+
+        calculated = quantile_value.value
+
+        data = np.linspace(10., 1., 10)
+        expected = (data - data.mean()) / data.std()
+
+        np.testing.assert_array_almost_equal(expected, calculated.values)

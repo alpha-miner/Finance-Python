@@ -40,29 +40,47 @@
 
 ### 安装
 
-首先将代码保存至本地：
+1. 从最新源代码安装
 
-    git clone https://github.com/ChinaQuants/Finance-Python.git (如果你是从github获取)
-    cd finance-Python
+    首先将代码保存至本地：
     
-* *Linux*
-
-只需运行如下命令：
-
-    python setpy.py install
+        git clone https://github.com/ChinaQuants/Finance-Python.git (如果你是从github获取)
+        cd finance-Python
+        
+    * *Linux*
     
-* *Windows*
+    只需运行如下命令：
     
-需要修改项目根目录下``setup.cfg``文件，添加如下两行：
+        python setpy.py install
+    
+    * *Windows*
+        
+    需要修改项目根目录下``setup.cfg``文件，添加如下两行：
+    
+        [build]
+        compiler=msvc
+    
+    然后再运行：``python setup.py install``
+    
+    安装之后，可以直先接运行测试：
+    
+        python setup.py test
+        
+2. 从``pypi``安装
 
-    [build]
-    compiler=msvc
-
-然后再运行：``python setup.py install``
-
-安装之后，可以直先接运行测试：
-
-    python setup.py test
+    * *Linux*
+    
+    只需运行如下命令：
+    
+        pip install Finance-Python
+        
+    * *Windows*
+    
+    从编译完成的``.whl``文件安装：
+    
+        pip insall --use-wheel Finance-Python
+        
+    现阶段支持python 2.7, 3.5以及3.6版本。
     
 ### 开发环境
 

@@ -16,5 +16,6 @@ cdef class SecurityValues(object):
     cpdef SecurityValues mask(self, flags)
     cpdef object index(self)
     cpdef SecurityValues rank(self)
+    cpdef SecurityValues zscore(self)
     cpdef double mean(self)
     cpdef double dot(self, SecurityValues right)

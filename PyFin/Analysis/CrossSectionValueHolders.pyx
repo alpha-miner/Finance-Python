@@ -241,3 +241,53 @@ cdef class CSQuantileSecurityValueHolder(CrossSectionValueHolder):
 
     def __setstate__(self, state):
         pass
+
+
+cdef class CSZScoreSecurityValueHolder(CrossSectionValueHolder):
+    def __init__(self, innerValue):
+        super(CSZScoreSecurityValueHolder, self).__init__(innerValue)
+
+    @property
+    def value(self):
+
+        cdef SecurityValues raw_values
+
+        if self.updated:
+            return self.cached
+        else:
+            raw_values = self._inner.value
+            self.cached = raw_values.zscore()
+            self.updated = 1
+            return self.cached
+
+    @cython.cdivision(True)
+    cpdef value_by_name(self, name):
+
+        cdef SecurityValues raw_values
+
+        if self.updated:
+            return self.cached[name]
+        else:
+            raw_values = self._inner.value
+            self.cached = raw_values.zscore()
+            self.updated = 1
+            return self.cached[name]
+
+    @cython.cdivision(True)
+    cpdef value_by_names(self, list names):
+
+        cdef SecurityValues raw_values
+
+        raw_values = self._inner.value_by_names(names)
+        raw_values = raw_values.zscore()
+        return raw_values[names]
+
+    def __deepcopy__(self, memo):
+        return CSZScoreSecurityValueHolder(self._inner)
+
+    def __reduce__(self):
+        d = {}
+        return CSZScoreSecurityValueHolder, (self._inner, ), d
+
+    def __setstate__(self, state):
+        pass

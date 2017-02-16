@@ -20,7 +20,7 @@ cpdef int pyEnsureRaise(exception, str msg="") except -1:
     raise exception(msg)
 
 
-cpdef pyFinWarning(condition, warn_type, str msg=""):
+cpdef int pyFinWarning(condition, warn_type, str msg=""):
     if not condition:
         warnings.warn(msg, warn_type)
     return 0

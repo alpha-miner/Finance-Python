@@ -384,19 +384,17 @@ cdef class IdentitySecurityValueHolder(SecurityValueHolder):
         return True
 
     cpdef push(self, dict data):
+        pass
 
-        cdef Identity holder
+    @property
+    def value(self):
+        return self._value
 
-        for name in data:
-            try:
-                holder = self._innerHolders[name]
-                holder.push(data)
-            except KeyError:
-                holder = copy.deepcopy(self._holderTemplate)
-                holder.push(data)
-                self._innerHolders[name] = holder
+    cpdef value_by_name(self, name):
+        return self._value
 
-        self.updated = 0
+    cpdef value_by_names(self, list names):
+        return self._value
 
     def __deepcopy__(self, memo):
         return IdentitySecurityValueHolder(self._value)
@@ -865,13 +863,28 @@ cdef class SecurityIIFValueHolder(SecurityValueHolder):
 
     @property
     def value(self):
+
+        cdef SecurityValues flag_value
+
         if self.updated:
             return self.cached
         else:
-            self.cached = SecurityValues(np.where(self._flag.value.values,
+            flag_value = self._flag.value
+
+            if isinstance(self._left, IdentitySecurityValueHolder):
+                left_value = self._left.value
+            else:
+                left_value = self._left.value.values
+
+            if isinstance(self._right, IdentitySecurityValueHolder):
+                right_value = self._right.value
+            else:
+                right_value = self._right.value.values
+
+            self.cached = SecurityValues(np.where(flag_value.values,
                                                   self._left.value.values,
                                                   self._right.value.values),
-                                         self._flag.value.name_mapping)
+                                         flag_value.name_mapping)
             self.updated = 1
             return self.cached
 
@@ -885,15 +898,28 @@ cdef class SecurityIIFValueHolder(SecurityValueHolder):
                 return self._right.value_by_name(name)
 
     cpdef value_by_names(self, list names):
+
+        cdef SecurityValues flag_value
+
         if self.updated:
             return self.cached[names]
         else:
+
             flag_value = self._flag.value_by_names(names)
-            left_value = self._left.value_by_names(names)
-            right_value = self._right.value_by_names(names)
+
+            if isinstance(self._left, IdentitySecurityValueHolder):
+                left_value = self._left.value_by_names(names)
+            else:
+                left_value = self._left.value_by_names(names).values
+
+            if isinstance(self._right, IdentitySecurityValueHolder):
+                right_value = self._right.value_by_names(names)
+            else:
+                right_value = self._right.value_by_names(names).values
+
             return SecurityValues(np.where(flag_value.values,
-                                           left_value.values,
-                                           right_value.values),
+                                           left_value,
+                                           right_value),
                                   flag_value.name_mapping)
 
     def __deepcopy__(self, memo):

@@ -577,7 +577,7 @@ cdef class Identity(Accumulator):
         self._window = 0
         self._value = value
         self._returnSize = 1
-        self._isFull = 0
+        self._isFull = 1
 
     cpdef push(self, dict data):
         pass

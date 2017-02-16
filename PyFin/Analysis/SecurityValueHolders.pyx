@@ -882,8 +882,8 @@ cdef class SecurityIIFValueHolder(SecurityValueHolder):
                 right_value = self._right.value.values
 
             self.cached = SecurityValues(np.where(flag_value.values,
-                                                  self._left.value.values,
-                                                  self._right.value.values),
+                                                  self._left.value,
+                                                  self._right.value),
                                          flag_value.name_mapping)
             self.updated = 1
             return self.cached

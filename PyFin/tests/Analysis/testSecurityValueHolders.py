@@ -163,6 +163,28 @@ class TestSecurityValueHolders(unittest.TestCase):
         self.assertAlmostEqual(calculated['aapl'], -data['aapl']['close'])
         self.assertTrue(np.isnan(calculated['ibm']))
 
+    def testSecurityWhereValueHolderWithScalarValue(self):
+        benchmark = SecurityLatestValueHolder(dependency='open')
+        testValueHolder = SecurityIIFValueHolder(benchmark > 0, 1., -1.)
+        for i in range(len(self.datas['aapl']['close'])):
+            data = {'aapl': {Factors.CLOSE: self.datas['aapl'][Factors.CLOSE][i],
+                             Factors.OPEN: self.datas['aapl'][Factors.OPEN][i]},
+                    'ibm': {Factors.CLOSE: self.datas['ibm'][Factors.CLOSE][i],
+                            Factors.OPEN: self.datas['ibm'][Factors.OPEN][i]}}
+            benchmark.push(data)
+            testValueHolder.push(data)
+
+            calculated = testValueHolder.value
+
+            for name in calculated.index():
+                rawValue = data[name][Factors.OPEN]
+                if rawValue > 0.:
+                    self.assertAlmostEqual(1., calculated[name])
+                    self.assertAlmostEqual(1., testValueHolder.value_by_name(name))
+                else:
+                    self.assertAlmostEqual(-1., calculated[name])
+                    self.assertAlmostEqual(-1., testValueHolder.value_by_name(name))
+
     def testFilteredSecurityValueHolder(self):
         benchmark = SecurityLatestValueHolder(dependency='close') > 0
         filtered = FilteredSecurityValueHolder(benchmark, benchmark)

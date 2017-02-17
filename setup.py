@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from setuptools import setup
+from setuptools import find_packages
 from distutils.cmd import Command
 from distutils import sysconfig
 from distutils.extension import Extension
@@ -23,7 +24,7 @@ else:
 
 PACKAGE = "PyFin"
 NAME = "Finance-Python"
-VERSION = "0.5.0"
+VERSION = "0.5.1"
 DESCRIPTION = "PyFin " + VERSION
 AUTHOR = "cheng li"
 AUTHOR_EMAIL = "wegamekinglc@hotmail.com"
@@ -186,36 +187,7 @@ setup(
     author=AUTHOR,
     author_email=AUTHOR_EMAIL,
     url=URL,
-    packages=['PyFin.api',
-              'PyFin.examples',
-              'PyFin.DateUtilities',
-              'PyFin.Enums',
-              'PyFin.Env',
-              'PyFin.Math',
-              'PyFin.Math.Accumulators',
-              'PyFin.Math.Distributions',
-              'PyFin.Math.Timeseries',
-              'PyFin.Patterns',
-              'PyFin.POpt',
-              'PyFin.PricingEngines',
-              'PyFin.Analysis',
-              'PyFin.Analysis.DataProviders',
-              'PyFin.Analysis.TechnicalAnalysis',
-              'PyFin.Utilities',
-              'PyFin.tests',
-              'PyFin.tests.api',
-              'PyFin.tests.DateUtilities',
-              'PyFin.tests.Env',
-              'PyFin.tests.Math',
-              'PyFin.tests.Math.Accumulators',
-              'PyFin.tests.Math.Distributions',
-              'PyFin.tests.Math.Timeseries',
-              'PyFin.tests.POpt',
-              'PyFin.tests.Analysis',
-              'PyFin.tests.Analysis.DataProviders',
-              'PyFin.tests.Analysis.TechnicalAnalysis',
-              'PyFin.tests.PricingEngines',
-              'PyFin.tests.Utilities'],
+    packages=find_packages(),
     py_modules=['PyFin.__init__', 'PyFin.tests.testSuite'],
     install_requires=io.open(requirements, encoding='utf8').read(),
     data_files=datafiles,

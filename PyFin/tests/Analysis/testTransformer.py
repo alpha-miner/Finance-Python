@@ -120,3 +120,25 @@ class TestTransformer(unittest.TestCase):
         expected = test_df[test_df.b >= 5]
         np.testing.assert_array_almost_equal(expected.b, calculated['filtered_b'])
         np.testing.assert_array_almost_equal(expected.code, calculated['code'])
+
+    def test_transformer_with_string_value(self):
+        test_df = pd.DataFrame({'code': ['a', 'b', 'c', 'd', 'a', 'b', 'c'],
+                                'b': [4, 5, 6, 7, 6, 5, 4],
+                                'c': [9, 8, 7, 6, 5, 4, 3]},
+                               index=[1, 1, 1, 1, 2, 2, 2],
+                               dtype=float)
+
+        value_holder = SecurityLatestValueHolder('b')
+        filter = SecurityLatestValueHolder('b') >= 5
+
+        filtered_value_holder = value_holder[filter]
+
+        calculated = transform(test_df,
+                               [filtered_value_holder],
+                               cols=['filtered_b'],
+                               category_field='code')
+
+        self.assertTrue(np.all(calculated['filtered_b'] >= 5))
+        expected = test_df[test_df.b >= 5]
+        np.testing.assert_array_almost_equal(expected.b, calculated['filtered_b'])
+        np.testing.assert_array_equal(expected.code, calculated['code'])

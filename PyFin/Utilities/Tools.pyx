@@ -11,7 +11,7 @@ cimport numpy as np
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
-def to_dict(total_index, list total_category, double[:, :] matrix_values, list columns):
+def to_dict(total_index, list total_category, np.ndarray matrix_values, list columns):
 
     cdef long start = 0
     cdef int i

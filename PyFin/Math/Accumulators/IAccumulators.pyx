@@ -15,7 +15,6 @@ from libc.math cimport acosh
 from libc.math cimport asin
 from libc.math cimport asinh
 cimport cython
-from libc.math cimport isnan
 import numpy as np
 cimport numpy as np
 import pandas as pd
@@ -127,9 +126,9 @@ cdef class Accumulator(IAccumulator):
 
         cdef int i
         cdef int k
-        cdef np.ndarray[double, ndim=2] matrix_values
+        cdef np.ndarray matrix_values
         cdef long n = len(data)
-        cdef np.ndarray[double, ndim=1] output_values = np.zeros(n)
+        cdef np.ndarray output_values = np.empty(n, dtype=object)
         cdef list columns
         cdef int column_length
         cdef dict data_dict
@@ -140,8 +139,7 @@ cdef class Accumulator(IAccumulator):
         if not name:
             name = 'transformed'
 
-        data = data.select_dtypes([np.number])
-        matrix_values = data.as_matrix().astype(np.float64)
+        matrix_values = data.as_matrix()
         columns = data.columns.tolist()
         column_length = len(columns)
 

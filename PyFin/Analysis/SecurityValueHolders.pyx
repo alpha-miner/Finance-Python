@@ -226,9 +226,9 @@ cdef class SecurityValueHolder(object):
         cdef str f
         cdef int dummy_category
         cdef np.ndarray total_category
-        cdef np.ndarray[double, ndim=2] matrix_values
+        cdef np.ndarray matrix_values
         cdef list columns
-        cdef np.ndarray[double, ndim=1] output_values
+        cdef np.ndarray output_values
         cdef int j
         cdef int start_count
         cdef int end_count
@@ -253,12 +253,11 @@ cdef class SecurityValueHolder(object):
             name = 'transformed'
 
         total_category = data[category_field].values
-        data = data.select_dtypes([np.number])
-        matrix_values = data.as_matrix().astype(np.float64)
+        matrix_values = data.as_matrix()
         columns = data.columns.tolist()
         split_category, split_values = to_dict(total_index, total_category.tolist(), matrix_values, columns)
 
-        output_values = np.zeros(len(data))
+        output_values = np.empty(len(data), dtype=object)
 
         start_count = 0
         if not dummy_category:

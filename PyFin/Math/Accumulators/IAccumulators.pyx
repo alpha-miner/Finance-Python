@@ -151,7 +151,7 @@ cdef class Accumulator(IAccumulator):
             self.push(data_dict)
             output_values[i] = self.result()
 
-        return pd.Series(output_values, index=data.index, name=name)
+        return pd.to_numeric(pd.Series(output_values, index=data.index, name=name), errors='ignore')
 
     @property
     def value(self):

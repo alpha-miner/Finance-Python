@@ -77,5 +77,5 @@ cpdef transform(data, list expressions, list cols, str category_field=None, to_s
     if not dummy_category:
         df[category_field] = total_category
 
-    df.dropna(inplace=True)
+    df = df.apply(pd.to_numeric, args=('ignore',))
     return df

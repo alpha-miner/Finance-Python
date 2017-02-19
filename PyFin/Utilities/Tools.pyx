@@ -8,6 +8,7 @@ Created on 2017-1-22
 cimport cython
 import numpy as np
 cimport numpy as np
+from PyFin.Utilities.Asserts cimport pyFinAssert
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
@@ -33,6 +34,10 @@ def to_dict(total_index, list total_category, np.ndarray matrix_values, list col
                         range(start, end+1)}
         splited_values[i] = current_dict
         start = end + 1
+
+        pyFinAssert(len(current_dict) == len(splited_category[i]),
+                    ValueError,
+                    "There is duplicated category value in the snapshot ({0})".format(total_index[start]))
 
     splited_category[index_diff_length] = total_category[start:]
     current_dict = {total_category[j]: {columns[k]: matrix_values[j, k] for k in range(column_length)} for j in

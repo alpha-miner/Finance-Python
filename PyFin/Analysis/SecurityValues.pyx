@@ -18,7 +18,14 @@ cdef class SecurityValues(object):
             index = OrderedDict(zip(data.keys(), range(len(data))))
             data = np.array(list(data.values()))
 
-        self.values = data
+        if len(data) > 0:
+            if isinstance(data[0], float) or isinstance(data[0], int):
+                self.values = data.astype(float)
+            else:
+                self.values = data
+        else:
+            self.values = data
+
         if isinstance(index, OrderedDict):
             self.name_mapping = index
         else:

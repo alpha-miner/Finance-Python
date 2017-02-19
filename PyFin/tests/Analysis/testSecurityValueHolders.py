@@ -14,6 +14,7 @@ from PyFin.Analysis.SecurityValueHolders import dependencyCalculator
 from PyFin.Analysis.SecurityValueHolders import FilteredSecurityValueHolder
 from PyFin.Analysis.SecurityValueHolders import SecurityLatestValueHolder
 from PyFin.Analysis.SecurityValueHolders import SecurityIIFValueHolder
+from PyFin.Analysis.SecurityValueHolders import SecurityShiftedValueHolder
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingAverage
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingMax
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingMinimum
@@ -37,6 +38,30 @@ class TestSecurityValueHolders(unittest.TestCase):
                                                                                             expected[name],
                                                                                             calculated[name]))
         self.checker = check_values
+
+    def testSecurityValueHolderWithGetItemUseInt(self):
+
+        shift = 2
+
+        benchmark = SecurityShiftedValueHolder(SecurityLatestValueHolder(dependency='close'), shift)
+        testValueHolder = SecurityLatestValueHolder(dependency='close')[shift]
+
+        for i in range(len(self.datas['aapl']['close'])):
+            data = {'aapl': {Factors.CLOSE: self.datas['aapl'][Factors.CLOSE][i],
+                             Factors.OPEN: self.datas['aapl'][Factors.OPEN][i]},
+                    'ibm': {Factors.CLOSE: self.datas['ibm'][Factors.CLOSE][i],
+                            Factors.OPEN: self.datas['ibm'][Factors.OPEN][i]}}
+            benchmark.push(data)
+            testValueHolder.push(data)
+
+            if i < shift:
+                continue
+
+            calculated = testValueHolder.value
+            expected = benchmark.value
+
+            self.assertEqual(calculated.name_mapping, expected.name_mapping)
+            np.testing.assert_array_almost_equal(calculated.values, expected.values)
 
     def testSecurityWhereValueHolder(self):
         benchmark = SecurityLatestValueHolder(dependency='close')
@@ -761,6 +786,21 @@ class TestSecurityValueHolders(unittest.TestCase):
         expected = {'aapl': 12.0, 'goog': 7.5}
         calculated = ma.value
         for name in expected:
+            self.assertAlmostEqual(expected[name], calculated[name], 15)
+
+    def testFilterSecurityValueHolderWorkWithStr(self):
+        filter = SecurityLatestValueHolder('code') == 'ibm'
+        ma = FilteredSecurityValueHolder(SecurityMovingAverage(10, 'close'), filter)
+
+        data = {'aapl': {'code': 'aapl', 'close': 15.},
+                'ibm': {'code': 'ibm', 'close': 10.},
+                'goog': {'code': 'goog', 'close': 7.}}
+
+        ma.push(data)
+        expected = {'ibm': 10.0}
+        calculated = ma.value
+
+        for name in calculated.index():
             self.assertAlmostEqual(expected[name], calculated[name], 15)
 
     def testLeSecurityValueHolder(self):

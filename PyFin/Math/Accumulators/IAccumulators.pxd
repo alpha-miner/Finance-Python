@@ -119,7 +119,7 @@ cdef class NeOperatorValueHolder(CombinedValueHolder):
 
 cdef class Identity(Accumulator):
 
-    cdef public double _value
+    cdef public object _value
 
     cpdef push(self, dict data)
     cpdef object result(self)

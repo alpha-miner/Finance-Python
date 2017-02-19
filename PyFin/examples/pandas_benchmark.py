@@ -21,7 +21,7 @@ index = pd.date_range(dt.datetime(1990, 1, 1), dt.datetime(1990, 1, 1) + dt.time
 index = np.repeat(index, n)
 
 df = pd.DataFrame(np.random.randn(n*m, 3), columns=['x', 'y', 'z'], index=index)
-df['c'] = matlib.repmat(np.linspace(0, m-1, m, dtype=int), 1, n)[0]
+df['c'] = matlib.repmat(np.linspace(0, n-1, n, dtype=int), 1, m)[0]
 
 start = dt.datetime.now()
 t = MA(20, LAST('x')) / MA(30, LAST('y'))

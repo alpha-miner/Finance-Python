@@ -39,7 +39,7 @@ cdef class FilteredSecurityValueHolder(SecurityValueHolder):
 
 cdef class IdentitySecurityValueHolder(SecurityValueHolder):
 
-    cdef public double _value
+    cdef public object _value
 
     cpdef push(self, dict data)
 

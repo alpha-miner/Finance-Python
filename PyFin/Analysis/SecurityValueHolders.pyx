@@ -102,7 +102,7 @@ cdef class SecurityValueHolder(object):
     @cython.wraparound(False)
     def value(self):
 
-        cdef np.ndarray[double, ndim=1] values
+        cdef np.ndarray values
         cdef Accumulator holder
         cdef int n
         cdef int i
@@ -112,7 +112,7 @@ cdef class SecurityValueHolder(object):
         else:
             keys = self._innerHolders.keys()
             n = len(keys)
-            values = np.zeros(n)
+            values = np.empty(n, dtype='object')
             for i, name in enumerate(keys):
                 try:
                     holder = self._innerHolders[name]
@@ -127,7 +127,7 @@ cdef class SecurityValueHolder(object):
     @cython.wraparound(False)
     cpdef value_by_names(self, list names):
         cdef Accumulator holder
-        cdef np.ndarray[double, ndim=1] res
+        cdef np.ndarray res
         cdef int i
         cdef int n
 
@@ -135,7 +135,7 @@ cdef class SecurityValueHolder(object):
             return self.cached[names]
         else:
             n = len(names)
-            res = np.zeros(n)
+            res = np.empty(n, dtype='object')
             for i, name in enumerate(names):
                 holder = self._innerHolders[name]
                 res[i] = holder.result()
@@ -167,6 +167,8 @@ cdef class SecurityValueHolder(object):
     def __getitem__(self, filter):
         if isinstance(filter, SecurityValueHolder):
             return FilteredSecurityValueHolder(self, filter)
+        elif isinstance(filter, int):
+            return SecurityShiftedValueHolder(self, filter)
         else:
             return self.value[filter]
 
@@ -528,8 +530,6 @@ cdef class SecurityCombinedValueHolder(SecurityValueHolder):
             self._left = copy.deepcopy(left)
             if isinstance(right, SecurityValueHolder):
                 self._right = copy.deepcopy(right)
-            elif isinstance(right, str):
-                self._right = SecurityLatestValueHolder(right)
             else:
                 self._right = IdentitySecurityValueHolder(right)
         elif isinstance(left, str):

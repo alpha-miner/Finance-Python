@@ -276,6 +276,7 @@ cdef class SecurityValueHolder(object):
             df[category_field] = total_category
 
         df = df.apply(pd.to_numeric, args=('ignore',))
+        df.dropna(inplace=True)
 
         return df
 

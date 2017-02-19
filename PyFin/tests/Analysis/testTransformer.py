@@ -116,10 +116,10 @@ class TestTransformer(unittest.TestCase):
                                cols=['filtered_b'],
                                category_field='code')
 
-        self.assertTrue(np.all(calculated[~np.isnan(calculated.filtered_b)]['filtered_b'] >= 5))
+        self.assertTrue(np.all(calculated['filtered_b'] >= 5))
         expected = test_df[test_df.b >= 5]
-        np.testing.assert_array_almost_equal(expected.b, calculated[~np.isnan(calculated.filtered_b)]['filtered_b'])
-        np.testing.assert_array_almost_equal(expected.code, calculated[~np.isnan(calculated.filtered_b)]['code'])
+        np.testing.assert_array_almost_equal(expected.b, calculated['filtered_b'])
+        np.testing.assert_array_almost_equal(expected.code, calculated['code'])
 
     def test_transformer_with_string_value(self):
         test_df = pd.DataFrame({'code': ['a', 'b', 'c', 'd', 'a', 'b', 'c'],
@@ -138,7 +138,7 @@ class TestTransformer(unittest.TestCase):
                                cols=['filtered_b'],
                                category_field='code')
 
-        self.assertTrue(np.all(calculated[~np.isnan(calculated.filtered_b)]['filtered_b'] >= 5))
+        self.assertTrue(np.all(calculated['filtered_b'] >= 5))
         expected = test_df[test_df.b >= 5]
-        np.testing.assert_array_almost_equal(expected.b, calculated[~np.isnan(calculated.filtered_b)]['filtered_b'])
-        np.testing.assert_array_equal(expected.code, calculated[~np.isnan(calculated.filtered_b)]['code'])
+        np.testing.assert_array_almost_equal(expected.b, calculated['filtered_b'])
+        np.testing.assert_array_equal(expected.code, calculated['code'])

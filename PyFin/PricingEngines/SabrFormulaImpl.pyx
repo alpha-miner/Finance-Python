@@ -16,13 +16,13 @@ from PyFin.Math.MathConstants import MathConstants
 cdef double QL_EPSILON = MathConstants.QL_EPSILON
 
 @cython.cdivision(True)
-cpdef double sabrVolatilityImpl(double strike,
-                                double forward,
-                                double expiryTime,
-                                double alpha,
-                                double beta,
-                                double nu,
-                                double rho):
+cpdef double sabrVolatility(double strike,
+                            double forward,
+                            double expiryTime,
+                            double alpha,
+                            double beta,
+                            double nu,
+                            double rho):
     cdef double oneMinusBeta = 1.0 - beta
     cdef double A = (forward * strike) ** oneMinusBeta
     cdef double sqrtA = sqrt(A)
@@ -61,7 +61,7 @@ cpdef double sabrVolatilityImpl(double strike,
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
-cpdef np.ndarray[double, ndim=1] sabrVolatilitiesImpl(np.ndarray[double, ndim=1] strikes,
+cpdef np.ndarray[double, ndim=1] sabrVolatilities(double[:] strikes,
                      double forward,
                      double expiry,
                      double alpha,
@@ -73,5 +73,74 @@ cpdef np.ndarray[double, ndim=1] sabrVolatilitiesImpl(np.ndarray[double, ndim=1]
     cdef np.ndarray[double, ndim=1] res = np.empty(length, np.float64)
 
     for i in range(length):
-        res[i] = sabrVolatilityImpl(strikes[i], forward, expiry, alpha, beta, nu, rho)
+        res[i] = sabrVolatility(strikes[i], forward, expiry, alpha, beta, nu, rho)
     return res
+
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+cpdef np.ndarray[double, ndim=1] _sabrCalibrationIteration(double[:] parameters,
+                              list parametetsNames,
+                              double[:] strikes,
+                              double[:] targetVols,
+                              double forward,
+                              double expiryTime,
+                              dict argDict):
+    cdef int i
+    cdef str name
+    for i, name in enumerate(parametetsNames):
+        argDict[name] = parameters[i]
+    return targetVols - sabrVolatilities(strikes,
+                                         forward,
+                                         expiryTime,
+                                         **argDict)
+
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+cpdef _parametersCheck(double intialAlpha,
+                       double initialBeta,
+                       double initialNu,
+                       double initialRho,
+                       bint isFixedAlpha,
+                       bint isFixedBeta,
+                       bint isFixedNu,
+                       bint isFixedRho):
+    cdef list x0 = []
+    cdef list freeParameters = []
+    cdef dict fixedParameters = {}
+    cdef tuple bounds = ([], [])
+
+    if isFixedAlpha:
+        fixedParameters['alpha'] = intialAlpha
+    else:
+        freeParameters.append('alpha')
+        x0.append(intialAlpha)
+        bounds[0].append(0.)
+        bounds[1].append(np.inf)
+
+    if isFixedBeta:
+        fixedParameters['beta'] = initialBeta
+    else:
+        freeParameters.append('beta')
+        x0.append(initialBeta)
+        bounds[0].append(0.)
+        bounds[1].append(1.)
+
+    if isFixedNu:
+        fixedParameters['nu'] = initialNu
+    else:
+        freeParameters.append('nu')
+        x0.append(initialNu)
+        bounds[0].append(0.)
+        bounds[1].append(np.inf)
+
+    if isFixedRho:
+        fixedParameters['rho'] = initialRho
+    else:
+        freeParameters.append('rho')
+        x0.append(initialRho)
+        bounds[0].append(-1.)
+        bounds[1].append(1.0)
+
+    return np.array(x0), freeParameters, fixedParameters, bounds

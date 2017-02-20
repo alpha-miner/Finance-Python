@@ -7,90 +7,10 @@ Created on 2017-1-7
 
 import numpy as np
 from scipy.optimize import least_squares
-from PyFin.PricingEngines.SVIInterpolationImpl import sviVolatilityImpl
-from PyFin.PricingEngines.SVIInterpolationImpl import sviVolatilitiesImpl
-
-
-def sviVolatility(strike, forward, expiry, a, b, sigma, rho, m):
-    return sviVolatilityImpl(strike, forward, expiry, a, b, sigma, rho, m)
-
-
-def sviVolatilities(strikes, forward, expiry, a, b, sigma, rho, m):
-    return sviVolatilitiesImpl(strikes, forward, expiry, a, b, sigma, rho, m)
-
-
-def _sviCalibrationIteration(parameters,
-                             parametetsNames,
-                             strikes,
-                             targetVols,
-                             forward,
-                             expiryTime,
-                             **kwargs):
-    for i, name in enumerate(parametetsNames):
-        kwargs[name] = parameters[i]
-    return targetVols - sviVolatilities(strikes,
-                                        forward,
-                                        expiryTime,
-                                        **kwargs)
-
-
-def _parametersCheck(initialA,
-                     initialB,
-                     initialSigma,
-                     initialRho,
-                     initialM,
-                     isFixedA,
-                     isFixedB,
-                     isFixedSigma,
-                     isFixedRho,
-                     isFixedM):
-    x0 = []
-    freeParameters = []
-    fixedParameters = {}
-    bounds = ([], [])
-
-    if isFixedA:
-        fixedParameters['a'] = initialA
-    else:
-        freeParameters.append('a')
-        x0.append(initialA)
-        bounds[0].append(-np.inf)
-        bounds[1].append(np.inf)
-
-    if isFixedB:
-        fixedParameters['b'] = initialB
-    else:
-        freeParameters.append('b')
-        x0.append(initialB)
-        bounds[0].append(0.)
-        bounds[1].append(np.inf)
-
-    if isFixedSigma:
-        fixedParameters['sigma'] = initialSigma
-    else:
-        freeParameters.append('sigma')
-        x0.append(initialSigma)
-        bounds[0].append(0.)
-        bounds[1].append(np.inf)
-
-    if isFixedRho:
-        fixedParameters['rho'] = initialRho
-    else:
-        freeParameters.append('rho')
-        x0.append(initialRho)
-        bounds[0].append(-1.)
-        bounds[1].append(1.0)
-
-    if isFixedM:
-        fixedParameters['m'] = initialM
-    else:
-        freeParameters.append('m')
-        x0.append(initialRho)
-        bounds[0].append(-np.inf)
-        bounds[1].append(np.inf)
-
-    x0 = np.array(x0)
-    return x0, freeParameters, fixedParameters, bounds
+from PyFin.PricingEngines.SVIInterpolationImpl import sviVolatility
+from PyFin.PricingEngines.SVIInterpolationImpl import sviVolatilities
+from PyFin.PricingEngines.SVIInterpolationImpl import _sviCalibrationIteration
+from PyFin.PricingEngines.SVIInterpolationImpl import _parametersCheck
 
 
 def sviCalibration(strikes,
@@ -127,8 +47,7 @@ def sviCalibration(strikes,
                           ftol=1e-10,
                           gtol=1e-10,
                           xtol=1e-10,
-                          args=(freeParameters, strikes, volatilites, forward, expiryTime),
-                          kwargs=fixedParameters)
+                          args=(freeParameters, strikes, volatilites, forward, expiryTime, fixedParameters))
     else:
         x = least_squares(_sviCalibrationIteration,
                           x0,
@@ -136,8 +55,7 @@ def sviCalibration(strikes,
                           ftol=1e-10,
                           gtol=1e-10,
                           xtol=1e-10,
-                          args=(freeParameters, strikes, volatilites, forward, expiryTime),
-                          kwargs=fixedParameters)
+                          args=(freeParameters, strikes, volatilites, forward, expiryTime, fixedParameters))
 
     parameters = ['a', 'b', 'sigma', 'rho', 'm']
     calibratedParameters = dict(zip(freeParameters, x.x))
@@ -150,3 +68,8 @@ def sviCalibration(strikes,
             res.append(fixedParameters[name])
 
     return np.array(res), x.status, x.message
+
+
+__all__ = ['sviVolatility',
+           'sviVolatilities',
+           'sviCalibration']

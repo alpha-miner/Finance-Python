@@ -24,7 +24,7 @@ df = pd.DataFrame(np.random.randn(n*m, 3), columns=['x', 'y', 'z'], index=index)
 df['c'] = matlib.repmat(np.linspace(0, n-1, n, dtype=int), 1, m)[0]
 
 start = dt.datetime.now()
-t = MA(20, LAST('x')) / MA(30, LAST('y'))
+t = MA(20, 'x') / MA(30, 'y')
 res = t.transform(df, category_field='c')
 print("Finance-Python (analysis): {0}s".format(dt.datetime.now() - start))
 
@@ -34,7 +34,7 @@ res = groups['x'].rolling(20).mean() / groups['y'].rolling(30).mean()
 print("Pandas (group by): {0}s".format(dt.datetime.now() - start))
 
 start = dt.datetime.now()
-t = MovingAverage(20, Latest('x')) / MovingAverage(30, Latest('x'))
+t = MovingAverage(20, 'x') / MovingAverage(30, 'x')
 res = t.transform(df)
 print("Finance-Python (accumulator): {0}s".format(dt.datetime.now() - start))
 

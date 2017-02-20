@@ -1,2 +1,9 @@
 *.pyc
 .idea/*
+build/*
+.vscode/*
+dist/*
+Finance_Python.egg-info/*
+*.c
+*.pyd
+*.html

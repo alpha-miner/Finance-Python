@@ -43,6 +43,8 @@ cpdef np.ndarray[double, ndim=1]  sviVolatilities(double[:] strikes,
     return res
 
 
+@cython.boundscheck(False)
+@cython.wraparound(False)
 cpdef np.ndarray[double, ndim=1] _sviCalibrationIteration(double[:] parameters,
                              list parametetsNames,
                              double[:] strikes,
@@ -62,7 +64,9 @@ cpdef np.ndarray[double, ndim=1] _sviCalibrationIteration(double[:] parameters,
                                         **argsDict)
 
 
-def _parametersCheck(double initialA,
+@cython.boundscheck(False)
+@cython.wraparound(False)
+cpdef _parametersCheck(double initialA,
                      double initialB,
                      double initialSigma,
                      double initialRho,

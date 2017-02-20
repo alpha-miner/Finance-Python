@@ -3,13 +3,11 @@
 from setuptools import setup
 from setuptools import find_packages
 from distutils.cmd import Command
-from distutils import sysconfig
 from distutils.extension import Extension
 import os
 import sys
 import io
 import subprocess
-import glob
 import numpy as np
 from Cython.Build import cythonize
 import Cython.Compiler.Options
@@ -29,36 +27,6 @@ DESCRIPTION = "PyFin " + VERSION
 AUTHOR = "cheng li"
 AUTHOR_EMAIL = "wegamekinglc@hotmail.com"
 URL = 'https://github.com/ChinaQuants/Finance-Python'
-
-packagePath = sysconfig.get_python_lib()
-
-files = glob.glob("PyFin/tests/Math/Accumulators/data/*.csv")
-datafiles = [
-    (os.path.join(packagePath, "PyFin/tests/Math/Accumulators/data"), files)]
-
-files = glob.glob("PyFin/tests/POpt/data/*.csv")
-datafiles.append((os.path.join(packagePath, "PyFin/tests/POpt/data"), files))
-
-files = glob.glob("PyFin/DateUtilities/*.pxd")
-datafiles.append((os.path.join(packagePath, "PyFin/DateUtilities"), files))
-
-files = glob.glob("PyFin/Analysis/*.pxd")
-datafiles.append((os.path.join(packagePath, "PyFin/Analysis"), files))
-
-files = glob.glob("PyFin/Enums/*.pxd")
-datafiles.append((os.path.join(packagePath, "PyFin/Enums"), files))
-
-files = glob.glob("PyFin/Math/*.pxd")
-datafiles.append((os.path.join(packagePath, "PyFin/Math"), files))
-
-files = glob.glob("PyFin/Utilities/*.pxd")
-datafiles.append((os.path.join(packagePath, "PyFin/Utilities"), files))
-
-files = glob.glob("PyFin/Math/Accumulators/*.pxd")
-datafiles.append((os.path.join(packagePath, "PyFin/Math/Accumulators"), files))
-
-files = glob.glob("PyFin/Math/Distributions/*.pxd")
-datafiles.append((os.path.join(packagePath, "PyFin/Math/Distributions"), files))
 
 
 def git_version():
@@ -147,6 +115,7 @@ ext_modules = [
     "PyFin/DateUtilities/Calendar.pyx",
     "PyFin/DateUtilities/Date.pyx",
     "PyFin/DateUtilities/Period.pyx",
+    "PyFin/DateUtilities/Schedule.pyx",
     "PyFin/Utilities/Asserts.pyx",
     "PyFin/Utilities/Tools.pyx",
     "PyFin/PricingEngines/BlackFormula.pyx",
@@ -188,9 +157,9 @@ setup(
     author_email=AUTHOR_EMAIL,
     url=URL,
     packages=find_packages(),
+    include_package_data=True,
     py_modules=['PyFin.__init__', 'PyFin.tests.testSuite'],
     install_requires=io.open(requirements, encoding='utf8').read(),
-    data_files=datafiles,
     classifiers=[],
     cmdclass={"test": test,
               "version_build": version_build},

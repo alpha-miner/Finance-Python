@@ -42,29 +42,29 @@ class Schedule(object):
         else:
             self._endOfMonth = endOfMonth
 
-        if firstDate is None or firstDate == effectiveDate:
+        if not firstDate or firstDate == effectiveDate:
             self._firstDate = None
         else:
             self._firstDate = firstDate
 
-        if nextToLastDate is None or nextToLastDate == terminationDate:
+        if not nextToLastDate or nextToLastDate == terminationDate:
             self._nextToLastDate = None
         else:
             self._nextToLastDate = nextToLastDate
 
         # in many cases (e.g. non-expired bonds) the effective date is not
         # really necessary. In these cases a decent placeholder is enough
-        if effectiveDate is None and firstDate is None and dateGenerationRule == DateGeneration.Backward:
+        if not effectiveDate and not firstDate and dateGenerationRule == DateGeneration.Backward:
             evalDate = Settings.evaluationDate
             pyFinAssert(evalDate < terminationDate, ValueError, "null effective date")
-            if nextToLastDate is not None:
+            if nextToLastDate:
                 y = int((nextToLastDate - evalDate) / 366) + 1
                 effectiveDate = nextToLastDate - Period(length=y, units=TimeUnits.Years)
             else:
                 y = int((terminationDate - evalDate) / 366) + 1
                 effectiveDate = terminationDate - Period(length=y, units=TimeUnits.Years)
         else:
-            pyFinAssert(effectiveDate is not None, ValueError, "null effective date")
+            pyFinAssert(effectiveDate, ValueError, "null effective date")
 
         pyFinAssert(effectiveDate < terminationDate, ValueError, "effective date ({0}) "
                                                                  "later than or equal to termination date ({1}"
@@ -75,7 +75,7 @@ class Schedule(object):
         else:
             pyFinAssert(tenor.length > 0, ValueError, "non positive tenor ({0:d}) not allowed".format(tenor.length))
 
-        if self._firstDate is not None:
+        if self._firstDate:
             if self._rule == DateGeneration.Backward or self._rule == DateGeneration.Forward:
                 pyFinAssert(effectiveDate < self._firstDate < terminationDate, ValueError,
                             "first date ({0}) out of effective-termination date range [{1}, {2})"
@@ -87,7 +87,7 @@ class Schedule(object):
             else:
                 raise ValueError("unknown rule ({0:d})".format(self._rule))
 
-        if self._nextToLastDate is not None:
+        if self._nextToLastDate:
             if self._rule == DateGeneration.Backward or self._rule == DateGeneration.Forward:
                 pyFinAssert(effectiveDate < self._nextToLastDate < terminationDate, ValueError,
                             "next to last date ({0}) out of effective-termination date range [{1}, {2})"
@@ -110,9 +110,10 @@ class Schedule(object):
         elif self._rule == DateGeneration.Backward:
             self._dates.append(terminationDate)
             seed = terminationDate
-            if self._nextToLastDate is not None:
+            if self._nextToLastDate:
                 self._dates.insert(0, self._nextToLastDate)
-                temp = nullCalendar.advanceDate(seed, Period(length=-periods * self._tenor.length, units=self._tenor.units),
+                temp = nullCalendar.advanceDate(seed,
+                                                Period(length=-periods * self._tenor.length, units=self._tenor.units),
                                                 convention, self._endOfMonth)
                 if temp != self._nextToLastDate:
                     self._isRegular.insert(0, False)
@@ -121,16 +122,15 @@ class Schedule(object):
                 seed = self._nextToLastDate
 
             exitDate = effectiveDate
-            if self._firstDate is not None:
+            if self._firstDate:
                 exitDate = self._firstDate
 
             while True:
-                temp = nullCalendar.advanceDate(seed, Period(length=-periods * self._tenor.length, units=self._tenor.units),
+                temp = nullCalendar.advanceDate(seed,
+                                                Period(length=-periods * self._tenor.length, units=self._tenor.units),
                                                 convention, self._endOfMonth)
                 if temp < exitDate:
-                    if self._firstDate is not None and self._cal.adjustDate(self._dates[0],
-                                                                            convention) != self._cal.adjustDate(
-                        self._firstDate, convention):
+                    if self._firstDate and self._cal.adjustDate(self._dates[0], convention) != self._cal.adjustDate(self._firstDate, convention):
                         self._dates.insert(0, self._firstDate)
                         self._isRegular.insert(0, False)
                     break
@@ -151,9 +151,10 @@ class Schedule(object):
 
             seed = self._dates[-1]
 
-            if self._firstDate is not None:
+            if self._firstDate:
                 self._dates.append(self._firstDate)
-                temp = nullCalendar.advanceDate(seed, Period(length=periods * self._tenor.length, units=self._tenor.units),
+                temp = nullCalendar.advanceDate(seed,
+                                                Period(length=periods * self._tenor.length, units=self._tenor.units),
                                                 convention, self._endOfMonth)
                 if temp != self._firstDate:
                     self._isRegular.append(False)
@@ -162,16 +163,15 @@ class Schedule(object):
                 seed = self._firstDate
 
             exitDate = terminationDate
-            if self._nextToLastDate is not None:
+            if self._nextToLastDate:
                 exitDate = self._nextToLastDate
 
             while True:
-                temp = nullCalendar.advanceDate(seed, Period(length=periods * self._tenor.length, units=self._tenor.units),
+                temp = nullCalendar.advanceDate(seed,
+                                                Period(length=periods * self._tenor.length, units=self._tenor.units),
                                                 convention, self._endOfMonth)
                 if temp > exitDate:
-                    if self._nextToLastDate is not None and self._cal.adjustDate(self._dates[-1],
-                                                                                 convention) != self._cal.adjustDate(
-                        self._nextToLastDate, convention):
+                    if self._nextToLastDate and self._cal.adjustDate(self._dates[-1], convention) != self._cal.adjustDate(self._nextToLastDate, convention):
                         self._dates.append(self._nextToLastDate)
                         self._isRegular.append(False)
                     break

@@ -1,32 +1,54 @@
 # -*- coding: utf-8 -*-
 u"""
-Created on 2015-7-15
+Created on 2015-2-20
 
 @author: cheng.li
 """
 
-from PyFin.Enums import BizDayConventions
-from PyFin.Enums import DateGeneration
-from PyFin.Enums import TimeUnits
-from PyFin.DateUtilities import Date
-from PyFin.DateUtilities import Period
-from PyFin.DateUtilities import Calendar
+from PyFin.Enums._BizDayConventions cimport BizDayConventions
+from PyFin.Enums._DateGeneration cimport DateGeneration
+from PyFin.Enums._TimeUnits cimport TimeUnits
+from PyFin.DateUtilities.Date cimport Date
+from PyFin.DateUtilities.Period cimport Period
+from PyFin.DateUtilities.Calendar cimport Calendar
 from PyFin.Env import Settings
-from PyFin.Utilities import pyFinAssert
+from PyFin.Utilities.Asserts cimport pyFinAssert
 
 
-class Schedule(object):
+cdef class Schedule(object):
+
+    cdef Period _tenor
+    cdef Calendar _cal
+    cdef int _convention
+    cdef int _terminationConvention
+    cdef int _rule
+    cdef list _dates
+    cdef list _isRegular
+    cdef bint _endOfMonth
+    cdef Date _firstDate
+    cdef Date _nextToLastDate
+
     def __init__(self,
-                 effectiveDate,
-                 terminationDate,
-                 tenor,
-                 calendar,
-                 convention=BizDayConventions.Following,
-                 terminationConvention=BizDayConventions.Following,
-                 dateGenerationRule=DateGeneration.Forward,
-                 endOfMonth=False,
-                 firstDate=None,
-                 nextToLastDate=None):
+                 Date effectiveDate,
+                 Date terminationDate,
+                 Period tenor,
+                 Calendar calendar,
+                 int convention=BizDayConventions.Following,
+                 int terminationConvention=BizDayConventions.Following,
+                 int dateGenerationRule=DateGeneration.Forward,
+                 bint endOfMonth=False,
+                 Date firstDate=None,
+                 Date nextToLastDate=None):
+
+        cdef int i
+        cdef int dateLen
+        cdef Calendar nullCalendar
+        cdef Date evalDate
+        cdef int y
+        cdef int periods
+        cdef Date seed
+        cdef Date temp
+        cdef Date exitDate
 
         # Initialize private data
         self._tenor = tenor
@@ -220,9 +242,11 @@ class Schedule(object):
         # date due to EOM adjustments (see the Schedule test suite
         # for an example).
 
-        if len(self._dates) >= 2 and self._dates[len(self._dates) - 2] >= self._dates[-1]:
-            self._isRegular[len(self._dates) - 2] = (self._dates[len(self._dates) - 2] == self._dates[-1])
-            self._dates[len(self._dates) - 2] = self._dates[-1]
+        dateLen = len(self._dates)
+
+        if dateLen >= 2 and self._dates[dateLen - 2] >= self._dates[-1]:
+            self._isRegular[dateLen - 2] = (self._dates[dateLen - 2] == self._dates[-1])
+            self._dates[dateLen - 2] = self._dates[-1]
             self._dates.pop()
             self._isRegular.pop()
 
@@ -249,7 +273,7 @@ class Schedule(object):
                             terminationDate,
                             self._rule, self._endOfMonth))
 
-    def size(self):
+    cpdef size(self):
         return len(self._dates)
 
     def __getitem__(self, item):

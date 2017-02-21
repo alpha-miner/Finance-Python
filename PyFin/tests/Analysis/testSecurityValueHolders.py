@@ -15,6 +15,7 @@ from PyFin.Analysis.SecurityValueHolders import FilteredSecurityValueHolder
 from PyFin.Analysis.SecurityValueHolders import SecurityLatestValueHolder
 from PyFin.Analysis.SecurityValueHolders import SecurityIIFValueHolder
 from PyFin.Analysis.SecurityValueHolders import SecurityShiftedValueHolder
+from PyFin.Analysis.SecurityValueHolders import SecurityConstArrayValueHolder
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingAverage
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingMax
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingMinimum
@@ -85,6 +86,45 @@ class TestSecurityValueHolders(unittest.TestCase):
                     self.assertAlmostEqual(rawValue, calculated[name])
                 else:
                     self.assertAlmostEqual(-rawValue, calculated[name])
+
+    def testSecurityConstArrayValueHolder(self):
+        constArray = SecurityConstArrayValueHolder({'a': 1.0, 'b': 2.0})
+
+        testValue = constArray.value
+        expectedValue = SecurityValues(np.array([1.0, 2.0]), index=['a', 'b'])
+
+        for name in expectedValue.index():
+            self.assertAlmostEqual(testValue[name], expectedValue[name])
+
+        testValue = constArray.value_by_name('a')
+        self.assertAlmostEqual(1.0, testValue)
+
+        testValue = constArray.value_by_names(['b', 'a', 'c'])
+        expectedValue = SecurityValues(np.array([2.0, 1.0, np.nan]), index=['b', 'a', 'c'])
+
+        np.testing.assert_array_almost_equal(testValue.values, expectedValue.values)
+        self.assertEqual(testValue.name_mapping, expectedValue.name_mapping)
+
+    def testSecurityConstArrayValueHolderWorkWithOthers(self):
+        dictValue = {'aapl': 1.0, 'ibm': 2.0}
+        constArray = SecurityConstArrayValueHolder(dictValue)
+
+        benchmark = SecurityLatestValueHolder(dependency='close')
+        multiplied = benchmark * constArray
+
+        for i in range(len(self.datas['aapl']['close'])):
+            data = {'aapl': {Factors.CLOSE: self.datas['aapl'][Factors.CLOSE][i],
+                             Factors.OPEN: self.datas['aapl'][Factors.OPEN][i]},
+                    'ibm': {Factors.CLOSE: self.datas['ibm'][Factors.CLOSE][i],
+                            Factors.OPEN: self.datas['ibm'][Factors.OPEN][i]}}
+            benchmark.push(data)
+            multiplied.push(data)
+
+            testValue = benchmark.value
+            expectedValue = multiplied.value
+
+            for name in expectedValue.index():
+                self.assertAlmostEqual(testValue[name] * dictValue[name], expectedValue[name])
 
     def testSecurityAndOperatorValueHolder(self):
         benchmark = SecurityLatestValueHolder(dependency='close') > 0

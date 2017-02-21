@@ -42,6 +42,16 @@ cdef class IdentitySecurityValueHolder(SecurityValueHolder):
     cdef public object _value
 
     cpdef push(self, dict data)
+    cpdef value_by_name(self, name)
+    cpdef value_by_names(self, list names)
+
+
+cdef class SecurityConstArrayValueHolder(SecurityValueHolder):
+    cdef SecurityValues _values
+
+    cpdef push(self, dict data)
+    cpdef value_by_name(self, name)
+    cpdef value_by_names(self, list names)
 
 
 cdef class SecurityUnitoryValueHolder(SecurityValueHolder):

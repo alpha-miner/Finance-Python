@@ -373,10 +373,6 @@ cdef class IdentitySecurityValueHolder(SecurityValueHolder):
         self._window = 0
         self._returnSize = 1
         self._dependency = []
-        self._innerHolders = {}
-        self._holderTemplate = Identity(value)
-        self.updated = 0
-        self.cached = None
 
     def isFullByName(self, name):
         return True
@@ -409,6 +405,55 @@ cdef class IdentitySecurityValueHolder(SecurityValueHolder):
     def __setstate__(self, state):
         pass
 
+
+cdef class SecurityConstArrayValueHolder(SecurityValueHolder):
+
+    def __init__(self, values):
+
+        if isinstance(values, SecurityValues):
+            self._values = values
+        else:
+            self._values = SecurityValues(values)
+        self._window = 0
+        self._returnSize = 1
+        self._dependency = []
+
+    def isFullByName(self, name):
+        if name in self._values:
+            return True
+        else:
+            return False
+
+    @property
+    def isFull(self):
+        return True
+
+    cpdef push(self, dict data):
+        pass
+
+    cpdef value_by_name(self, name):
+        if name in self._values:
+            return self._values[name]
+        else:
+            return np.nan
+
+    cpdef value_by_names(self, list names):
+        return self._values[names]
+
+    @property
+    def value(self):
+        return self._values
+
+    def __deepcopy__(self, memo):
+        return SecurityConstArrayValueHolder(self._values)
+
+    def __reduce__(self):
+        d = {}
+
+        return SecurityConstArrayValueHolder, (self._values,), d
+
+    def __setstate__(self, state):
+        pass
 
 
 cdef class SecurityUnitoryValueHolder(SecurityValueHolder):

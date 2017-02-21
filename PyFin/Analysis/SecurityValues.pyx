@@ -45,8 +45,7 @@ cdef class SecurityValues(object):
 
             values = self.values
             name_mapping = self.name_mapping
-
-            data = np.array([values[name_mapping[n]] for n in name])
+            data = np.array([values[name_mapping[n]] if n in name_mapping else np.nan for n in name])
             return SecurityValues(data, OrderedDict(zip(name, range(len(name)))))
 
     @cython.boundscheck(False)

@@ -192,3 +192,6 @@ cdef class SecurityValues(object):
 
     def __setstate__(self, state):
         pass
+
+    def __str__(self):
+        return dict(zip(self.values, self.name_mapping.keys())).__str__()

@@ -8,7 +8,6 @@ Created on 2015-7-15
 import unittest
 from PyFin.DateUtilities import Date
 from PyFin.Env import Settings
-from PyFin.Env.Settings import SettingsFactory
 
 
 class TestSettings(unittest.TestCase):
@@ -23,19 +22,3 @@ class TestSettings(unittest.TestCase):
         # check wrong input
         with self.assertRaises(ValueError):
             Settings.evaluationDate = 2
-
-        # settings should be a singleton by default
-        secondeSettings = SettingsFactory()
-        self.assertEqual(Settings.evaluationDate, secondeSettings.evaluationDate, "Settings should be a singleton\n"
-                                                                                  "expected:   {0}\n"
-                                                                                  "calculated: {1}"
-                         .format(Settings.evaluationDate,
-                                 secondeSettings.evaluationDate))
-
-        # test forced building
-        newSettings = SettingsFactory(forcedBuild=True)
-        self.assertEqual(newSettings.evaluationDate, Date.todaysDate(),
-                         "Forced built settings should be a fresh object\n"
-                         "expected:   {0}\n"
-                         "calculated: {1}".format(Date.todaysDate(),
-                                                  newSettings.evaluationDate))

@@ -5,10 +5,8 @@ Created on 2015-7-23
 @author: cheng.li
 """
 
-from PyFin.Patterns.Singleton import Singleton
 
-
-class MathConstantsFactory(Singleton):
+class MathConstantsFactory(object):
     def __init__(self):
         self._dbl_min = 2.2250738585072014e-308
         self._ql_epsilon = 2.2250738585072014e-308

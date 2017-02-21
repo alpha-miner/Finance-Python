@@ -12,7 +12,7 @@ from PyFin.Utilities.Asserts cimport pyFinAssert
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
-def to_dict(total_index, list total_category, np.ndarray matrix_values, list columns):
+cpdef to_dict(total_index, list total_category, np.ndarray matrix_values, list columns):
 
     cdef long start = 0
     cdef int i

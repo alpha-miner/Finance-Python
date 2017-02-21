@@ -295,7 +295,7 @@ cdef class Date(object):
         self._year = year
 
 cpdef check_date(date):
-    if isinstance(date, str):
+    if isinstance(date, str) or isinstance(date, unicode):
         return Date.parseISO(date)
     else:
         return Date.fromDateTime(date)

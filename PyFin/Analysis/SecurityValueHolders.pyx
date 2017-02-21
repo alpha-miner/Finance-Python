@@ -119,7 +119,7 @@ cdef class SecurityValueHolder(object):
                     values[i] = holder.result()
                 except ArithmeticError:
                     values[i] = np.nan
-            self.cached = SecurityValues(values, index=OrderedDict(zip(keys, range(n))))
+            self.cached = SecurityValues(values, index=keys)
             self.updated = 1
             return self.cached
 
@@ -139,8 +139,7 @@ cdef class SecurityValueHolder(object):
             for i, name in enumerate(names):
                 holder = self._innerHolders[name]
                 res[i] = holder.result()
-            return SecurityValues(res,
-                                  index=OrderedDict(zip(names, range(n))))
+            return SecurityValues(res, index=names)
 
     cpdef value_by_name(self, name):
         cdef Accumulator holder

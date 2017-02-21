@@ -29,7 +29,7 @@ cdef class SecurityValues(object):
         if isinstance(index, OrderedDict):
             self.name_mapping = index
         else:
-            raise ValueError("name mapping {0} is not Ordered dict".format(index))
+            self.name_mapping = OrderedDict(zip(index, range(len(index))))
         self.name_array = None
 
     @cython.boundscheck(False)

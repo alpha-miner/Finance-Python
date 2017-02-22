@@ -35,10 +35,7 @@ cdef class SecurityValueHolder(object):
             self._window = self._compHolder._window
         else:
             self._compHolder = None
-            if not isinstance(dependency, str) and len(dependency) == 1:
-                self._dependency = [dependency[0]]
-
-            elif not isinstance(dependency, str) and len(dependency) >= 1:
+            if not isinstance(dependency, str):
                 self._dependency = [name for name in dependency]
             else:
                 self._dependency = [dependency]
@@ -110,7 +107,7 @@ cdef class SecurityValueHolder(object):
         if self.updated:
             return SecurityValues(self.cached.values, self.cached.name_mapping)
         else:
-            keys = self._innerHolders.keys()
+            keys = sorted(self._innerHolders.keys())
             n = len(keys)
             values = np.empty(n, dtype='object')
             for i, name in enumerate(keys):
@@ -369,10 +366,8 @@ cdef class FilteredSecurityValueHolder(SecurityValueHolder):
 cdef class IdentitySecurityValueHolder(SecurityValueHolder):
 
     def __init__(self, value):
+        super(IdentitySecurityValueHolder, self).__init__([])
         self._value = value
-        self._window = 0
-        self._returnSize = 1
-        self._dependency = []
 
     def isFullByName(self, name):
         return True
@@ -409,14 +404,12 @@ cdef class IdentitySecurityValueHolder(SecurityValueHolder):
 cdef class SecurityConstArrayValueHolder(SecurityValueHolder):
 
     def __init__(self, values):
+        super(SecurityConstArrayValueHolder, self).__init__([])
 
         if isinstance(values, SecurityValues):
             self._values = values
         else:
             self._values = SecurityValues(values)
-        self._window = 0
-        self._returnSize = 1
-        self._dependency = []
 
     def isFullByName(self, name):
         if name in self._values:

@@ -15,8 +15,9 @@ cdef class SecurityValues(object):
 
     def __init__(self, data, index=None):
         if isinstance(data, dict):
-            index = OrderedDict(zip(data.keys(), range(len(data))))
-            data = np.array(list(data.values()))
+            keys = sorted(data.keys())
+            index = OrderedDict(zip(keys, range(len(data))))
+            data = np.array([data[k] for k in keys])
 
         if data.dtype == np.object and len(data) > 0:
             if isinstance(data[0], float) or isinstance(data[0], int):

@@ -118,6 +118,7 @@ class TestSecurityValueHolders(unittest.TestCase):
                     'ibm': {Factors.CLOSE: self.datas['ibm'][Factors.CLOSE][i],
                             Factors.OPEN: self.datas['ibm'][Factors.OPEN][i]}}
             benchmark.push(data)
+            constArray.push(data)
             multiplied.push(data)
 
             testValue = benchmark.value

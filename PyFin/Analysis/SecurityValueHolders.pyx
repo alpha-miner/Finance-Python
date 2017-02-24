@@ -282,6 +282,7 @@ cdef class SecurityValueHolder(object):
 cdef class FilteredSecurityValueHolder(SecurityValueHolder):
 
     def __init__(self, computer, filtering):
+        super(FilteredSecurityValueHolder, self).__init__([])
         self._filter = copy.deepcopy(filtering)
         self._computer = copy.deepcopy(computer)
         self._window = max(computer.window, filtering.window)
@@ -452,6 +453,7 @@ cdef class SecurityConstArrayValueHolder(SecurityValueHolder):
 cdef class SecurityUnitoryValueHolder(SecurityValueHolder):
 
     def __init__(self, right, op):
+        super(SecurityUnitoryValueHolder, self).__init__([])
         self._right = copy.deepcopy(right)
 
         self._window = self._right.window

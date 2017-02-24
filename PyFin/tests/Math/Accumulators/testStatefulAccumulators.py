@@ -231,7 +231,7 @@ class TestStatefulAccumulators(unittest.TestCase):
         window = 120
         total = 2500
 
-        mv = MovingSum(window, dependency=['z'])
+        mv = MovingSum(window, dependency='z')
         runningSum = 0.0
         con = []
         for i in range(total):

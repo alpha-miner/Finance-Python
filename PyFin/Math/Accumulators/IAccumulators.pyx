@@ -77,25 +77,16 @@ cdef class Accumulator(IAccumulator):
 
         if isinstance(dependency, Accumulator):
             self._isValueHolderContained = 1
+            self._dependency = deepcopy(dependency)
         else:
             self._isValueHolderContained = 0
-        if hasattr(dependency, '__iter__') and len(dependency) >= 2:
-            for name in dependency:
-                pyFinAssert(isinstance(name, str), ValueError, '{0} in pNames should be a plain string. But it is {1}'
-                         .format(name,type(name)))
-            self._dependency = dependency
-        elif hasattr(dependency, '__iter__') and len(dependency) == 1:
-            for name in dependency:
-                pyFinAssert(isinstance(name, str), ValueError, '{0} in pNames should be a plain string. But it is {1}'
-                         .format(name,type(name)))
-            self._dependency = dependency[0]
-        elif hasattr(dependency, '__iter__'):
-            raise ValueError("parameters' name list should not be empty")
-        else:
-            pyFinAssert(isinstance(dependency, str) or isinstance(dependency, Accumulator), ValueError,
-                        '{0} in pNames should be a plain string or an value holder. But it is {1}'
-                        .format(dependency, type(dependency)))
-            self._dependency = deepcopy(dependency)
+            if (isinstance(dependency, tuple) or isinstance(dependency, list)) and len(dependency) > 1:
+                self._dependency = dependency
+            elif (isinstance(dependency, tuple) or isinstance(dependency, list)) and len(dependency) == 1:
+                self._dependency = dependency[0]
+            else:
+                self._dependency = dependency
+
 
     cdef extract(self, dict data):
         cdef str p
@@ -190,19 +181,18 @@ cdef class Accumulator(IAccumulator):
 cdef class Negative(Accumulator):
 
     def __init__(self, valueHolder):
-        self._valueHolder = build_holder(valueHolder)
+        super(Negative, self).__init__(valueHolder)
         self._returnSize = valueHolder.valueSize
         self._window = valueHolder.window
-        self._dependency = deepcopy(valueHolder.dependency)
         self._isFull = 0
 
     cpdef push(self, dict data):
-        self._valueHolder.push(data)
-        if self._valueHolder.isFull():
+        self._dependency.push(data)
+        if self._dependency.isFull():
             self._isFull = 1
 
     cpdef object result(self):
-        res = self._valueHolder.result()
+        res = self._dependency.result()
         try:
             return -res
         except TypeError:
@@ -223,11 +213,13 @@ cdef class Negative(Accumulator):
 cdef class ListedValueHolder(Accumulator):
 
     def __init__(self, left, right):
+        super(ListedValueHolder, self).__init__([])
         self._left = build_holder(left)
         self._right = build_holder(right)
         self._returnSize = self._left.valueSize + self._right.valueSize
         self._dependency = list(set(self._left.dependency).union(set(self._right.dependency)))
         self._window = max(self._left.window, self._right.window)
+        self._isValueHolderContained = 1
         self._isFull = 0
 
     cpdef push(self, dict data):
@@ -261,6 +253,7 @@ cdef class ListedValueHolder(Accumulator):
 cdef class TruncatedValueHolder(Accumulator):
 
     def __init__(self, valueHolder, item):
+        super(TruncatedValueHolder, self).__init__(valueHolder)
         if valueHolder.valueSize == 1:
             raise TypeError("scalar valued holder ({0}) can't be sliced".format(valueHolder))
         if isinstance(item, slice):
@@ -276,21 +269,18 @@ cdef class TruncatedValueHolder(Accumulator):
             self._start = item
             self._stop = -1
             self._returnSize = 1
-
-        self._valueHolder = build_holder(valueHolder)
-        self._dependency = self._valueHolder.dependency
         self._window = valueHolder.window
         self._isFull = 0
 
     cpdef push(self, dict data):
-        self._valueHolder.push(data)
-        if self._valueHolder.isFull():
+        self._dependency.push(data)
+        if self._dependency.isFull():
             self._isFull = 1
 
     cpdef object result(self):
         if self._stop == -1:
-            return self._valueHolder.result()[self._start]
-        return self._valueHolder.result()[self._start:self._stop]
+            return self._dependency.result()[self._start]
+        return self._dependency.result()[self._start:self._stop]
 
     def __deepcopy__(self, memo):
         if self._stop == -1:
@@ -316,6 +306,7 @@ cdef class TruncatedValueHolder(Accumulator):
 cdef class CombinedValueHolder(Accumulator):
 
     def __init__(self, left, right):
+        super(CombinedValueHolder, self).__init__([])
         self._left = build_holder(left)
         self._right = build_holder(right)
         self._returnSize = self._left.valueSize
@@ -680,6 +671,7 @@ cpdef build_holder(name):
 cdef class CompoundedValueHolder(Accumulator):
 
     def __init__(self, left, right):
+        super(CompoundedValueHolder, self).__init__([])
         self._left = build_holder(left)
         self._right = build_holder(right)
         self._returnSize = self._right.valueSize
@@ -727,6 +719,7 @@ cdef class CompoundedValueHolder(Accumulator):
 cdef class IIF(Accumulator):
 
     def __init__(self, cond, left, right):
+        super(IIF, self).__init__([])
         self._cond = build_holder(cond)
         self._returnSize = self._cond.valueSize
         self._left = build_holder(left)

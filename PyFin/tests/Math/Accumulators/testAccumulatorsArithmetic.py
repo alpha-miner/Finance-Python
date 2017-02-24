@@ -50,10 +50,6 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
         self.assertAlmostEqual(10., m.value)
 
     def testAccumulatorBasic(self):
-        # check parameter list should not be empty
-        with self.assertRaises(ValueError):
-            Max(dependency=[])
-
         m = Max(dependency='x')
         m.push({'x': 10.0})
         self.assertAlmostEqual(m.result(), m.value)

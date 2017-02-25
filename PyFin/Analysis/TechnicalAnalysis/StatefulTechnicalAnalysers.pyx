@@ -6,7 +6,6 @@ Created on 2015-8-8
 """
 
 import copy
-from collections import OrderedDict
 import numpy as np
 cimport numpy as np
 cimport cython
@@ -443,7 +442,7 @@ cdef class SecurityMovingHistoricalWindow(SecuritySingleValueHolder):
                     values[i] = holder.result()
                 except ArithmeticError:
                     values[i] = np.nan
-            self.cached = SecurityValues(np.array(values), index=OrderedDict(zip(keys, range(n))))
+            self.cached = SecurityValues(np.array(values), index=dict(zip(keys, range(n))))
             self.updated = 1
             return self.cached
 
@@ -463,8 +462,7 @@ cdef class SecurityMovingHistoricalWindow(SecuritySingleValueHolder):
             for i, name in enumerate(names):
                 holder = self._innerHolders[name]
                 res[i] = holder.result()
-            return SecurityValues(np.array(res),
-                                  index=OrderedDict(zip(names, range(n))))
+            return SecurityValues(np.array(res), index=dict(zip(names, range(n))))
 
     cpdef value_by_name(self, name):
         cdef Accumulator holder

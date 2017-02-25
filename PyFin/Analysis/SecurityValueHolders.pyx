@@ -7,7 +7,6 @@ Created on 2015-8-7
 
 import copy
 from collections import defaultdict
-from collections import OrderedDict
 import sys
 import operator
 import numpy as np
@@ -18,7 +17,6 @@ from PyFin.Analysis.SecurityValues cimport SecurityValues
 from PyFin.Utilities import to_dict
 from PyFin.Math.Accumulators.StatefulAccumulators cimport Shift
 from PyFin.Math.Accumulators.IAccumulators cimport Latest
-from PyFin.Math.Accumulators.IAccumulators cimport Identity
 
 if sys.version_info > (3, 0, 0):
     div_attr = "truediv"

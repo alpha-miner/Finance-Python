@@ -118,6 +118,7 @@ cdef class Accumulator(IAccumulator):
         cdef int i
         cdef int k
         cdef np.ndarray matrix_values
+        cdef np.ndarray row_values
         cdef long n = len(data)
         cdef np.ndarray output_values = np.empty(n, dtype=object)
         cdef list columns
@@ -137,8 +138,9 @@ cdef class Accumulator(IAccumulator):
         data_dict = {columns[k]: 0 for k in range(column_length)}
 
         for i in range(n):
+            row_values = matrix_values[i]
             for k in range(column_length):
-                data_dict[columns[k]] = matrix_values[i, k]
+                data_dict[columns[k]] = row_values[k]
             self.push(data_dict)
             output_values[i] = self.result()
 

@@ -9,7 +9,7 @@ cimport numpy as np
 
 cdef class SecurityValues(object):
 
-    cdef public object name_mapping
+    cdef public dict name_mapping
     cdef public np.ndarray values
     cdef public np.ndarray name_array
 

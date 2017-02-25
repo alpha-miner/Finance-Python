@@ -5,7 +5,6 @@ Created on 2017-2-7
 @author: cheng.li
 """
 
-from collections import OrderedDict
 cimport cython
 import numpy as np
 cimport numpy as np
@@ -16,7 +15,7 @@ cdef class SecurityValues(object):
     def __init__(self, data, index=None):
         if isinstance(data, dict):
             keys = sorted(data.keys())
-            index = OrderedDict(zip(keys, range(len(data))))
+            index = dict(zip(keys, range(len(data))))
             data = np.array([data[k] for k in keys])
 
         if data.dtype == np.object and len(data) > 0:
@@ -27,10 +26,10 @@ cdef class SecurityValues(object):
         else:
             self.values = data
 
-        if isinstance(index, OrderedDict):
+        if isinstance(index, dict):
             self.name_mapping = index
         else:
-            self.name_mapping = OrderedDict(zip(index, range(len(index))))
+            self.name_mapping = dict(zip(index, range(len(index))))
         self.name_array = None
 
     @cython.boundscheck(False)
@@ -47,16 +46,16 @@ cdef class SecurityValues(object):
             values = self.values
             name_mapping = self.name_mapping
             data = np.array([values[name_mapping[n]] if n in name_mapping else np.nan for n in name])
-            return SecurityValues(data, OrderedDict(zip(name, range(len(name)))))
+            return SecurityValues(data, dict(zip(name, range(len(name)))))
 
     @cython.boundscheck(False)
     @cython.wraparound(False)
     cpdef SecurityValues mask(self, flags):
         if not self.name_array:
-            self.name_array = np.array(list(self.name_mapping.keys()))
+            self.name_array = np.array(sorted(self.name_mapping.keys()))
 
         filtered_names = self.name_array[flags]
-        return SecurityValues(self.values[flags], OrderedDict(zip(filtered_names, range(len(filtered_names)))))
+        return SecurityValues(self.values[flags], dict(zip(filtered_names, range(len(filtered_names)))))
 
     def __invert__(self):
         return SecurityValues(~self.values, self.name_mapping)

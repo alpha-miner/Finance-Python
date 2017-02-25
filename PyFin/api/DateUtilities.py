@@ -11,6 +11,7 @@ from PyFin.DateUtilities import Period
 from PyFin.DateUtilities import Schedule
 from PyFin.Enums import BizDayConventions
 from PyFin.DateUtilities import check_date
+from PyFin.Utilities.Asserts import pyFinAssert
 
 
 def isBizDay(holidayCenter, ref):
@@ -22,7 +23,7 @@ def isBizDay(holidayCenter, ref):
 def datesList(fromDate, toDate):
     fromDate = check_date(fromDate)
     toDate = check_date(toDate)
-    assert fromDate <= toDate, "from date ({0} must be earlier than to date {1}".format(fromDate, toDate)
+    pyFinAssert(fromDate <= toDate, ValueError, "from date ({0} must be earlier than to date {1}".format(fromDate, toDate))
     return [Date.fromExcelSerialNumber(serial).toDateTime() for serial in
             range(fromDate.serialNumber, toDate.serialNumber + 1)]
 
@@ -31,7 +32,7 @@ def bizDatesList(holidayCenter, fromDate, toDate):
     cal = Calendar(holidayCenter)
     fromDate = check_date(fromDate)
     toDate = check_date(toDate)
-    assert fromDate <= toDate, "from date ({0} must be earlier than to date {1}".format(fromDate, toDate)
+    pyFinAssert(fromDate <= toDate, ValueError, "from date ({0} must be earlier than to date {1}".format(fromDate, toDate))
     return [d.toDateTime() for d in cal.bizDatesList(fromDate, toDate)]
 
 
@@ -39,7 +40,7 @@ def holDatesList(holidayCenter, fromDate, toDate, includeWeekend=True):
     cal = Calendar(holidayCenter)
     fromDate = check_date(fromDate)
     toDate = check_date(toDate)
-    assert fromDate <= toDate, "from date ({0} must be earlier than to date {1}".format(fromDate, toDate)
+    pyFinAssert(fromDate <= toDate, ValueError, "from date ({0} must be earlier than to date {1}".format(fromDate, toDate))
     return [d.toDateTime() for d in cal.holDatesList(fromDate, toDate, includeWeekend)]
 
 

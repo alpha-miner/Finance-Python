@@ -112,12 +112,15 @@ cdef class Calendar(object):
         cdef int n
         cdef int units
         cdef Date d1
+        cdef Period pobj
 
         if isinstance(period, str):
-            period = Period(period)
+            pobj = Period(period)
+        else:
+            pobj = period
 
-        n = period.length
-        units = period.units
+        n = pobj.length
+        units = pobj.units
 
         if n == 0:
             return self.adjustDate(d, c)
@@ -137,10 +140,10 @@ cdef class Calendar(object):
                     n += 1
             return d1
         elif units == TimeUnits.Days or units == TimeUnits.Weeks:
-            d1 = d + period
+            d1 = d + pobj
             return self.adjustDate(d1, c)
         else:
-            d1 = d + period
+            d1 = d + pobj
             if endOfMonth and self.isEndOfMonth(d):
                 return self.endOfMonth(d1)
             return self.adjustDate(d1, c)
@@ -188,15 +191,15 @@ cdef class Calendar(object):
 
 cdef class CalendarImpl(object):
 
-    cpdef bint isBizDay(self, Date date):
+    cdef bint isBizDay(self, Date date):
         pass
 
-    cpdef bint isWeekEnd(self, int weekDay):
+    cdef bint isWeekEnd(self, int weekDay):
         pass
 
 
 
-sse_holDays = { Date(2005, 1, 3),
+cdef set sse_holDays = { Date(2005, 1, 3),
                 Date(2005, 2, 7),
                 Date(2005, 2, 8),
                 Date(2005, 2, 9),
@@ -442,13 +445,13 @@ cdef class ChinaSseImpl(CalendarImpl):
     def __init__(self):
         pass
 
-    cpdef bint isBizDay(self, Date date):
+    cdef bint isBizDay(self, Date date):
         cdef int w = date.weekday()
         if self.isWeekEnd(w) or date in sse_holDays:
             return False
         return True
 
-    cpdef bint isWeekEnd(self, int weekDay):
+    cdef bint isWeekEnd(self, int weekDay):
         return weekDay == Weekdays.Saturday or weekDay == Weekdays.Sunday
 
     def __richcmp__(self, right, int op):
@@ -587,10 +590,10 @@ cdef class NullCalendar(CalendarImpl):
     def __init__(self):
         pass
 
-    cpdef bint isBizDay(self, Date date):
+    cdef bint isBizDay(self, Date date):
         return True
 
-    cpdef bint isWeekEnd(self, int weekDay):
+    cdef bint isWeekEnd(self, int weekDay):
         return weekDay == Weekdays.Saturday or weekDay == Weekdays.Sunday
 
     def __richcmp__(self, right, int op):
@@ -606,10 +609,10 @@ cdef class ChinaCFFEXImpl(CalendarImpl):
     def __init__(self):
         pass
 
-    cpdef bint isBizDay(self, Date date):
-        return self.isBizDay(date)
+    cdef bint isBizDay(self, Date date):
+        return _sseImpl.isBizDay(date)
 
-    cpdef bint isWeekEnd(self, int weekDay):
+    cdef bint isWeekEnd(self, int weekDay):
         return _sseImpl.isWeekEnd(weekDay)
 
     def __richcmp__(self, right, int op):
@@ -656,10 +659,10 @@ EasterMonday[:] = [
 
 cdef class WestenImpl(CalendarImpl):
 
-    cpdef bint isWeekEnd(self, int weekDay):
+    cdef bint isWeekEnd(self, int weekDay):
         return weekDay == Weekdays.Saturday or weekDay == Weekdays.Sunday
 
-    cpdef int easterMonday(self, int year):
+    cdef int easterMonday(self, int year):
         return EasterMonday[year - 1901]
 
 
@@ -667,7 +670,7 @@ cdef class TargetImpl(WestenImpl):
     def __init__(self):
         pass
 
-    cpdef bint isBizDay(self, Date date):
+    cdef bint isBizDay(self, Date date):
         cdef int w = date.weekday()
         cdef int d = date.dayOfMonth()
         cdef int dd = date.dayOfYear()
@@ -694,7 +697,7 @@ cdef class TargetImpl(WestenImpl):
                 return False
 
 
-_holDict = {'china.sse': ChinaSseImpl,
+cdef dict _holDict = {'china.sse': ChinaSseImpl,
             'china.ib': ChinaIBImpl,
             'china.cffex': ChinaCFFEXImpl,
             'target': TargetImpl,

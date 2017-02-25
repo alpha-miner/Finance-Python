@@ -10,8 +10,8 @@ from PyFin.DateUtilities.Date cimport Date
 
 cdef class CalendarImpl(object):
 
-    cpdef bint isBizDay(self, Date date)
-    cpdef bint isWeekEnd(self, int weekDay)
+    cdef bint isBizDay(self, Date date)
+    cdef bint isWeekEnd(self, int weekDay)
 
 
 cdef class Calendar(object):

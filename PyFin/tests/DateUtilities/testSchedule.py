@@ -6,6 +6,10 @@ Created on 2015-7-15
 """
 
 import unittest
+import copy
+import tempfile
+import pickle
+import os
 from PyFin.DateUtilities import Date
 from PyFin.DateUtilities import Schedule
 from PyFin.DateUtilities import Period
@@ -69,3 +73,30 @@ class TestSchedule(unittest.TestCase):
         expected = [Date(2012, 1, 17), Date(2012, 1, 18), Date(2012, 1, 19), Date(2012, 1, 20), Date(2012, 1, 23),
                     Date(2012, 1, 24)]
         self.checkDates(s, expected)
+
+    def testScheduleDeepCopy(self):
+        startDate = Date(2013, 3, 31)
+        endDate = Date(2013, 6, 30)
+        tenor = Period('1m')
+        cal = Calendar('NullCalendar')
+        sch = Schedule(startDate, endDate, tenor, cal)
+        copied_sch = copy.deepcopy(sch)
+
+        self.assertEqual(sch, copied_sch)
+
+    def testSchedulePickle(self):
+        startDate = Date(2013, 3, 31)
+        endDate = Date(2013, 6, 30)
+        tenor = Period('1m')
+        cal = Calendar('NullCalendar')
+        sch = Schedule(startDate, endDate, tenor, cal)
+
+        f = tempfile.NamedTemporaryFile('w+b', delete=False)
+        pickle.dump(sch, f)
+        f.close()
+
+        with open(f.name, 'rb') as f2:
+            pickled_sch = pickle.load(f2)
+            self.assertEqual(sch, pickled_sch)
+
+        os.unlink(f.name)

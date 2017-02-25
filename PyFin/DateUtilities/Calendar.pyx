@@ -5,7 +5,6 @@ Created on 2017-2-1
 @author: cheng.li
 """
 
-cimport cython
 from PyFin.Enums._Weekdays cimport Weekdays
 from PyFin.Enums._TimeUnits cimport TimeUnits
 from PyFin.Enums._Months cimport Months
@@ -73,6 +72,7 @@ cdef class Calendar(object):
     cpdef adjustDate(self, Date d, int c=BizDayConventions.Following):
 
         cdef Date d1
+        cdef Date d2
 
         if c == BizDayConventions.Unadjusted:
             return d
@@ -146,10 +146,11 @@ cdef class Calendar(object):
             return self.adjustDate(d1, c)
 
     cpdef holDatesList(self, Date fromDate, Date toDate, bint includeWeekEnds=True):
+        cdef list result = []
+        cdef Date d = fromDate
+
         pyFinAssert(fromDate <= toDate, ValueError, "from date ({0} must be earlier than to date {1}"
                     .format(fromDate, toDate))
-        result = []
-        d = fromDate
         while d <= toDate:
             if self.isHoliday(d) and (includeWeekEnds or not self.isWeekEnd(d.weekday())):
                 result.append(d)
@@ -157,10 +158,12 @@ cdef class Calendar(object):
         return result
 
     cpdef bizDatesList(self, Date fromDate, Date toDate):
-        pyFinAssert(fromDate <= toDate, ValueError, "from date ({0} must be earlier than to date {1}"
-                    .format(fromDate, toDate))
         cdef list result = []
         cdef Date d = fromDate
+
+        pyFinAssert(fromDate <= toDate, ValueError, "from date ({0} must be earlier than to date {1}"
+                    .format(fromDate, toDate))
+
         while d <= toDate:
             if self.isBizDay(d):
                 result.append(d)

@@ -14,19 +14,7 @@ from PyFin.DateUtilities.Calendar cimport Calendar
 from PyFin.Env import Settings
 from PyFin.Utilities.Asserts cimport pyFinAssert
 
-
 cdef class Schedule(object):
-
-    cdef Period _tenor
-    cdef Calendar _cal
-    cdef int _convention
-    cdef int _terminationConvention
-    cdef int _rule
-    cdef list _dates
-    cdef list _isRegular
-    cdef bint _endOfMonth
-    cdef Date _firstDate
-    cdef Date _nextToLastDate
 
     def __init__(self,
                  Date effectiveDate,
@@ -51,6 +39,8 @@ cdef class Schedule(object):
         cdef Date exitDate
 
         # Initialize private data
+        self._effectiveDate = effectiveDate
+        self._terminationDate = terminationDate
         self._tenor = tenor
         self._cal = calendar
         self._convention = convention
@@ -90,7 +80,7 @@ cdef class Schedule(object):
 
         pyFinAssert(effectiveDate < terminationDate, ValueError, "effective date ({0}) "
                                                                  "later than or equal to termination date ({1}"
-                    .format(effectiveDate, terminationDate))
+        .format(effectiveDate, terminationDate))
 
         if tenor.length == 0:
             self._rule = DateGeneration.Zero
@@ -152,7 +142,8 @@ cdef class Schedule(object):
                                                 Period(length=-periods * self._tenor.length, units=self._tenor.units),
                                                 convention, self._endOfMonth)
                 if temp < exitDate:
-                    if self._firstDate and self._cal.adjustDate(self._dates[0], convention) != self._cal.adjustDate(self._firstDate, convention):
+                    if self._firstDate and self._cal.adjustDate(self._dates[0], convention) != self._cal.adjustDate(
+                            self._firstDate, convention):
                         self._dates.insert(0, self._firstDate)
                         self._isRegular.insert(0, False)
                     break
@@ -193,7 +184,9 @@ cdef class Schedule(object):
                                                 Period(length=periods * self._tenor.length, units=self._tenor.units),
                                                 convention, self._endOfMonth)
                 if temp > exitDate:
-                    if self._nextToLastDate and self._cal.adjustDate(self._dates[-1], convention) != self._cal.adjustDate(self._nextToLastDate, convention):
+                    if self._nextToLastDate and self._cal.adjustDate(self._dates[-1],
+                                                                     convention) != self._cal.adjustDate(
+                            self._nextToLastDate, convention):
                         self._dates.append(self._nextToLastDate)
                         self._isRegular.append(False)
                     break
@@ -265,16 +258,58 @@ cdef class Schedule(object):
                                                        "termination date: {6}\n"
                                                        "generation rule: {7}\n"
                                                        "end of month: {8}\n"
-                    .format(self._dates[0],
-                            seed, exitDate,
-                            effectiveDate,
-                            firstDate,
-                            nextToLastDate,
-                            terminationDate,
-                            self._rule, self._endOfMonth))
+        .format(self._dates[0],
+                seed, exitDate,
+                effectiveDate,
+                firstDate,
+                nextToLastDate,
+                terminationDate,
+                self._rule, self._endOfMonth))
 
-    cpdef size(self):
+    cpdef int size(self):
         return len(self._dates)
 
     def __getitem__(self, item):
         return self._dates[item]
+
+    def __deepcopy__(self, memo):
+        return Schedule(self._effectiveDate,
+                        self._terminationDate,
+                        self._tenor,
+                        self._cal,
+                        self._convention,
+                        self._terminationConvention,
+                        self._rule,
+                        self._endOfMonth,
+                        self._firstDate,
+                        self._nextToLastDate)
+
+    def __reduce__(self):
+        d = {}
+
+        return Schedule, (self._effectiveDate,
+                          self._terminationDate,
+                          self._tenor,
+                          self._cal,
+                          self._convention,
+                          self._terminationConvention,
+                          self._rule,
+                          self._endOfMonth,
+                          self._firstDate,
+                          self._nextToLastDate), d
+
+    def __setstate__(self, state):
+        pass
+
+    def __richcmp__(self, Schedule other, int op):
+        if op == 2:
+            return self._effectiveDate == other._effectiveDate \
+                   and self._terminationDate == other._terminationDate \
+                   and self._tenor == other._tenor \
+                   and self._cal == other._cal \
+                   and self._convention == other._convention \
+                   and self._terminationConvention == other._terminationConvention \
+                   and self._rule == other._rule \
+                   and self._endOfMonth == other._endOfMonth \
+                   and self._firstDate == other._firstDate \
+                   and self._nextToLastDate == other._nextToLastDate

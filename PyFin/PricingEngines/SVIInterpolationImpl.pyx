@@ -19,7 +19,7 @@ cpdef double sviVolatility(double strike,
                                double b,
                                double sigma,
                                double rho,
-                               double m):
+                               double m) nogil:
     k = log(strike / forward)
     totalVairance = a + b * (rho * (k - m) + sqrt((k - m) * (k - m) + sigma * sigma))
     return sqrt(totalVairance / expiry)

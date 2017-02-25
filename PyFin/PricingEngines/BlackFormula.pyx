@@ -89,16 +89,16 @@ cdef double _bsImplWithDerivative(double*dStdDev,
     dStdDev[0] = discount * strike * pdf(optionType * d2, 2.0, _M_SQRT_2 * _M_1_SQRTPI)
     return discount * optionType * (forward * nd1 - strike * nd2)
 
-def blackFormula(int optionType,
+cpdef double blackFormula(int optionType,
                  double strike,
                  double forward,
                  double stdDev,
                  double discount=1.0,
-                 double displacement=0.0):
+                 double displacement=0.0) nogil:
     cdef int flag = _checkParameters(strike, forward, displacement)
     return _bsImpl(optionType, strike, forward, stdDev, discount, displacement)
 
-def blackFormula2(int optionType,
+cpdef double blackFormula2(int optionType,
                   double strike,
                   double forward,
                   double tte,
@@ -164,7 +164,7 @@ cdef double _bsImplStdDev(int optionType,
                           double blackPrice,
                           double discount=1.0,
                           double displacement=0.0,
-                          double xAccuracy=1e-5):
+                          double xAccuracy=1e-5) nogil:
     cdef double stdDev
     cdef double stdDevOld
     cdef double err
@@ -189,13 +189,13 @@ cdef double _bsImplStdDev(int optionType,
     free(dStdDev)
     return stdDev
 
-cpdef blackFormulaImpliedStdDev(int optionType,
+cpdef double blackFormulaImpliedStdDev(int optionType,
                                 double strike,
                                 double forward,
                                 double blackPrice,
                                 double discount=1.0,
                                 double displacement=0.0,
-                                double xAccuracy=1e-5):
+                                double xAccuracy=1e-5) nogil:
     return _bsImplStdDev(optionType,
                          strike,
                          forward,
@@ -204,13 +204,13 @@ cpdef blackFormulaImpliedStdDev(int optionType,
                          displacement,
                          xAccuracy)
 
-cpdef blackFormulaImpliedVol(int optionType,
+cpdef double blackFormulaImpliedVol(int optionType,
                              double strike,
                              double forward,
                              double tte,
                              double blackPrice,
                              double riskFree=0.0,
-                             double displacement=0.0):
+                             double displacement=0.0) nogil:
     cdef double discount = exp(-riskFree * tte)
     stdDev = _bsImplStdDev(optionType,
                            strike,
@@ -225,7 +225,7 @@ cpdef double bachelierFormula(int optionType,
                               double strike,
                               double forward,
                               double stdDev,
-                              double discount=1.0):
+                              double discount=1.0) nogil:
     cdef double d
     d = (forward - strike) * optionType
     if stdDev == 0:
@@ -276,7 +276,7 @@ cpdef double bachelierFormulaImpliedVol(int optionType,
                                         double forward,
                                         double tte,
                                         double bachelierPrice,
-                                        double discount=1.0):
+                                        double discount=1.0) nogil:
     cdef double SQRT_QL_EPSILON
     cdef double forwardPremium
     cdef double straddlePremium

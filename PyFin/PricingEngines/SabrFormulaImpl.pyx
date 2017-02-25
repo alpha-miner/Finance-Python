@@ -22,7 +22,7 @@ cpdef double sabrVolatility(double strike,
                             double alpha,
                             double beta,
                             double nu,
-                            double rho):
+                            double rho) nogil:
     cdef double oneMinusBeta = 1.0 - beta
     cdef double A = (forward * strike) ** oneMinusBeta
     cdef double sqrtA = sqrt(A)

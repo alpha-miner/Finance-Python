@@ -32,7 +32,6 @@ def bizDatesList(holidayCenter, fromDate, toDate):
     cal = Calendar(holidayCenter)
     fromDate = check_date(fromDate)
     toDate = check_date(toDate)
-    pyFinAssert(fromDate <= toDate, ValueError, "from date ({0} must be earlier than to date {1}".format(fromDate, toDate))
     return [d.toDateTime() for d in cal.bizDatesList(fromDate, toDate)]
 
 
@@ -40,7 +39,6 @@ def holDatesList(holidayCenter, fromDate, toDate, includeWeekend=True):
     cal = Calendar(holidayCenter)
     fromDate = check_date(fromDate)
     toDate = check_date(toDate)
-    pyFinAssert(fromDate <= toDate, ValueError, "from date ({0} must be earlier than to date {1}".format(fromDate, toDate))
     return [d.toDateTime() for d in cal.holDatesList(fromDate, toDate, includeWeekend)]
 
 

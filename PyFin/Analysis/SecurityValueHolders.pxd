@@ -24,7 +24,7 @@ cdef class SecurityValueHolder(object):
     cpdef value_by_names(self, list names)
     cpdef value_by_name(self, name)
     cpdef shift(self, int n)
-    cpdef transform(self, data, str name=*, str category_field=*)
+    cpdef transform(self, data, str name=*, str category_field=*, bint dropna=*)
 
 
 cdef class FilteredSecurityValueHolder(SecurityValueHolder):

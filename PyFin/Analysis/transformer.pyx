@@ -15,7 +15,7 @@ from PyFin.Analysis.SecurityValueHolders cimport SecurityValueHolder
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
-cpdef transform(data, list expressions, list cols, str category_field=None, to_sort=False):
+cpdef transform(data, list expressions, list cols, str category_field=None, bint to_sort=False, bint dropna=True):
 
     cdef int dummy_category
     cdef int i
@@ -78,5 +78,8 @@ cpdef transform(data, list expressions, list cols, str category_field=None, to_s
         df[category_field] = total_category
 
     df = df.apply(pd.to_numeric, args=('ignore',))
-    df.dropna(inplace=True)
+
+    if dropna:
+        df.dropna(inplace=True)
+
     return df

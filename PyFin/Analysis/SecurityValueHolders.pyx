@@ -217,7 +217,7 @@ cdef class SecurityValueHolder(object):
     cpdef shift(self, int n):
         return SecurityShiftedValueHolder(self, n)
 
-    cpdef transform(self, data, str name=None, str category_field=None):
+    cpdef transform(self, data, str name=None, str category_field=None, bint dropna=True):
 
         cdef str f
         cdef int dummy_category
@@ -272,7 +272,9 @@ cdef class SecurityValueHolder(object):
             df[category_field] = total_category
 
         df = df.apply(pd.to_numeric, args=('ignore',))
-        df.dropna(inplace=True)
+
+        if dropna:
+            df.dropna(inplace=True)
 
         return df
 

@@ -113,7 +113,7 @@ cdef class Accumulator(IAccumulator):
 
     @cython.boundscheck(False)
     @cython.wraparound(False)
-    def transform(self, data, str name=None, to_sort=False):
+    cpdef transform(self, data, str name=None, bint to_sort=False):
 
         cdef int i
         cdef int k

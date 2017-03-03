@@ -22,6 +22,7 @@ cdef class Accumulator(IAccumulator):
     cdef extract(self, dict data)
     cpdef push(self, dict data)
     cpdef object result(self)
+    cpdef transform(self, data, str name=*, bint to_sort=*)
 
 cdef class StatelessSingleValueAccumulator(Accumulator):
 

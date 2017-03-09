@@ -31,7 +31,7 @@ cdef class Shift(StatefulValueHolder):
 
 cdef class SingleValuedValueHolder(StatefulValueHolder):
 
-    cdef double _push(self, dict data)
+    cpdef double _push(self, dict data)
 
 
 cdef class SortedValueHolder(SingleValuedValueHolder):

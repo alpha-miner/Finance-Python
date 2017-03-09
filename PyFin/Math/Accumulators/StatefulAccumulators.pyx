@@ -100,7 +100,7 @@ cdef class SingleValuedValueHolder(StatefulValueHolder):
         super(SingleValuedValueHolder, self).__init__(window, dependency)
         _checkParameterList(dependency)
 
-    cdef double _push(self, dict data):
+    cpdef double _push(self, dict data):
 
         cdef Accumulator comp
 

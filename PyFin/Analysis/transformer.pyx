@@ -9,7 +9,7 @@ import numpy as np
 cimport numpy as np
 import pandas as pd
 cimport cython
-from PyFin.Utilities import to_dict
+from PyFin.Utilities.Tools import to_dict
 from PyFin.Analysis.SecurityValueHolders cimport SecurityValueHolder
 
 
@@ -21,8 +21,9 @@ cpdef transform(data, list expressions, list cols, str category_field=None, bint
     cdef int i
     cdef int j
     cdef np.ndarray total_category
-    cdef np.ndarray matrix_values
-    cdef np.ndarray output_values
+    cdef double[:, :] matrix_values
+    cdef double[:, :] output_values
+    cdef double[:] narr_view
     cdef int start_count
     cdef int end_count
     cdef list flags
@@ -44,13 +45,13 @@ cpdef transform(data, list expressions, list cols, str category_field=None, bint
         total_index = data.index
 
     total_category = data[category_field].values
-
+    data = data.select_dtypes([np.number])
     matrix_values = data.as_matrix()
     columns = data.columns.tolist()
 
     split_category, split_values = to_dict(total_index, total_category.tolist(), matrix_values, columns)
 
-    output_values = np.empty((len(data), len(expressions)), dtype=object)
+    output_values = np.zeros((len(data), len(expressions)))
 
     flags = [isinstance(e, SecurityValueHolder) for e in expressions]
 
@@ -63,7 +64,8 @@ cpdef transform(data, list expressions, list cols, str category_field=None, bint
                     exp = e
                     exp.push(dict_data)
                     end_count = start_count + len(dict_data)
-                    output_values[start_count:end_count, i] = exp.value_by_names(split_category[j]).values
+                    narr_view = exp.value_by_names(split_category[j]).values
+                    output_values[start_count:end_count, i] = narr_view
                     start_count = end_count
             else:
                 for j, dict_data in enumerate(split_values):
@@ -71,13 +73,12 @@ cpdef transform(data, list expressions, list cols, str category_field=None, bint
                     exp.push(dict_data)
                     output_values[j, i] = exp.value_by_name(split_category[j][0])
         else:
-            output_values[:, i] = data[e]
+            narr_view = data[e].values
+            output_values[:, i] = narr_view
 
-    df = pd.DataFrame(output_values, index=data.index, columns=cols)
+    df = pd.DataFrame(np.array(output_values), index=data.index, columns=cols)
     if not dummy_category:
         df[category_field] = total_category
-
-    df = df.apply(pd.to_numeric, args=('ignore',))
 
     if dropna:
         df.dropna(inplace=True)

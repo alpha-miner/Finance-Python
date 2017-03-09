@@ -117,10 +117,9 @@ cdef class Accumulator(IAccumulator):
 
         cdef int i
         cdef int k
-        cdef np.ndarray matrix_values
-        cdef np.ndarray row_values
+        cdef double[:, :] matrix_values
         cdef long n = len(data)
-        cdef np.ndarray output_values = np.empty(n, dtype=object)
+        cdef double[:] output_values = np.zeros(n)
         cdef list columns
         cdef int column_length
         cdef dict data_dict
@@ -131,6 +130,7 @@ cdef class Accumulator(IAccumulator):
         if not name:
             name = 'transformed'
 
+        data = data.select_dtypes([np.number])
         matrix_values = data.as_matrix()
         columns = data.columns.tolist()
         column_length = len(columns)
@@ -138,13 +138,12 @@ cdef class Accumulator(IAccumulator):
         data_dict = {columns[k]: 0 for k in range(column_length)}
 
         for i in range(n):
-            row_values = matrix_values[i]
             for k in range(column_length):
-                data_dict[columns[k]] = row_values[k]
+                data_dict[columns[k]] = matrix_values[i, k]
             self.push(data_dict)
             output_values[i] = self.result()
 
-        return pd.to_numeric(pd.Series(output_values, index=data.index, name=name), errors='ignore')
+        return pd.Series(output_values, index=data.index, name=name)
 
     @property
     def value(self):

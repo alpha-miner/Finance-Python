@@ -12,14 +12,13 @@ from PyFin.Utilities.Asserts cimport pyFinAssert
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
-cpdef to_dict(total_index, list total_category, np.ndarray matrix_values, list columns):
+cpdef to_dict(total_index, list total_category, double[:, :] matrix_values, list columns):
 
     cdef long start = 0
     cdef int i
     cdef long end
     cdef int k
     cdef int j
-    cdef np.ndarray row_values
 
     cdef dict current_dict = {}
     cdef list index_diff_loc = list(np.where(np.diff(total_index))[0])
@@ -33,8 +32,7 @@ cpdef to_dict(total_index, list total_category, np.ndarray matrix_values, list c
         splited_category[i] = total_category[start:end+1]
         current_dict = {}
         for j in range(start, end+1):
-            row_values = matrix_values[j]
-            current_dict[total_category[j]] = {columns[k]: row_values[k] for k in range(column_length)}
+            current_dict[total_category[j]] = {columns[k]: matrix_values[j, k] for k in range(column_length)}
         splited_values[i] = current_dict
         start = end + 1
 
@@ -45,8 +43,7 @@ cpdef to_dict(total_index, list total_category, np.ndarray matrix_values, list c
     splited_category[index_diff_length] = total_category[start:]
     current_dict = {}
     for j in range(start, len(total_category)):
-        row_values = matrix_values[j]
-        current_dict[total_category[j]] = {columns[k]: row_values[k] for k in range(column_length)}
+        current_dict[total_category[j]] = {columns[k]: matrix_values[j, k] for k in range(column_length)}
     splited_values[index_diff_length] = current_dict
 
-    return splited_category, splited_values
+    return splited_category, splited_values# -*- coding: utf-8 -*-

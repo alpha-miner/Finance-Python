@@ -10,12 +10,10 @@ import numpy as np
 from PyFin.Utilities.Asserts import pyFinAssert
 from PyFin.Utilities.Asserts import pyFinWarning
 from PyFin.Utilities.Asserts import isClose
-from PyFin.Utilities.Tools import to_dict
 
 __all__ = ['pyFinAssert',
            'pyFinWarning',
-           'isClose',
-           'to_dict']
+           'isClose']
 
 
 def print_timing(func):

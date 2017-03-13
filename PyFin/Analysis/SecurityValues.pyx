@@ -194,4 +194,4 @@ cdef class SecurityValues(object):
         pass
 
     def __str__(self):
-        return dict(zip(self.values, self.name_mapping.keys())).__str__()
+        return dict(zip(self.name_mapping.keys(), self.values)).__str__()

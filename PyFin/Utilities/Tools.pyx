@@ -46,4 +46,4 @@ cpdef to_dict(total_index, list total_category, double[:, :] matrix_values, list
         current_dict[total_category[j]] = {columns[k]: matrix_values[j, k] for k in range(column_length)}
     splited_values[index_diff_length] = current_dict
 
-    return splited_category, splited_values# -*- coding: utf-8 -*-
+    return splited_category, splited_values

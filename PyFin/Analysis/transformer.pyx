@@ -33,7 +33,7 @@ cpdef transform(data, list expressions, list cols, str category_field=None, bint
     cdef dict dict_data
 
     if to_sort:
-            data.sort_index(inplace=True)
+        data.sort_index(inplace=True)
 
     dummy_category = 0
     if not category_field:
@@ -45,18 +45,16 @@ cpdef transform(data, list expressions, list cols, str category_field=None, bint
         total_index = data.index
 
     total_category = data[category_field].values
-    data = data.select_dtypes([np.number])
-    matrix_values = data.as_matrix()
-    columns = data.columns.tolist()
+    numeric_data = data.select_dtypes([np.number])
+    matrix_values = numeric_data.as_matrix()
+    columns = numeric_data.columns.tolist()
 
     split_category, split_values = to_dict(total_index, total_category.tolist(), matrix_values, columns)
 
-    output_values = np.zeros((len(data), len(expressions)))
-
     flags = [isinstance(e, SecurityValueHolder) for e in expressions]
+    output_values = np.zeros((len(numeric_data), len(expressions)))
 
     for i, e in enumerate(expressions):
-
         if flags[i]:
             if not dummy_category:
                 start_count = 0
@@ -72,11 +70,13 @@ cpdef transform(data, list expressions, list cols, str category_field=None, bint
                     exp = e
                     exp.push(dict_data)
                     output_values[j, i] = exp.value_by_name(split_category[j][0])
-        else:
-            narr_view = data[e].values
-            output_values[:, i] = narr_view
 
     df = pd.DataFrame(np.array(output_values), index=data.index, columns=cols)
+
+    for i, e in enumerate(expressions):
+        if not flags[i]:
+            df[e] = data[e].values
+
     if not dummy_category:
         df[category_field] = total_category
 

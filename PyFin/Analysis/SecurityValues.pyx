@@ -92,23 +92,39 @@ cdef class SecurityValues(object):
 
     @cython.cdivision(True)
     def __truediv__(self, right):
+        cdef np.ndarray[double, ndim=1] values
+        cdef dict name_mapping
         if isinstance(right, SecurityValues):
             if isinstance(self, SecurityValues):
-                return SecurityValues(self.values / right.values, self.name_mapping)
+                values = self.values / right.values
+                name_mapping = self.name_mapping
             else:
-                return SecurityValues(self / right.values, right.name_mapping)
+                values = self / right.values
+                name_mapping = right.name_mapping
         else:
-            return SecurityValues(self.values / right, self.name_mapping)
+            values = self.values / right
+            name_mapping = self.name_mapping
+
+        values[(values == np.inf) | (values == -np.inf)] = np.nan
+        return SecurityValues(values, name_mapping)
 
     @cython.cdivision(True)
     def __div__(self, right):
+        cdef np.ndarray[double, ndim=1] values
+        cdef dict name_mapping
         if isinstance(right, SecurityValues):
             if isinstance(self, SecurityValues):
-                return SecurityValues(self.values / right.values, self.name_mapping)
+                values = self.values / right.values
+                name_mapping = self.name_mapping
             else:
-                return SecurityValues(self / right.values, right.name_mapping)
+                values = self / right.values
+                name_mapping = right.name_mapping
         else:
-            return SecurityValues(self.values / right, self.name_mapping)
+            values = self.values / right
+            name_mapping = self.name_mapping
+
+        values[(values == np.inf) | (values == -np.inf)] = np.nan
+        return SecurityValues(values, name_mapping)
 
     def __and__(self, right):
         if isinstance(right, SecurityValues):
@@ -192,6 +208,9 @@ cdef class SecurityValues(object):
 
     def __setstate__(self, state):
         pass
+
+    def __repr__(self):
+        return 'SecurityValues({0})'.format(self.__str__())
 
     def __str__(self):
         return dict(zip(self.name_mapping.keys(), self.values)).__str__()

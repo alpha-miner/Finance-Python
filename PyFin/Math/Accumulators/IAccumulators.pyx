@@ -6,6 +6,7 @@ Created on 2017-2-8
 """
 
 from copy import deepcopy
+import six
 from libc.math cimport sqrt
 from libc.math cimport fabs
 from libc.math cimport log
@@ -131,7 +132,7 @@ cdef class Accumulator(IAccumulator):
             name = 'transformed'
 
         data = data.select_dtypes([np.number])
-        matrix_values = data.as_matrix()
+        matrix_values = data.as_matrix().astype(float)
         columns = data.columns.tolist()
         column_length = len(columns)
 
@@ -162,7 +163,7 @@ cdef class Accumulator(IAccumulator):
 
     @property
     def dependency(self):
-        if isinstance(self._dependency, str) or hasattr(self._dependency, '__iter__'):
+        if isinstance(self._dependency, six.string_types) or hasattr(self._dependency, '__iter__'):
             return self._dependency
         else:
             return self._dependency.dependency
@@ -661,7 +662,7 @@ cdef int isanumber(a):
 cpdef build_holder(name):
     if isinstance(name, Accumulator):
         return deepcopy(name)
-    elif isinstance(name, str):
+    elif isinstance(name, six.string_types):
         return Latest(name)
     elif isanumber(name):
         return Identity(float(name))

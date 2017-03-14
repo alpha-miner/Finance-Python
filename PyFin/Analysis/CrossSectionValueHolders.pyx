@@ -6,6 +6,7 @@ Created on 2017-2-10
 """
 
 import copy
+import six
 import numpy as np
 cimport numpy as np
 cimport cython
@@ -21,7 +22,7 @@ cdef class CrossSectionValueHolder(SecurityValueHolder):
     def __init__(self, innerValue):
         if isinstance(innerValue, SecurityValueHolder):
             self._inner = copy.deepcopy(innerValue)
-        elif isinstance(innerValue, str):
+        elif isinstance(innerValue, six.string_types):
             self._inner = SecurityLatestValueHolder(innerValue)
         else:
             raise ValueError("Currently only value holder input is allowed for rank holder.")

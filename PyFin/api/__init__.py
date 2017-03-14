@@ -27,6 +27,7 @@ from PyFin.api.Analysis import MIN
 from PyFin.api.Analysis import QUANTILE
 from PyFin.api.Analysis import ALLTRUE
 from PyFin.api.Analysis import ANYTRUE
+from PyFin.api.Analysis import SUM
 from PyFin.api.Analysis import VARIANCE
 from PyFin.api.Analysis import STD
 from PyFin.api.Analysis import NPOSITIVE
@@ -80,6 +81,7 @@ __all__ = ["datesList",
            "QUANTILE",
            "ALLTRUE",
            "ANYTRUE",
+           "SUM",
            "VARIANCE",
            "STD",
            "NPOSITIVE",

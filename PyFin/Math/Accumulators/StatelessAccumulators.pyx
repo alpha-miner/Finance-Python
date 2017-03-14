@@ -9,6 +9,7 @@ import math
 import numpy as np
 cimport numpy as np
 cimport cython
+import six
 from libc.math cimport isnan
 from libc.math cimport log
 from libc.math cimport fmax
@@ -20,7 +21,7 @@ import bisect
 
 
 cdef _checkParameterList(dependency):
-    if not isinstance(dependency, Accumulator) and len(dependency) > 1 and not isinstance(dependency, str):
+    if not isinstance(dependency, Accumulator) and len(dependency) > 1 and not isinstance(dependency, six.string_types):
         raise ValueError("This value holder (e.g. Max or Minimum) can't hold more than 2 parameter names ({0})"
                          " provided".format(dependency))
 

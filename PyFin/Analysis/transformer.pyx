@@ -46,7 +46,7 @@ cpdef transform(data, list expressions, list cols, str category_field=None, bint
 
     total_category = data[category_field].values
     numeric_data = data.select_dtypes([np.number])
-    matrix_values = numeric_data.as_matrix()
+    matrix_values = numeric_data.as_matrix().astype(float)
     columns = numeric_data.columns.tolist()
 
     split_category, split_values = to_dict(total_index, total_category.tolist(), matrix_values, columns)

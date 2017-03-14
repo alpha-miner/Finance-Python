@@ -6,6 +6,7 @@ Created on 2017-1-3
 """
 
 import datetime as dt
+import six
 cimport cython
 from libc.math cimport floor
 from PyFin.Enums._TimeUnits cimport TimeUnits
@@ -295,7 +296,7 @@ cdef class Date(object):
         self._year = year
 
 cpdef check_date(date):
-    if isinstance(date, str) or isinstance(date, unicode):
+    if isinstance(date, six.string_types) or isinstance(date, unicode):
         return Date.parseISO(date)
     else:
         return Date.fromDateTime(date)

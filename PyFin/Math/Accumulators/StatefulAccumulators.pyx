@@ -6,6 +6,7 @@ Created on 2017-2-8
 """
 
 import bisect
+import six
 import numpy as np
 cimport numpy as np
 cimport cython
@@ -26,7 +27,7 @@ from PyFin.Math.Accumulators.impl cimport Deque
 
 
 cdef _checkParameterList(dependency):
-    if not isinstance(dependency, Accumulator) and len(dependency) > 1 and not isinstance(dependency, str):
+    if not isinstance(dependency, Accumulator) and len(dependency) > 1 and not isinstance(dependency, six.string_types):
         raise ValueError("This value holder (e.g. Max or Minimum) can't hold more than 2 parameter names ({0})"
                          " provided".format(dependency))
 

@@ -9,6 +9,7 @@ import copy
 from collections import defaultdict
 import sys
 import operator
+import six
 import numpy as np
 cimport numpy as np
 import pandas as pd
@@ -29,11 +30,12 @@ cdef class SecurityValueHolder(object):
     def __init__(self, dependency='x'):
         if isinstance(dependency, SecurityValueHolder):
             self._dependency = dependency._dependency
+            self._dependency = dependency._dependency
             self._compHolder = copy.deepcopy(dependency)
             self._window = self._compHolder._window
         else:
             self._compHolder = None
-            if not isinstance(dependency, str):
+            if not isinstance(dependency, six.string_types):
                 self._dependency = [name for name in dependency]
             else:
                 self._dependency = [dependency]
@@ -251,7 +253,7 @@ cdef class SecurityValueHolder(object):
 
         total_category = data[category_field].values
         data = data.select_dtypes([np.number])
-        matrix_values = data.as_matrix()
+        matrix_values = data.as_matrix().astype(float)
         columns = data.columns.tolist()
         split_category, split_values = to_dict(total_index, total_category.tolist(), matrix_values, columns)
 
@@ -572,7 +574,7 @@ cdef class SecurityCombinedValueHolder(SecurityValueHolder):
                 self._right = copy.deepcopy(right)
             else:
                 self._right = IdentitySecurityValueHolder(right)
-        elif isinstance(left, str):
+        elif isinstance(left, six.string_types):
             self._left = SecurityLatestValueHolder(left)
             self._right = copy.deepcopy(right)
         else:
@@ -855,7 +857,7 @@ cdef class SecurityIIFValueHolder(SecurityValueHolder):
     def __init__(self, flag, left, right):
 
         if not isinstance(flag, SecurityValueHolder):
-            if isinstance(flag, str):
+            if isinstance(flag, six.string_types):
                 self._flag = SecurityLatestValueHolder(flag)
             else:
                 self._flag = IdentitySecurityValueHolder(flag)
@@ -863,7 +865,7 @@ cdef class SecurityIIFValueHolder(SecurityValueHolder):
             self._flag = copy.deepcopy(flag)
 
         if not isinstance(left, SecurityValueHolder):
-            if isinstance(left, str):
+            if isinstance(left, six.string_types):
                 self._left = SecurityLatestValueHolder(left)
             else:
                 self._left = IdentitySecurityValueHolder(left)
@@ -871,7 +873,7 @@ cdef class SecurityIIFValueHolder(SecurityValueHolder):
             self._left = copy.deepcopy(left)
 
         if not isinstance(right, SecurityValueHolder):
-            if isinstance(left, str):
+            if isinstance(left, six.string_types):
                 self._right = SecurityLatestValueHolder(right)
             else:
                 self._right = IdentitySecurityValueHolder(right)

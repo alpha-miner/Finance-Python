@@ -5,6 +5,7 @@ Created on 2017-2-1
 @author: cheng.li
 """
 
+import six
 from PyFin.Enums._Weekdays cimport Weekdays
 from PyFin.Enums._TimeUnits cimport TimeUnits
 from PyFin.Enums._Months cimport Months
@@ -17,7 +18,7 @@ from PyFin.Utilities.Asserts cimport pyFinAssert
 cdef class Calendar(object):
 
     def __init__(self, holCenter):
-        pyFinAssert(isinstance(holCenter, str),
+        pyFinAssert(isinstance(holCenter, six.string_types),
                     ValueError,
                     "{0} is not a valid description of a holiday center".format(holCenter))
         holCenter = holCenter.lower()
@@ -114,7 +115,7 @@ cdef class Calendar(object):
         cdef Date d1
         cdef Period pobj
 
-        if isinstance(period, str):
+        if isinstance(period, six.string_types):
             pobj = Period(period)
         else:
             pobj = period

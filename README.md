@@ -29,6 +29,7 @@
     numpy
     pandas
     scipy
+    six
     
 以及相关的c/c++编译器（例如Linux下的gcc，windows下的visual studio）
 

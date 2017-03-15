@@ -105,7 +105,7 @@ cdef class SecurityValues(object):
             values = self.values / right
             name_mapping = self.name_mapping
 
-        values[(values == np.inf) | (values == -np.inf)] = np.nan
+        values[~np.isfinite(values)] = np.nan
         return SecurityValues(values, name_mapping)
 
     @cython.cdivision(True)
@@ -123,7 +123,7 @@ cdef class SecurityValues(object):
             values = self.values / right
             name_mapping = self.name_mapping
 
-        values[(values == np.inf) | (values == -np.inf)] = np.nan
+        values[~np.isfinite(values)] = np.nan
         return SecurityValues(values, name_mapping)
 
     def __and__(self, right):

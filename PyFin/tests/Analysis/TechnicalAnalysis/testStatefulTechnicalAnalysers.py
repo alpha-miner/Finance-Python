@@ -10,6 +10,7 @@ import math
 import numpy as np
 import copy
 from collections import deque
+from PyFin.Analysis.SecurityValueHolders import SecurityLatestValueHolder
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingAverage
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingVariance
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingStandardDeviation
@@ -46,8 +47,10 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
         ma1 = SecurityMovingAverage(window, ['close'])
 
         for i in range(len(self.aapl['close'])):
-            data = {'aapl': {'close': self.aapl['close'][i], 'open': self.aapl['open'][i]}}
-            data['ibm'] = {'close': self.ibm['close'][i], 'open': self.ibm['open'][i]}
+            data = dict(aapl=dict(close=self.aapl['close'][i],
+                                  open=self.aapl['open'][i]),
+                        ibm=dict(close=self.ibm['close'][i],
+                                 open=self.ibm['open'][i]))
             ma1.push(data)
             if i < window:
                 start = 0
@@ -65,13 +68,44 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
         with self.assertRaises(ValueError):
             _ = SecurityMovingAverage(window, ['close', 'open'])
 
+    def testSecurityMovingAverageWithErrorValues(self):
+        window = 5
+        to_average = SecurityLatestValueHolder('open') / SecurityLatestValueHolder('close')
+        ma = SecurityMovingAverage(window, to_average)
+
+        container = {'aapl': deque(maxlen=window), 'ibm': deque(maxlen=window)}
+
+        for i in range(len(self.aapl['close'])):
+            data = dict(aapl=dict(close=1.0 if self.aapl['close'][i] >= 1.0 else 0.,
+                                  open=self.aapl['open'][i]),
+                        ibm=dict(close=self.ibm['close'][i],
+                                 open=self.ibm['open'][i]))
+
+            ma.push(data)
+
+            for name in data:
+                res = data[name]['open'] / data[name]['close']
+                if res != np.inf and res != -np.inf and not math.isnan(res):
+                    container[name].append(res)
+
+            value = ma.value
+
+            for name in value.index():
+                expected = np.mean(container[name])
+                calculated = value[name]
+                self.assertAlmostEqual(expected, calculated, 12, 'at index {0}\n'
+                                                                 'expected:   {1:.12f}\n'
+                                                                 'calculated: {2:.12f}'.format(i, expected, calculated))
+
     def testSecurityMovingVariance(self):
         window = 10
         var = SecurityMovingVariance(window, ['close'])
 
         for i in range(len(self.aapl['close'])):
-            data = {'aapl': {'close': self.aapl['close'][i], 'open': self.aapl['open'][i]}}
-            data['ibm'] = {'close': self.ibm['close'][i], 'open': self.ibm['open'][i]}
+            data = dict(aapl=dict(close=self.aapl['close'][i],
+                                  open=self.aapl['open'][i]),
+                        ibm=dict(close=self.ibm['close'][i],
+                                 open=self.ibm['open'][i]))
 
             var.push(data)
 
@@ -98,8 +132,10 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
         std = SecurityMovingStandardDeviation(window, ['close'])
 
         for i in range(len(self.aapl['close'])):
-            data = {'aapl': {'close': self.aapl['close'][i], 'open': self.aapl['open'][i]}}
-            data['ibm'] = {'close': self.ibm['close'][i], 'open': self.ibm['open'][i]}
+            data = dict(aapl=dict(close=self.aapl['close'][i],
+                                  open=self.aapl['open'][i]),
+                        ibm=dict(close=self.ibm['close'][i],
+                                 open=self.ibm['open'][i]))
 
             std.push(data)
 
@@ -128,8 +164,10 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
         ma1 = SecurityMovingMax(window, ['close'])
 
         for i in range(len(self.aapl['close'])):
-            data = {'aapl': {'close': self.aapl['close'][i], 'open': self.aapl['open'][i]}}
-            data['ibm'] = {'close': self.ibm['close'][i], 'open': self.ibm['open'][i]}
+            data = dict(aapl=dict(close=self.aapl['close'][i],
+                                  open=self.aapl['open'][i]),
+                        ibm=dict(close=self.ibm['close'][i],
+                                 open=self.ibm['open'][i]))
             ma1.push(data)
             if i < window:
                 start = 0
@@ -152,8 +190,10 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
         ma1 = SecurityMovingMinimum(window, ['close'])
 
         for i in range(len(self.aapl['close'])):
-            data = {'aapl': {'close': self.aapl['close'][i], 'open': self.aapl['open'][i]}}
-            data['ibm'] = {'close': self.ibm['close'][i], 'open': self.ibm['open'][i]}
+            data = dict(aapl=dict(close=self.aapl['close'][i],
+                                  open=self.aapl['open'][i]),
+                        ibm=dict(close=self.ibm['close'][i],
+                                 open=self.ibm['open'][i]))
             ma1.push(data)
             if i < window:
                 start = 0
@@ -176,8 +216,10 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
         mq = SecurityMovingQuantile(window, ['close'])
 
         for i in range(len(self.aapl['close'])):
-            data = {'aapl': {'close': self.aapl['close'][i], 'open': self.aapl['open'][i]}}
-            data['ibm'] = {'close': self.ibm['close'][i], 'open': self.ibm['open'][i]}
+            data = dict(aapl=dict(close=self.aapl['close'][i],
+                                  open=self.aapl['open'][i]),
+                        ibm=dict(close=self.ibm['close'][i],
+                                 open=self.ibm['open'][i]))
             mq.push(data)
             if i < window:
                 start = 0
@@ -206,8 +248,10 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
         mq = SecurityMovingAllTrue(window, ['close'])
 
         for i in range(len(self.aapl['close'])):
-            data = {'aapl': {'close': self.aapl['close'][i], 'open': self.aapl['open'][i]}}
-            data['ibm'] = {'close': self.ibm['close'][i], 'open': self.ibm['open'][i]}
+            data = dict(aapl=dict(close=self.aapl['close'][i],
+                                  open=self.aapl['open'][i]),
+                        ibm=dict(close=self.ibm['close'][i],
+                                 open=self.ibm['open'][i]))
             mq.push(data)
             if i < window:
                 start = 0
@@ -235,8 +279,10 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
         mq = SecurityMovingAnyTrue(window, ['close'])
 
         for i in range(len(self.aapl['close'])):
-            data = {'aapl': {'close': self.aapl['close'][i], 'open': self.aapl['open'][i]}}
-            data['ibm'] = {'close': self.ibm['close'][i], 'open': self.ibm['open'][i]}
+            data = dict(aapl=dict(close=self.aapl['close'][i],
+                                  open=self.aapl['open'][i]),
+                        ibm=dict(close=self.ibm['close'][i],
+                                 open=self.ibm['open'][i]))
             mq.push(data)
             if i < window:
                 start = 0
@@ -260,8 +306,10 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
         ma1 = SecurityMovingSum(window, ['close'])
 
         for i in range(len(self.aapl['close'])):
-            data = {'aapl': {'close': self.aapl['close'][i], 'open': self.aapl['open'][i]}}
-            data['ibm'] = {'close': self.ibm['close'][i], 'open': self.ibm['open'][i]}
+            data = dict(aapl=dict(close=self.aapl['close'][i],
+                                  open=self.aapl['open'][i]),
+                        ibm=dict(close=self.ibm['close'][i],
+                                 open=self.ibm['open'][i]))
             ma1.push(data)
             if i < window:
                 start = 0
@@ -281,8 +329,10 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
         ma1 = SecurityMovingCountedPositive(window, ['close'])
 
         for i in range(len(self.aapl['close'])):
-            data = {'aapl': {'close': self.aapl['close'][i], 'open': self.aapl['open'][i]}}
-            data['ibm'] = {'close': self.ibm['close'][i], 'open': self.ibm['open'][i]}
+            data = dict(aapl=dict(close=self.aapl['close'][i],
+                                  open=self.aapl['open'][i]),
+                        ibm=dict(close=self.ibm['close'][i],
+                                 open=self.ibm['open'][i]))
             ma1.push(data)
             if i < window:
                 start = 0
@@ -305,8 +355,10 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
         ma1 = SecurityMovingPositiveAverage(window, ['close'])
 
         for i in range(len(self.aapl['close'])):
-            data = {'aapl': {'close': self.aapl['close'][i], 'open': self.aapl['open'][i]}}
-            data['ibm'] = {'close': self.ibm['close'][i], 'open': self.ibm['open'][i]}
+            data = dict(aapl=dict(close=self.aapl['close'][i],
+                                  open=self.aapl['open'][i]),
+                        ibm=dict(close=self.ibm['close'][i],
+                                 open=self.ibm['open'][i]))
             ma1.push(data)
             if i < window:
                 start = 0
@@ -335,8 +387,10 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
         neg_avg = SecurityMovingNegativeDifferenceAverage(window, ['close'])
 
         for i in range(len(self.aapl['close'])):
-            data = {'aapl': {'close': self.aapl['close'][i], 'open': self.aapl['open'][i]}}
-            data['ibm'] = {'close': self.ibm['close'][i], 'open': self.ibm['open'][i]}
+            data = dict(aapl=dict(close=self.aapl['close'][i],
+                                  open=self.aapl['open'][i]),
+                        ibm=dict(close=self.ibm['close'][i],
+                                 open=self.ibm['open'][i]))
             rsi.push(data)
             pos_avg.push(data)
             neg_avg.push(data)
@@ -362,8 +416,10 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
         self.newDataSet['ibm']['open'] = np.exp(self.newDataSet['ibm']['open'])
 
         for i in range(len(self.aapl['close'])):
-            data = {'aapl': {'close': self.newDataSet['aapl']['close'][i], 'open': self.newDataSet['aapl']['open'][i]}}
-            data['ibm'] = {'close': self.newDataSet['ibm']['close'][i], 'open': self.newDataSet['ibm']['open'][i]}
+            data = dict(aapl=dict(close=self.newDataSet['aapl']['close'][i],
+                                  open=self.newDataSet['aapl']['open'][i]),
+                        ibm=dict(close=self.newDataSet['ibm']['close'][i],
+                                 open=self.newDataSet['ibm']['open'][i]))
             ma1.push(data)
             if i < window:
                 start = 0

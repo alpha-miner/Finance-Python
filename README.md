@@ -81,7 +81,8 @@
     
         pip insall --use-wheel Finance-Python
         
-    现阶段支持python 2.7, 3.5以及3.6版本。如果在首次运行时遇到dll文件无法找到的问题，请确保您的电脑上有visual studio 2015的运行时环境。
+    现阶段支持python 2.7, 3.5以及3.6版本，并且只有64位版本。如果在首次运行时遇到dll文件无法找到的问题，请确保您的电脑上有visual studio 2015的运行时环境，
+    下载地址：[Visual C++ Redistributable for Visual Studio 2015](https://www.microsoft.com/en-us/download/details.aspx?id=48145)
     
     
 ### 开发环境

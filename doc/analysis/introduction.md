@@ -1,6 +1,6 @@
 # Introduction
 
-### 为什么要使用``Analysis``?
+## 为什么要使用``Analysis``?
 
 ``Finance-Python``中的``Analysis``模块对标的是[``TA-Lib``](http://ta-lib.org/)，目标都是提供金融时间序列的指标计算功能。相比与``TA-Lib``，``Analysis``模块有下面这些特点：
 

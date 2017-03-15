@@ -1,6 +1,6 @@
 # Tutorial
 
-### 确认安装
+## 确认安装
 
 安装完成``Finance-Python``之后，应该可以在例如``ipython``中直接导入：
 
@@ -14,7 +14,7 @@ Out[2]: '0.4.2'
 如果获得上述类似的输出，证明``Finance-Python``已经在电脑上正确安装。如果有例如``ImportError``等异常，请回到[README](../../README.md)按照步骤以及依赖重新安装。
 
 
-### Hello World!
+## Hello World!
 
 最简单的使用``Finance-Python``的方法是直接使用它对外提供的``api``:
 

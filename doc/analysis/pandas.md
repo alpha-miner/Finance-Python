@@ -1,6 +1,6 @@
 # Work with Pandas
 
-### 数据准备
+## 数据准备
 
 ```python
 In [1]: from PyFin.examples.datas import sample_data
@@ -15,7 +15,7 @@ Out[2]:
 2016-01-03     2   3.5    2.1
 ```
 
-### 构造指标
+## 构造指标
 
 这里我们就计算各个不同``code``的``'close'``的2日平均值：
 
@@ -24,7 +24,7 @@ In [3]: from PyFin.api import MA
 In [4]: ts = MA(2, 'close')
 ```
 
-### 指标计算
+## 指标计算
 
 这时我们可以将指标作用于感兴趣的数据之上，只需要调用``SecurityValueHolder``的``transform``方法：
 
@@ -40,7 +40,7 @@ Out[5]:
 2016-01-03  2.95     2
 ```
 
-### 参数的含义
+## 参数的含义
 
 在``transform``方法中，我们需要关注两个参数：``name``, ``category_field``:
 

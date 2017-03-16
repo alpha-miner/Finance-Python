@@ -1,7 +1,7 @@
 # Finance - Python
 
 * [入门](tutorial/README.md)
-* [Hello World!](tutorial/hello_world.md)
+  * [Hello World!](tutorial/hello_world.md)
 * [Analysis](analysis/README.md)
   * [Introduction](analysis/introduction.md)
   * [Basics](analysis/basics.md)

@@ -23,7 +23,6 @@ def isBizDay(holidayCenter, ref):
 def datesList(fromDate, toDate):
     fromDate = check_date(fromDate)
     toDate = check_date(toDate)
-    pyFinAssert(fromDate <= toDate, ValueError, "from date ({0} must be earlier than to date {1}".format(fromDate, toDate))
     return [Date.fromExcelSerialNumber(serial).toDateTime() for serial in
             range(fromDate.serialNumber, toDate.serialNumber + 1)]
 

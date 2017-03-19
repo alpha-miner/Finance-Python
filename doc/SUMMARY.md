@@ -7,4 +7,6 @@
   * [Basics](analysis/basics.md)
   * [Advances](analysis/advances.md)
   * [Work with Pandas](analysis/pandas.md)
-  * [Api Reference](analysis/reference.md)
+  * [API Reference](analysis/reference.md)
+* [Dates](dates/dates.md)
+  * [Basics](dates/basics.md)

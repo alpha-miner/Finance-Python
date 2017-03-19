@@ -4,4 +4,4 @@
 * [Basics](basics.md)
 * [Advances](advances.md)
 * [Work with Pandas](pandas.md)
-* [Api Reference](reference.md)
+* [API Reference](reference.md)

@@ -65,7 +65,7 @@
     
     安装之后，可以直先接运行测试：
     
-        python setup.py test
+        python PyFin/tests/testSuite.py
         
 2. 从``pypi``安装
 

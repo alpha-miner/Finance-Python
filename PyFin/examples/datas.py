@@ -24,6 +24,7 @@ sample_data = sample_data[['code', 'open', 'close']]
 
 
 if __name__ == '__main__':
+
     from PyFin.api import MA
     ts = MA(2, 'close')
     res = ts.transform(sample_data, name='ma_2_no_code')

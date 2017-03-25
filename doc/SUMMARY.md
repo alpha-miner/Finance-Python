@@ -8,5 +8,5 @@
   * [Advances](analysis/advances.md)
   * [Work with Pandas](analysis/pandas.md)
   * [API Reference](analysis/reference.md)
-* [Dates](dates/dates.md)
+* [Dates](dates/README.md)
   * [Basics](dates/basics.md)

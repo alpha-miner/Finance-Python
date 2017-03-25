@@ -17,5 +17,7 @@ cdef class SecurityValues(object):
     cpdef object index(self)
     cpdef SecurityValues rank(self)
     cpdef SecurityValues zscore(self)
+    cpdef SecurityValues unit(self)
     cpdef double mean(self)
     cpdef double dot(self, SecurityValues right)
+    cpdef dict to_dict(self)

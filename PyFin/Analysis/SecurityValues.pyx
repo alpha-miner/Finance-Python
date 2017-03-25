@@ -193,11 +193,19 @@ cdef class SecurityValues(object):
         cdef np.ndarray[double, ndim=1] data = self.values
         return SecurityValues((data - data.mean()) / data.std(), self.name_mapping)
 
+    cpdef SecurityValues unit(self):
+        cdef np.ndarray[double, ndim=1] data = self.values
+        return SecurityValues(data / np.nansum(np.abs(data)), self.name_mapping)
+
     cpdef double mean(self):
         return np.nanmean(self.values)
 
     cpdef double dot(self, SecurityValues right):
         return np.dot(self.values, right.values)
+
+    cpdef dict to_dict(self):
+        keys = self.name_mapping.keys()
+        return {k: self.values[self.name_mapping[k]] for k in keys}
 
     def __deepcopy__(self, memo):
         return SecurityValues(self.values, self.name_mapping)
@@ -213,4 +221,4 @@ cdef class SecurityValues(object):
         return 'SecurityValues({0})'.format(self.__str__())
 
     def __str__(self):
-        return dict(zip(self.name_mapping.keys(), self.values)).__str__()
+        return self.to_dict().__str__()

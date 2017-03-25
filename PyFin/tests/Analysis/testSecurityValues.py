@@ -31,10 +31,23 @@ class TestSecurityValues(unittest.TestCase):
         data = np.array([3, 2, np.nan, np.nan, 4, 5])
         index = [1, 2, 3, 4, 5, 6]
 
-        data = SecurityValues(data, dict(zip(index, range(len(index)))))
+        data = SecurityValues(data, index)
         test = data.rank()
 
         expected = SecurityValues(np.array([2, 1, np.nan, np.nan, 3, 4]), dict(zip(index, range(len(index)))))
+        for name in test.index():
+            if np.isnan(test[name]):
+                self.assertTrue(np.isnan(expected[name]))
+            else:
+                self.assertEqual(test[name], expected[name])
+
+    def testSecurityValuesUnit(self):
+        data = np.array([3, -2, np.nan, np.nan, 4, 5])
+        index = [1, 2, 3, 4, 5, 6]
+        test = SecurityValues(data, index)
+        test = test.unit()
+
+        expected = SecurityValues(data / np.nansum(np.abs(data)), dict(zip(index, range(len(index)))))
         for name in test.index():
             if np.isnan(test[name]):
                 self.assertTrue(np.isnan(expected[name]))
@@ -45,7 +58,7 @@ class TestSecurityValues(unittest.TestCase):
         data = np.array([3, 2, 2., 1., 4., 5.])
         index = [1, 2, 3, 4, 5, 6]
 
-        test = SecurityValues(data, dict(zip(index, range(len(index)))))
+        test = SecurityValues(data, index)
         copied = copy.deepcopy(test)
 
         np.testing.assert_array_equal(test.values, copied.values)
@@ -57,23 +70,23 @@ class TestSecurityValues(unittest.TestCase):
         data2 = -np.array([3, 2, 2., 1., 4., 5.])
         index = [1, 2, 3, 4, 5, 6]
 
-        test1 = SecurityValues(data1, dict(zip(index, range(len(index)))))
-        test2 = SecurityValues(data2, dict(zip(index, range(len(index)))))
+        test1 = SecurityValues(data1, index)
+        test2 = SecurityValues(data2, index)
 
         calculated = test1 + test2
-        expected = SecurityValues(data1 + data2, dict(zip(index, range(len(index)))))
+        expected = SecurityValues(data1 + data2, index)
 
         np.testing.assert_array_equal(calculated.values, expected.values)
         self.assertEqual(calculated.name_mapping, expected.name_mapping)
 
         calculated = test1 + 2.0
-        expected = SecurityValues(data1 + 2.0, dict(zip(index, range(len(index)))))
+        expected = SecurityValues(data1 + 2.0, index)
 
         np.testing.assert_array_equal(calculated.values, expected.values)
         self.assertEqual(calculated.name_mapping, expected.name_mapping)
 
         calculated = 2.0 + test2
-        expected = SecurityValues(2.0 + data2, dict(zip(index, range(len(index)))))
+        expected = SecurityValues(2.0 + data2, index)
 
         np.testing.assert_array_equal(calculated.values, expected.values)
         self.assertEqual(calculated.name_mapping, expected.name_mapping)
@@ -84,23 +97,23 @@ class TestSecurityValues(unittest.TestCase):
         data2 = -np.array([3, 2, 2., 1., 4., 5.])
         index = [1, 2, 3, 4, 5, 6]
 
-        test1 = SecurityValues(data1, dict(zip(index, range(len(index)))))
-        test2 = SecurityValues(data2, dict(zip(index, range(len(index)))))
+        test1 = SecurityValues(data1, index)
+        test2 = SecurityValues(data2, index)
 
         calculated = test1 - test2
-        expected = SecurityValues(data1 - data2, dict(zip(index, range(len(index)))))
+        expected = SecurityValues(data1 - data2, index)
 
         np.testing.assert_array_equal(calculated.values, expected.values)
         self.assertEqual(calculated.name_mapping, expected.name_mapping)
 
         calculated = test1 - 2.0
-        expected = SecurityValues(data1 - 2.0, dict(zip(index, range(len(index)))))
+        expected = SecurityValues(data1 - 2.0, index)
 
         np.testing.assert_array_equal(calculated.values, expected.values)
         self.assertEqual(calculated.name_mapping, expected.name_mapping)
 
         calculated = 2.0 - test2
-        expected = SecurityValues(2.0 - data2, dict(zip(index, range(len(index)))))
+        expected = SecurityValues(2.0 - data2, index)
 
         np.testing.assert_array_equal(calculated.values, expected.values)
         self.assertEqual(calculated.name_mapping, expected.name_mapping)
@@ -111,23 +124,23 @@ class TestSecurityValues(unittest.TestCase):
         data2 = -np.array([3, 2, 2., 1., 4., 5.])
         index = [1, 2, 3, 4, 5, 6]
 
-        test1 = SecurityValues(data1, dict(zip(index, range(len(index)))))
-        test2 = SecurityValues(data2, dict(zip(index, range(len(index)))))
+        test1 = SecurityValues(data1, index)
+        test2 = SecurityValues(data2, index)
 
         calculated = test1 * test2
-        expected = SecurityValues(data1 * data2, dict(zip(index, range(len(index)))))
+        expected = SecurityValues(data1 * data2, index)
 
         np.testing.assert_array_equal(calculated.values, expected.values)
         self.assertEqual(calculated.name_mapping, expected.name_mapping)
 
         calculated = test1 * 2.0
-        expected = SecurityValues(data1 * 2.0, dict(zip(index, range(len(index)))))
+        expected = SecurityValues(data1 * 2.0, index)
 
         np.testing.assert_array_equal(calculated.values, expected.values)
         self.assertEqual(calculated.name_mapping, expected.name_mapping)
 
         calculated = 2.0 * test2
-        expected = SecurityValues(2.0 * data2, dict(zip(index, range(len(index)))))
+        expected = SecurityValues(2.0 * data2, index)
 
         np.testing.assert_array_equal(calculated.values, expected.values)
         self.assertEqual(calculated.name_mapping, expected.name_mapping)
@@ -138,23 +151,23 @@ class TestSecurityValues(unittest.TestCase):
         data2 = -np.array([3, 2, 2., 1., 4., 5.])
         index = [1, 2, 3, 4, 5, 6]
 
-        test1 = SecurityValues(data1, dict(zip(index, range(len(index)))))
-        test2 = SecurityValues(data2, dict(zip(index, range(len(index)))))
+        test1 = SecurityValues(data1, index)
+        test2 = SecurityValues(data2, index)
 
         calculated = test1 / test2
-        expected = SecurityValues(data1 / data2, dict(zip(index, range(len(index)))))
+        expected = SecurityValues(data1 / data2, index)
 
         np.testing.assert_array_equal(calculated.values, expected.values)
         self.assertEqual(calculated.name_mapping, expected.name_mapping)
 
         calculated = test1 / 2.0
-        expected = SecurityValues(data1 / 2.0, dict(zip(index, range(len(index)))))
+        expected = SecurityValues(data1 / 2.0, index)
 
         np.testing.assert_array_equal(calculated.values, expected.values)
         self.assertEqual(calculated.name_mapping, expected.name_mapping)
 
         calculated = 2.0 / test2
-        expected = SecurityValues(2.0 / data2, dict(zip(index, range(len(index)))))
+        expected = SecurityValues(2.0 / data2, index)
 
         np.testing.assert_array_equal(calculated.values, expected.values)
         self.assertEqual(calculated.name_mapping, expected.name_mapping)
@@ -163,7 +176,7 @@ class TestSecurityValues(unittest.TestCase):
         data = np.array([3, 2, np.nan, np.nan, 4, 5])
         index = [1, 2, 3, 4, 5, 6]
 
-        test = SecurityValues(data, dict(zip(index, range(len(index)))))
+        test = SecurityValues(data, index)
 
         f = tempfile.NamedTemporaryFile('w+b', delete=False)
         pickle.dump(test, f)

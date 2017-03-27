@@ -6,6 +6,10 @@ Created on 2015-8-12
 """
 
 import unittest
+import copy
+import pickle
+import tempfile
+import os
 import numpy as np
 import pandas as pd
 from PyFin.Enums import Factors
@@ -38,6 +42,7 @@ class TestSecurityValueHolders(unittest.TestCase):
                                                                    "calculated: {2}".format(name,
                                                                                             expected[name],
                                                                                             calculated[name]))
+
         self.checker = check_values
 
     def testSecurityValueHolderWithGetItemUseInt(self):
@@ -498,7 +503,7 @@ class TestSecurityValueHolders(unittest.TestCase):
         test.push({'aapl': {'close': 10.0}, 'ibm': {'close': 15.0}, 'goog': {'close': 17.0}})
         test.push({'aapl': {'close': 12.0}, 'ibm': {'close': 10.0}, 'goog': {'close': 13.0}})
 
-        expected = {'ibm': 12.5, 'goog':15.0}
+        expected = {'ibm': 12.5, 'goog': 15.0}
         for s in expected:
             self.assertAlmostEqual(test[s], expected[s])
 
@@ -782,20 +787,20 @@ class TestSecurityValueHolders(unittest.TestCase):
 
         shifted1.push(data2)
         expected = SecurityValues({'aapl': 1.0,
-                   'ibm': 2.0,
-                   'goog': 3.0})
+                                   'ibm': 2.0,
+                                   'goog': 3.0})
         calculated = shifted1.value
         for name in expected.index():
             self.assertAlmostEqual(expected[name], calculated[name])
 
         data3 = ({'aapl': {'close': 3.0},
-                 'ibm': {'close': 4.0},
-                 'goog': {'close': 5.0}})
+                  'ibm': {'close': 4.0},
+                  'goog': {'close': 5.0}})
 
         shifted1.push(data3)
         expected = SecurityValues({'aapl': 1.5,
-                    'ibm': 2.5,
-                    'goog': 3.5})
+                                   'ibm': 2.5,
+                                   'goog': 3.5})
         calculated = shifted1.value
         for name in expected.index():
             self.assertAlmostEqual(expected[name], calculated[name])
@@ -970,4 +975,38 @@ class TestSecurityValueHolders(unittest.TestCase):
         np.testing.assert_array_almost_equal(calculated['new_factor'].values[1:],
                                              expected['close'].values[1:])
 
+    def testSecurityLatestValueHolderDeepcopy(self):
+        latest = SecurityLatestValueHolder('x')
 
+        data = dict(aapl=dict(x=1),
+                    ibm=dict(x=2))
+
+        latest.push(data)
+
+        copied = copy.deepcopy(latest)
+
+        calculated = copied.value
+
+        for name in data.keys():
+            self.assertAlmostEqual(data[name]['x'], calculated[name])
+
+    def testSecurityLatestValueHolderPickle(self):
+        latest = SecurityLatestValueHolder('x')
+
+        data = dict(aapl=dict(x=1),
+                    ibm=dict(x=2))
+
+        latest.push(data)
+
+        f = tempfile.NamedTemporaryFile('w+b', delete=False)
+        pickle.dump(latest, f)
+        f.close()
+
+        with open(f.name, 'rb') as f2:
+            pickled = pickle.load(f2)
+            calculated = pickled.value
+
+            for name in data.keys():
+                self.assertAlmostEqual(data[name]['x'], calculated[name])
+
+        os.unlink(f.name)

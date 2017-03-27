@@ -624,12 +624,12 @@ cdef class StatelessSingleValueAccumulator(Accumulator):
 
 cdef class Latest(StatelessSingleValueAccumulator):
 
-    def __init__(self, dependency='x'):
+    def __init__(self, dependency='x', current_value=np.nan):
         super(Latest, self).__init__(dependency)
         self._window = 0
         self._returnSize = 1
         self._isFull = 1
-        self._latest = np.nan
+        self._latest = current_value
 
     cpdef push(self, dict data):
         self._latest = self._push(data)
@@ -638,16 +638,15 @@ cdef class Latest(StatelessSingleValueAccumulator):
         return self._latest
 
     def __deepcopy__(self, memo):
-        return Latest(self._dependency)
+        return Latest(self._dependency, self._latest)
 
     def __reduce__(self):
         d = {}
 
-        return Latest, (self._dependency,), d
+        return Latest, (self._dependency, self._latest), d
 
     def __setstate__(self, state):
         pass
-
 
 cdef int isanumber(a):
     cdef int bool_a = 1

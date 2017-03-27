@@ -216,6 +216,28 @@ cdef class SecurityValueHolder(object):
     def __ror__(self, left):
         return SecurityOrOperatorValueHolder(left, self)
 
+    cpdef copy_attributes(self, dict attributes, bint is_deep=True):
+        self._dependency = copy.deepcopy(attributes['_dependency']) if is_deep else attributes['_dependency']
+        self._compHolder = copy.deepcopy(attributes['_compHolder']) if is_deep else attributes['_compHolder']
+        self._window = attributes['_window']
+        self._returnSize = attributes['_returnSize']
+        self._holderTemplate = copy.deepcopy(attributes['_holderTemplate']) if is_deep else attributes['_holderTemplate']
+        self.updated = attributes['updated']
+        self._innerHolders = copy.deepcopy(attributes['_innerHolders']) if is_deep else attributes['_innerHolders']
+        self.cached = copy.deepcopy(attributes['cached']) if is_deep else attributes['cached']
+
+    cpdef collect_attributes(self):
+        attributes = dict()
+        attributes['_dependency'] = self._dependency
+        attributes['_compHolder'] = self._compHolder
+        attributes['_window'] = self._window
+        attributes['_returnSize'] = self._returnSize
+        attributes['_holderTemplate'] = self._holderTemplate
+        attributes['updated'] = self.updated
+        attributes['_innerHolders'] = self._innerHolders
+        attributes['cached'] = self.cached
+        return attributes
+
     cpdef shift(self, int n):
         return SecurityShiftedValueHolder(self, n)
 
@@ -550,19 +572,22 @@ cdef class SecurityLatestValueHolder(SecurityValueHolder):
 
     def __deepcopy__(self, memo):
         if self._compHolder:
-            return SecurityLatestValueHolder(self._compHolder)
+            copied = SecurityLatestValueHolder(self._compHolder)
         else:
-            return SecurityLatestValueHolder(self._dependency)
+            copied = SecurityLatestValueHolder(self._dependency)
+
+        copied.copy_attributes(self.collect_attributes(), is_deep=True)
+        return copied
 
     def __reduce__(self):
-        d = {}
+        d = self.collect_attributes()
         if self._compHolder:
             return SecurityLatestValueHolder, (self._compHolder,), d
         else:
             return SecurityLatestValueHolder, (self._dependency,), d
 
     def __setstate__(self, state):
-        pass
+        self.copy_attributes(state, is_deep=False)
 
 
 cdef class SecurityCombinedValueHolder(SecurityValueHolder):

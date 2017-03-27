@@ -8,6 +8,9 @@ Created on 2015-7-16
 import unittest
 import csv
 import os
+import copy
+import pickle
+import tempfile
 import math
 import numpy as np
 from collections import deque
@@ -69,6 +72,43 @@ class TestStatefulAccumulators(unittest.TestCase):
 
         test1.push({'x': np.nan})
         self.assertTrue(math.isnan(test1.value))
+
+    def testLatestValueHolderDeepCopy(self):
+
+        latest = Latest('x')
+        copied = copy.deepcopy(latest)
+
+        self.assertTrue(math.isnan(copied.value))
+
+        latest.push({'x': 1.})
+        copied = copy.deepcopy(latest)
+        self.assertTrue(copied.value, 1.)
+
+    def testLatestValueHolderPickle(self):
+
+        latest = Latest('x')
+
+        f = tempfile.NamedTemporaryFile('w+b', delete=False)
+        pickle.dump(latest, f)
+        f.close()
+
+        with open(f.name, 'rb') as f2:
+            pickled = pickle.load(f2)
+            self.assertTrue(math.isnan(pickled._latest))
+
+        os.unlink(f.name)
+
+        latest.push({'x': 1.})
+
+        f = tempfile.NamedTemporaryFile('w+b', delete=False)
+        pickle.dump(latest, f)
+        f.close()
+
+        with open(f.name, 'rb') as f2:
+            pickled = pickle.load(f2)
+            self.assertTrue(pickled.value, 1.)
+
+        os.unlink(f.name)
 
     def testShiftValueHolder(self):
         ma = MovingAverage(10, 'close')

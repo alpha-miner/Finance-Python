@@ -5,6 +5,7 @@ include .coveragerc
 include SUMMARY.md
 include requirements/*.txt
 include PyFin/tests/Math/Accumulators/data/*.csv
+include PyFin/tests/POpt/data/*.csv
 recursive-include PyFin *.pyx
 recursive-include PyFin *.pxd
 recursive-include . *.md

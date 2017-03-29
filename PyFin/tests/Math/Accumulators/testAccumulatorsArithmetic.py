@@ -6,6 +6,7 @@ Created on 2015-7-27
 """
 
 import unittest
+import copy
 import math
 from collections import deque
 import numpy as np
@@ -614,6 +615,64 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
             self.assertAlmostEqual(calculated, expected, 12, "at index {0:d}\n"
                                                              "expected:   {1:f}\n"
                                                              "calculated: {2:f}".format(i, expected, calculated))
+
+    def testArithmeticFunctionsDeepcopy(self):
+
+        data = {'x': 1}
+
+        test = Exp('x')
+        test.push(data)
+        copied = copy.deepcopy(test)
+        self.assertAlmostEqual(math.exp(data['x']), copied.value)
+
+        test = Log('x')
+        test.push(data)
+        copied = copy.deepcopy(test)
+        self.assertAlmostEqual(math.log(data['x']), copied.value)
+
+        test = Sqrt('x')
+        test.push(data)
+        copied = copy.deepcopy(test)
+        self.assertAlmostEqual(math.sqrt(data['x']), copied.value)
+
+        data['x'] = -1.
+
+        test = Pow('x', 2)
+        test.push(data)
+        copied = copy.deepcopy(test)
+        self.assertAlmostEqual(data['x'] ** 2, copied.value)
+
+        test = Abs('x')
+        test.push(data)
+        copied = copy.deepcopy(test)
+        self.assertAlmostEqual(abs(data['x']), copied.value)
+
+        test = Sign('x')
+        test.push(data)
+        copied = copy.deepcopy(test)
+        self.assertAlmostEqual(-1., copied.value)
+
+        data['x'] = 1.
+
+        test = Acos('x')
+        test.push(data)
+        copied = copy.deepcopy(test)
+        self.assertAlmostEqual(math.acos(data['x']), copied.value)
+
+        test = Asin('x')
+        test.push(data)
+        copied = copy.deepcopy(test)
+        self.assertAlmostEqual(math.asin(data['x']), copied.value)
+
+        test = Acosh('x')
+        test.push(data)
+        copied = copy.deepcopy(test)
+        self.assertAlmostEqual(math.acosh(data['x']), copied.value)
+
+        test = Asinh('x')
+        test.push(data)
+        copied = copy.deepcopy(test)
+        self.assertAlmostEqual(math.asinh(data['x']), copied.value)
 
     def testAccumulatorTransform(self):
         window = 5

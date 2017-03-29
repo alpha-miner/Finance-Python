@@ -753,7 +753,7 @@ cdef class IIF(Accumulator):
 
 cdef class BasicFunction(Accumulator):
 
-    def __init__(self, dependency):
+    def __init__(self, dependency, orig_value=np.nan):
         super(BasicFunction, self).__init__(dependency)
         if self._isValueHolderContained:
             self._window = self._dependency.window
@@ -761,7 +761,7 @@ cdef class BasicFunction(Accumulator):
             self._window = 1
         self._returnSize = 1
         self._isFull = 1
-        self._origValue = np.nan
+        self._origValue = orig_value
 
     cpdef push(self, dict data):
 
@@ -769,69 +769,69 @@ cdef class BasicFunction(Accumulator):
         self._origValue = value
 
     def __deepcopy__(self, memo):
-        return BasicFunction(self._dependency)
+        return BasicFunction(self._dependency, self._origValue)
 
     def __reduce__(self):
         d = {}
 
-        return BasicFunction, (self._dependency,), d
+        return BasicFunction, (self._dependency, self._origValue), d
 
     def __setstate__(self, state):
         pass
 
 
 cdef class Exp(BasicFunction):
-    def __init__(self, dependency):
-        super(Exp, self).__init__(dependency)
+    def __init__(self, dependency, orig_value=np.nan):
+        super(Exp, self).__init__(dependency, orig_value)
 
     cpdef object result(self):
         return exp(self._origValue)
 
     def __deepcopy__(self, memo):
-        return Exp(self._dependency)
+        return Exp(self._dependency, self._origValue)
 
     def __reduce__(self):
         d = {}
 
-        return Exp, (self._dependency,), d
+        return Exp, (self._dependency, self._origValue), d
 
     def __setstate__(self, state):
         pass
 
 
 cdef class Log(BasicFunction):
-    def __init__(self, dependency):
-        super(Log, self).__init__(dependency)
+    def __init__(self, dependency, orig_value=np.nan):
+        super(Log, self).__init__(dependency, orig_value)
 
     cpdef object result(self):
         return log(self._origValue)
 
     def __deepcopy__(self, memo):
-        return Log(self._dependency)
+        return Log(self._dependency, self._origValue)
 
     def __reduce__(self):
         d = {}
 
-        return Log, (self._dependency,), d
+        return Log, (self._dependency, self._origValue), d
 
     def __setstate__(self, state):
         pass
 
 
 cdef class Sqrt(BasicFunction):
-    def __init__(self, dependency):
-        super(Sqrt, self).__init__(dependency)
+    def __init__(self, dependency, orig_value=np.nan):
+        super(Sqrt, self).__init__(dependency, orig_value)
 
     cpdef object result(self):
         return sqrt(self._origValue)
 
     def __deepcopy__(self, memo):
-        return Sqrt(self._dependency)
+        return Sqrt(self._dependency, self._origValue)
 
     def __reduce__(self):
         d = {}
 
-        return Sqrt, (self._dependency,), d
+        return Sqrt, (self._dependency, self._origValue), d
 
     def __setstate__(self, state):
         pass
@@ -840,45 +840,45 @@ cdef class Sqrt(BasicFunction):
 # due to the fact that pow function is much slower than ** operator
 cdef class Pow(BasicFunction):
 
-    def __init__(self, dependency, n):
-        super(Pow, self).__init__(dependency)
+    def __init__(self, dependency, n, orig_value=np.nan):
+        super(Pow, self).__init__(dependency, orig_value)
         self._n = n
 
     cpdef object result(self):
         return self._origValue ** self._n
 
     def __deepcopy__(self, memo):
-        return Pow(self._dependency, self._n)
+        return Pow(self._dependency, self._n, self._origValue)
 
     def __reduce__(self):
         d = {}
 
-        return Pow, (self._dependency, self._n), d
+        return Pow, (self._dependency, self._n, self._origValue), d
 
     def __setstate__(self, state):
         pass
 
 
 cdef class Abs(BasicFunction):
-    def __init__(self, dependency):
-        super(Abs, self).__init__(dependency)
+    def __init__(self, dependency, orig_value=np.nan):
+        super(Abs, self).__init__(dependency, orig_value)
 
     cpdef object result(self):
         return fabs(self._origValue)
 
     def __deepcopy__(self, memo):
-        return Abs(self._dependency)
+        return Abs(self._dependency, self._origValue)
 
     def __reduce__(self):
         d = {}
 
-        return Abs, (self._dependency,), d
+        return Abs, (self._dependency, self._origValue), d
 
     def __setstate__(self, state):
         pass
 
 
-cdef double sign(double x):
+cdef double sign(double x) nogil:
     if x > 0.:
         return 1.
     elif x < 0.:
@@ -888,95 +888,95 @@ cdef double sign(double x):
 
 
 cdef class Sign(BasicFunction):
-    def __init__(self, dependency):
-        super(Sign, self).__init__(dependency)
+    def __init__(self, dependency, orig_value=np.nan):
+        super(Sign, self).__init__(dependency, orig_value)
 
     cpdef object result(self):
         return sign(self._origValue)
 
     def __deepcopy__(self, memo):
-        return Sign(self._dependency)
+        return Sign(self._dependency, self._origValue)
 
     def __reduce__(self):
         d = {}
 
-        return Sign, (self._dependency,), d
+        return Sign, (self._dependency, self._origValue), d
 
     def __setstate__(self, state):
         pass
 
 
 cdef class Acos(BasicFunction):
-    def __init__(self, dependency):
-        super(Acos, self).__init__(dependency)
+    def __init__(self, dependency, orig_value=np.nan):
+        super(Acos, self).__init__(dependency, orig_value)
 
     cpdef object result(self):
         return acos(self._origValue)
 
     def __deepcopy__(self, memo):
-        return Acos(self._dependency)
+        return Acos(self._dependency, self._origValue)
 
     def __reduce__(self):
         d = {}
 
-        return Acos, (self._dependency,), d
+        return Acos, (self._dependency, self._origValue), d
 
     def __setstate__(self, state):
         pass
 
 
 cdef class Acosh(BasicFunction):
-    def __init__(self, dependency):
-        super(Acosh, self).__init__(dependency)
+    def __init__(self, dependency, orig_value=np.nan):
+        super(Acosh, self).__init__(dependency, orig_value)
 
     cpdef object result(self):
         return acosh(self._origValue)
 
     def __deepcopy__(self, memo):
-        return Acosh(self._dependency)
+        return Acosh(self._dependency, self._origValue)
 
     def __reduce__(self):
         d = {}
 
-        return Acosh, (self._dependency,), d
+        return Acosh, (self._dependency, self._origValue), d
 
     def __setstate__(self, state):
         pass
 
 
 cdef class Asin(BasicFunction):
-    def __init__(self, dependency):
-        super(Asin, self).__init__(dependency)
+    def __init__(self, dependency, orig_value=np.nan):
+        super(Asin, self).__init__(dependency, orig_value)
 
     cpdef object result(self):
         return asin(self._origValue)
 
     def __deepcopy__(self, memo):
-        return Asin(self._dependency)
+        return Asin(self._dependency, self._origValue)
 
     def __reduce__(self):
         d = {}
 
-        return Asin, (self._dependency,), d
+        return Asin, (self._dependency, self._origValue), d
 
     def __setstate__(self, state):
         pass
 
 
 cdef class Asinh(BasicFunction):
-    def __init__(self, dependency):
-        super(Asinh, self).__init__(dependency)
+    def __init__(self, dependency, orig_value=np.nan):
+        super(Asinh, self).__init__(dependency, orig_value)
 
     cpdef object result(self):
         return asinh(self._origValue)
 
     def __deepcopy__(self, memo):
-        return Asinh(self._dependency)
+        return Asinh(self._dependency, self._origValue)
 
     def __reduce__(self):
         d = {}
 
-        return Asinh, (self._dependency,), d
+        return Asinh, (self._dependency, self._origValue), d
 
     def __setstate__(self, state):
         pass

@@ -322,19 +322,22 @@ cdef class SecurityDiffValueHolder(SecurityStatelessSingleValueHolder):
 
     def __deepcopy__(self, memo):
         if self._compHolder:
-            return SecurityDiffValueHolder(self._compHolder)
+            copied = SecurityDiffValueHolder(self._compHolder)
         else:
-            return SecurityDiffValueHolder(self._dependency)
+            copied = SecurityDiffValueHolder(self._dependency)
+
+        copied.copy_attributes(self.collect_attributes(), is_deep=True)
+        return copied
 
     def __reduce__(self):
-        d = {}
+        d = self.collect_attributes()
         if self._compHolder:
             return SecurityDiffValueHolder, (self._compHolder,), d
         else:
             return SecurityDiffValueHolder, (self._dependency,), d
 
     def __setstate__(self, state):
-        pass
+        self.copy_attributes(state, is_deep=False)
 
 
 cdef class SecuritySimpleReturnValueHolder(SecurityStatelessSingleValueHolder):

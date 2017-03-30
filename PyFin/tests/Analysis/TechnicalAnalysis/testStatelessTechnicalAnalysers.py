@@ -8,6 +8,11 @@ Created on 2016-1-13
 import unittest
 import math
 import numpy as np
+import copy
+import pickle
+import tempfile
+import os
+from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import SecurityDiffValueHolder
 from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import SecuritySignValueHolder
 from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import SecurityXAverageValueHolder
 from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import SecurityExpValueHolder
@@ -202,3 +207,86 @@ class TestStatelessTechnicalAnalysis(unittest.TestCase):
                                                                  'expected:   {1:.12f}\n'
                                                                  'calculat: {2:.12f}'
                                        .format(i, expected, calculated))
+
+    def testSecurityDiffValueHolder(self):
+
+        mv = SecurityDiffValueHolder('close')
+
+        for i in range(len(self.aapl['close'])):
+            data = dict(aapl=dict(close=self.aapl['close'][i],
+                                  open=self.aapl['open'][i]),
+                        ibm=dict(close=self.ibm['close'][i],
+                                 open=self.ibm['open'][i]))
+            mv.push(data)
+
+            if i > 0:
+                value = mv.value
+                for name in value.index():
+                    expected = data[name]['close'] - previous_data[name]['close']
+                    calculated = value[name]
+                    self.assertAlmostEqual(expected, calculated, 12, 'at index {0}\n'
+                                                                     'expected:   {1:.12f}\n'
+                                                                     'calculat: {2:.12f}'
+                                           .format(i, expected, calculated))
+            previous_data = data
+
+    def testSecurityDiffValueHolderDeepcopy(self):
+        ma = SecurityDiffValueHolder(['x'])
+
+        data = dict(aapl=dict(x=1.),
+                    ibm=dict(x=2.))
+        data2 = dict(aapl=dict(x=2.),
+                     ibm=dict(x=3.))
+
+        ma.push(data)
+        ma.push(data2)
+
+        copied = copy.deepcopy(ma)
+
+        for name in ma.value.index():
+            self.assertAlmostEqual(ma.value[name], copied.value[name])
+
+        for v in np.random.rand(20):
+            data['aapl']['x'] = v
+            data['ibm']['x'] = v + 1.
+            ma.push(data)
+
+        copied = copy.deepcopy(ma)
+        for name in ma.value.index():
+            self.assertAlmostEqual(ma.value[name], copied.value[name])
+
+    def testSecurityDiffValueHolderPickle(self):
+        ma = SecurityDiffValueHolder(['x'])
+
+        data = dict(aapl=dict(x=1.),
+                    ibm=dict(x=2.))
+        data2 = dict(aapl=dict(x=2.),
+                     ibm=dict(x=3.))
+
+        ma.push(data)
+        ma.push(data2)
+
+        f = tempfile.NamedTemporaryFile('w+b', delete=False)
+        pickle.dump(ma, f)
+        f.close()
+
+        with open(f.name, 'rb') as f2:
+            pickled = pickle.load(f2)
+            for name in ma.value.index():
+                self.assertAlmostEqual(ma.value[name], pickled.value[name])
+        os.unlink(f.name)
+
+        for v in np.random.rand(20):
+            data['aapl']['x'] = v
+            data['ibm']['x'] = v + 1.
+            ma.push(data)
+
+        f = tempfile.NamedTemporaryFile('w+b', delete=False)
+        pickle.dump(ma, f)
+        f.close()
+
+        with open(f.name, 'rb') as f2:
+            pickled = pickle.load(f2)
+            for name in ma.value.index():
+                self.assertAlmostEqual(ma.value[name], pickled.value[name])
+        os.unlink(f.name)

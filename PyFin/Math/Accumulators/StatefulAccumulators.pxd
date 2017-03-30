@@ -17,6 +17,8 @@ cdef class StatefulValueHolder(Accumulator):
 
     cpdef int size(self)
     cpdef int isFull(self)
+    cpdef copy_attributes(self, dict attributes, bint is_deep=*)
+    cpdef collect_attributes(self)
 
 
 cdef class Shift(StatefulValueHolder):

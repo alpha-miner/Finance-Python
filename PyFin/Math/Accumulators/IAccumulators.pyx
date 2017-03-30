@@ -5,6 +5,7 @@ Created on 2017-2-8
 @author: cheng.li
 """
 
+import copy
 from copy import deepcopy
 import six
 from libc.math cimport sqrt
@@ -167,6 +168,22 @@ cdef class Accumulator(IAccumulator):
             return self._dependency
         else:
             return self._dependency.dependency
+
+    cpdef copy_attributes(self, dict attributes, bint is_deep=True):
+        self._isFull = attributes['_isFull']
+        self._dependency = copy.deepcopy(attributes['_dependency']) if is_deep else attributes['_dependency']
+        self._isValueHolderContained = attributes['_isValueHolderContained']
+        self._window = attributes['_window']
+        self._returnSize = attributes['_returnSize']
+
+    cpdef collect_attributes(self):
+        attributes = dict()
+        attributes['_isFull'] = self._isFull
+        attributes['_dependency'] = self._dependency
+        attributes['_isValueHolderContained'] = self._isValueHolderContained
+        attributes['_window'] = self._window
+        attributes['_returnSize'] = self._returnSize
+        return attributes
 
     def __deepcopy__(self, memo):
         return Accumulator(self._dependency)

@@ -6,6 +6,10 @@ Created on 2015-7-29
 """
 
 import unittest
+import copy
+import pickle
+import tempfile
+import os
 import math
 import numpy as np
 from PyFin.Math.Accumulators.IAccumulators import Sign
@@ -121,6 +125,46 @@ class TestStatelessAccumulators(unittest.TestCase):
                                                                  "expected min:   {1:f}\n"
                                                                  "calculated diff: {2:f}".format(i, expected,
                                                                                                  calculated))
+
+    def testDiffDeepcopy(self):
+        mv = Diff(dependency='x')
+
+        mv.push(dict(x=1.))
+        mv.push(dict(x=2.))
+
+        copied = copy.deepcopy(mv)
+        self.assertAlmostEqual(copied.value, mv.value)
+
+        for i in np.random.rand(30):
+            mv.push(dict(x=float(i)))
+
+        copied = copy.deepcopy(mv)
+        self.assertAlmostEqual(copied.value, mv.value)
+
+    def testDiffPickle(self):
+        mv = Diff(dependency='x')
+
+        mv.push(dict(x=1.))
+        mv.push(dict(x=2.))
+
+        f = tempfile.NamedTemporaryFile('w+b', delete=False)
+        pickle.dump(mv, f)
+        f.close()
+        with open(f.name, 'rb') as f2:
+            pickled = pickle.load(f2)
+            self.assertAlmostEqual(mv.value, pickled.value)
+        os.unlink(f.name)
+
+        for i in np.random.rand(30):
+            mv.push(dict(x=float(i)))
+
+        f = tempfile.NamedTemporaryFile('w+b', delete=False)
+        pickle.dump(mv, f)
+        f.close()
+        with open(f.name, 'rb') as f2:
+            pickled = pickle.load(f2)
+            self.assertAlmostEqual(mv.value, pickled.value)
+        os.unlink(f.name)
 
     def testSimpleReturn(self):
         mm = SimpleReturn(dependency='close')

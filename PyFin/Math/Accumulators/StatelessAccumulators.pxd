@@ -12,7 +12,6 @@ from PyFin.Math.Accumulators.IAccumulators cimport StatelessSingleValueAccumulat
 
 cdef class Diff(StatelessSingleValueAccumulator):
 
-    cdef public double _diff
     cdef public double _curr
     cdef public double _previous
 

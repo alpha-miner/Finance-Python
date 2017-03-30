@@ -5,6 +5,7 @@ Created on 2017-2-8
 @author: cheng.li
 """
 
+import copy
 import bisect
 import six
 import numpy as np
@@ -49,6 +50,15 @@ cdef class StatefulValueHolder(Accumulator):
 
     cpdef int isFull(self):
         return self._deque.isFull()
+
+    cpdef copy_attributes(self, dict attributes, bint is_deep=True):
+        super(StatefulValueHolder, self).copy_attributes(attributes, is_deep)
+        self._deque = copy.deepcopy(attributes['_deque']) if is_deep else attributes['_deque']
+
+    cpdef collect_attributes(self):
+        attributes = super(StatefulValueHolder, self).collect_attributes()
+        attributes['_deque'] = self._deque
+        return attributes
 
     def __deepcopy__(self, memo):
         return StatefulValueHolder(self._window, self._dependency)
@@ -375,15 +385,20 @@ cdef class MovingAverage(SingleValuedValueHolder):
             return np.nan
 
     def __deepcopy__(self, memo):
-        return MovingAverage(self._window, self._dependency)
+        copied = MovingAverage(self._window, self._dependency)
+
+        copied.copy_attributes(self.collect_attributes(), is_deep=True)
+        copied._runningSum = self._runningSum
+        return copied
 
     def __reduce__(self):
-        d = {}
-
+        d = self.collect_attributes()
+        d['_runningSum'] = self._runningSum
         return MovingAverage, (self._window, self._dependency), d
 
     def __setstate__(self, state):
-        pass
+        self.copy_attributes(state, is_deep=False)
+        self._runningSum = state['_runningSum']
 
 
 cdef class MovingPositiveAverage(SingleValuedValueHolder):
@@ -661,15 +676,23 @@ cdef class MovingStandardDeviation(SingleValuedValueHolder):
                 return np.nan
 
     def __deepcopy__(self, memo):
-        return MovingStandardDeviation(self._window, self._dependency, self._isPop)
+        copied = MovingStandardDeviation(self._window, self._dependency, self._isPop)
+
+        copied.copy_attributes(self.collect_attributes(), is_deep=True)
+        copied._runningSum = self._runningSum
+        copied._runningSumSquare = self._runningSumSquare
+        return copied
 
     def __reduce__(self):
-        d = {}
-
+        d = self.collect_attributes()
+        d['_runningSum'] = self._runningSum
+        d['_runningSumSquare'] = self._runningSumSquare
         return MovingStandardDeviation, (self._window, self._dependency, self._isPop), d
 
     def __setstate__(self, state):
-        pass
+        self.copy_attributes(state, is_deep=False)
+        self._runningSum = state['_runningSum']
+        self._runningSumSquare = state['_runningSumSquare']
 
 
 cdef class MovingNegativeVariance(SingleValuedValueHolder):
@@ -833,15 +856,17 @@ cdef class MovingHistoricalWindow(StatefulValueHolder):
         return [self.__getitem__(i) for i in range(self.size())]
 
     def __deepcopy__(self, memo):
-        return MovingHistoricalWindow(self._window, self._dependency)
+        copied = MovingHistoricalWindow(self._window, self._dependency)
+
+        copied.copy_attributes(self.collect_attributes(), is_deep=True)
+        return copied
 
     def __reduce__(self):
-        d = {}
-
+        d = self.collect_attributes()
         return MovingHistoricalWindow, (self._window, self._dependency), d
 
     def __setstate__(self, state):
-        pass
+        self.copy_attributes(state, is_deep=False)
 
 
 # Calculator for one pair of series

@@ -32,7 +32,6 @@ cdef class Diff(StatelessSingleValueAccumulator):
         super(Diff, self).__init__(dependency)
         _checkParameterList(dependency)
         self._returnSize = 1
-        self._diff = np.nan
         self._curr = np.nan
         self._previous = np.nan
 
@@ -48,7 +47,23 @@ cdef class Diff(StatelessSingleValueAccumulator):
         return self._curr - self._previous
 
     def __deepcopy__(self, memo):
-        return Diff(self._dependency)
+        copied = Diff(self._dependency)
+
+        copied.copy_attributes(self.collect_attributes(), is_deep=True)
+        copied._curr = self._curr
+        copied._previous = self._previous
+        return copied
+
+    def __reduce__(self):
+        d = self.collect_attributes()
+        d['_curr'] = self._curr
+        d['_previous'] = self._previous
+        return Diff, (self._dependency,), d
+
+    def __setstate__(self, state):
+        self.copy_attributes(state, is_deep=False)
+        self._curr = state['_curr']
+        self._previous = state['_previous']
 
 
 cdef class SimpleReturn(StatelessSingleValueAccumulator):

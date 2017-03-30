@@ -154,6 +154,48 @@ class TestStatefulAccumulators(unittest.TestCase):
                                                                  "Average calculated: {2:f}".format(i, expected,
                                                                                                     calculated))
 
+    def testMovingAverageDeepcopy(self):
+        window = 20
+        mv = MovingAverage(window, dependency='x')
+
+        mv.push(dict(x=1.))
+        mv.push(dict(x=2.))
+
+        copied = copy.deepcopy(mv)
+        self.assertAlmostEqual(copied.value, mv.value)
+
+        for i in range(3, 40):
+            mv.push(dict(x=float(i)))
+
+        copied = copy.deepcopy(mv)
+        self.assertAlmostEqual(copied.value, mv.value)
+
+    def testMovingAveragePickle(self):
+        window = 20
+        mv = MovingAverage(window, dependency='x')
+
+        mv.push(dict(x=1.))
+        mv.push(dict(x=2.))
+
+        f = tempfile.NamedTemporaryFile('w+b', delete=False)
+        pickle.dump(mv, f)
+        f.close()
+        with open(f.name, 'rb') as f2:
+            pickled = pickle.load(f2)
+            self.assertAlmostEqual(mv.value, pickled.value)
+        os.unlink(f.name)
+
+        for i in range(3, 40):
+            mv.push(dict(x=float(i)))
+
+        f = tempfile.NamedTemporaryFile('w+b', delete=False)
+        pickle.dump(mv, f)
+        f.close()
+        with open(f.name, 'rb') as f2:
+            pickled = pickle.load(f2)
+            self.assertAlmostEqual(mv.value, pickled.value)
+        os.unlink(f.name)
+
     def testMovingPositiveAverager(self):
         dirName = os.path.dirname(os.path.abspath(__file__))
         filePath = os.path.join(dirName, 'data/averagepostiveandnegative_random.csv')
@@ -561,6 +603,48 @@ class TestStatefulAccumulators(unittest.TestCase):
                                                                  "Var calculated: {2:f}".format(i, expected,
                                                                                                 calculated))
 
+    def testMovingStandardDeviationDeepcopy(self):
+        window = 20
+        mv = MovingStandardDeviation(window, dependency='x')
+
+        mv.push(dict(x=1.))
+        mv.push(dict(x=2.))
+
+        copied = copy.deepcopy(mv)
+        self.assertAlmostEqual(copied.value, mv.value)
+
+        for i in range(3, 40):
+            mv.push(dict(x=float(i)))
+
+        copied = copy.deepcopy(mv)
+        self.assertAlmostEqual(copied.value, mv.value)
+
+    def testMovingStandardDeviationPickle(self):
+        window = 20
+        mv = MovingStandardDeviation(window, dependency='x')
+
+        mv.push(dict(x=1.))
+        mv.push(dict(x=2.))
+
+        f = tempfile.NamedTemporaryFile('w+b', delete=False)
+        pickle.dump(mv, f)
+        f.close()
+        with open(f.name, 'rb') as f2:
+            pickled = pickle.load(f2)
+            self.assertAlmostEqual(mv.value, pickled.value)
+        os.unlink(f.name)
+
+        for i in range(3, 40):
+            mv.push(dict(x=float(i)))
+
+        f = tempfile.NamedTemporaryFile('w+b', delete=False)
+        pickle.dump(mv, f)
+        f.close()
+        with open(f.name, 'rb') as f2:
+            pickled = pickle.load(f2)
+            self.assertAlmostEqual(mv.value, pickled.value)
+        os.unlink(f.name)
+
     def testMovingNegativeVariancer(self):
         # test without enough negative value
         mv = MovingNegativeVariance(20, dependency='z', isPopulation=True)
@@ -636,6 +720,48 @@ class TestStatefulAccumulators(unittest.TestCase):
                 self.assertAlmostEqual(expected, calculated, 12, "at index {0} and position {1}\n"
                                                                  "expected:   {2}\n"
                                                                  "calculated: {3}".format(i, k, expected, calculated))
+
+    def testMovingHistoricalWindowDeepcopy(self):
+        window = 20
+        mv = MovingHistoricalWindow(window, dependency='x')
+
+        mv.push(dict(x=1.))
+        mv.push(dict(x=2.))
+
+        copied = copy.deepcopy(mv)
+        self.assertEqual(copied.value, mv.value)
+
+        for i in range(3, 40):
+            mv.push(dict(x=float(i)))
+
+        copied = copy.deepcopy(mv)
+        self.assertEqual(copied.value, mv.value)
+
+    def testMovingHistoricalWindowPickle(self):
+        window = 20
+        mv = MovingHistoricalWindow(window, dependency='x')
+
+        mv.push(dict(x=1.))
+        mv.push(dict(x=2.))
+
+        f = tempfile.NamedTemporaryFile('w+b', delete=False)
+        pickle.dump(mv, f)
+        f.close()
+        with open(f.name, 'rb') as f2:
+            pickled = pickle.load(f2)
+            self.assertEqual(mv.value, pickled.value)
+        os.unlink(f.name)
+
+        for i in range(3, 40):
+            mv.push(dict(x=float(i)))
+
+        f = tempfile.NamedTemporaryFile('w+b', delete=False)
+        pickle.dump(mv, f)
+        f.close()
+        with open(f.name, 'rb') as f2:
+            pickled = pickle.load(f2)
+            self.assertEqual(mv.value, pickled.value)
+        os.unlink(f.name)
 
     def testMovingCorrelation(self):
         dirName = os.path.dirname(os.path.abspath(__file__))

@@ -7,6 +7,9 @@ Created on 2015-7-27
 
 import unittest
 import copy
+import tempfile
+import pickle
+import os
 import math
 from collections import deque
 import numpy as np
@@ -617,7 +620,6 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
                                                              "calculated: {2:f}".format(i, expected, calculated))
 
     def testArithmeticFunctionsDeepcopy(self):
-
         data = {'x': 1}
 
         test = Exp('x')
@@ -673,6 +675,123 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
         test.push(data)
         copied = copy.deepcopy(test)
         self.assertAlmostEqual(math.asinh(data['x']), copied.value)
+
+    def testArithmeticFunctionsPickle(self):
+        data = {'x': 1}
+
+        test = Exp('x')
+        test.push(data)
+        f = tempfile.NamedTemporaryFile('w+b', delete=False)
+        pickle.dump(test, f)
+        f.close()
+
+        with open(f.name, 'rb') as f2:
+            pickled = pickle.load(f2)
+            self.assertAlmostEqual(test.value, pickled.value)
+        os.unlink(f.name)
+
+        test = Log('x')
+        test.push(data)
+        f = tempfile.NamedTemporaryFile('w+b', delete=False)
+        pickle.dump(test, f)
+        f.close()
+
+        with open(f.name, 'rb') as f2:
+            pickled = pickle.load(f2)
+            self.assertAlmostEqual(test.value, pickled.value)
+        os.unlink(f.name)
+
+        test = Sqrt('x')
+        test.push(data)
+        f = tempfile.NamedTemporaryFile('w+b', delete=False)
+        pickle.dump(test, f)
+        f.close()
+
+        with open(f.name, 'rb') as f2:
+            pickled = pickle.load(f2)
+            self.assertAlmostEqual(test.value, pickled.value)
+        os.unlink(f.name)
+
+        data['x'] = -1.
+
+        test = Pow('x', 2)
+        test.push(data)
+        f = tempfile.NamedTemporaryFile('w+b', delete=False)
+        pickle.dump(test, f)
+        f.close()
+
+        with open(f.name, 'rb') as f2:
+            pickled = pickle.load(f2)
+            self.assertAlmostEqual(test.value, pickled.value)
+        os.unlink(f.name)
+
+        test = Abs('x')
+        test.push(data)
+        f = tempfile.NamedTemporaryFile('w+b', delete=False)
+        pickle.dump(test, f)
+        f.close()
+
+        with open(f.name, 'rb') as f2:
+            pickled = pickle.load(f2)
+            self.assertAlmostEqual(test.value, pickled.value)
+        os.unlink(f.name)
+
+        test = Sign('x')
+        test.push(data)
+        f = tempfile.NamedTemporaryFile('w+b', delete=False)
+        pickle.dump(test, f)
+        f.close()
+
+        with open(f.name, 'rb') as f2:
+            pickled = pickle.load(f2)
+            self.assertAlmostEqual(test.value, pickled.value)
+        os.unlink(f.name)
+
+        data['x'] = 1.
+
+        test = Acos('x')
+        test.push(data)
+        f = tempfile.NamedTemporaryFile('w+b', delete=False)
+        pickle.dump(test, f)
+        f.close()
+
+        with open(f.name, 'rb') as f2:
+            pickled = pickle.load(f2)
+            self.assertAlmostEqual(test.value, pickled.value)
+        os.unlink(f.name)
+
+        test = Asin('x')
+        test.push(data)
+        f = tempfile.NamedTemporaryFile('w+b', delete=False)
+        pickle.dump(test, f)
+        f.close()
+
+        with open(f.name, 'rb') as f2:
+            pickled = pickle.load(f2)
+            self.assertAlmostEqual(test.value, pickled.value)
+        os.unlink(f.name)
+
+        test = Acosh('x')
+        test.push(data)
+        f = tempfile.NamedTemporaryFile('w+b', delete=False)
+        pickle.dump(test, f)
+        f.close()
+
+        with open(f.name, 'rb') as f2:
+            pickled = pickle.load(f2)
+            self.assertAlmostEqual(test.value, pickled.value)
+        os.unlink(f.name)
+
+        test = Asinh('x')
+        test.push(data)
+        f = tempfile.NamedTemporaryFile('w+b', delete=False)
+        pickle.dump(test, f)
+        f.close()
+
+        with open(f.name, 'rb') as f2:
+            pickled = pickle.load(f2)
+            self.assertAlmostEqual(test.value, pickled.value)
+        os.unlink(f.name)
 
     def testAccumulatorTransform(self):
         window = 5

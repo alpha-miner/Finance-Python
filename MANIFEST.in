@@ -1,10 +1,7 @@
-include README.*
 include MANIFEST.in
-include LICENSE.txt
 include .coveragerc
-include requirements/*.txt
-include PyFin/tests/Math/Accumulators/data/*.csv
-include PyFin/tests/POpt/data/*.csv
+recursive-include . *.txt
+recursive-include PyFin *.csv
 recursive-include PyFin *.pyx
 recursive-include PyFin *.pxd
 recursive-include . *.md

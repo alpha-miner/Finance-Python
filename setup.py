@@ -8,6 +8,7 @@ import os
 import sys
 import io
 import subprocess
+import platform
 import numpy as np
 from Cython.Build import cythonize
 import Cython.Compiler.Options
@@ -149,6 +150,17 @@ def generate_extensions(ext_modules, line_trace=False):
     return extensions
 
 
+if platform.system() != "Windows":
+    import multiprocessing
+    n_cpu = multiprocessing.cpu_count()
+else:
+    n_cpu = 0
+
+ext_modules_settings = cythonize(generate_extensions(ext_modules, line_trace), 
+                                 compiler_directives={'embedsignature': True, 'linetrace': line_trace}, 
+                                 nthreads=n_cpu)
+
+
 setup(
     name=NAME,
     version=VERSION,
@@ -162,9 +174,6 @@ setup(
     classifiers=[],
     cmdclass={"test": test,
               "version_build": version_build},
-    ext_modules=cythonize(generate_extensions(ext_modules, line_trace),
-                          compiler_directives={'embedsignature': True,
-                                               'linetrace': line_trace},
-                          nthreads=4),
+    ext_modules=ext_modules_settings,
     include_dirs=[np.get_include()],
 )

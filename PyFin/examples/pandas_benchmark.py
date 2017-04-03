@@ -10,9 +10,7 @@ import numpy as np
 import numpy.matlib as matlib
 import pandas as pd
 from PyFin.api import MA
-from PyFin.api import LAST
 from PyFin.Math.Accumulators import MovingAverage
-from PyFin.Math.Accumulators import Latest
 
 n = 3000
 m = 3000

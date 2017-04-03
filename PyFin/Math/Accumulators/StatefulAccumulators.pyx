@@ -371,10 +371,10 @@ cdef class MovingAverage(SingleValuedValueHolder):
         if isnan(value):
             return np.nan
         popout = self._deque.dump(value)
-        if not isnan(popout):
-            self._runningSum += value - popout
-        else:
+        if isnan(popout):
             self._runningSum += value
+        else:
+            self._runningSum += value - popout
 
     @cython.cdivision(True)
     cpdef object result(self):
@@ -453,8 +453,7 @@ cdef class MovingPositiveDifferenceAverage(SingleValuedValueHolder):
 
     cpdef push(self, dict data):
         self._runningAverage.push(data)
-        if self._isFull == 0 and self._runningAverage.isFull() == 1:
-            self._isFull = 1
+        self._isFull = self._isFull or self._runningAverage.isFull()
 
     cpdef object result(self):
         return self._runningAverage.result()
@@ -480,8 +479,7 @@ cdef class MovingNegativeDifferenceAverage(SingleValuedValueHolder):
 
     cpdef push(self, dict data):
         self._runningAverage.push(data)
-        if self._isFull == 0 and self._runningAverage.isFull():
-            self._isFull = 1
+        self._isFull = self._isFull or self._runningAverage.isFull()
 
     cpdef object result(self):
         return self._runningAverage.result()
@@ -508,15 +506,13 @@ cdef class MovingRSI(SingleValuedValueHolder):
     cpdef push(self, dict data):
         self._posDiffAvg.push(data)
         self._negDiffAvg.push(data)
-
-        if self._isFull == 0 and self._posDiffAvg.isFull() and self._negDiffAvg.isFull():
-            self._isFull = 1
+        self._isFull = self._isFull or (self._posDiffAvg.isFull() and self._negDiffAvg.isFull())
 
     @cython.cdivision(True)
     cpdef object result(self):
         cdef double nominator = self._posDiffAvg.result()
         cdef double denominator = nominator - self._negDiffAvg.result()
-        if denominator != 0.:
+        if denominator:
             return 100. * nominator / denominator
         else:
             return 50.
@@ -541,10 +537,9 @@ cdef class MovingNegativeAverage(SingleValuedValueHolder):
         self._runningNegativeCount = 0
 
     cpdef push(self, dict data):
-        cdef double value
+        cdef double value = self._push(data)
         cdef double popout
 
-        value = self._push(data)
         if isnan(value):
             return np.nan
         popout = self._deque.dump(value)
@@ -558,10 +553,10 @@ cdef class MovingNegativeAverage(SingleValuedValueHolder):
 
     @cython.cdivision(True)
     cpdef object result(self):
-        if self._runningNegativeCount == 0:
-            return 0.0
-        else:
+        if self._runningNegativeCount:
             return self._runningNegativeSum / self._runningNegativeCount
+        else:
+            return 0.
 
     def __deepcopy__(self, memo):
         return MovingNegativeAverage(self._window, self._dependency)
@@ -587,19 +582,19 @@ cdef class MovingVariance(SingleValuedValueHolder):
 
     cpdef push(self, dict data):
 
-        cdef double value
+        cdef double value = self._push(data)
         cdef double popout
 
-        value = self._push(data)
         if isnan(value):
             return np.nan
         popout = self._deque.dump(value)
-        if not isnan(popout):
-            self._runningSum += value - popout
-            self._runningSumSquare += value * value - popout * popout
-        else:
+
+        if isnan(popout):
             self._runningSum += value
             self._runningSumSquare += value * value
+        else:
+            self._runningSum += value - popout
+            self._runningSumSquare += value * value - popout * popout
 
     @cython.cdivision(True)
     cpdef object result(self):
@@ -643,19 +638,19 @@ cdef class MovingStandardDeviation(SingleValuedValueHolder):
 
     cpdef push(self, dict data):
 
-        cdef double value
+        cdef double value = self._push(data)
         cdef double popout
 
-        value = self._push(data)
         if isnan(value):
             return np.nan
         popout = self._deque.dump(value)
-        if not isnan(popout):
-            self._runningSum += value - popout
-            self._runningSumSquare += value * value - popout * popout
-        else:
+
+        if isnan(popout):
             self._runningSum += value
             self._runningSumSquare += value * value
+        else:
+            self._runningSum += value - popout
+            self._runningSumSquare += value * value - popout * popout
 
     @cython.cdivision(True)
     cpdef object result(self):
@@ -706,13 +701,13 @@ cdef class MovingNegativeVariance(SingleValuedValueHolder):
 
     cpdef push(self, dict data):
 
-        cdef double value
+        cdef double value = self._push(data)
         cdef double popout
 
-        value = self._push(data)
         if isnan(value):
             return np.nan
         popout = self._deque.dump(value)
+
         if value < 0:
             self._runningNegativeSum += value
             self._runningNegativeSumSquare += value * value
@@ -763,10 +758,9 @@ cdef class MovingCountedPositive(SingleValuedValueHolder):
 
     cpdef push(self, dict data):
 
-        cdef double value
+        cdef double value = self._push(data)
         cdef double popout
 
-        value = self._push(data)
         if isnan(value):
             return np.nan
         popout = self._deque.dump(value)
@@ -799,10 +793,9 @@ cdef class MovingCountedNegative(SingleValuedValueHolder):
 
     cpdef push(self, dict data):
 
-        cdef double value
+        cdef double value = self._push(data)
         cdef double popout
 
-        value = self._push(data)
         if isnan(value):
             return np.nan
         popout = self._deque.dump(value)

@@ -101,7 +101,7 @@ cdef class SecurityValueHolder(object):
 
         cdef np.ndarray values
         cdef Accumulator holder
-        cdef int n
+        cdef size_t n
         cdef int i
 
         if self.updated:
@@ -126,7 +126,7 @@ cdef class SecurityValueHolder(object):
         cdef Accumulator holder
         cdef np.ndarray res
         cdef int i
-        cdef int n
+        cdef size_t n
 
         if self.updated:
             return self.cached[names]
@@ -251,8 +251,8 @@ cdef class SecurityValueHolder(object):
         cdef double[:] output_values
         cdef double[:] narr_view
         cdef int j
-        cdef int start_count
-        cdef int end_count
+        cdef size_t start_count
+        cdef size_t end_count
         cdef list split_category
         cdef list split_values
         cdef dict dict_data

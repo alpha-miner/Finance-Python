@@ -24,8 +24,8 @@ cpdef transform(data, list expressions, list cols, str category_field=None, bint
     cdef double[:, :] matrix_values
     cdef double[:, :] output_values
     cdef double[:] narr_view
-    cdef int start_count
-    cdef int end_count
+    cdef size_t start_count
+    cdef size_t end_count
     cdef list flags
     cdef list split_category
     cdef list split_values

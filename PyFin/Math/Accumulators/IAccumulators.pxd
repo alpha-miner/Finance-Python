@@ -12,13 +12,13 @@ cdef class IAccumulator(object):
 
 cdef class Accumulator(IAccumulator):
 
-    cdef public int _isFull
+    cdef public bint _isFull
     cdef public object _dependency
-    cdef public int _isValueHolderContained
-    cdef public int _window
-    cdef public int _returnSize
+    cdef public bint _isValueHolderContained
+    cdef public size_t _window
+    cdef public size_t _returnSize
 
-    cpdef int isFull(self)
+    cpdef bint isFull(self)
     cdef extract(self, dict data)
     cpdef push(self, dict data)
     cpdef object result(self)
@@ -67,7 +67,7 @@ cdef class CombinedValueHolder(Accumulator):
     cdef public Accumulator _right
 
     cpdef push(self, dict data)
-    cpdef int isFull(self)
+    cpdef bint isFull(self)
 
 
 cdef class AddedValueHolder(CombinedValueHolder):
@@ -142,7 +142,7 @@ cdef class CompoundedValueHolder(Accumulator):
     cdef public Accumulator _right
 
     cpdef push(self, dict data)
-    cpdef int isFull(self)
+    cpdef bint isFull(self)
     cpdef object result(self)
 
 

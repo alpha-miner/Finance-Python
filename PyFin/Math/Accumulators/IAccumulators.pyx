@@ -73,15 +73,15 @@ cdef class IAccumulator(object):
 cdef class Accumulator(IAccumulator):
 
     def __init__(self, dependency):
-        self._isFull = 0
+        self._isFull = False
         self._window = 0
         self._returnSize = 1
 
         if isinstance(dependency, Accumulator):
-            self._isValueHolderContained = 1
+            self._isValueHolderContained = True
             self._dependency = deepcopy(dependency)
         else:
-            self._isValueHolderContained = 0
+            self._isValueHolderContained = False
             if (isinstance(dependency, tuple) or isinstance(dependency, list)) and len(dependency) > 1:
                 self._dependency = dependency
             elif (isinstance(dependency, tuple) or isinstance(dependency, list)) and len(dependency) == 1:
@@ -120,10 +120,10 @@ cdef class Accumulator(IAccumulator):
         cdef int i
         cdef int k
         cdef double[:, :] matrix_values
-        cdef long n = len(data)
+        cdef size_t n = len(data)
         cdef double[:] output_values = np.zeros(n)
         cdef list columns
-        cdef int column_length
+        cdef size_t column_length
         cdef dict data_dict
 
         if to_sort:
@@ -151,8 +151,8 @@ cdef class Accumulator(IAccumulator):
     def value(self):
         return self.result()
 
-    cpdef int isFull(self):
-        return self._isFull == 1
+    cpdef bint isFull(self):
+        return self._isFull
 
     @property
     def window(self):
@@ -203,12 +203,11 @@ cdef class Negative(Accumulator):
         super(Negative, self).__init__(valueHolder)
         self._returnSize = valueHolder.valueSize
         self._window = valueHolder.window
-        self._isFull = 0
+        self._isFull = False
 
     cpdef push(self, dict data):
         self._dependency.push(data)
-        if self._dependency.isFull():
-            self._isFull = 1
+        self._isFull = self._dependency.isFull()
 
     cpdef object result(self):
         res = self._dependency.result()
@@ -238,14 +237,13 @@ cdef class ListedValueHolder(Accumulator):
         self._returnSize = self._left.valueSize + self._right.valueSize
         self._dependency = list(set(self._left.dependency).union(set(self._right.dependency)))
         self._window = max(self._left.window, self._right.window)
-        self._isValueHolderContained = 1
-        self._isFull = 0
+        self._isValueHolderContained = True
+        self._isFull = False
 
     cpdef push(self, dict data):
         self._left.push(data)
         self._right.push(data)
-        if self._isFull == 0 and self._left.isFull() and self._right.isFull():
-            self._isFull = 1
+        self._isFull =  self._isFull or (self._left.isFull() and self._right.isFull())
 
     cpdef object result(self):
         resLeft = self._left.result()
@@ -293,8 +291,7 @@ cdef class TruncatedValueHolder(Accumulator):
 
     cpdef push(self, dict data):
         self._dependency.push(data)
-        if self._dependency.isFull():
-            self._isFull = 1
+        self._isFull = self._dependency.isFull()
 
     cpdef object result(self):
         if self._stop == -1:
@@ -331,19 +328,15 @@ cdef class CombinedValueHolder(Accumulator):
         self._returnSize = self._left.valueSize
         self._dependency = list(set(self._left.dependency).union(set(self._right.dependency)))
         self._window = max(self._left.window, self._right.window)
-        self._isFull = 0
+        self._isFull = False
 
     cpdef push(self, dict data):
         self._left.push(data)
         self._right.push(data)
-        if self._isFull == 0 and self._left.isFull() and self._right.isFull():
-            self._isFull = 1
+        self._isFull = self._isFull or (self._left.isFull() and self._right.isFull())
 
-    cpdef int isFull(self):
-        if self._left.isFull() and self._right.isFull():
-            return True
-        else:
-            return False
+    cpdef bint isFull(self):
+        return self._isFull
 
     def __deepcopy__(self, memo):
         return CombinedValueHolder(self._left, self._right)
@@ -585,7 +578,7 @@ cdef class Identity(Accumulator):
         self._window = 0
         self._value = value
         self._returnSize = 1
-        self._isFull = 1
+        self._isFull = True
 
     cpdef push(self, dict data):
         pass
@@ -645,7 +638,7 @@ cdef class Latest(StatelessSingleValueAccumulator):
         super(Latest, self).__init__(dependency)
         self._window = 0
         self._returnSize = 1
-        self._isFull = 1
+        self._isFull = True
         self._latest = current_value
 
     cpdef push(self, dict data):
@@ -665,12 +658,12 @@ cdef class Latest(StatelessSingleValueAccumulator):
     def __setstate__(self, state):
         pass
 
-cdef int isanumber(a):
-    cdef int bool_a = 1
+cdef bint isanumber(a):
+    cdef bint bool_a = True
     try:
         float(repr(a))
     except:
-        bool_a = 0
+        bool_a = False
 
     return bool_a
 
@@ -712,15 +705,13 @@ cdef class CompoundedValueHolder(Accumulator):
         else:
             parameters = {name: value for name, value in zip(self._right.dependency, values)}
         self._right.push(parameters)
+        self._isFull = self._isFull or (self._left.isFull() and self._right.isFull())
 
     cpdef object result(self):
         return self._right.result()
 
-    cpdef int isFull(self):
-        if self._left.isFull() and self._right.isFull():
-            return 1
-        else:
-            return 0
+    cpdef bint isFull(self):
+        return self._isFull
 
     def __deepcopy__(self, memo):
         return CompoundedValueHolder(self._left, self._right)
@@ -744,14 +735,13 @@ cdef class IIF(Accumulator):
         self._right = build_holder(right)
         self._dependency = list(set(self._cond.dependency).union(set(self._cond.dependency).union(set(self._cond.dependency))))
         self._window = max(self._cond.window, self._left.window, self._right.window)
-        self._isFull = 0
+        self._isFull = False
 
     cpdef push(self, dict data):
         self._cond.push(data)
         self._left.push(data)
         self._right.push(data)
-        if self._isFull == 0 and self._cond.isFull() and self._left.isFull() and self._right.isFull():
-            self._isFull = 1
+        self._isFull = self._isFull or (self._cond.isFull() and self._left.isFull() and self._right.isFull())
 
     cpdef object result(self):
         return self._left.result() if self._cond.result() else self._right.result()

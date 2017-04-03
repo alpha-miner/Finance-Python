@@ -35,7 +35,7 @@ cpdef np.ndarray[double, ndim=1]  sviVolatilities(double[:] strikes,
                                      double rho,
                                      double m):
     cdef int i
-    cdef int length = len(strikes)
+    cdef size_t length = len(strikes)
     cdef np.ndarray[double, ndim=1] res = np.empty(length, np.float64)
 
     for i in range(length):

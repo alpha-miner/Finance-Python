@@ -14,10 +14,10 @@ cimport cython
 cdef class Deque:
 
     def __init__(self,
-                 int window,
-                 int is_full=0,
+                 size_t window,
+                 bint is_full=False,
                  con=None,
-                 int start=0):
+                 size_t start=0):
         self.window = window
         self.is_full = is_full
         if con:
@@ -30,8 +30,8 @@ cdef class Deque:
     @cython.boundscheck(False)
     @cython.wraparound(False)
     cdef dump(self, value):
-        cdef int n = self.start
-        cdef int window = self.window
+        cdef size_t n = self.start
+        cdef size_t window = self.window
 
         if self.is_full:
             popout = self.con[n]
@@ -42,18 +42,18 @@ cdef class Deque:
 
             self.con.append(value)
             if len(self.con) == window:
-                self.is_full = 1
+                self.is_full = True
 
             if hasattr(value, '__len__'):
                 return np.array([np.nan] * len(value))
             else:
                 return np.nan
 
-    cdef int size(self):
+    cdef size_t size(self):
         return len(self.con)
 
-    cdef int isFull(self):
-        return self.is_full == 1
+    cdef bint isFull(self):
+        return self.is_full
 
     cdef np.ndarray as_array(self):
         return np.array(self.as_list())

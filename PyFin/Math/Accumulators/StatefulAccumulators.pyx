@@ -45,10 +45,10 @@ cdef class StatefulValueHolder(Accumulator):
         self._window = window
         self._deque = Deque(window)
 
-    cpdef int size(self):
+    cpdef size_t size(self):
         return self._deque.size()
 
-    cpdef int isFull(self):
+    cpdef bint isFull(self):
         return self._deque.isFull()
 
     cpdef copy_attributes(self, dict attributes, bint is_deep=True):
@@ -224,7 +224,7 @@ cdef class MovingQuantile(SortedValueHolder):
 
     @cython.cdivision(True)
     cpdef object result(self):
-        cdef int n = len(self._sortedArray)
+        cdef size_t n = len(self._sortedArray)
         if n > 1:
             return self._sortedArray.index(self._deque[n-1]) / (n - 1.)
         else:
@@ -378,7 +378,7 @@ cdef class MovingAverage(SingleValuedValueHolder):
 
     @cython.cdivision(True)
     cpdef object result(self):
-        cdef int size = self.size()
+        cdef size_t size = self.size()
         if size:
             return self._runningSum / size
         else:
@@ -603,7 +603,7 @@ cdef class MovingVariance(SingleValuedValueHolder):
 
     @cython.cdivision(True)
     cpdef object result(self):
-        cdef int length = self._deque.size()
+        cdef size_t length = self._deque.size()
         cdef double tmp
 
         if length == 0:
@@ -659,7 +659,7 @@ cdef class MovingStandardDeviation(SingleValuedValueHolder):
 
     @cython.cdivision(True)
     cpdef object result(self):
-        cdef int length = self._deque.size()
+        cdef size_t length = self._deque.size()
         cdef double tmp
 
         if length == 0:
@@ -846,7 +846,7 @@ cdef class MovingHistoricalWindow(StatefulValueHolder):
         _ = self._deque.dump(value)
 
     def __getitem__(self, item):
-        cdef int length = self.size()
+        cdef size_t length = self.size()
         if item >= length:
             raise ValueError("index {0} is out of the bound of the historical current length {1}".format(item, length))
 
@@ -904,7 +904,7 @@ cdef class MovingCorrelation(StatefulValueHolder):
             self._runningSumCrossSquare = self._runningSumCrossSquare + value[0] * value[1]
 
     cpdef object result(self):
-        cdef int n = self.size()
+        cdef size_t n = self.size()
         if n >= 2:
             nominator = n * self._runningSumCrossSquare - self._runningSumLeft * self._runningSumRight
             denominator = (n * self._runningSumSquareLeft - self._runningSumLeft * self._runningSumLeft) \
@@ -959,7 +959,7 @@ cdef class MovingCorrelationMatrix(StatefulValueHolder):
             self._runningSumCrossSquare += reshapeValues * reshapeValues.T
 
     cpdef object result(self):
-        n = self.size()
+        cdef size_t n = self.size()
         if n >= 2:
             nominator = n * self._runningSumCrossSquare - self._runningSum * self._runningSum.T
             denominator = n * np.diag(self._runningSumCrossSquare) - self._runningSum * self._runningSum

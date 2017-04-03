@@ -433,7 +433,7 @@ cdef class SecurityMovingHistoricalWindow(SecuritySingleValueHolder):
 
         cdef list values
         cdef Accumulator holder
-        cdef int n
+        cdef size_t n
         cdef int i
 
         if self.updated:
@@ -458,7 +458,7 @@ cdef class SecurityMovingHistoricalWindow(SecuritySingleValueHolder):
         cdef Accumulator holder
         cdef list res
         cdef int i
-        cdef int n
+        cdef size_t n
 
         if self.updated:
             return self.cached[names]

@@ -15,8 +15,8 @@ cdef class StatefulValueHolder(Accumulator):
 
     cdef public Deque _deque
 
-    cpdef int size(self)
-    cpdef int isFull(self)
+    cpdef size_t size(self)
+    cpdef bint isFull(self)
     cpdef copy_attributes(self, dict attributes, bint is_deep=*)
     cpdef collect_attributes(self)
 
@@ -60,7 +60,7 @@ cdef class MovingQuantile(SortedValueHolder):
 
 cdef class MovingAllTrue(SingleValuedValueHolder):
 
-    cdef public int _countedTrue
+    cdef public size_t _countedTrue
 
     cpdef push(self, dict data)
     cpdef object result(self)
@@ -68,7 +68,7 @@ cdef class MovingAllTrue(SingleValuedValueHolder):
 
 cdef class MovingAnyTrue(SingleValuedValueHolder):
 
-    cdef public int _countedTrue
+    cdef public size_t _countedTrue
 
     cpdef push(self, dict data)
     cpdef object result(self)

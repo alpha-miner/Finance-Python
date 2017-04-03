@@ -29,7 +29,7 @@ cdef class Schedule(object):
                  Date nextToLastDate=None):
 
         cdef int i
-        cdef int dateLen
+        cdef size_t dateLen
         cdef Calendar nullCalendar
         cdef Date evalDate
         cdef int y
@@ -266,7 +266,7 @@ cdef class Schedule(object):
                 terminationDate,
                 self._rule, self._endOfMonth))
 
-    cpdef int size(self):
+    cpdef size_t size(self):
         return len(self._dates)
 
     def __getitem__(self, item):

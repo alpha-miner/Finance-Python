@@ -39,7 +39,7 @@ cdef class Diff(StatelessSingleValueAccumulator):
         cdef double value = self._push(data)
         if isnan(value):
             return np.nan
-        self._isFull = 1
+        self._isFull = True
         self._previous = self._curr
         self._curr = value
 
@@ -80,7 +80,7 @@ cdef class SimpleReturn(StatelessSingleValueAccumulator):
         cdef double value = self._push(data)
         if isnan(value):
             return np.nan
-        self._isFull = 1
+        self._isFull = True
         self._previous = self._curr
         self._curr = value
 
@@ -111,7 +111,7 @@ cdef class LogReturn(StatelessSingleValueAccumulator):
         cdef double value = self._push(data)
         if isnan(value):
             return np.nan
-        self._isFull = 1
+        self._isFull = True
         self._previous = self._curr
         self._curr = value
 
@@ -134,7 +134,7 @@ cdef class PositivePart(StatelessSingleValueAccumulator):
         _checkParameterList(dependency)
         self._returnSize = 1
         self._pos = np.nan
-        self._isFull = 1
+        self._isFull = True
 
     cpdef push(self, dict data):
         cdef double value = self._push(data)
@@ -157,7 +157,7 @@ cdef class NegativePart(StatelessSingleValueAccumulator):
         _checkParameterList(dependency)
         self._returnSize = 1
         self._neg = np.nan
-        self._isFull = 1
+        self._isFull = False
 
     cpdef push(self, dict data):
         cdef double value = self._push(data)
@@ -165,6 +165,7 @@ cdef class NegativePart(StatelessSingleValueAccumulator):
             self._neg = np.nan
         else:
             self._neg = fmin(value, 0.)
+            self._isFull = True
 
     cpdef object result(self):
         return self._neg
@@ -180,7 +181,7 @@ cdef class Max(StatelessSingleValueAccumulator):
         _checkParameterList(dependency)
         self._currentMax = -np.inf
         self._returnSize = 1
-        self._isFull = 0
+        self._isFull = False
 
     cpdef push(self, dict data):
         cdef double value = self._push(data)
@@ -188,7 +189,7 @@ cdef class Max(StatelessSingleValueAccumulator):
             return np.nan
 
         self._currentMax = fmax(value, self._currentMax)
-        self._isFull = 1
+        self._isFull = True
 
     cpdef object result(self):
         return self._currentMax
@@ -204,7 +205,7 @@ cdef class Minimum(StatelessSingleValueAccumulator):
         _checkParameterList(dependency)
         self._currentMin = np.inf
         self._returnSize = 1
-        self._isFull = 0
+        self._isFull = False
 
     cpdef push(self, dict data):
         cdef double value = self._push(data)
@@ -212,7 +213,7 @@ cdef class Minimum(StatelessSingleValueAccumulator):
             return np.nan
 
         self._currentMin = fmin(value, self._currentMin)
-        self._isFull = 1
+        self._isFull = True
 
     cpdef object result(self):
         return self._currentMin
@@ -228,14 +229,14 @@ cdef class Sum(StatelessSingleValueAccumulator):
         _checkParameterList(dependency)
         self._currentSum = 0.
         self._returnSize = 1
-        self._isFull = 0
+        self._isFull = False
 
     cpdef push(self, dict data):
         cdef double value = self._push(data)
         if isnan(value):
             return np.nan
 
-        self._isFull = 1
+        self._isFull = True
         self._currentSum += value
 
     cpdef object result(self):
@@ -253,14 +254,14 @@ cdef class Average(StatelessSingleValueAccumulator):
         self._currentSum = 0.
         self._currentCount = 0
         self._returnSize = 1
-        self._isFull = 0
+        self._isFull = False
 
     cpdef push(self, dict data):
         cdef double value = self._push(data)
         if isnan(value):
             return np.nan
 
-        self._isFull = 1
+        self._isFull = True
         self._currentCount += 1
         self._currentSum += value
 
@@ -288,7 +289,7 @@ cdef class XAverage(StatelessSingleValueAccumulator):
         if isnan(value):
             return np.nan
 
-        self._isFull = 1
+        self._isFull = True
 
         if self._count == 0:
             self._average = value
@@ -305,7 +306,7 @@ cdef class XAverage(StatelessSingleValueAccumulator):
 
 cdef class Variance(StatelessSingleValueAccumulator):
 
-    def __init__(self, dependency='x', isPopulation=0):
+    def __init__(self, dependency='x', bint isPopulation=0):
         super(Variance, self).__init__(dependency)
         _checkParameterList(dependency)
         self._currentSum = 0.0
@@ -319,7 +320,7 @@ cdef class Variance(StatelessSingleValueAccumulator):
         if isnan(value):
             return np.nan
 
-        self._isFull = 1
+        self._isFull = True
 
         self._currentSum += value
         self._currentSumSquare += value * value
@@ -352,7 +353,7 @@ cdef class Product(StatelessSingleValueAccumulator):
         if isnan(value):
             return np.nan
 
-        self._isFull = 1
+        self._isFull = True
         self._product *= value
 
     cpdef object result(self):
@@ -375,7 +376,7 @@ cdef class CenterMoment(StatelessSingleValueAccumulator):
         if isnan(value):
             return np.nan
 
-        self._isFull = 1
+        self._isFull = True
 
         self._this_list.append(value)
         self._moment = np.mean(np.power(np.abs(np.array(self._this_list) - np.mean(self._this_list)), self._order))
@@ -442,7 +443,7 @@ cdef class Rank(StatelessSingleValueAccumulator):
         if isnan(value):
             return np.nan
 
-        self._isFull = 1
+        self._isFull = True
 
         self._thisList.append(value)
         self._sortedList = sorted(self._thisList)
@@ -467,7 +468,7 @@ cdef class LevelList(StatelessSingleValueAccumulator):
         if isnan(value):
             return np.nan
 
-        self._isFull = 1
+        self._isFull = True
 
         self._thisList.append(value)
         if len(self._thisList) == 1:
@@ -494,7 +495,7 @@ cdef class LevelValue(StatelessSingleValueAccumulator):
         if isnan(value):
             return np.nan
 
-        self._isFull = 1
+        self._isFull = True
 
         self._thisList.append(value)
         if len(self._thisList) == 1:
@@ -524,7 +525,7 @@ cdef class AutoCorrelation(StatelessSingleValueAccumulator):
         if isnan(value):
             return np.nan
 
-        self._isFull = 1
+        self._isFull = True
         self._thisList.append(value)
 
     cpdef object result(self):
@@ -584,7 +585,7 @@ cdef class Correlation(StatelessMultiValueAccumulator):
         if isnan(value[0]) or isnan(value[1]):
             return np.nan
 
-        self._isFull = 1
+        self._isFull = True
 
         self._runningSumLeft = self._runningSumLeft + value[0]
         self._runningSumRight = self._runningSumRight + value[1]

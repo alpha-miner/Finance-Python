@@ -25,4 +25,4 @@ cdef class Schedule(object):
     cdef public Date _firstDate
     cdef public Date _nextToLastDate
 
-    cpdef int size(self)
+    cpdef size_t size(self)

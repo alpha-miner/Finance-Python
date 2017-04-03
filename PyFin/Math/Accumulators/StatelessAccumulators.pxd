@@ -106,7 +106,7 @@ cdef class Variance(StatelessSingleValueAccumulator):
     cdef public double _currentSum
     cdef public double _currentSumSquare
     cdef public int _currentCount
-    cdef public int _isPop
+    cdef public bint _isPop
 
     cpdef push(self, dict data)
     cpdef object result(self)

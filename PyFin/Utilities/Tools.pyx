@@ -22,10 +22,10 @@ cpdef to_dict(total_index, list total_category, double[:, :] matrix_values, list
 
     cdef dict current_dict = {}
     cdef list index_diff_loc = list(np.where(np.diff(total_index))[0])
-    cdef int index_diff_length = len(index_diff_loc)
+    cdef size_t index_diff_length = len(index_diff_loc)
     cdef list splited_values = [None] * (index_diff_length + 1)
     cdef list splited_category = [None] * (index_diff_length + 1)
-    cdef int column_length = len(columns)
+    cdef size_t column_length = len(columns)
 
     for i in range(index_diff_length):
         end = index_diff_loc[i]

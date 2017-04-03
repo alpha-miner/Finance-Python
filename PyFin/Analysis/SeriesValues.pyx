@@ -10,7 +10,7 @@ import numpy as np
 cimport numpy as np
 
 
-cdef class SecurityValues(object):
+cdef class SeriesValues(object):
 
     def __init__(self, data, index=None):
         if isinstance(data, dict):
@@ -46,56 +46,56 @@ cdef class SecurityValues(object):
             values = self.values
             name_mapping = self.name_mapping
             data = np.array([values[name_mapping[n]] if n in name_mapping else np.nan for n in name])
-            return SecurityValues(data, dict(zip(name, range(len(name)))))
+            return SeriesValues(data, dict(zip(name, range(len(name)))))
 
     @cython.boundscheck(False)
     @cython.wraparound(False)
-    cpdef SecurityValues mask(self, flags):
+    cpdef SeriesValues mask(self, flags):
         if not self.name_array:
             self.name_array = np.array(sorted(self.name_mapping.keys()))
 
         filtered_names = self.name_array[flags]
-        return SecurityValues(self.values[flags], dict(zip(filtered_names, range(len(filtered_names)))))
+        return SeriesValues(self.values[flags], dict(zip(filtered_names, range(len(filtered_names)))))
 
     def __invert__(self):
-        return SecurityValues(~self.values, self.name_mapping)
+        return SeriesValues(~self.values, self.name_mapping)
 
     def __neg__(self):
-        return SecurityValues(-self.values, self.name_mapping)
+        return SeriesValues(-self.values, self.name_mapping)
 
     def __add__(self, right):
-        if isinstance(right, SecurityValues):
-            if isinstance(self, SecurityValues):
-                return SecurityValues(self.values + right.values, self.name_mapping)
+        if isinstance(right, SeriesValues):
+            if isinstance(self, SeriesValues):
+                return SeriesValues(self.values + right.values, self.name_mapping)
             else:
-                return SecurityValues(self + right.values, right.name_mapping)
+                return SeriesValues(self + right.values, right.name_mapping)
         else:
-            return SecurityValues(self.values + right, self.name_mapping)
+            return SeriesValues(self.values + right, self.name_mapping)
 
     def __sub__(self, right):
-        if isinstance(right, SecurityValues):
-            if isinstance(self, SecurityValues):
-                return SecurityValues(self.values - right.values, self.name_mapping)
+        if isinstance(right, SeriesValues):
+            if isinstance(self, SeriesValues):
+                return SeriesValues(self.values - right.values, self.name_mapping)
             else:
-                return SecurityValues(self - right.values, right.name_mapping)
+                return SeriesValues(self - right.values, right.name_mapping)
         else:
-            return SecurityValues(self.values - right, self.name_mapping)
+            return SeriesValues(self.values - right, self.name_mapping)
 
     def __mul__(self, right):
-        if isinstance(right, SecurityValues):
-            if isinstance(self, SecurityValues):
-                return SecurityValues(self.values * right.values, self.name_mapping)
+        if isinstance(right, SeriesValues):
+            if isinstance(self, SeriesValues):
+                return SeriesValues(self.values * right.values, self.name_mapping)
             else:
-                return SecurityValues(self * right.values, right.name_mapping)
+                return SeriesValues(self * right.values, right.name_mapping)
         else:
-            return SecurityValues(self.values * right, self.name_mapping)
+            return SeriesValues(self.values * right, self.name_mapping)
 
     @cython.cdivision(True)
     def __truediv__(self, right):
         cdef np.ndarray[double, ndim=1] values
         cdef dict name_mapping
-        if isinstance(right, SecurityValues):
-            if isinstance(self, SecurityValues):
+        if isinstance(right, SeriesValues):
+            if isinstance(self, SeriesValues):
                 values = self.values / right.values
                 name_mapping = self.name_mapping
             else:
@@ -106,14 +106,14 @@ cdef class SecurityValues(object):
             name_mapping = self.name_mapping
 
         values[~np.isfinite(values)] = np.nan
-        return SecurityValues(values, name_mapping)
+        return SeriesValues(values, name_mapping)
 
     @cython.cdivision(True)
     def __div__(self, right):
         cdef np.ndarray[double, ndim=1] values
         cdef dict name_mapping
-        if isinstance(right, SecurityValues):
-            if isinstance(self, SecurityValues):
+        if isinstance(right, SeriesValues):
+            if isinstance(self, SeriesValues):
                 values = self.values / right.values
                 name_mapping = self.name_mapping
             else:
@@ -124,54 +124,54 @@ cdef class SecurityValues(object):
             name_mapping = self.name_mapping
 
         values[~np.isfinite(values)] = np.nan
-        return SecurityValues(values, name_mapping)
+        return SeriesValues(values, name_mapping)
 
     def __and__(self, right):
-        if isinstance(right, SecurityValues):
-            if isinstance(self, SecurityValues):
-                return SecurityValues(self.values & right.values, self.name_mapping)
+        if isinstance(right, SeriesValues):
+            if isinstance(self, SeriesValues):
+                return SeriesValues(self.values & right.values, self.name_mapping)
             else:
-                return SecurityValues(self & right.values, right.name_mapping)
+                return SeriesValues(self & right.values, right.name_mapping)
         else:
-            return SecurityValues(self.values & right, self.name_mapping)
+            return SeriesValues(self.values & right, self.name_mapping)
 
     def __or__(self, right):
-        if isinstance(right, SecurityValues):
-            if isinstance(self, SecurityValues):
-                return SecurityValues(self.values | right.values, self.name_mapping)
+        if isinstance(right, SeriesValues):
+            if isinstance(self, SeriesValues):
+                return SeriesValues(self.values | right.values, self.name_mapping)
             else:
-                return SecurityValues(self | right.values, right.name_mapping)
+                return SeriesValues(self | right.values, right.name_mapping)
         else:
-            return SecurityValues(self.values | right, self.name_mapping)
+            return SeriesValues(self.values | right, self.name_mapping)
 
     def __richcmp__(self, right, int op):
 
-        if isinstance(right, SecurityValues):
+        if isinstance(right, SeriesValues):
             if op == 0:
-                return SecurityValues(self.values < right.values, self.name_mapping)
+                return SeriesValues(self.values < right.values, self.name_mapping)
             elif op == 1:
-                return SecurityValues(self.values <= right.values, self.name_mapping)
+                return SeriesValues(self.values <= right.values, self.name_mapping)
             elif op == 2:
-                return SecurityValues(self.values == right.values, self.name_mapping)
+                return SeriesValues(self.values == right.values, self.name_mapping)
             elif op == 3:
-                return SecurityValues(self.values != right.values, self.name_mapping)
+                return SeriesValues(self.values != right.values, self.name_mapping)
             elif op == 4:
-                return SecurityValues(self.values > right.values, self.name_mapping)
+                return SeriesValues(self.values > right.values, self.name_mapping)
             elif op == 5:
-                return SecurityValues(self.values >= right.values, self.name_mapping)
+                return SeriesValues(self.values >= right.values, self.name_mapping)
         else:
             if op == 0:
-                return SecurityValues(self.values < right, self.name_mapping)
+                return SeriesValues(self.values < right, self.name_mapping)
             elif op == 1:
-                return SecurityValues(self.values <= right, self.name_mapping)
+                return SeriesValues(self.values <= right, self.name_mapping)
             elif op == 2:
-                return SecurityValues(self.values == right, self.name_mapping)
+                return SeriesValues(self.values == right, self.name_mapping)
             elif op == 3:
-                return SecurityValues(self.values != right, self.name_mapping)
+                return SeriesValues(self.values != right, self.name_mapping)
             elif op == 4:
-                return SecurityValues(self.values > right, self.name_mapping)
+                return SeriesValues(self.values > right, self.name_mapping)
             elif op == 5:
-                return SecurityValues(self.values >= right, self.name_mapping)
+                return SeriesValues(self.values >= right, self.name_mapping)
 
     cpdef object index(self):
         return self.name_mapping.keys()
@@ -184,23 +184,23 @@ cdef class SecurityValues(object):
 
     @cython.boundscheck(False)
     @cython.wraparound(False)
-    cpdef SecurityValues rank(self):
+    cpdef SeriesValues rank(self):
         cdef np.ndarray[double, ndim=1] data = self.values.argsort().argsort().astype(float)
         data[np.isnan(self.values)] = np.nan
-        return SecurityValues(data + 1., self.name_mapping)
+        return SeriesValues(data + 1., self.name_mapping)
 
-    cpdef SecurityValues zscore(self):
+    cpdef SeriesValues zscore(self):
         cdef np.ndarray[double, ndim=1] data = self.values
-        return SecurityValues((data - data.mean()) / data.std(), self.name_mapping)
+        return SeriesValues((data - data.mean()) / data.std(), self.name_mapping)
 
-    cpdef SecurityValues unit(self):
+    cpdef SeriesValues unit(self):
         cdef np.ndarray[double, ndim=1] data = self.values
-        return SecurityValues(data / np.nansum(np.abs(data)), self.name_mapping)
+        return SeriesValues(data / np.nansum(np.abs(data)), self.name_mapping)
 
     cpdef double mean(self):
         return np.nanmean(self.values)
 
-    cpdef double dot(self, SecurityValues right):
+    cpdef double dot(self, SeriesValues right):
         return np.dot(self.values, right.values)
 
     cpdef dict to_dict(self):
@@ -208,17 +208,17 @@ cdef class SecurityValues(object):
         return {k: self.values[self.name_mapping[k]] for k in keys}
 
     def __deepcopy__(self, memo):
-        return SecurityValues(self.values, self.name_mapping)
+        return SeriesValues(self.values, self.name_mapping)
 
     def __reduce__(self):
         d = {}
-        return SecurityValues, (self.values, self.name_mapping), d
+        return SeriesValues, (self.values, self.name_mapping), d
 
     def __setstate__(self, state):
         pass
 
     def __repr__(self):
-        return 'SecurityValues({0})'.format(self.__str__())
+        return 'SeriesValues({0})'.format(self.__str__())
 
     def __str__(self):
         return self.to_dict().__str__()

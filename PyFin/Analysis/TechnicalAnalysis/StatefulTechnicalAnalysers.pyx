@@ -10,7 +10,7 @@ import numpy as np
 cimport numpy as np
 cimport cython
 from PyFin.Math.Accumulators.IAccumulators cimport Accumulator
-from PyFin.Analysis.SecurityValues cimport SecurityValues
+from PyFin.Analysis.SeriesValues cimport SeriesValues
 from PyFin.Analysis.SecurityValueHolders cimport SecurityValueHolder
 from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingAverage
 from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingMax
@@ -422,7 +422,7 @@ cdef class SecurityMovingHistoricalWindow(SecuritySingleValueHolder):
                     res[name] = self._innerHolders[name].value[item]
                 except ArithmeticError:
                     res[name] = np.nan
-            return SecurityValues(res)
+            return SeriesValues(res)
         else:
             raise ValueError("{0} is not recognized as valid int or string".format(item))
 
@@ -437,7 +437,7 @@ cdef class SecurityMovingHistoricalWindow(SecuritySingleValueHolder):
         cdef int i
 
         if self.updated:
-            return SecurityValues(self.cached.values, self.cached.name_mapping)
+            return SeriesValues(self.cached.values, self.cached.name_mapping)
         else:
             keys = self._innerHolders.keys()
             n = len(keys)
@@ -448,7 +448,7 @@ cdef class SecurityMovingHistoricalWindow(SecuritySingleValueHolder):
                     values[i] = holder.result()
                 except ArithmeticError:
                     values[i] = np.nan
-            self.cached = SecurityValues(np.array(values), index=dict(zip(keys, range(n))))
+            self.cached = SeriesValues(np.array(values), index=dict(zip(keys, range(n))))
             self.updated = 1
             return self.cached
 
@@ -468,7 +468,7 @@ cdef class SecurityMovingHistoricalWindow(SecuritySingleValueHolder):
             for i, name in enumerate(names):
                 holder = self._innerHolders[name]
                 res[i] = holder.result()
-            return SecurityValues(np.array(res), index=dict(zip(names, range(n))))
+            return SeriesValues(np.array(res), index=dict(zip(names, range(n))))
 
     cpdef value_by_name(self, name):
         cdef Accumulator holder

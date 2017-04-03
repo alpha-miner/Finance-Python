@@ -8,7 +8,7 @@ Created on 2015-9-23
 
 import functools
 
-from PyFin.Analysis.SecurityValues import SecurityValues
+from PyFin.Analysis.SeriesValues import SeriesValues
 
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingAverage
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingMax

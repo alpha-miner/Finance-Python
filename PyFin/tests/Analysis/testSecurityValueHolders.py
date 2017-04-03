@@ -13,7 +13,7 @@ import os
 import numpy as np
 import pandas as pd
 from PyFin.Enums import Factors
-from PyFin.Analysis.SecurityValues import SecurityValues
+from PyFin.Analysis.SeriesValues import SeriesValues
 from PyFin.Analysis.SecurityValueHolders import dependencyCalculator
 from PyFin.Analysis.SecurityValueHolders import FilteredSecurityValueHolder
 from PyFin.Analysis.SecurityValueHolders import SecurityLatestValueHolder
@@ -96,7 +96,7 @@ class TestSecurityValueHolders(unittest.TestCase):
         constArray = SecurityConstArrayValueHolder({'a': 1.0, 'b': 2.0})
 
         testValue = constArray.value
-        expectedValue = SecurityValues(np.array([1.0, 2.0]), index=['a', 'b'])
+        expectedValue = SeriesValues(np.array([1.0, 2.0]), index=['a', 'b'])
 
         for name in expectedValue.index():
             self.assertAlmostEqual(testValue[name], expectedValue[name])
@@ -105,7 +105,7 @@ class TestSecurityValueHolders(unittest.TestCase):
         self.assertAlmostEqual(1.0, testValue)
 
         testValue = constArray.value_by_names(['b', 'a', 'c'])
-        expectedValue = SecurityValues(np.array([2.0, 1.0, np.nan]), index=['b', 'a', 'c'])
+        expectedValue = SeriesValues(np.array([2.0, 1.0, np.nan]), index=['b', 'a', 'c'])
 
         np.testing.assert_array_almost_equal(testValue.values, expectedValue.values)
         self.assertEqual(testValue.name_mapping, expectedValue.name_mapping)
@@ -344,52 +344,52 @@ class TestSecurityValueHolders(unittest.TestCase):
 
     def testSecuritiesValuesComparison(self):
 
-        benchmarkValues = SecurityValues({'AAPL': 1.0, 'IBM': 2.0, 'GOOG': 3.0})
+        benchmarkValues = SeriesValues({'AAPL': 1.0, 'IBM': 2.0, 'GOOG': 3.0})
         calculated = benchmarkValues > 1.5
-        expected = SecurityValues({'AAPL': False, 'IBM': True, 'GOOG': True})
+        expected = SeriesValues({'AAPL': False, 'IBM': True, 'GOOG': True})
         self.checker(expected, calculated)
 
         calculated = benchmarkValues < 1.5
-        expected = SecurityValues({'AAPL': True, 'IBM': False, 'GOOG': False})
+        expected = SeriesValues({'AAPL': True, 'IBM': False, 'GOOG': False})
         self.checker(expected, calculated)
 
         calculated = benchmarkValues >= 1.0
-        expected = SecurityValues({'AAPL': True, 'IBM': True, 'GOOG': True})
+        expected = SeriesValues({'AAPL': True, 'IBM': True, 'GOOG': True})
         self.checker(expected, calculated)
 
         calculated = benchmarkValues <= 2.0
-        expected = SecurityValues({'AAPL': True, 'IBM': True, 'GOOG': False})
+        expected = SeriesValues({'AAPL': True, 'IBM': True, 'GOOG': False})
         self.checker(expected, calculated)
 
-        benchmarkValues = SecurityValues({'AAPL': False, 'IBM': True, 'GOOG': False})
+        benchmarkValues = SeriesValues({'AAPL': False, 'IBM': True, 'GOOG': False})
         calculated = benchmarkValues & True
-        expected = SecurityValues({'AAPL': False, 'IBM': True, 'GOOG': False})
+        expected = SeriesValues({'AAPL': False, 'IBM': True, 'GOOG': False})
         self.checker(expected, calculated)
 
         calculated = True & benchmarkValues
-        expected = SecurityValues({'AAPL': False, 'IBM': True, 'GOOG': False})
+        expected = SeriesValues({'AAPL': False, 'IBM': True, 'GOOG': False})
         self.checker(expected, calculated)
 
         calculated = benchmarkValues | True
-        expected = SecurityValues({'AAPL': True, 'IBM': True, 'GOOG': True})
+        expected = SeriesValues({'AAPL': True, 'IBM': True, 'GOOG': True})
         self.checker(expected, calculated)
 
         calculated = True | benchmarkValues
-        expected = SecurityValues({'AAPL': True, 'IBM': True, 'GOOG': True})
+        expected = SeriesValues({'AAPL': True, 'IBM': True, 'GOOG': True})
         self.checker(expected, calculated)
 
-        benchmarkValues = SecurityValues({'AAPL': 1.0, 'IBM': 2.0, 'GOOG': 3.0})
+        benchmarkValues = SeriesValues({'AAPL': 1.0, 'IBM': 2.0, 'GOOG': 3.0})
         calculated = benchmarkValues == 2.0
-        expected = SecurityValues({'AAPL': False, 'IBM': True, 'GOOG': False})
+        expected = SeriesValues({'AAPL': False, 'IBM': True, 'GOOG': False})
         self.checker(expected, calculated)
 
         calculated = benchmarkValues != 2.0
-        expected = SecurityValues({'AAPL': True, 'IBM': False, 'GOOG': True})
+        expected = SeriesValues({'AAPL': True, 'IBM': False, 'GOOG': True})
         self.checker(expected, calculated)
 
     def testSecuritiesValuesArithmetic(self):
         benchmarkValues = {'AAPL': 1.0, 'IBM': 2.0, 'GOOG': 3.0}
-        values = SecurityValues(benchmarkValues)
+        values = SeriesValues(benchmarkValues)
 
         self.assertEqual(len(benchmarkValues), len(values))
 
@@ -401,7 +401,7 @@ class TestSecurityValueHolders(unittest.TestCase):
             self.assertAlmostEqual(benchmarkValues[key], -negValues[key], 12)
 
         benchmarkValues2 = {'AAPL': 3.0, 'IBM': 2.0, 'GOOG': 1.0}
-        values2 = SecurityValues(benchmarkValues2)
+        values2 = SeriesValues(benchmarkValues2)
         addedValue = values + values2
         for key in benchmarkValues:
             self.assertAlmostEqual(benchmarkValues[key] + benchmarkValues2[key], addedValue[key], 12)
@@ -786,7 +786,7 @@ class TestSecurityValueHolders(unittest.TestCase):
                  'goog': {'close': 4.0}}
 
         shifted1.push(data2)
-        expected = SecurityValues({'aapl': 1.0,
+        expected = SeriesValues({'aapl': 1.0,
                                    'ibm': 2.0,
                                    'goog': 3.0})
         calculated = shifted1.value
@@ -798,7 +798,7 @@ class TestSecurityValueHolders(unittest.TestCase):
                   'goog': {'close': 5.0}})
 
         shifted1.push(data3)
-        expected = SecurityValues({'aapl': 1.5,
+        expected = SeriesValues({'aapl': 1.5,
                                    'ibm': 2.5,
                                    'goog': 3.5})
         calculated = shifted1.value

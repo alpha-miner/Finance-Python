@@ -6,7 +6,7 @@ Created on 2017-2-11
 """
 
 from PyFin.Math.Accumulators.IAccumulators cimport Accumulator
-from PyFin.Analysis.SecurityValues cimport SecurityValues
+from PyFin.Analysis.SeriesValues cimport SeriesValues
 
 
 cdef class SecurityValueHolder(object):
@@ -18,7 +18,7 @@ cdef class SecurityValueHolder(object):
     cdef public Accumulator _holderTemplate
     cdef public int updated
     cdef public dict _innerHolders
-    cdef public SecurityValues cached
+    cdef public SeriesValues cached
 
     cpdef push(self, dict data)
     cpdef value_by_names(self, list names)
@@ -49,7 +49,7 @@ cdef class IdentitySecurityValueHolder(SecurityValueHolder):
 
 
 cdef class SecurityConstArrayValueHolder(SecurityValueHolder):
-    cdef SecurityValues _values
+    cdef SeriesValues _values
 
     cpdef push(self, dict data)
     cpdef value_by_name(self, name)

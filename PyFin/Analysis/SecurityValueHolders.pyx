@@ -14,7 +14,7 @@ import numpy as np
 cimport numpy as np
 import pandas as pd
 cimport cython
-from PyFin.Analysis.SecurityValues cimport SecurityValues
+from PyFin.Analysis.SeriesValues cimport SeriesValues
 from PyFin.Utilities.Tools import to_dict
 from PyFin.Math.Accumulators.StatefulAccumulators cimport Shift
 from PyFin.Math.Accumulators.IAccumulators cimport Latest
@@ -67,7 +67,7 @@ cdef class SecurityValueHolder(object):
 
     cpdef push(self, dict data):
 
-        cdef SecurityValues sec_values
+        cdef SeriesValues sec_values
         cdef Accumulator holder
         self.updated = 0
 
@@ -105,7 +105,7 @@ cdef class SecurityValueHolder(object):
         cdef int i
 
         if self.updated:
-            return SecurityValues(self.cached.values, self.cached.name_mapping)
+            return SeriesValues(self.cached.values, self.cached.name_mapping)
         else:
             keys = sorted(self._innerHolders.keys())
             n = len(keys)
@@ -116,7 +116,7 @@ cdef class SecurityValueHolder(object):
                     values[i] = holder.result()
                 except ArithmeticError:
                     values[i] = np.nan
-            self.cached = SecurityValues(values, index=keys)
+            self.cached = SeriesValues(values, index=keys)
             self.updated = 1
             return self.cached
 
@@ -136,7 +136,7 @@ cdef class SecurityValueHolder(object):
             for i, name in enumerate(names):
                 holder = self._innerHolders[name]
                 res[i] = holder.result()
-            return SecurityValues(res, index=names)
+            return SeriesValues(res, index=names)
 
     cpdef value_by_name(self, name):
         cdef Accumulator holder
@@ -336,7 +336,7 @@ cdef class FilteredSecurityValueHolder(SecurityValueHolder):
 
     @property
     def value(self):
-        cdef SecurityValues filter_value
+        cdef SeriesValues filter_value
 
         if self.updated:
             return self.cached
@@ -361,15 +361,15 @@ cdef class FilteredSecurityValueHolder(SecurityValueHolder):
 
     cpdef value_by_names(self, list names):
 
-        cdef SecurityValues filter_value
-        cdef SecurityValues orig_values
+        cdef SeriesValues filter_value
+        cdef SeriesValues orig_values
 
         if self.updated:
             return self.cached[names]
         else:
             filter_value = self._filter.value_by_names(names)
             orig_values = self._computer.value_by_names(names)
-            return SecurityValues(np.where(filter_value.values, orig_values.values, np.nan), filter_value.name_mapping)
+            return SeriesValues(np.where(filter_value.values, orig_values.values, np.nan), filter_value.name_mapping)
 
     cpdef push(self, dict data):
         self._computer.push(data)
@@ -432,10 +432,10 @@ cdef class SecurityConstArrayValueHolder(SecurityValueHolder):
     def __init__(self, values):
         super(SecurityConstArrayValueHolder, self).__init__([])
 
-        if isinstance(values, SecurityValues):
+        if isinstance(values, SeriesValues):
             self._values = values
         else:
-            self._values = SecurityValues(values)
+            self._values = SeriesValues(values)
 
     def isFullByName(self, name):
         if name in self._values:
@@ -932,7 +932,7 @@ cdef class SecurityIIFValueHolder(SecurityValueHolder):
     @property
     def value(self):
 
-        cdef SecurityValues flag_value
+        cdef SeriesValues flag_value
 
         if self.updated:
             return self.cached
@@ -949,10 +949,10 @@ cdef class SecurityIIFValueHolder(SecurityValueHolder):
             else:
                 right_value = self._right.value.values
 
-            self.cached = SecurityValues(np.where(flag_value.values,
-                                                  left_value,
-                                                  right_value),
-                                         flag_value.name_mapping)
+            self.cached = SeriesValues(np.where(flag_value.values,
+                                                left_value,
+                                                right_value),
+                                       flag_value.name_mapping)
             self.updated = 1
             return self.cached
 
@@ -967,7 +967,7 @@ cdef class SecurityIIFValueHolder(SecurityValueHolder):
 
     cpdef value_by_names(self, list names):
 
-        cdef SecurityValues flag_value
+        cdef SeriesValues flag_value
 
         if self.updated:
             return self.cached[names]
@@ -985,10 +985,10 @@ cdef class SecurityIIFValueHolder(SecurityValueHolder):
             else:
                 right_value = self._right.value_by_names(names).values
 
-            return SecurityValues(np.where(flag_value.values,
-                                           left_value,
-                                           right_value),
-                                  flag_value.name_mapping)
+            return SeriesValues(np.where(flag_value.values,
+                                         left_value,
+                                         right_value),
+                                flag_value.name_mapping)
 
     def __deepcopy__(self, memo):
         return SecurityIIFValueHolder(self._flag, self._left, self._right)

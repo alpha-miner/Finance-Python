@@ -10,7 +10,7 @@ import six
 import numpy as np
 cimport numpy as np
 cimport cython
-from PyFin.Analysis.SecurityValues cimport SecurityValues
+from PyFin.Analysis.SeriesValues cimport SeriesValues
 from PyFin.Analysis.SecurityValueHolders cimport SecurityValueHolder
 from PyFin.Analysis.SecurityValueHolders cimport SecurityLatestValueHolder
 
@@ -53,7 +53,7 @@ cdef class CSRankedSecurityValueHolder(CrossSectionValueHolder):
     @property
     def value(self):
 
-        cdef SecurityValues raw_values
+        cdef SeriesValues raw_values
 
         if self.updated:
             return self.cached
@@ -65,7 +65,7 @@ cdef class CSRankedSecurityValueHolder(CrossSectionValueHolder):
 
     cpdef value_by_name(self, name):
 
-        cdef SecurityValues raw_values
+        cdef SeriesValues raw_values
 
         if self.updated:
             return self.cached[name]
@@ -76,7 +76,7 @@ cdef class CSRankedSecurityValueHolder(CrossSectionValueHolder):
             return self.cached[name]
 
     cpdef value_by_names(self, list names):
-        cdef SecurityValues raw_values
+        cdef SeriesValues raw_values
         raw_values = self._inner.value_by_names(names)
         raw_values = raw_values.rank()
         return raw_values
@@ -99,7 +99,7 @@ cdef class CSAverageSecurityValueHolder(CrossSectionValueHolder):
     @property
     def value(self):
 
-        cdef SecurityValues raw_values
+        cdef SeriesValues raw_values
         cdef np.ndarray[double, ndim=1] mean_value
 
         if self.updated:
@@ -108,13 +108,13 @@ cdef class CSAverageSecurityValueHolder(CrossSectionValueHolder):
             raw_values = self._inner.value
             mean_value = np.array([raw_values.mean()] * len(raw_values))
             mean_value[np.isnan(raw_values.values)] = np.nan
-            self.cached = SecurityValues(mean_value, raw_values.name_mapping)
+            self.cached = SeriesValues(mean_value, raw_values.name_mapping)
             self.updated = 1
             return self.cached
 
     cpdef value_by_name(self, name):
 
-        cdef SecurityValues raw_values
+        cdef SeriesValues raw_values
         cdef np.ndarray[double, ndim=1] mean_value
 
         if self.updated:
@@ -123,19 +123,19 @@ cdef class CSAverageSecurityValueHolder(CrossSectionValueHolder):
             raw_values = self._inner.value
             mean_value = np.array([raw_values.mean()] * len(raw_values))
             mean_value[np.isnan(raw_values.values)] = np.nan
-            self.cached = SecurityValues(mean_value, raw_values.name_mapping)
+            self.cached = SeriesValues(mean_value, raw_values.name_mapping)
             self.updated = 1
             return self.cached[name]
 
     cpdef value_by_names(self, list names):
 
-        cdef SecurityValues raw_values
+        cdef SeriesValues raw_values
         cdef np.ndarray[double, ndim=1] mean_value
 
         raw_values = self._inner.value_by_names(names)
         mean_value = np.array([raw_values.mean()] * len(raw_values))
         mean_value[np.isnan(raw_values.values)] = np.nan
-        raw_values = SecurityValues(mean_value, raw_values.name_mapping)
+        raw_values = SeriesValues(mean_value, raw_values.name_mapping)
         return raw_values[names]
 
     def __deepcopy__(self, memo):
@@ -156,7 +156,7 @@ cdef class CSAverageAdjustedSecurityValueHolder(CrossSectionValueHolder):
     @property
     def value(self):
 
-        cdef SecurityValues raw_values
+        cdef SeriesValues raw_values
 
         if self.updated:
             return self.cached
@@ -168,7 +168,7 @@ cdef class CSAverageAdjustedSecurityValueHolder(CrossSectionValueHolder):
 
     cpdef value_by_name(self, name):
 
-        cdef SecurityValues raw_values
+        cdef SeriesValues raw_values
 
         if self.updated:
             return self.cached[name]
@@ -201,7 +201,7 @@ cdef class CSQuantileSecurityValueHolder(CrossSectionValueHolder):
     @property
     def value(self):
 
-        cdef SecurityValues raw_values
+        cdef SeriesValues raw_values
 
         if self.updated:
             return self.cached
@@ -214,7 +214,7 @@ cdef class CSQuantileSecurityValueHolder(CrossSectionValueHolder):
     @cython.cdivision(True)
     cpdef value_by_name(self, name):
 
-        cdef SecurityValues raw_values
+        cdef SeriesValues raw_values
 
         if self.updated:
             return self.cached[name]
@@ -227,7 +227,7 @@ cdef class CSQuantileSecurityValueHolder(CrossSectionValueHolder):
     @cython.cdivision(True)
     cpdef value_by_names(self, list names):
 
-        cdef SecurityValues raw_values
+        cdef SeriesValues raw_values
 
         raw_values = self._inner.value_by_names(names)
         raw_values = (raw_values.rank() - 1.) / (len(raw_values) - 1.)
@@ -251,7 +251,7 @@ cdef class CSZScoreSecurityValueHolder(CrossSectionValueHolder):
     @property
     def value(self):
 
-        cdef SecurityValues raw_values
+        cdef SeriesValues raw_values
 
         if self.updated:
             return self.cached
@@ -264,7 +264,7 @@ cdef class CSZScoreSecurityValueHolder(CrossSectionValueHolder):
     @cython.cdivision(True)
     cpdef value_by_name(self, name):
 
-        cdef SecurityValues raw_values
+        cdef SeriesValues raw_values
 
         if self.updated:
             return self.cached[name]
@@ -277,7 +277,7 @@ cdef class CSZScoreSecurityValueHolder(CrossSectionValueHolder):
     @cython.cdivision(True)
     cpdef value_by_names(self, list names):
 
-        cdef SecurityValues raw_values
+        cdef SeriesValues raw_values
 
         raw_values = self._inner.value_by_names(names)
         raw_values = raw_values.zscore()

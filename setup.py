@@ -100,7 +100,7 @@ else:
 
 
 ext_modules = [
-    "PyFin/Analysis/SecurityValues.pyx",
+    "PyFin/Analysis/SeriesValues.pyx",
     "PyFin/Analysis/transformer.pyx",
     "PyFin/Analysis/SecurityValueHolders.pyx",
     "PyFin/Analysis/CrossSectionValueHolders.pyx",

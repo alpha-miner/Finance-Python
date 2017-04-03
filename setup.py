@@ -113,6 +113,7 @@ ext_modules = [
     "PyFin/Math/Distributions/NormalDistribution.pyx",
     "PyFin/Math/Distributions/norm.pyx",
     "PyFin/Math/ErrorFunction.pyx",
+    "PyFin/Math/MathConstants.pyx",
     "PyFin/DateUtilities/Calendar.pyx",
     "PyFin/DateUtilities/Date.pyx",
     "PyFin/DateUtilities/Period.pyx",

@@ -6,14 +6,18 @@ from PyFin.Math.Distributions.norm cimport cdf_derivative
 from libc.math cimport exp
 from libc.math cimport log
 from libc.math cimport sqrt
-from PyFin.Math.MathConstants import MathConstants
+from PyFin.Math.MathConstants cimport M_SQRT_2
+from PyFin.Math.MathConstants cimport M_1_SQRTPI
+from PyFin.Math.MathConstants cimport QL_EPSILON
+from PyFin.Math.MathConstants cimport M_SQRT2
+from PyFin.Math.MathConstants cimport M_SQRTPI
 
 
-cdef double _M_SQRT_2 = MathConstants.M_SQRT_2
-cdef double _M_1_SQRTPI = MathConstants.M_1_SQRTPI
-cdef double _QL_EPSILON = MathConstants.QL_EPSILON
-cdef double _M_SQRT2 = MathConstants.M_SQRT2
-cdef double _M_SQRTPI = MathConstants.M_SQRTPI
+cdef double _M_SQRT_2 = M_SQRT_2
+cdef double _M_1_SQRTPI = M_1_SQRTPI
+cdef double _QL_EPSILON = QL_EPSILON
+cdef double _M_SQRT2 = M_SQRT2
+cdef double _M_SQRTPI = M_SQRTPI
 
 
 cdef class NormalDistribution(object):

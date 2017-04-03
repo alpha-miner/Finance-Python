@@ -5,5 +5,8 @@ build/*
 dist/*
 Finance_Python.egg-info/*
 *.c
+*.cpp
+*.hpp
+*.h
 *.pyd
 *.html

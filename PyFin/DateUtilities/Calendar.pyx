@@ -17,10 +17,7 @@ from PyFin.Utilities.Asserts cimport pyFinAssert
 
 cdef class Calendar(object):
 
-    def __init__(self, holCenter):
-        pyFinAssert(isinstance(holCenter, six.string_types),
-                    ValueError,
-                    "{0} is not a valid description of a holiday center".format(holCenter))
+    def __init__(self, str holCenter):
         holCenter = holCenter.lower()
         try:
             self._impl = _holDict[holCenter]()
@@ -92,7 +89,7 @@ cdef class Calendar(object):
         elif c == BizDayConventions.Preceding or c == BizDayConventions.ModifiedPreceding:
             while self.isHoliday(d1):
                 d1 -= 1
-            if c == BizDayConventions.ModifiedPreceding and d1.month() != d.month:
+            if c == BizDayConventions.ModifiedPreceding and d1.month() != d.month():
                 return self.adjustDate(d, BizDayConventions.Following)
         elif c == BizDayConventions.Nearest:
             d2 = d
@@ -120,8 +117,8 @@ cdef class Calendar(object):
         else:
             pobj = period
 
-        n = pobj.length
-        units = pobj.units
+        n = pobj.length()
+        units = pobj.units()
 
         if n == 0:
             return self.adjustDate(d, c)
@@ -457,10 +454,7 @@ cdef class ChinaSseImpl(CalendarImpl):
 
     def __richcmp__(self, right, int op):
         if op == 2:
-            if isinstance(right, ChinaSseImpl):
-                return True
-            else:
-                return False
+            return isinstance(right, ChinaSseImpl)
 
 
 cdef set ib_working_weekends = {
@@ -580,10 +574,7 @@ cdef class ChinaIBImpl(CalendarImpl):
 
     def __richcmp__(self, right, int op):
         if op == 2:
-            if isinstance(right, ChinaIBImpl):
-                return True
-            else:
-                return False
+            return isinstance(right, ChinaIBImpl)
 
 
 cdef class NullCalendar(CalendarImpl):
@@ -599,10 +590,7 @@ cdef class NullCalendar(CalendarImpl):
 
     def __richcmp__(self, right, int op):
         if op == 2:
-            if isinstance(right, NullCalendar):
-                return True
-            else:
-                return False
+            return isinstance(right, NullCalendar)
 
 
 cdef class ChinaCFFEXImpl(CalendarImpl):
@@ -618,10 +606,8 @@ cdef class ChinaCFFEXImpl(CalendarImpl):
 
     def __richcmp__(self, right, int op):
         if op == 2:
-            if isinstance(right, ChinaCFFEXImpl):
-                return True
-            else:
-                return False
+            return isinstance(right, ChinaCFFEXImpl)
+
 
 cdef int EasterMonday[299]
 EasterMonday[:] = [
@@ -692,10 +678,7 @@ cdef class TargetImpl(WestenImpl):
 
     def __richcmp__(self, right, int op):
         if op == 2:
-            if isinstance(right, TargetImpl):
-                return True
-            else:
-                return False
+            return isinstance(right, TargetImpl)
 
 
 cdef dict _holDict = {'china.sse': ChinaSseImpl,

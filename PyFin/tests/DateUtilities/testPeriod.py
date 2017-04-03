@@ -242,39 +242,39 @@ class TestPeriod(unittest.TestCase):
                               " != {3}".format(threeMonths, sixMonths, oneYear, Period(length=21, units=TimeUnits.Months)))
 
         twelveMonths = Period(length=12, units=TimeUnits.Months)
-        flag = twelveMonths.length == 12
+        flag = twelveMonths.length() == 12
         self.assertTrue(flag, "normalization error: TwelveMonths.length"
                               " is {0:d}"
-                              " instead of 12".format(twelveMonths.length))
-        flag = twelveMonths.units == TimeUnits.Months
+                              " instead of 12".format(twelveMonths.length()))
+        flag = twelveMonths.units() == TimeUnits.Months
         self.assertTrue(flag, "normalization error: TwelveMonths.units"
                               " is {0:d}"
-                              " instead of {1:d}".format(twelveMonths.units, TimeUnits.Months))
+                              " instead of {1:d}".format(twelveMonths.units(), TimeUnits.Months))
 
         normalizedTwelveMonths = Period(length=12, units=TimeUnits.Months)
         normalizedTwelveMonths = normalizedTwelveMonths.normalize()
-        flag = normalizedTwelveMonths.length == 1
+        flag = normalizedTwelveMonths.length() == 1
         self.assertTrue(flag, "normalization error: TwelveMonths.length"
                               " is {0:d}"
-                              " instead of 1".format(twelveMonths.length))
-        flag = normalizedTwelveMonths.units == TimeUnits.Years
+                              " instead of 1".format(twelveMonths.length()))
+        flag = normalizedTwelveMonths.units() == TimeUnits.Years
         self.assertTrue(flag, "normalization error: TwelveMonths.units"
                               " is {0:d}"
-                              " instead of {1:d}".format(twelveMonths.units, TimeUnits.Years))
+                              " instead of {1:d}".format(twelveMonths.units(), TimeUnits.Years))
 
         thirtyDays = Period(length=30, units=TimeUnits.Days)
         normalizedThirtyDays = thirtyDays.normalize()
-        flag = normalizedThirtyDays.units == TimeUnits.Days
+        flag = normalizedThirtyDays.units() == TimeUnits.Days
         self.assertTrue(flag, "normalization error: ThirtyDays.units"
                               " is {0:d}"
-                              " instead of {1:d}".format(normalizedThirtyDays.units, TimeUnits.Days))
+                              " instead of {1:d}".format(normalizedThirtyDays.units(), TimeUnits.Days))
 
         thirtyBDays = Period(length=30, units=TimeUnits.BDays)
         normalizedThirtyBDays = thirtyBDays.normalize()
-        flag = normalizedThirtyBDays.units == TimeUnits.BDays
+        flag = normalizedThirtyBDays.units() == TimeUnits.BDays
         self.assertTrue(flag, "normalization error: ThirtyBDays.units"
                               " is {0:d}"
-                              " instead of {1:d}".format(normalizedThirtyBDays.units, TimeUnits.BDays))
+                              " instead of {1:d}".format(normalizedThirtyBDays.units(), TimeUnits.BDays))
 
     def testWeeksDaysAlgebra(self):
         twoWeeks = Period(length=2, units=TimeUnits.Weeks)
@@ -307,24 +307,24 @@ class TestPeriod(unittest.TestCase):
                               " != {3}".format(threeDays, oneDay, oneWeek, Period(length=11, units=TimeUnits.Days)))
 
         sevenDays = Period(length=7, units=TimeUnits.Days)
-        flag = sevenDays.length == 7
+        flag = sevenDays.length() == 7
         self.assertTrue(flag, "normalization error: sevenDays.length"
                               " is {0:d}"
-                              " instead of 7".format(sevenDays.length))
-        flag = sevenDays.units == TimeUnits.Days
+                              " instead of 7".format(sevenDays.length()))
+        flag = sevenDays.units() == TimeUnits.Days
         self.assertTrue(flag, "normalization error: sevenDays.units"
                               " is {0:d}"
-                              " instead of {1:d}".format(sevenDays.units, TimeUnits.Days))
+                              " instead of {1:d}".format(sevenDays.units(), TimeUnits.Days))
 
         normalizedSevenDays = sevenDays.normalize()
-        flag = normalizedSevenDays.length == 1
+        flag = normalizedSevenDays.length() == 1
         self.assertTrue(flag, "normalization error: normalizedSevenDays.length"
                               " is {0:d}"
-                              " instead of 1".format(normalizedSevenDays.length))
-        flag = normalizedSevenDays.units == TimeUnits.Weeks
+                              " instead of 1".format(normalizedSevenDays.length()))
+        flag = normalizedSevenDays.units() == TimeUnits.Weeks
         self.assertTrue(flag, "normalization error: TwelveMonths.units"
                               " is {0:d}"
-                              " instead of {1:d}".format(normalizedSevenDays.units, TimeUnits.Weeks))
+                              " instead of {1:d}".format(normalizedSevenDays.units(), TimeUnits.Weeks))
 
     def testPeriodDeepCopy(self):
 

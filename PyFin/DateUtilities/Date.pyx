@@ -16,20 +16,14 @@ from PyFin.DateUtilities.Period cimport Period
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
-cdef int _monthLength(int month, int isLeap):
-    if isLeap:
-        return _MonthLeapLength[month - 1]
-    else:
-        return _MonthLength[month - 1]
+cdef inline int _monthLength(int month, bint isLeap):
+    return _MonthLeapLength[month - 1] if isLeap else  _MonthLength[month - 1]
 
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
-cdef int _monthOffset(int month, int isLeap):
-    if isLeap:
-        return _MonthLeapOffset[month - 1]
-    else:
-        return _MonthOffset[month - 1]
+cdef inline int _monthOffset(int month, bint isLeap):
+    return _MonthLeapOffset[month - 1] if isLeap else _MonthOffset[month - 1]
 
 
 @cython.boundscheck(False)
@@ -103,12 +97,10 @@ cdef class Date(object):
             while d <= _monthOffset(m, leap):
                 m -= 1
 
-            if y <= 1900 or y >= 2200:
-                pyFinAssert(1900 < y < 2200, ValueError, 'year {0:d} is out of bound. It must be in [1901, 2199]'.format(y))
+            pyFinAssert(1900 < y < 2200, ValueError, 'year {0:d} is out of bound. It must be in [1901, 2199]'.format(y))
             self._year = y
             self._month = m
             self._day = d - _monthOffset(m, leap)
-
             return
         elif serialNumber is not None and (year is not None or month is not None or day is not None):
             raise ValueError("When serial number is offered, no year or month or day number should be entered")
@@ -117,19 +109,19 @@ cdef class Date(object):
 
         self._calculate_date(year, month, day)
 
-    cpdef dayOfMonth(self):
+    cpdef int dayOfMonth(self):
         return self._day
 
-    cpdef dayOfYear(self):
+    cpdef int dayOfYear(self):
         return self.__serialNumber__ - _YearOffset[self.year() - 1900]
 
-    cpdef year(self):
+    cpdef int year(self):
         return self._year
 
-    cpdef month(self):
+    cpdef int month(self):
         return self._month
 
-    cpdef weekday(self):
+    cpdef int weekday(self):
         cdef int w
         w = self.__serialNumber__ % 7
         return 7 if w == 0 else w
@@ -157,23 +149,23 @@ cdef class Date(object):
 
     def __add__(self, period):
         if isinstance(period, Period):
-            return _advance(self, period.length, period.units)
+            return _advance(self, period.length(), period.units())
         elif isinstance(period, int):
             return Date(serialNumber=self.__serialNumber__ + period)
         else:
             period = Period(period)
-            return _advance(self, period.length, period.units)
+            return _advance(self, period.length(), period.units())
 
     def __sub__(self, period):
         if isinstance(period, Period):
-            return _advance(self, -period.length, period.units)
+            return _advance(self, -period.length(), period.units())
         elif isinstance(period, int):
             return Date(serialNumber=self.__serialNumber__ - period)
         elif isinstance(period, Date):
             return self.__serialNumber__ - period.__serialNumber__
         else:
             period = Period(period)
-            return _advance(self, -period.length, period.units)
+            return _advance(self, -period.length(), period.units())
 
     def __hash__(self):
         return self.__serialNumber__
@@ -256,8 +248,6 @@ cdef class Date(object):
 
     @staticmethod
     def parseISO(dateStr):
-        pyFinAssert(len(dateStr) == 10 and dateStr[4] == '-' and dateStr[7] == '-', ValueError,
-                    "invalid format {0}".format(dateStr))
         return Date(int(dateStr[0:4]), int(dateStr[5:7]), int(dateStr[8:10]))
 
     @staticmethod
@@ -301,7 +291,7 @@ cpdef check_date(date):
     else:
         return Date.fromDateTime(date)
 
-cdef int _YearIsLeap[301]
+cdef bint _YearIsLeap[301]
 cdef int _YearOffset[301]
 
 _YearIsLeap[:] = [

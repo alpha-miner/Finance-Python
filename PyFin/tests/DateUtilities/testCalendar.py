@@ -22,9 +22,6 @@ class TestCalendar(unittest.TestCase):
         with self.assertRaises(ValueError):
             _ = Calendar('NulCalendar')
 
-        with self.assertRaises(ValueError):
-            _ = Calendar(Date(2015, 1, 1))
-
     def testCalendarConstructionIsInsensitiveOfCase(self):
         cal1 = Calendar('NullCalendar')
         cal2 = Calendar('nullcalendar')

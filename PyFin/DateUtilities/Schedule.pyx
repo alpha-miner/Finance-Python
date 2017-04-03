@@ -82,10 +82,10 @@ cdef class Schedule(object):
                                                                  "later than or equal to termination date ({1}"
         .format(effectiveDate, terminationDate))
 
-        if tenor.length == 0:
+        if tenor.length() == 0:
             self._rule = DateGeneration.Zero
         else:
-            pyFinAssert(tenor.length > 0, ValueError, "non positive tenor ({0:d}) not allowed".format(tenor.length))
+            pyFinAssert(tenor.length() > 0, ValueError, "non positive tenor ({0:d}) not allowed".format(tenor.length()))
 
         if self._firstDate:
             if self._rule == DateGeneration.Backward or self._rule == DateGeneration.Forward:
@@ -125,7 +125,7 @@ cdef class Schedule(object):
             if self._nextToLastDate:
                 self._dates.insert(0, self._nextToLastDate)
                 temp = nullCalendar.advanceDate(seed,
-                                                Period(length=-periods * self._tenor.length, units=self._tenor.units),
+                                                Period(length=-periods * self._tenor.length(), units=self._tenor.units()),
                                                 convention, self._endOfMonth)
                 if temp != self._nextToLastDate:
                     self._isRegular.insert(0, False)
@@ -139,7 +139,7 @@ cdef class Schedule(object):
 
             while True:
                 temp = nullCalendar.advanceDate(seed,
-                                                Period(length=-periods * self._tenor.length, units=self._tenor.units),
+                                                Period(length=-periods * self._tenor.length(), units=self._tenor.units()),
                                                 convention, self._endOfMonth)
                 if temp < exitDate:
                     if self._firstDate and self._cal.adjustDate(self._dates[0], convention) != self._cal.adjustDate(
@@ -167,7 +167,7 @@ cdef class Schedule(object):
             if self._firstDate:
                 self._dates.append(self._firstDate)
                 temp = nullCalendar.advanceDate(seed,
-                                                Period(length=periods * self._tenor.length, units=self._tenor.units),
+                                                Period(length=periods * self._tenor.length(), units=self._tenor.units()),
                                                 convention, self._endOfMonth)
                 if temp != self._firstDate:
                     self._isRegular.append(False)
@@ -181,7 +181,7 @@ cdef class Schedule(object):
 
             while True:
                 temp = nullCalendar.advanceDate(seed,
-                                                Period(length=periods * self._tenor.length, units=self._tenor.units),
+                                                Period(length=periods * self._tenor.length(), units=self._tenor.units()),
                                                 convention, self._endOfMonth)
                 if temp > exitDate:
                     if self._nextToLastDate and self._cal.adjustDate(self._dates[-1],

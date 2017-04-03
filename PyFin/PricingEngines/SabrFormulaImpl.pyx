@@ -11,9 +11,9 @@ from libc.math cimport log
 from libc.math cimport fabs
 import numpy as np
 cimport numpy as np
-from PyFin.Math.MathConstants import MathConstants
+from PyFin.Math.MathConstants cimport QL_EPSILON
 
-cdef double QL_EPSILON = MathConstants.QL_EPSILON
+cdef double QL_EPSILON = QL_EPSILON
 
 @cython.cdivision(True)
 cpdef double sabrVolatility(double strike,

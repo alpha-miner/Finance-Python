@@ -12,15 +12,15 @@ cdef class Date(object):
     cdef public int _month
     cdef public int _day
 
-    cpdef dayOfMonth(self)
+    cpdef int dayOfMonth(self)
 
-    cpdef dayOfYear(self)
+    cpdef int dayOfYear(self)
 
-    cpdef year(self)
+    cpdef int year(self)
 
-    cpdef month(self)
+    cpdef int month(self)
 
-    cpdef weekday(self)
+    cpdef int weekday(self)
 
     cpdef toDateTime(self)
 

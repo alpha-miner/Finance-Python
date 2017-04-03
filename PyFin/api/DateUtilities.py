@@ -11,7 +11,6 @@ from PyFin.DateUtilities import Period
 from PyFin.DateUtilities import Schedule
 from PyFin.Enums import BizDayConventions
 from PyFin.DateUtilities import check_date
-from PyFin.Utilities.Asserts import pyFinAssert
 
 
 def isBizDay(holidayCenter, ref):

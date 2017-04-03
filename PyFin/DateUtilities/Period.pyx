@@ -41,17 +41,15 @@ cdef class Period(object):
             self._length = length
             self._units = units
 
-    @property
-    def length(self):
+    cpdef int length(self):
         return self._length
 
-    @property
-    def units(self):
+    cpdef int units(self):
         return self._units
 
     cpdef Period normalize(self):
-        cdef int length = self.length
-        cdef int units = self.units
+        cdef int length = self.length()
+        cdef int units = self.units()
         if length != 0:
             if units == TimeUnits.BDays or units == TimeUnits.Weeks or units == TimeUnits.Years:
                 return Period(length=length, units=units)
@@ -70,8 +68,8 @@ cdef class Period(object):
 
     def __div__(self, int n):
 
-        cdef int resunits = self.units
-        cdef int reslength = self.length
+        cdef int resunits = self.units()
+        cdef int reslength = self.length()
 
         if reslength % n == 0:
             reslength /= n
@@ -93,8 +91,8 @@ cdef class Period(object):
     # only work for python 3
     def __truediv__(self, int n):
 
-        cdef int resunits = self.units
-        cdef int reslength = self.length
+        cdef int resunits = self.units()
+        cdef int reslength = self.length()
 
         if reslength % n == 0:
             reslength /= n
@@ -114,12 +112,12 @@ cdef class Period(object):
 
     def __add__(self, p2):
 
-        cdef int reslength = self.length
-        cdef int resunits = self.units
-        cdef int p2length = p2.length
-        cdef int p2units = p2.units
+        cdef int reslength = self.length()
+        cdef int resunits = self.units()
+        cdef int p2length = p2.length()
+        cdef int p2units = p2.units()
 
-        if self.length == 0:
+        if reslength == 0:
             return Period(length=p2length, units=p2units)
         elif resunits == p2units:
             reslength += p2length
@@ -167,16 +165,16 @@ cdef class Period(object):
                 return Period(length=reslength, units=resunits)
 
     def __neg__(self):
-        return Period(length=-self.length, units=self.units)
+        return Period(length=-self.length(), units=self.units())
 
     def __sub__(self, p2):
         return self + (-p2)
 
     def __str__(self):
         cdef str out = ""
-        cdef int n = self.length
+        cdef int n = self.length()
         cdef int m = 0
-        cdef int units = self.units
+        cdef int units = self.units()
 
         if units == TimeUnits.Days:
             if n >= 7:
@@ -214,12 +212,12 @@ cdef class Period(object):
             return _lt_cmp(right, self)
 
     def __deepcopy__(self, memo):
-        return Period(length=self.length, units=self.units)
+        return Period(length=self.length(), units=self.units())
 
     def __reduce__(self):
         d = {}
 
-        return Period, (None, self.length, self.units), d
+        return Period, (None, self.length(), self.units()), d
 
     def __setstate__(self, state):
         pass
@@ -231,10 +229,10 @@ cdef bint _lt_cmp(Period p1, Period p2) except -1:
 
     cdef tuple p1lim
     cdef tuple p2lim
-    cdef int p1length = p1.length
-    cdef int p1units = p1.units
-    cdef int p2length = p2.length
-    cdef int p2units = p2.units
+    cdef int p1length = p1.length()
+    cdef int p1units = p1.units()
+    cdef int p2length = p2.length()
+    cdef int p2units = p2.units()
 
     if p1length == 0:
         return p2length > 0
@@ -269,8 +267,8 @@ cdef bint _lt_cmp(Period p1, Period p2) except -1:
 
 cdef tuple _daysMinMax(Period p):
 
-    cdef int units = p.units
-    cdef int length = p.length
+    cdef int units = p.units()
+    cdef int length = p.length()
 
     if units == TimeUnits.Days:
         return length, length

@@ -41,8 +41,7 @@ cdef class Deque:
         else:
 
             self.con.append(value)
-            if len(self.con) == window:
-                self.is_full = True
+            self.is_full = len(self.con) == window
 
             if hasattr(value, '__len__'):
                 return np.array([np.nan] * len(value))

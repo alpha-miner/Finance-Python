@@ -52,7 +52,7 @@ cdef class SeriesValues(object):
     @cython.wraparound(False)
     cpdef SeriesValues mask(self, flags):
         if not self.name_array:
-            self.name_array = np.array(sorted(self.name_mapping.keys()))
+            self.name_array = np.array(sorted(self.name_mapping.keys()), dtype=str)
 
         filtered_names = self.name_array[flags]
         return SeriesValues(self.values[flags], dict(zip(filtered_names, range(len(filtered_names)))))

@@ -10,3 +10,4 @@ Finance_Python.egg-info/*
 *.h
 *.pyd
 *.html
+.idea/

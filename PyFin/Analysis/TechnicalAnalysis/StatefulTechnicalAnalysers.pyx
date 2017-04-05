@@ -75,19 +75,21 @@ cdef class SecurityMovingMax(SecuritySingleValueHolder):
 
     def __deepcopy__(self, memo):
         if self._compHolder:
-            return SecurityMovingMax(self._window - self._compHolder._window, self._compHolder)
+            copied = SecurityMovingMax(self._window - self._compHolder._window, self._compHolder)
         else:
-            return SecurityMovingMax(self._window, self._dependency)
+            copied = SecurityMovingMax(self._window, self._dependency)
+        copied.copy_attributes(self.collect_attributes(), is_deep=True)
+        return copied
 
     def __reduce__(self):
-        d = {}
+        d = self.collect_attributes()
         if self._compHolder:
             return SecurityMovingMax, (self._window - self._compHolder._window, self._compHolder), d
         else:
             return SecurityMovingMax, (self._window, self._dependency), d
 
     def __setstate__(self, state):
-        pass
+        self.copy_attributes(state, is_deep=False)
 
 
 cdef class SecurityMovingMinimum(SecuritySingleValueHolder):
@@ -96,19 +98,21 @@ cdef class SecurityMovingMinimum(SecuritySingleValueHolder):
 
     def __deepcopy__(self, memo):
         if self._compHolder:
-            return SecurityMovingMinimum(self._window - self._compHolder._window, self._compHolder)
+            copied = SecurityMovingMinimum(self._window - self._compHolder._window, self._compHolder)
         else:
-            return SecurityMovingMinimum(self._window, self._dependency)
+            copied = SecurityMovingMinimum(self._window, self._dependency)
+        copied.copy_attributes(self.collect_attributes(), is_deep=True)
+        return copied
 
     def __reduce__(self):
-        d = {}
+        d = self.collect_attributes()
         if self._compHolder:
             return SecurityMovingMinimum, (self._window - self._compHolder._window, self._compHolder), d
         else:
             return SecurityMovingMinimum, (self._window, self._dependency), d
 
     def __setstate__(self, state):
-        pass
+        self.copy_attributes(state, is_deep=False)
 
 
 cdef class SecurityMovingQuantile(SecuritySingleValueHolder):
@@ -117,19 +121,21 @@ cdef class SecurityMovingQuantile(SecuritySingleValueHolder):
 
     def __deepcopy__(self, memo):
         if self._compHolder:
-            return SecurityMovingQuantile(self._window - self._compHolder._window, self._compHolder)
+            copied = SecurityMovingQuantile(self._window - self._compHolder._window, self._compHolder)
         else:
-            return SecurityMovingQuantile(self._window, self._dependency)
+            copied = SecurityMovingQuantile(self._window, self._dependency)
+        copied.copy_attributes(self.collect_attributes(), is_deep=True)
+        return copied
 
     def __reduce__(self):
-        d = {}
+        d = self.collect_attributes()
         if self._compHolder:
             return SecurityMovingQuantile, (self._window - self._compHolder._window, self._compHolder), d
         else:
             return SecurityMovingQuantile, (self._window, self._dependency), d
 
     def __setstate__(self, state):
-        pass
+        self.copy_attributes(state, is_deep=False)
 
 
 cdef class SecurityMovingAllTrue(SecuritySingleValueHolder):
@@ -138,19 +144,21 @@ cdef class SecurityMovingAllTrue(SecuritySingleValueHolder):
 
     def __deepcopy__(self, memo):
         if self._compHolder:
-            return SecurityMovingAllTrue(self._window - self._compHolder._window, self._compHolder)
+            copied = SecurityMovingAllTrue(self._window - self._compHolder._window, self._compHolder)
         else:
-            return SecurityMovingAllTrue(self._window, self._dependency)
+            copied = SecurityMovingAllTrue(self._window, self._dependency)
+        copied.copy_attributes(self.collect_attributes(), is_deep=True)
+        return copied
 
     def __reduce__(self):
-        d = {}
+        d = self.collect_attributes()
         if self._compHolder:
             return SecurityMovingAllTrue, (self._window - self._compHolder._window, self._compHolder), d
         else:
             return SecurityMovingAllTrue, (self._window, self._dependency), d
 
     def __setstate__(self, state):
-        pass
+        self.copy_attributes(state, is_deep=False)
 
 
 cdef class SecurityMovingAnyTrue(SecuritySingleValueHolder):
@@ -159,19 +167,21 @@ cdef class SecurityMovingAnyTrue(SecuritySingleValueHolder):
 
     def __deepcopy__(self, memo):
         if self._compHolder:
-            return SecurityMovingAnyTrue(self._window - self._compHolder._window, self._compHolder)
+            copied = SecurityMovingAnyTrue(self._window - self._compHolder._window, self._compHolder)
         else:
-            return SecurityMovingAnyTrue(self._window, self._dependency)
+            copied = SecurityMovingAnyTrue(self._window, self._dependency)
+        copied.copy_attributes(self.collect_attributes(), is_deep=True)
+        return copied
 
     def __reduce__(self):
-        d = {}
+        d = self.collect_attributes()
         if self._compHolder:
             return SecurityMovingAnyTrue, (self._window - self._compHolder._window, self._compHolder), d
         else:
             return SecurityMovingAnyTrue, (self._window, self._dependency), d
 
     def __setstate__(self, state):
-        pass
+        self.copy_attributes(state, is_deep=False)
 
 
 cdef class SecurityMovingSum(SecuritySingleValueHolder):
@@ -180,19 +190,21 @@ cdef class SecurityMovingSum(SecuritySingleValueHolder):
 
     def __deepcopy__(self, memo):
         if self._compHolder:
-            return SecurityMovingSum(self._window - self._compHolder._window, self._compHolder)
+            copied = SecurityMovingSum(self._window - self._compHolder._window, self._compHolder)
         else:
-            return SecurityMovingSum(self._window, self._dependency)
+            copied = SecurityMovingSum(self._window, self._dependency)
+        copied.copy_attributes(self.collect_attributes(), is_deep=True)
+        return copied
 
     def __reduce__(self):
-        d = {}
+        d = self.collect_attributes()
         if self._compHolder:
             return SecurityMovingSum, (self._window - self._compHolder._window, self._compHolder), d
         else:
             return SecurityMovingSum, (self._window, self._dependency), d
 
     def __setstate__(self, state):
-        pass
+        self.copy_attributes(state, is_deep=False)
 
 
 cdef class SecurityMovingVariance(SecuritySingleValueHolder):

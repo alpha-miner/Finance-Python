@@ -314,6 +314,54 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
         with self.assertRaises(ValueError):
             _ = SecurityMovingMax(window, ['close', 'open'])
 
+    def testSecurityMovingMaxDeepcopy(self):
+        tested = SecurityMovingMax(3, ['close'])
+
+        data = dict(aapl=dict(close=2.0),
+                    ibm=dict(close=3.0))
+        tested.push(data)
+
+        data = dict(aapl=dict(close=1.0),
+                    ibm=dict(close=2.0))
+        tested.push(data)
+
+        data = dict(aapl=dict(close=3.0),
+                    ibm=dict(close=1.0))
+        tested.push(data)
+
+        expected = tested.value
+        calculated = copy.deepcopy(tested).value
+
+        for name in expected.index():
+            self.assertAlmostEqual(expected[name], calculated[name])
+
+    def testSecurityMovingMaxPickle(self):
+        tested = SecurityMovingMax(3, ['close'])
+
+        data = dict(aapl=dict(close=2.0),
+                    ibm=dict(close=3.0))
+        tested.push(data)
+
+        data = dict(aapl=dict(close=1.0),
+                    ibm=dict(close=2.0))
+        tested.push(data)
+
+        data = dict(aapl=dict(close=3.0),
+                    ibm=dict(close=1.0))
+        tested.push(data)
+
+        with tempfile.NamedTemporaryFile('w+b', delete=False) as f:
+            pickle.dump(tested, f)
+
+        with open(f.name, 'rb') as f2:
+            pickled = pickle.load(f2)
+
+        expected = tested.value
+        calculated = pickled.value
+
+        for name in expected.index():
+            self.assertAlmostEqual(expected[name], calculated[name])
+
     def testSecurityMovingMinimum(self):
         window = 10
         ma1 = SecurityMovingMinimum(window, ['close'])
@@ -339,6 +387,54 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
 
         with self.assertRaises(ValueError):
             _ = SecurityMovingMinimum(window, ['close', 'open'])
+
+    def testSecuritySecurityMovingMinimumDeepcopy(self):
+        tested = SecurityMovingMinimum(3, ['close'])
+
+        data = dict(aapl=dict(close=2.0),
+                    ibm=dict(close=3.0))
+        tested.push(data)
+
+        data = dict(aapl=dict(close=1.0),
+                    ibm=dict(close=2.0))
+        tested.push(data)
+
+        data = dict(aapl=dict(close=3.0),
+                    ibm=dict(close=1.0))
+        tested.push(data)
+
+        expected = tested.value
+        calculated = copy.deepcopy(tested).value
+
+        for name in expected.index():
+            self.assertAlmostEqual(expected[name], calculated[name])
+
+    def testSecurityMovingMinimumPickle(self):
+        tested = SecurityMovingMinimum(3, ['close'])
+
+        data = dict(aapl=dict(close=2.0),
+                    ibm=dict(close=3.0))
+        tested.push(data)
+
+        data = dict(aapl=dict(close=1.0),
+                    ibm=dict(close=2.0))
+        tested.push(data)
+
+        data = dict(aapl=dict(close=3.0),
+                    ibm=dict(close=1.0))
+        tested.push(data)
+
+        with tempfile.NamedTemporaryFile('w+b', delete=False) as f:
+            pickle.dump(tested, f)
+
+        with open(f.name, 'rb') as f2:
+            pickled = pickle.load(f2)
+
+        expected = tested.value
+        calculated = pickled.value
+
+        for name in expected.index():
+            self.assertAlmostEqual(expected[name], calculated[name])
 
     def testSecurityMovingQuantile(self):
         window = 10
@@ -368,7 +464,55 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
                                                                  'expected:   {1:.12f}\n'
                                                                  'calculated: {2:.12f}'.format(i, expected, calculated))
 
-    def testSecurityMovingAllTru(self):
+    def testSecurityMovingQuantileDeepcopy(self):
+        tested = SecurityMovingQuantile(3, ['close'])
+
+        data = dict(aapl=dict(close=2.0),
+                    ibm=dict(close=3.0))
+        tested.push(data)
+
+        data = dict(aapl=dict(close=1.0),
+                    ibm=dict(close=2.0))
+        tested.push(data)
+
+        data = dict(aapl=dict(close=3.0),
+                    ibm=dict(close=1.0))
+        tested.push(data)
+
+        expected = tested.value
+        calculated = copy.deepcopy(tested).value
+
+        for name in expected.index():
+            self.assertAlmostEqual(expected[name], calculated[name])
+
+    def testSecurityMovingQuantilePickle(self):
+        tested = SecurityMovingQuantile(3, ['close'])
+
+        data = dict(aapl=dict(close=2.0),
+                    ibm=dict(close=3.0))
+        tested.push(data)
+
+        data = dict(aapl=dict(close=1.0),
+                    ibm=dict(close=2.0))
+        tested.push(data)
+
+        data = dict(aapl=dict(close=3.0),
+                    ibm=dict(close=1.0))
+        tested.push(data)
+
+        with tempfile.NamedTemporaryFile('w+b', delete=False) as f:
+            pickle.dump(tested, f)
+
+        with open(f.name, 'rb') as f2:
+            pickled = pickle.load(f2)
+
+        expected = tested.value
+        calculated = pickled.value
+
+        for name in expected.index():
+            self.assertAlmostEqual(expected[name], calculated[name])
+
+    def testSecurityMovingAllTrue(self):
         window = 3
 
         self.aapl['close'] = self.aapl['close'] > 0.
@@ -399,7 +543,55 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
                                                        'expected:   {1}\n'
                                                        'calculated: {2}'.format(i, expected, calculated))
 
-    def testSecurityMovingAnyTru(self):
+    def testSecurityMovingAllTrueDeepcopy(self):
+        tested = SecurityMovingAllTrue(3, SecurityLatestValueHolder('close') >= 0.)
+
+        data = dict(aapl=dict(close=2.0),
+                    ibm=dict(close=3.0))
+        tested.push(data)
+
+        data = dict(aapl=dict(close=1.0),
+                    ibm=dict(close=2.0))
+        tested.push(data)
+
+        data = dict(aapl=dict(close=3.0),
+                    ibm=dict(close=-1.0))
+        tested.push(data)
+
+        expected = tested.value
+        calculated = copy.deepcopy(tested).value
+
+        for name in expected.index():
+            self.assertAlmostEqual(expected[name], calculated[name])
+
+    def testSecurityMovingAllTruePickle(self):
+        tested = SecurityMovingAllTrue(3, SecurityLatestValueHolder('close') >= 0.)
+
+        data = dict(aapl=dict(close=2.0),
+                    ibm=dict(close=3.0))
+        tested.push(data)
+
+        data = dict(aapl=dict(close=1.0),
+                    ibm=dict(close=2.0))
+        tested.push(data)
+
+        data = dict(aapl=dict(close=3.0),
+                    ibm=dict(close=-1.0))
+        tested.push(data)
+
+        with tempfile.NamedTemporaryFile('w+b', delete=False) as f:
+            pickle.dump(tested, f)
+
+        with open(f.name, 'rb') as f2:
+            pickled = pickle.load(f2)
+
+        expected = tested.value
+        calculated = pickled.value
+
+        for name in expected.index():
+            self.assertAlmostEqual(expected[name], calculated[name])
+
+    def testSecurityMovingAnyTrue(self):
         window = 3
 
         self.aapl['close'] = self.aapl['close'] > 0.
@@ -430,6 +622,54 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
                                                        'expected:   {1}\n'
                                                        'calculated: {2}'.format(i, expected, calculated))
 
+    def testSecurityMovingAnyTrueDeepcopy(self):
+        tested = SecurityMovingAnyTrue(3, SecurityLatestValueHolder('close') >= 0.)
+
+        data = dict(aapl=dict(close=-2.0),
+                    ibm=dict(close=-3.0))
+        tested.push(data)
+
+        data = dict(aapl=dict(close=-1.0),
+                    ibm=dict(close=2.0))
+        tested.push(data)
+
+        data = dict(aapl=dict(close=-3.0),
+                    ibm=dict(close=--1.0))
+        tested.push(data)
+
+        expected = tested.value
+        calculated = copy.deepcopy(tested).value
+
+        for name in expected.index():
+            self.assertAlmostEqual(expected[name], calculated[name])
+
+    def testSecurityMovingAnyTruePickle(self):
+        tested = SecurityMovingAnyTrue(3, SecurityLatestValueHolder('close') >= 0.)
+
+        data = dict(aapl=dict(close=-2.0),
+                    ibm=dict(close=-3.0))
+        tested.push(data)
+
+        data = dict(aapl=dict(close=-1.0),
+                    ibm=dict(close=2.0))
+        tested.push(data)
+
+        data = dict(aapl=dict(close=-3.0),
+                    ibm=dict(close=--1.0))
+        tested.push(data)
+
+        with tempfile.NamedTemporaryFile('w+b', delete=False) as f:
+            pickle.dump(tested, f)
+
+        with open(f.name, 'rb') as f2:
+            pickled = pickle.load(f2)
+
+        expected = tested.value
+        calculated = pickled.value
+
+        for name in expected.index():
+            self.assertAlmostEqual(expected[name], calculated[name])
+
     def testSecurityMovingSum(self):
         window = 10
         ma1 = SecurityMovingSum(window, ['close'])
@@ -452,6 +692,54 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
                 self.assertAlmostEqual(expected, calculated, 12, 'at index {0}\n'
                                                                  'expected:   {1:.12f}\n'
                                                                  'calculated: {2:.12f}'.format(i, expected, calculated))
+
+    def testSecurityMovingSumDeepcopy(self):
+        tested = SecurityMovingSum(3, ['close'])
+
+        data = dict(aapl=dict(close=2.0),
+                    ibm=dict(close=3.0))
+        tested.push(data)
+
+        data = dict(aapl=dict(close=1.0),
+                    ibm=dict(close=2.0))
+        tested.push(data)
+
+        data = dict(aapl=dict(close=3.0),
+                    ibm=dict(close=1.0))
+        tested.push(data)
+
+        expected = tested.value
+        calculated = copy.deepcopy(tested).value
+
+        for name in expected.index():
+            self.assertAlmostEqual(expected[name], calculated[name])
+
+    def testSecurityMovingSumPickle(self):
+        tested = SecurityMovingSum(3, ['close'])
+
+        data = dict(aapl=dict(close=2.0),
+                    ibm=dict(close=3.0))
+        tested.push(data)
+
+        data = dict(aapl=dict(close=1.0),
+                    ibm=dict(close=2.0))
+        tested.push(data)
+
+        data = dict(aapl=dict(close=3.0),
+                    ibm=dict(close=1.0))
+        tested.push(data)
+
+        with tempfile.NamedTemporaryFile('w+b', delete=False) as f:
+            pickle.dump(tested, f)
+
+        with open(f.name, 'rb') as f2:
+            pickled = pickle.load(f2)
+
+        expected = tested.value
+        calculated = pickled.value
+
+        for name in expected.index():
+            self.assertAlmostEqual(expected[name], calculated[name])
 
     def testSecurityMovingCountedPositive(self):
         window = 10

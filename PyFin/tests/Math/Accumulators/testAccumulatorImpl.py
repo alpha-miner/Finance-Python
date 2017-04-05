@@ -25,9 +25,8 @@ class TestAccumulatorImpl(unittest.TestCase):
     def testDequePickle(self):
         benchmark_deque = Deque(5)
 
-        f = tempfile.NamedTemporaryFile('w+b', delete=False)
-        pickle.dump(benchmark_deque, f)
-        f.close()
+        with tempfile.NamedTemporaryFile('w+b', delete=False) as f:
+            pickle.dump(benchmark_deque, f)
 
         with open(f.name, 'rb') as f2:
             pickled_deque = pickle.load(f2)

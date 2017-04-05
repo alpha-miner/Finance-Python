@@ -41,6 +41,8 @@ cdef class SortedValueHolder(SingleValuedValueHolder):
     cdef public list _sortedArray
 
     cpdef push(self, dict data)
+    cpdef copy_attributes(self, dict attributes, bint is_deep=*)
+    cpdef collect_attributes(self)
 
 
 cdef class MovingMax(SortedValueHolder):

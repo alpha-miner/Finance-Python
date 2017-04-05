@@ -681,9 +681,8 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
 
         test = Exp('x')
         test.push(data)
-        f = tempfile.NamedTemporaryFile('w+b', delete=False)
-        pickle.dump(test, f)
-        f.close()
+        with tempfile.NamedTemporaryFile('w+b', delete=False) as f:
+            pickle.dump(test, f)
 
         with open(f.name, 'rb') as f2:
             pickled = pickle.load(f2)
@@ -692,9 +691,8 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
 
         test = Log('x')
         test.push(data)
-        f = tempfile.NamedTemporaryFile('w+b', delete=False)
-        pickle.dump(test, f)
-        f.close()
+        with tempfile.NamedTemporaryFile('w+b', delete=False) as f:
+            pickle.dump(test, f)
 
         with open(f.name, 'rb') as f2:
             pickled = pickle.load(f2)
@@ -703,9 +701,8 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
 
         test = Sqrt('x')
         test.push(data)
-        f = tempfile.NamedTemporaryFile('w+b', delete=False)
-        pickle.dump(test, f)
-        f.close()
+        with tempfile.NamedTemporaryFile('w+b', delete=False) as f:
+            pickle.dump(test, f)
 
         with open(f.name, 'rb') as f2:
             pickled = pickle.load(f2)
@@ -716,9 +713,8 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
 
         test = Pow('x', 2)
         test.push(data)
-        f = tempfile.NamedTemporaryFile('w+b', delete=False)
-        pickle.dump(test, f)
-        f.close()
+        with tempfile.NamedTemporaryFile('w+b', delete=False) as f:
+            pickle.dump(test, f)
 
         with open(f.name, 'rb') as f2:
             pickled = pickle.load(f2)
@@ -727,9 +723,8 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
 
         test = Abs('x')
         test.push(data)
-        f = tempfile.NamedTemporaryFile('w+b', delete=False)
-        pickle.dump(test, f)
-        f.close()
+        with tempfile.NamedTemporaryFile('w+b', delete=False) as f:
+            pickle.dump(test, f)
 
         with open(f.name, 'rb') as f2:
             pickled = pickle.load(f2)
@@ -738,9 +733,8 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
 
         test = Sign('x')
         test.push(data)
-        f = tempfile.NamedTemporaryFile('w+b', delete=False)
-        pickle.dump(test, f)
-        f.close()
+        with tempfile.NamedTemporaryFile('w+b', delete=False) as f:
+            pickle.dump(test, f)
 
         with open(f.name, 'rb') as f2:
             pickled = pickle.load(f2)
@@ -751,9 +745,8 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
 
         test = Acos('x')
         test.push(data)
-        f = tempfile.NamedTemporaryFile('w+b', delete=False)
-        pickle.dump(test, f)
-        f.close()
+        with tempfile.NamedTemporaryFile('w+b', delete=False) as f:
+            pickle.dump(test, f)
 
         with open(f.name, 'rb') as f2:
             pickled = pickle.load(f2)
@@ -762,9 +755,8 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
 
         test = Asin('x')
         test.push(data)
-        f = tempfile.NamedTemporaryFile('w+b', delete=False)
-        pickle.dump(test, f)
-        f.close()
+        with tempfile.NamedTemporaryFile('w+b', delete=False) as f:
+            pickle.dump(test, f)
 
         with open(f.name, 'rb') as f2:
             pickled = pickle.load(f2)
@@ -773,9 +765,8 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
 
         test = Acosh('x')
         test.push(data)
-        f = tempfile.NamedTemporaryFile('w+b', delete=False)
-        pickle.dump(test, f)
-        f.close()
+        with tempfile.NamedTemporaryFile('w+b', delete=False) as f:
+            pickle.dump(test, f)
 
         with open(f.name, 'rb') as f2:
             pickled = pickle.load(f2)
@@ -784,9 +775,8 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
 
         test = Asinh('x')
         test.push(data)
-        f = tempfile.NamedTemporaryFile('w+b', delete=False)
-        pickle.dump(test, f)
-        f.close()
+        with tempfile.NamedTemporaryFile('w+b', delete=False) as f:
+            pickle.dump(test, f)
 
         with open(f.name, 'rb') as f2:
             pickled = pickle.load(f2)

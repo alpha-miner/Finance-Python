@@ -147,9 +147,9 @@ class TestStatelessAccumulators(unittest.TestCase):
         mv.push(dict(x=1.))
         mv.push(dict(x=2.))
 
-        f = tempfile.NamedTemporaryFile('w+b', delete=False)
-        pickle.dump(mv, f)
-        f.close()
+        with tempfile.NamedTemporaryFile('w+b', delete=False) as f:
+            pickle.dump(mv, f)
+
         with open(f.name, 'rb') as f2:
             pickled = pickle.load(f2)
             self.assertAlmostEqual(mv.value, pickled.value)
@@ -158,9 +158,9 @@ class TestStatelessAccumulators(unittest.TestCase):
         for i in np.random.rand(30):
             mv.push(dict(x=float(i)))
 
-        f = tempfile.NamedTemporaryFile('w+b', delete=False)
-        pickle.dump(mv, f)
-        f.close()
+        with tempfile.NamedTemporaryFile('w+b', delete=False) as f:
+            pickle.dump(mv, f)
+
         with open(f.name, 'rb') as f2:
             pickled = pickle.load(f2)
             self.assertAlmostEqual(mv.value, pickled.value)
@@ -400,8 +400,8 @@ class TestStatelessAccumulators(unittest.TestCase):
                 calculated = autoCorr.result()
                 self.assertAlmostEqual(expected[0, 1], calculated, 10, "at index of {0:d}\n"
                                                                        "expected autoCorr:   {1:f}\n"
-                                                                       "calculated autoCorr: {2:f}".format(i, expected[
-                    0, 1],
+                                                                       "calculated autoCorr: {2:f}".format(i,
+                                                                                                           expected[0, 1],
                                                                                                            calculated))
 
 

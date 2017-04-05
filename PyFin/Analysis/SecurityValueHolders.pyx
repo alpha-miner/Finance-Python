@@ -862,19 +862,22 @@ cdef class SecurityShiftedValueHolder(SecurityValueHolder):
 
     def __deepcopy__(self, memo):
         if self._compHolder:
-            return SecurityShiftedValueHolder(self._compHolder, self._holderTemplate.lag())
+            copied = SecurityShiftedValueHolder(self._compHolder, self._holderTemplate.lag())
         else:
-            return SecurityShiftedValueHolder(self._dependency, self._holderTemplate.lag())
+            copied = SecurityShiftedValueHolder(self._dependency, self._holderTemplate.lag())
+
+        copied.copy_attributes(self.collect_attributes(), is_deep=True)
+        return copied
 
     def __reduce__(self):
-        d = {}
+        d = self.collect_attributes()
         if self._compHolder:
             return SecurityShiftedValueHolder, (self._compHolder, self._holderTemplate.lag()), d
         else:
             return SecurityShiftedValueHolder, (self._dependency, self._holderTemplate.lag()), d
 
     def __setstate__(self, state):
-        pass
+        self.copy_attributes(state, is_deep=False)
 
 
 cdef class SecurityIIFValueHolder(SecurityValueHolder):

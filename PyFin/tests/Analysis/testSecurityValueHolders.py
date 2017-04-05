@@ -810,6 +810,54 @@ class TestSecurityValueHolders(unittest.TestCase):
         with self.assertRaises(ValueError):
             _ = mm.shift(0)
 
+    def testShiftedSecurityValueHolderDeepcopy(self):
+        tested = SecurityShiftedValueHolder(SecurityLatestValueHolder('close'), 2)
+
+        data = dict(aapl=dict(close=1.0),
+                    ibm=dict(close=2.0))
+        tested.push(data)
+
+        data = dict(aapl=dict(close=3.0),
+                    ibm=dict(close=4.0))
+        tested.push(data)
+
+        data = dict(aapl=dict(close=5.0),
+                    ibm=dict(close=6.0))
+        tested.push(data)
+
+        copied = copy.deepcopy(tested)
+
+        expected = tested.value
+        calcualted = copied.value
+        for name in expected.index():
+            self.assertAlmostEqual(expected[name], calcualted[name])
+
+    def testShiftedSecurityValueHolderPickle(self):
+        tested = SecurityShiftedValueHolder(SecurityLatestValueHolder('close'), 2)
+
+        data = dict(aapl=dict(close=1.0),
+                    ibm=dict(close=2.0))
+        tested.push(data)
+
+        data = dict(aapl=dict(close=3.0),
+                    ibm=dict(close=4.0))
+        tested.push(data)
+
+        data = dict(aapl=dict(close=5.0),
+                    ibm=dict(close=6.0))
+        tested.push(data)
+
+        with tempfile.NamedTemporaryFile('w+b', delete=False) as f:
+            pickle.dump(tested, f)
+
+        with open(f.name, 'rb') as f2:
+            pickled = pickle.load(f2)
+
+        expected = tested.value
+        calcualted = pickled.value
+        for name in expected.index():
+            self.assertAlmostEqual(expected[name], calcualted[name])
+
     def testLtSecurityValueHolder(self):
         filter = SecurityLatestValueHolder('close') < 10.0
         ma = FilteredSecurityValueHolder(SecurityMovingAverage(10, 'close'), filter)

@@ -14,17 +14,11 @@ cimport cython
 cdef class Deque:
 
     def __init__(self,
-                 size_t window,
-                 bint is_full=False,
-                 con=None,
-                 size_t start=0):
+                 size_t window):
         self.window = window
-        self.is_full = is_full
-        if con:
-            self.con = copy.deepcopy(con)
-        else:
-            self.con = []
-        self.start = start
+        self.is_full = False
+        self.con = []
+        self.start = 0
 
     @cython.cdivision(True)
     @cython.boundscheck(False)
@@ -70,10 +64,11 @@ cdef class Deque:
         return self.con[(self.start + item) % self.window]
 
     def __deepcopy__(self, memo):
-        return Deque(self.window,
-                     self.is_full,
-                     self.con,
-                     self.start)
+        copied = Deque(self.window)
+        copied.is_full = self.is_full
+        copied.con = copy.deepcopy(self.con)
+        copied.start = self.start
+        return copied
 
     def __richcmp__(Deque self, Deque other, int op):
         if op == 2:
@@ -89,15 +84,13 @@ cdef class Deque:
 
     def __reduce__(self):
         d = {
-            'window': self.window,
             'is_full': self.is_full,
             'con': self.con,
             'start': self.start
-        }
-        return Deque, (0,), d
+            }
+        return Deque, (self.window,), d
 
     def __setstate__(self, state):
-        self.window = state['window']
         self.is_full = state['is_full']
         self.con = state['con']
         self.start = state['start']

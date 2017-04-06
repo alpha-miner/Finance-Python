@@ -6,10 +6,10 @@ Created on 2017-4-3
 """
 
 
-cdef public double DBL_MIN
-cdef public double QL_EPSILON
-cdef public double M_SQRT2
-cdef public double M_SQRT_2
-cdef public double M_SQRTPI
-cdef public double M_1_SQRTPI
-cdef public double M_PI
+cdef double DBL_MIN
+cdef double QL_EPSILON
+cdef double M_SQRT2
+cdef double M_SQRT_2
+cdef double M_SQRTPI
+cdef double M_1_SQRTPI
+cdef double M_PI

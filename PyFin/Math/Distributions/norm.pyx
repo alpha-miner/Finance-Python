@@ -8,11 +8,14 @@ Created on 2017-2-4
 cimport cython
 from libc.math cimport fabs
 from PyFin.Math.ErrorFunction cimport errorFunction
+from PyFin.Math.MathConstants cimport M_SQRT_2
+from PyFin.Math.MathConstants cimport M_1_SQRTPI
+from PyFin.Math.MathConstants cimport QL_EPSILON
 
 
-cdef double _M_SQRT_2 = 0.7071067811865475244008443621048490392848359376887
-cdef double _M_1_SQRTPI = 0.564189583547756286948
-cdef double _QL_EPSILON = 2.2250738585072014e-308
+cdef double _M_SQRT_2 = M_SQRT_2
+cdef double _M_1_SQRTPI = M_1_SQRTPI
+cdef double _QL_EPSILON = QL_EPSILON
 
 
 @cython.cdivision(True)

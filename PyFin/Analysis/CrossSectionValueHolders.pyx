@@ -13,6 +13,7 @@ cimport cython
 from PyFin.Analysis.SeriesValues cimport SeriesValues
 from PyFin.Analysis.SecurityValueHolders cimport SecurityValueHolder
 from PyFin.Analysis.SecurityValueHolders cimport SecurityLatestValueHolder
+from PyFin.Math.MathConstants cimport NAN
 
 
 cdef class CrossSectionValueHolder(SecurityValueHolder):
@@ -107,7 +108,7 @@ cdef class CSAverageSecurityValueHolder(CrossSectionValueHolder):
         else:
             raw_values = self._inner.value
             mean_value = np.array([raw_values.mean()] * len(raw_values))
-            mean_value[np.isnan(raw_values.values)] = np.nan
+            mean_value[np.isnan(raw_values.values)] = NAN
             self.cached = SeriesValues(mean_value, raw_values.name_mapping)
             self.updated = 1
             return self.cached
@@ -122,7 +123,7 @@ cdef class CSAverageSecurityValueHolder(CrossSectionValueHolder):
         else:
             raw_values = self._inner.value
             mean_value = np.array([raw_values.mean()] * len(raw_values))
-            mean_value[np.isnan(raw_values.values)] = np.nan
+            mean_value[np.isnan(raw_values.values)] = NAN
             self.cached = SeriesValues(mean_value, raw_values.name_mapping)
             self.updated = 1
             return self.cached[name]
@@ -134,7 +135,7 @@ cdef class CSAverageSecurityValueHolder(CrossSectionValueHolder):
 
         raw_values = self._inner.value_by_names(names)
         mean_value = np.array([raw_values.mean()] * len(raw_values))
-        mean_value[np.isnan(raw_values.values)] = np.nan
+        mean_value[np.isnan(raw_values.values)] = NAN
         raw_values = SeriesValues(mean_value, raw_values.name_mapping)
         return raw_values[names]
 

@@ -17,6 +17,7 @@ from libc.math cimport fmin
 from PyFin.Math.Accumulators.IAccumulators cimport Accumulator
 from PyFin.Math.Accumulators.IAccumulators cimport Pow
 from PyFin.Math.Accumulators.IAccumulators cimport StatelessSingleValueAccumulator
+from PyFin.Math.MathConstants cimport NAN
 import bisect
 
 
@@ -32,13 +33,13 @@ cdef class Diff(StatelessSingleValueAccumulator):
         super(Diff, self).__init__(dependency)
         _checkParameterList(dependency)
         self._returnSize = 1
-        self._curr = np.nan
-        self._previous = np.nan
+        self._curr = NAN
+        self._previous = NAN
 
     cpdef push(self, dict data):
         cdef double value = self._push(data)
         if isnan(value):
-            return np.nan
+            return NAN
         self._isFull = True
         self._previous = self._curr
         self._curr = value
@@ -72,14 +73,14 @@ cdef class SimpleReturn(StatelessSingleValueAccumulator):
         super(SimpleReturn, self).__init__(dependency)
         _checkParameterList(dependency)
         self._returnSize = 1
-        self._diff = np.nan
-        self._curr = np.nan
-        self._previous = np.nan
+        self._diff = NAN
+        self._curr = NAN
+        self._previous = NAN
 
     cpdef push(self, dict data):
         cdef double value = self._push(data)
         if isnan(value):
-            return np.nan
+            return NAN
         self._isFull = True
         self._previous = self._curr
         self._curr = value
@@ -91,7 +92,7 @@ cdef class SimpleReturn(StatelessSingleValueAccumulator):
         if denorm:
             return self._curr / denorm - 1.
         else:
-            return np.nan
+            return NAN
 
     def __deepcopy__(self, memo):
         return SimpleReturn(self._dependency)
@@ -103,14 +104,14 @@ cdef class LogReturn(StatelessSingleValueAccumulator):
         super(LogReturn, self).__init__(dependency)
         _checkParameterList(dependency)
         self._returnSize = 1
-        self._diff = np.nan
-        self._curr = np.nan
-        self._previous = np.nan
+        self._diff = NAN
+        self._curr = NAN
+        self._previous = NAN
 
     cpdef push(self, dict data):
         cdef double value = self._push(data)
         if isnan(value):
-            return np.nan
+            return NAN
         self._isFull = True
         self._previous = self._curr
         self._curr = value
@@ -121,7 +122,7 @@ cdef class LogReturn(StatelessSingleValueAccumulator):
         if denorm:
             return log(self._curr / denorm)
         else:
-            return np.nan
+            return NAN
 
     def __deepcopy__(self, memo):
         return LogReturn(self._dependency)
@@ -133,13 +134,13 @@ cdef class PositivePart(StatelessSingleValueAccumulator):
         super(PositivePart, self).__init__(dependency)
         _checkParameterList(dependency)
         self._returnSize = 1
-        self._pos = np.nan
+        self._pos = NAN
         self._isFull = True
 
     cpdef push(self, dict data):
         cdef double value = self._push(data)
         if isnan(value):
-            self._pos = np.nan
+            self._pos = NAN
         else:
             self._pos = fmax(value, 0.)
 
@@ -156,13 +157,13 @@ cdef class NegativePart(StatelessSingleValueAccumulator):
         super(NegativePart, self).__init__(dependency)
         _checkParameterList(dependency)
         self._returnSize = 1
-        self._neg = np.nan
+        self._neg = NAN
         self._isFull = False
 
     cpdef push(self, dict data):
         cdef double value = self._push(data)
         if isnan(value):
-            self._neg = np.nan
+            self._neg = NAN
         else:
             self._neg = fmin(value, 0.)
             self._isFull = True
@@ -186,7 +187,7 @@ cdef class Max(StatelessSingleValueAccumulator):
     cpdef push(self, dict data):
         cdef double value = self._push(data)
         if isnan(value):
-            return np.nan
+            return NAN
 
         self._currentMax = fmax(value, self._currentMax)
         self._isFull = True
@@ -210,7 +211,7 @@ cdef class Minimum(StatelessSingleValueAccumulator):
     cpdef push(self, dict data):
         cdef double value = self._push(data)
         if isnan(value):
-            return np.nan
+            return NAN
 
         self._currentMin = fmin(value, self._currentMin)
         self._isFull = True
@@ -234,7 +235,7 @@ cdef class Sum(StatelessSingleValueAccumulator):
     cpdef push(self, dict data):
         cdef double value = self._push(data)
         if isnan(value):
-            return np.nan
+            return NAN
 
         self._isFull = True
         self._currentSum += value
@@ -259,7 +260,7 @@ cdef class Average(StatelessSingleValueAccumulator):
     cpdef push(self, dict data):
         cdef double value = self._push(data)
         if isnan(value):
-            return np.nan
+            return NAN
 
         self._isFull = True
         self._currentCount += 1
@@ -270,7 +271,7 @@ cdef class Average(StatelessSingleValueAccumulator):
         if self._currentCount:
             return self._currentSum / self._currentCount
         else:
-            return np.nan
+            return NAN
 
     def __deepcopy__(self, memo):
         return Average(self._dependency)
@@ -287,7 +288,7 @@ cdef class XAverage(StatelessSingleValueAccumulator):
     cpdef push(self, dict data):
         cdef double value = self._push(data)
         if isnan(value):
-            return np.nan
+            return NAN
 
         self._isFull = True
 
@@ -334,7 +335,7 @@ cdef class Variance(StatelessSingleValueAccumulator):
     cpdef push(self, dict data):
         cdef double value = self._push(data)
         if isnan(value):
-            return np.nan
+            return NAN
 
         self._isFull = True
 
@@ -352,7 +353,7 @@ cdef class Variance(StatelessSingleValueAccumulator):
         if pop_num:
             return tmp / pop_num
         else:
-            return np.nan
+            return NAN
 
     def __deepcopy__(self, memo):
         return Variance(self._dependency, self._isPop)
@@ -367,7 +368,7 @@ cdef class Product(StatelessSingleValueAccumulator):
     cpdef push(self, dict data):
         cdef double value = self._push(data)
         if isnan(value):
-            return np.nan
+            return NAN
 
         self._isFull = True
         self._product *= value
@@ -385,12 +386,12 @@ cdef class CenterMoment(StatelessSingleValueAccumulator):
         super(CenterMoment, self).__init__(dependency)
         self._this_list = []
         self._order = order
-        self._moment = np.nan
+        self._moment = NAN
 
     cpdef push(self, dict data):
         cdef double value = self._push(data)
         if isnan(value):
-            return np.nan
+            return NAN
 
         self._isFull = True
 
@@ -419,7 +420,7 @@ cdef class Skewness(StatelessSingleValueAccumulator):
         try:
             return self._skewness.result()
         except ZeroDivisionError:
-            return np.nan
+            return NAN
 
     def __deepcopy__(self, memo):
         return Skewness(self._dependency)
@@ -440,7 +441,7 @@ cdef class Kurtosis(StatelessSingleValueAccumulator):
         try:
             return self._kurtosis.result()
         except ZeroDivisionError:
-            return np.nan
+            return NAN
 
     def __deepcopy__(self, memo):
         return Kurtosis(self._dependency)
@@ -457,7 +458,7 @@ cdef class Rank(StatelessSingleValueAccumulator):
     cpdef push(self, dict data):
         cdef double value = self._push(data)
         if isnan(value):
-            return np.nan
+            return NAN
 
         self._isFull = True
 
@@ -482,7 +483,7 @@ cdef class LevelList(StatelessSingleValueAccumulator):
     cpdef push(self, dict data):
         cdef double value = self._push(data)
         if isnan(value):
-            return np.nan
+            return NAN
 
         self._isFull = True
 
@@ -504,12 +505,12 @@ cdef class LevelValue(StatelessSingleValueAccumulator):
     def __init__(self, dependency='x'):
         super(LevelValue, self).__init__(dependency)
         self._thisList = []
-        self._levelValue = np.nan
+        self._levelValue = NAN
 
     cpdef push(self, dict data):
         value = self._push(data)
         if isnan(value):
-            return np.nan
+            return NAN
 
         self._isFull = True
 
@@ -539,7 +540,7 @@ cdef class AutoCorrelation(StatelessSingleValueAccumulator):
     cpdef push(self, dict data):
         cdef double value = self._push(data)
         if isnan(value):
-            return np.nan
+            return NAN
 
         self._isFull = True
         self._thisList.append(value)
@@ -555,7 +556,7 @@ cdef class AutoCorrelation(StatelessSingleValueAccumulator):
                 self._AutoCorrMatrix = np.cov(self._VecBackward, self._VecForward) / \
                                 (np.std(self._VecBackward) * np.std(self._VecForward))
             except ZeroDivisionError:
-                return np.nan
+                return NAN
             return self._AutoCorrMatrix[0, 1]
 
     def __deepcopy__(self, memo):
@@ -574,7 +575,7 @@ cdef class StatelessMultiValueAccumulator(Accumulator):
             try:
                 value = [data[name] for name in self._dependency]
             except KeyError:
-                value = [np.nan] * len(self._dependency)
+                value = [NAN] * len(self._dependency)
         else:
             self._dependency.push(data)
             value = self._dependency.result()
@@ -599,7 +600,7 @@ cdef class Correlation(StatelessMultiValueAccumulator):
     cpdef push(self, dict data):
         value = self._push(data)
         if isnan(value[0]) or isnan(value[1]):
-            return np.nan
+            return NAN
 
         self._isFull = True
 
@@ -619,7 +620,7 @@ cdef class Correlation(StatelessMultiValueAccumulator):
         if denominator != 0:
             return nominator / denominator
         else:
-            return np.nan
+            return NAN
 
     def __deepcopy__(self, memo):
         return Correlation(self._dependency)

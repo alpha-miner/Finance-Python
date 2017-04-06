@@ -9,6 +9,7 @@ import copy
 import numpy as np
 cimport numpy as np
 cimport cython
+from PyFin.Math.MathConstants cimport NAN
 
 
 cdef class Deque:
@@ -26,21 +27,22 @@ cdef class Deque:
     cdef dump(self, value):
         cdef size_t n = self.start
         cdef size_t window = self.window
+        cdef list con = self.con
 
         if self.is_full:
-            popout = self.con[n]
-            self.con[n] = value
+            popout = con[n]
+            con[n] = value
             self.start = (n + 1) % window
             return popout
         else:
 
-            self.con.append(value)
-            self.is_full = len(self.con) == window
+            con.append(value)
+            self.is_full = len(con) == window
 
             if hasattr(value, '__len__'):
-                return np.array([np.nan] * len(value))
+                return np.array([NAN] * len(value))
             else:
-                return np.nan
+                return NAN
 
     cdef size_t size(self):
         return len(self.con)
@@ -60,7 +62,7 @@ cdef class Deque:
     @cython.cdivision(True)
     @cython.boundscheck(False)
     @cython.wraparound(False)
-    def __getitem__(self, item):
+    def __getitem__(self, size_t item):
         return self.con[(self.start + item) % self.window]
 
     def __deepcopy__(self, memo):

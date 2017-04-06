@@ -21,6 +21,7 @@ import numpy as np
 cimport numpy as np
 import pandas as pd
 from PyFin.Utilities.Asserts cimport pyFinAssert
+from PyFin.Math.MathConstants cimport NAN
 
 
 cdef class IAccumulator(object):
@@ -101,7 +102,7 @@ cdef class Accumulator(IAccumulator):
                 try:
                     return tuple(data[p] for p in self._dependency)
                 except KeyError:
-                    return np.nan
+                    return NAN
         else:
             comp = self._dependency
             comp.push(data)
@@ -613,7 +614,7 @@ cdef class StatelessSingleValueAccumulator(Accumulator):
             try:
                 value = data[self._dependency]
             except KeyError:
-                value = np.nan
+                value = NAN
         else:
             comp = self._dependency
             comp.push(data)
@@ -634,7 +635,7 @@ cdef class StatelessSingleValueAccumulator(Accumulator):
 
 cdef class Latest(StatelessSingleValueAccumulator):
 
-    def __init__(self, dependency='x', current_value=np.nan):
+    def __init__(self, dependency='x', current_value=NAN):
         super(Latest, self).__init__(dependency)
         self._window = 0
         self._returnSize = 1
@@ -760,7 +761,7 @@ cdef class IIF(Accumulator):
 
 cdef class BasicFunction(Accumulator):
 
-    def __init__(self, dependency, orig_value=np.nan):
+    def __init__(self, dependency, orig_value=NAN):
         super(BasicFunction, self).__init__(dependency)
         if self._isValueHolderContained:
             self._window = self._dependency.window
@@ -788,7 +789,7 @@ cdef class BasicFunction(Accumulator):
 
 
 cdef class Exp(BasicFunction):
-    def __init__(self, dependency, orig_value=np.nan):
+    def __init__(self, dependency, orig_value=NAN):
         super(Exp, self).__init__(dependency, orig_value)
 
     cpdef object result(self):
@@ -807,7 +808,7 @@ cdef class Exp(BasicFunction):
 
 
 cdef class Log(BasicFunction):
-    def __init__(self, dependency, orig_value=np.nan):
+    def __init__(self, dependency, orig_value=NAN):
         super(Log, self).__init__(dependency, orig_value)
 
     cpdef object result(self):
@@ -826,7 +827,7 @@ cdef class Log(BasicFunction):
 
 
 cdef class Sqrt(BasicFunction):
-    def __init__(self, dependency, orig_value=np.nan):
+    def __init__(self, dependency, orig_value=NAN):
         super(Sqrt, self).__init__(dependency, orig_value)
 
     cpdef object result(self):
@@ -847,7 +848,7 @@ cdef class Sqrt(BasicFunction):
 # due to the fact that pow function is much slower than ** operator
 cdef class Pow(BasicFunction):
 
-    def __init__(self, dependency, n, orig_value=np.nan):
+    def __init__(self, dependency, n, orig_value=NAN):
         super(Pow, self).__init__(dependency, orig_value)
         self._n = n
 
@@ -867,7 +868,7 @@ cdef class Pow(BasicFunction):
 
 
 cdef class Abs(BasicFunction):
-    def __init__(self, dependency, orig_value=np.nan):
+    def __init__(self, dependency, orig_value=NAN):
         super(Abs, self).__init__(dependency, orig_value)
 
     cpdef object result(self):
@@ -895,7 +896,7 @@ cdef double sign(double x) nogil:
 
 
 cdef class Sign(BasicFunction):
-    def __init__(self, dependency, orig_value=np.nan):
+    def __init__(self, dependency, orig_value=NAN):
         super(Sign, self).__init__(dependency, orig_value)
 
     cpdef object result(self):
@@ -914,7 +915,7 @@ cdef class Sign(BasicFunction):
 
 
 cdef class Acos(BasicFunction):
-    def __init__(self, dependency, orig_value=np.nan):
+    def __init__(self, dependency, orig_value=NAN):
         super(Acos, self).__init__(dependency, orig_value)
 
     cpdef object result(self):
@@ -933,7 +934,7 @@ cdef class Acos(BasicFunction):
 
 
 cdef class Acosh(BasicFunction):
-    def __init__(self, dependency, orig_value=np.nan):
+    def __init__(self, dependency, orig_value=NAN):
         super(Acosh, self).__init__(dependency, orig_value)
 
     cpdef object result(self):
@@ -952,7 +953,7 @@ cdef class Acosh(BasicFunction):
 
 
 cdef class Asin(BasicFunction):
-    def __init__(self, dependency, orig_value=np.nan):
+    def __init__(self, dependency, orig_value=NAN):
         super(Asin, self).__init__(dependency, orig_value)
 
     cpdef object result(self):
@@ -971,7 +972,7 @@ cdef class Asin(BasicFunction):
 
 
 cdef class Asinh(BasicFunction):
-    def __init__(self, dependency, orig_value=np.nan):
+    def __init__(self, dependency, orig_value=NAN):
         super(Asinh, self).__init__(dependency, orig_value)
 
     cpdef object result(self):

@@ -18,6 +18,7 @@ from PyFin.Analysis.SeriesValues cimport SeriesValues
 from PyFin.Utilities.Tools import to_dict
 from PyFin.Math.Accumulators.StatefulAccumulators cimport Shift
 from PyFin.Math.Accumulators.IAccumulators cimport Latest
+from PyFin.Math.MathConstants cimport NAN
 
 if sys.version_info > (3, 0, 0):
     div_attr = "truediv"
@@ -115,7 +116,7 @@ cdef class SecurityValueHolder(object):
                     holder = self._innerHolders[name]
                     values[i] = holder.result()
                 except ArithmeticError:
-                    values[i] = np.nan
+                    values[i] = NAN
             self.cached = SeriesValues(values, index=keys)
             self.updated = 1
             return self.cached
@@ -357,7 +358,7 @@ cdef class FilteredSecurityValueHolder(SecurityValueHolder):
             if filter_value:
                 return self._computer.value_by_name(name)
             else:
-                return np.nan
+                return NAN
 
     cpdef value_by_names(self, list names):
 
@@ -369,7 +370,7 @@ cdef class FilteredSecurityValueHolder(SecurityValueHolder):
         else:
             filter_value = self._filter.value_by_names(names)
             orig_values = self._computer.value_by_names(names)
-            return SeriesValues(np.where(filter_value.values, orig_values.values, np.nan), filter_value.name_mapping)
+            return SeriesValues(np.where(filter_value.values, orig_values.values, NAN), filter_value.name_mapping)
 
     cpdef push(self, dict data):
         self._computer.push(data)
@@ -454,7 +455,7 @@ cdef class SecurityConstArrayValueHolder(SecurityValueHolder):
         if name in self._values:
             return self._values[name]
         else:
-            return np.nan
+            return NAN
 
     cpdef value_by_names(self, list names):
         return self._values[names]

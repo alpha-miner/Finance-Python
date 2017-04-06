@@ -8,6 +8,9 @@ Created on 2017-2-7
 cimport cython
 import numpy as np
 cimport numpy as np
+from numpy import nansum
+from numpy import nanmean
+from PyFin.Math.MathConstants cimport NAN
 
 
 cdef class SeriesValues(object):
@@ -45,7 +48,7 @@ cdef class SeriesValues(object):
 
             values = self.values
             name_mapping = self.name_mapping
-            data = np.array([values[name_mapping[n]] if n in name_mapping else np.nan for n in name])
+            data = np.array([values[name_mapping[n]] if n in name_mapping else NAN for n in name])
             return SeriesValues(data, dict(zip(name, range(len(name)))))
 
     @cython.boundscheck(False)
@@ -105,7 +108,7 @@ cdef class SeriesValues(object):
             values = self.values / right
             name_mapping = self.name_mapping
 
-        values[~np.isfinite(values)] = np.nan
+        values[~np.isfinite(values)] = NAN
         return SeriesValues(values, name_mapping)
 
     @cython.cdivision(True)
@@ -123,7 +126,7 @@ cdef class SeriesValues(object):
             values = self.values / right
             name_mapping = self.name_mapping
 
-        values[~np.isfinite(values)] = np.nan
+        values[~np.isfinite(values)] = NAN
         return SeriesValues(values, name_mapping)
 
     def __and__(self, right):
@@ -186,7 +189,7 @@ cdef class SeriesValues(object):
     @cython.wraparound(False)
     cpdef SeriesValues rank(self):
         cdef np.ndarray[double, ndim=1] data = self.values.argsort().argsort().astype(float)
-        data[np.isnan(self.values)] = np.nan
+        data[np.isnan(self.values)] = NAN
         return SeriesValues(data + 1., self.name_mapping)
 
     cpdef SeriesValues zscore(self):
@@ -195,10 +198,10 @@ cdef class SeriesValues(object):
 
     cpdef SeriesValues unit(self):
         cdef np.ndarray[double, ndim=1] data = self.values
-        return SeriesValues(data / np.nansum(np.abs(data)), self.name_mapping)
+        return SeriesValues(data / nansum(np.abs(data)), self.name_mapping)
 
     cpdef double mean(self):
-        return np.nanmean(self.values)
+        return nanmean(self.values)
 
     cpdef double dot(self, SeriesValues right):
         return np.dot(self.values, right.values)

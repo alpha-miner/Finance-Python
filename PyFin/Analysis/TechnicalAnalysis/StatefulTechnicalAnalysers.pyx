@@ -30,6 +30,7 @@ from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingNegativeDifferen
 from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingRSI
 from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingHistoricalWindow
 from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingLogReturn
+from PyFin.Math.MathConstants cimport NAN
 
 
 cdef class SecuritySingleValueHolder(SecurityValueHolder):
@@ -433,7 +434,7 @@ cdef class SecurityMovingHistoricalWindow(SecuritySingleValueHolder):
                 try:
                     res[name] = self._innerHolders[name].value[item]
                 except ArithmeticError:
-                    res[name] = np.nan
+                    res[name] = NAN
             return SeriesValues(res)
         else:
             raise ValueError("{0} is not recognized as valid int or string".format(item))
@@ -459,7 +460,7 @@ cdef class SecurityMovingHistoricalWindow(SecuritySingleValueHolder):
                     holder = self._innerHolders[name]
                     values[i] = holder.result()
                 except ArithmeticError:
-                    values[i] = np.nan
+                    values[i] = NAN
             self.cached = SeriesValues(np.array(values), index=dict(zip(keys, range(n))))
             self.updated = 1
             return self.cached

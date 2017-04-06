@@ -8,8 +8,6 @@ Created on 2015-9-23
 
 import functools
 
-from PyFin.Analysis.SeriesValues import SeriesValues
-
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingAverage
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingMax
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingMinimum
@@ -90,39 +88,39 @@ def MA(window, dependency='x'):
     return SecurityMovingAverage(window, dependency)
 
 
-def MAX(window, dependency='x'):
+def MMAX(window, dependency='x'):
     return SecurityMovingMax(window, dependency)
 
 
-def MIN(window, dependency='x'):
+def MMIN(window, dependency='x'):
     return SecurityMovingMinimum(window, dependency)
 
 
-def QUANTILE(window, dependency='x'):
+def MQUANTILE(window, dependency='x'):
     return SecurityMovingQuantile(window, dependency)
 
 
-def ALLTRUE(window, dependency='x'):
+def MALLTRUE(window, dependency='x'):
     return SecurityMovingAllTrue(window, dependency)
 
 
-def ANYTRUE(window, dependency='x'):
+def MANYTRUE(window, dependency='x'):
     return SecurityMovingAnyTrue(window, dependency)
 
 
-def SUM(window, dependency='x'):
+def MSUM(window, dependency='x'):
     return SecurityMovingSum(window, dependency)
 
 
-def VARIANCE(window, dependency='x'):
+def MVARIANCE(window, dependency='x'):
     return SecurityMovingVariance(window, dependency)
 
 
-def STD(window, dependency='x'):
+def MSTD(window, dependency='x'):
     return SecurityMovingStandardDeviation(window, dependency)
 
 
-def NPOSITIVE(window, dependency='x'):
+def MNPOSITIVE(window, dependency='x'):
     return SecurityMovingCountedPositive(window, dependency)
 
 

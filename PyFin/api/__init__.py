@@ -17,21 +17,21 @@ from PyFin.api.DateUtilities import nthWeekDay
 from PyFin.api.DateUtilities import makeSchedule
 
 from PyFin.Analysis import transform
-from PyFin.api.Analysis import SeriesValues
+from PyFin.Analysis.SeriesValues import SeriesValues
 from PyFin.api.Analysis import SIGN
 from PyFin.api.Analysis import EMA
 from PyFin.api.Analysis import MACD
 from PyFin.api.Analysis import RSI
 from PyFin.api.Analysis import MA
-from PyFin.api.Analysis import MAX
-from PyFin.api.Analysis import MIN
-from PyFin.api.Analysis import QUANTILE
-from PyFin.api.Analysis import ALLTRUE
-from PyFin.api.Analysis import ANYTRUE
-from PyFin.api.Analysis import SUM
-from PyFin.api.Analysis import VARIANCE
-from PyFin.api.Analysis import STD
-from PyFin.api.Analysis import NPOSITIVE
+from PyFin.api.Analysis import MMAX
+from PyFin.api.Analysis import MMIN
+from PyFin.api.Analysis import MQUANTILE
+from PyFin.api.Analysis import MALLTRUE
+from PyFin.api.Analysis import MANYTRUE
+from PyFin.api.Analysis import MSUM
+from PyFin.api.Analysis import MVARIANCE
+from PyFin.api.Analysis import MSTD
+from PyFin.api.Analysis import MNPOSITIVE
 from PyFin.api.Analysis import MAPOSITIVE
 from PyFin.api.Analysis import HIST
 from PyFin.api.Analysis import LAST
@@ -78,15 +78,15 @@ __all__ = ["datesList",
            "MACD",
            "RSI",
            "MA",
-           "MAX",
-           "MIN",
-           "QUANTILE",
-           "ALLTRUE",
-           "ANYTRUE",
-           "SUM",
-           "VARIANCE",
-           "STD",
-           "NPOSITIVE",
+           "MMAX",
+           "MMIN",
+           "MQUANTILE",
+           "MALLTRUE",
+           "MANYTRUE",
+           "MSUM",
+           "MVARIANCE",
+           "MSTD",
+           "MNPOSITIVE",
            "MAPOSITIVE",
            "HIST",
            "LAST",

@@ -246,6 +246,29 @@ class TestStatefulAccumulators(unittest.TestCase):
                                                                                                                 expected,
                                                                                                                 calculated))
 
+    def testMovingPositiveAverageDeepcopy(self):
+        mv = MovingPositiveAverage(3, 'x')
+        mv.push(dict(x=1.))
+        mv.push(dict(x=-1.))
+        mv.push(dict(x=2.))
+
+        copied = copy.deepcopy(mv)
+        self.assertAlmostEqual(mv.value, copied.value)
+
+    def testMovingPositiveAveragePickle(self):
+        mv = MovingPositiveAverage(3, 'x')
+        mv.push(dict(x=1.))
+        mv.push(dict(x=-1.))
+        mv.push(dict(x=2.))
+
+        with tempfile.NamedTemporaryFile('w+b', delete=False) as f:
+            pickle.dump(mv, f)
+
+        with open(f.name, 'rb') as f2:
+            pickled = pickle.load(f2)
+
+        self.assertAlmostEqual(mv.value, pickled.value)
+
     def testMovingPositiveDifferenceAverage(self):
         window = 10
         mv = MovingPositiveDifferenceAverage(window=window, dependency='x')
@@ -268,6 +291,29 @@ class TestStatefulAccumulators(unittest.TestCase):
                                                                 "positive average calculated: {2:f}".format(i,
                                                                                                             expected,
                                                                                                             calculated))
+
+    def testMovingPositiveDifferenceAverageDeepcopy(self):
+        mv = MovingPositiveDifferenceAverage(3, 'x')
+        mv.push(dict(x=1.))
+        mv.push(dict(x=-1.))
+        mv.push(dict(x=2.))
+
+        copied = copy.deepcopy(mv)
+        self.assertAlmostEqual(mv.value, copied.value)
+
+    def testMovingPositiveDifferenceAveragePickle(self):
+        mv = MovingPositiveDifferenceAverage(3, 'x')
+        mv.push(dict(x=1.))
+        mv.push(dict(x=-1.))
+        mv.push(dict(x=2.))
+
+        with tempfile.NamedTemporaryFile('w+b', delete=False) as f:
+            pickle.dump(mv, f)
+
+        with open(f.name, 'rb') as f2:
+            pickled = pickle.load(f2)
+
+        self.assertAlmostEqual(mv.value, pickled.value)
 
     def testMovingNegativeDifferenceAverage(self):
         window = 10
@@ -292,6 +338,29 @@ class TestStatefulAccumulators(unittest.TestCase):
                                                                                                             expected,
                                                                                                             calculated))
 
+    def testMovingNegativeDifferenceAverageDeepcopy(self):
+        mv = MovingNegativeDifferenceAverage(3, 'x')
+        mv.push(dict(x=1.))
+        mv.push(dict(x=-1.))
+        mv.push(dict(x=2.))
+
+        copied = copy.deepcopy(mv)
+        self.assertAlmostEqual(mv.value, copied.value)
+
+    def testMovingNegativeDifferenceAveragePickle(self):
+        mv = MovingNegativeDifferenceAverage(3, 'x')
+        mv.push(dict(x=1.))
+        mv.push(dict(x=-1.))
+        mv.push(dict(x=2.))
+
+        with tempfile.NamedTemporaryFile('w+b', delete=False) as f:
+            pickle.dump(mv, f)
+
+        with open(f.name, 'rb') as f2:
+            pickled = pickle.load(f2)
+
+        self.assertAlmostEqual(mv.value, pickled.value)
+
     def testMovingRSI(self):
         window = 10
         rsi = MovingRSI(window=window, dependency='x')
@@ -310,6 +379,29 @@ class TestStatefulAccumulators(unittest.TestCase):
                                                                 "negative average calculated: {2:f}".format(i,
                                                                                                             expected,
                                                                                                             calculated))
+
+    def testMovingRSIDeepcopy(self):
+        mv = MovingRSI(3, 'x')
+        mv.push(dict(x=1.))
+        mv.push(dict(x=-1.))
+        mv.push(dict(x=2.))
+
+        copied = copy.deepcopy(mv)
+        self.assertAlmostEqual(mv.value, copied.value)
+
+    def testMovingRSIPickle(self):
+        mv = MovingRSI(3, 'x')
+        mv.push(dict(x=1.))
+        mv.push(dict(x=-1.))
+        mv.push(dict(x=2.))
+
+        with tempfile.NamedTemporaryFile('w+b', delete=False) as f:
+            pickle.dump(mv, f)
+
+        with open(f.name, 'rb') as f2:
+            pickled = pickle.load(f2)
+
+        self.assertAlmostEqual(mv.value, pickled.value)
 
     def testMovingNegativeAverager(self):
         dirName = os.path.dirname(os.path.abspath(__file__))
@@ -334,6 +426,29 @@ class TestStatefulAccumulators(unittest.TestCase):
                                                                     "positive average calculated: {2:f}".format(i,
                                                                                                                 expected,
                                                                                                                 calculated))
+
+    def testMovingNegativeAverageDeepcopy(self):
+        mv = MovingNegativeAverage(3, 'x')
+        mv.push(dict(x=1.))
+        mv.push(dict(x=-1.))
+        mv.push(dict(x=2.))
+
+        copied = copy.deepcopy(mv)
+        self.assertAlmostEqual(mv.value, copied.value)
+
+    def testMovingNegativeAveragePickle(self):
+        mv = MovingNegativeAverage(3, 'x')
+        mv.push(dict(x=1.))
+        mv.push(dict(x=-1.))
+        mv.push(dict(x=2.))
+
+        with tempfile.NamedTemporaryFile('w+b', delete=False) as f:
+            pickle.dump(mv, f)
+
+        with open(f.name, 'rb') as f2:
+            pickled = pickle.load(f2)
+
+        self.assertAlmostEqual(mv.value, pickled.value)
 
     def testMovingSum(self):
         window = 120
@@ -641,6 +756,33 @@ class TestStatefulAccumulators(unittest.TestCase):
                                                                                                              expected,
                                                                                                              calculated))
 
+    def testMovingCountedPositiveDeepcopy(self):
+        test = MovingCountedPositive(3, 'x')
+
+        test.push(dict(x=-3.0))
+        test.push(dict(x=-4.0))
+        test.push(dict(x=2.0))
+        test.push(dict(x=-3.5))
+
+        copied = copy.deepcopy(test)
+        self.assertAlmostEqual(copied.value, test.value)
+
+    def testMovingCountedPositivePickle(self):
+        test = MovingCountedPositive(3, 'x')
+
+        test.push(dict(x=3.0))
+        test.push(dict(x=-4.0))
+        test.push(dict(x=-2.0))
+        test.push(dict(x=-3.5))
+
+        f = tempfile.NamedTemporaryFile('w+b', delete=False)
+        pickle.dump(test, f)
+        f.close()
+        with open(f.name, 'rb') as f2:
+            pickled = pickle.load(f2)
+            self.assertAlmostEqual(test.value, pickled.value)
+        os.unlink(f.name)
+
     def testMovingCountedNegative(self):
         window = 120
         total = 2500
@@ -668,6 +810,33 @@ class TestStatefulAccumulators(unittest.TestCase):
                                                                  "Counted negative calculated: {2:f}".format(i,
                                                                                                              expected,
                                                                                                              calculated))
+
+    def testMovingCountedNegativeDeepcopy(self):
+        test = MovingCountedNegative(3, 'x')
+
+        test.push(dict(x=-3.0))
+        test.push(dict(x=-4.0))
+        test.push(dict(x=2.0))
+        test.push(dict(x=-3.5))
+
+        copied = copy.deepcopy(test)
+        self.assertAlmostEqual(copied.value, test.value)
+
+    def testMovingCountedNegativePickle(self):
+        test = MovingCountedNegative(3, 'x')
+
+        test.push(dict(x=3.0))
+        test.push(dict(x=-4.0))
+        test.push(dict(x=-2.0))
+        test.push(dict(x=-3.5))
+
+        f = tempfile.NamedTemporaryFile('w+b', delete=False)
+        pickle.dump(test, f)
+        f.close()
+        with open(f.name, 'rb') as f2:
+            pickled = pickle.load(f2)
+            self.assertAlmostEqual(test.value, pickled.value)
+        os.unlink(f.name)
 
     def testMovingVariancer(self):
         window = 120
@@ -726,6 +895,48 @@ class TestStatefulAccumulators(unittest.TestCase):
                                                                  "Var expected:   {1:f}\n"
                                                                  "Var calculated: {2:f}".format(i, expected,
                                                                                                 calculated))
+
+    def testMovingVarianceDeepcopy(self):
+        window = 20
+        mv = MovingVariance(window, dependency='x')
+
+        mv.push(dict(x=1.))
+        mv.push(dict(x=2.))
+
+        copied = copy.deepcopy(mv)
+        self.assertAlmostEqual(copied.value, mv.value)
+
+        for i in range(3, 40):
+            mv.push(dict(x=float(i)))
+
+        copied = copy.deepcopy(mv)
+        self.assertAlmostEqual(copied.value, mv.value)
+
+    def testMovingVariancePickle(self):
+        window = 20
+        mv = MovingVariance(window, dependency='x')
+
+        mv.push(dict(x=1.))
+        mv.push(dict(x=2.))
+
+        with tempfile.NamedTemporaryFile('w+b', delete=False) as f:
+            pickle.dump(mv, f)
+
+        with open(f.name, 'rb') as f2:
+            pickled = pickle.load(f2)
+            self.assertAlmostEqual(mv.value, pickled.value)
+        os.unlink(f.name)
+
+        for i in range(3, 40):
+            mv.push(dict(x=float(i)))
+
+        with tempfile.NamedTemporaryFile('w+b', delete=False) as f:
+            pickle.dump(mv, f)
+
+        with open(f.name, 'rb') as f2:
+            pickled = pickle.load(f2)
+            self.assertAlmostEqual(mv.value, pickled.value)
+        os.unlink(f.name)
 
     def testMovingStandardDeviation(self):
         window = 120
@@ -808,9 +1019,9 @@ class TestStatefulAccumulators(unittest.TestCase):
         mv.push(dict(x=1.))
         mv.push(dict(x=2.))
 
-        f = tempfile.NamedTemporaryFile('w+b', delete=False)
-        pickle.dump(mv, f)
-        f.close()
+        with tempfile.NamedTemporaryFile('w+b', delete=False) as f:
+            pickle.dump(mv, f)
+
         with open(f.name, 'rb') as f2:
             pickled = pickle.load(f2)
             self.assertAlmostEqual(mv.value, pickled.value)
@@ -819,9 +1030,9 @@ class TestStatefulAccumulators(unittest.TestCase):
         for i in range(3, 40):
             mv.push(dict(x=float(i)))
 
-        f = tempfile.NamedTemporaryFile('w+b', delete=False)
-        pickle.dump(mv, f)
-        f.close()
+        with tempfile.NamedTemporaryFile('w+b', delete=False) as f:
+            pickle.dump(mv, f)
+
         with open(f.name, 'rb') as f2:
             pickled = pickle.load(f2)
             self.assertAlmostEqual(mv.value, pickled.value)
@@ -864,6 +1075,50 @@ class TestStatefulAccumulators(unittest.TestCase):
                                                                     "Negative variance calculated: {2:f}".format(i,
                                                                                                                  expected,
                                                                                                                  calculated))
+
+    def testMovingNegativeVarianceDeepcopy(self):
+        window = 20
+        mv = MovingNegativeVariance(window, dependency='x')
+
+        mv.push(dict(x=-1.))
+        mv.push(dict(x=-2.))
+
+        copied = copy.deepcopy(mv)
+        self.assertAlmostEqual(copied.value, mv.value)
+
+        datas = np.random.randn(40)
+        for i in datas:
+            mv.push(dict(x=i))
+
+        copied = copy.deepcopy(mv)
+        self.assertAlmostEqual(copied.value, mv.value)
+
+    def testMovingNegativeVariancePickle(self):
+        window = 20
+        mv = MovingNegativeVariance(window, dependency='x')
+
+        mv.push(dict(x=-1.))
+        mv.push(dict(x=-2.))
+
+        with tempfile.NamedTemporaryFile('w+b', delete=False) as f:
+            pickle.dump(mv, f)
+
+        with open(f.name, 'rb') as f2:
+            pickled = pickle.load(f2)
+            self.assertAlmostEqual(mv.value, pickled.value)
+        os.unlink(f.name)
+
+        datas = np.random.randn(40)
+        for i in datas:
+            mv.push(dict(x=i))
+
+        with tempfile.NamedTemporaryFile('w+b', delete=False) as f:
+            pickle.dump(mv, f)
+
+        with open(f.name, 'rb') as f2:
+            pickled = pickle.load(f2)
+            self.assertAlmostEqual(mv.value, pickled.value)
+        os.unlink(f.name)
 
     def testMovingHistoricalWindow(self):
         # test simple historical value holder
@@ -1035,6 +1290,48 @@ class TestStatefulAccumulators(unittest.TestCase):
                                                                 "product calculated: {2:f}".format(i, expected,
                                                                                                    calculated))
 
+    def testMovingProductDeepcopy(self):
+        window = 10
+        mv = MovingProduct(window, dependency='x')
+
+        mv.push(dict(x=1.))
+        mv.push(dict(x=2.))
+
+        copied = copy.deepcopy(mv)
+        self.assertAlmostEqual(copied.value, mv.value)
+
+        for i in range(3, 20):
+            mv.push(dict(x=float(i)))
+
+        copied = copy.deepcopy(mv)
+        self.assertAlmostEqual(copied.value, mv.value)
+
+    def testMovingProductPickle(self):
+        window = 10
+        mv = MovingProduct(window, dependency='x')
+
+        mv.push(dict(x=1.))
+        mv.push(dict(x=2.))
+
+        f = tempfile.NamedTemporaryFile('w+b', delete=False)
+        pickle.dump(mv, f)
+        f.close()
+        with open(f.name, 'rb') as f2:
+            pickled = pickle.load(f2)
+            self.assertAlmostEqual(mv.value, pickled.value)
+        os.unlink(f.name)
+
+        for i in range(3, 20):
+            mv.push(dict(x=float(i)))
+
+        with tempfile.NamedTemporaryFile('w+b', delete=False) as f:
+            pickle.dump(mv, f)
+
+        with open(f.name, 'rb') as f2:
+            pickled = pickle.load(f2)
+            self.assertAlmostEqual(mv.value, pickled.value)
+        os.unlink(f.name)
+
     def testMovingCenterMoment(self):
         window = 10
         order = 1
@@ -1072,6 +1369,50 @@ class TestStatefulAccumulators(unittest.TestCase):
                                                                 "moment calculated: {2:f}".format(i, expected,
                                                                                                   calculated))
 
+    def testMovingCenterMomentDeepcopy(self):
+        window = 10
+        order = 1.5
+        mv = MovingCenterMoment(window, order, dependency='x')
+
+        mv.push(dict(x=1.))
+        mv.push(dict(x=2.))
+
+        copied = copy.deepcopy(mv)
+        self.assertAlmostEqual(copied.value, mv.value)
+
+        for i in range(3, 20):
+            mv.push(dict(x=float(i)))
+
+        copied = copy.deepcopy(mv)
+        self.assertAlmostEqual(copied.value, mv.value)
+
+    def testMovingCenterMomentPickle(self):
+        window = 10
+        order = 1.5
+        mv = MovingCenterMoment(window, order, dependency='x')
+
+        mv.push(dict(x=1.))
+        mv.push(dict(x=2.))
+
+        f = tempfile.NamedTemporaryFile('w+b', delete=False)
+        pickle.dump(mv, f)
+        f.close()
+        with open(f.name, 'rb') as f2:
+            pickled = pickle.load(f2)
+            self.assertAlmostEqual(mv.value, pickled.value)
+        os.unlink(f.name)
+
+        for i in range(3, 20):
+            mv.push(dict(x=float(i)))
+
+        with tempfile.NamedTemporaryFile('w+b', delete=False) as f:
+            pickle.dump(mv, f)
+
+        with open(f.name, 'rb') as f2:
+            pickled = pickle.load(f2)
+            self.assertAlmostEqual(mv.value, pickled.value)
+        os.unlink(f.name)
+
     def testMovingSkewness(self):
         window = 10
         ms = MovingSkewness(window, dependency='x')
@@ -1089,7 +1430,49 @@ class TestStatefulAccumulators(unittest.TestCase):
                                                                 "skewness calculated: {2:f}".format(i, expected,
                                                                                                     calculated))
 
-    def testMovingTsMaxPos(self):
+    def testMovingSkewnessDeepcopy(self):
+        window = 10
+        mv = MovingSkewness(window, dependency='x')
+
+        mv.push(dict(x=1.))
+        mv.push(dict(x=2.))
+
+        copied = copy.deepcopy(mv)
+        self.assertAlmostEqual(copied.value, mv.value)
+
+        for i in range(3, 20):
+            mv.push(dict(x=float(i)))
+
+        copied = copy.deepcopy(mv)
+        self.assertAlmostEqual(copied.value, mv.value)
+
+    def testMovingSkewnessPickle(self):
+        window = 10
+        mv = MovingSkewness(window, dependency='x')
+
+        mv.push(dict(x=1.))
+        mv.push(dict(x=2.))
+
+        f = tempfile.NamedTemporaryFile('w+b', delete=False)
+        pickle.dump(mv, f)
+        f.close()
+        with open(f.name, 'rb') as f2:
+            pickled = pickle.load(f2)
+            self.assertAlmostEqual(mv.value, pickled.value)
+        os.unlink(f.name)
+
+        for i in range(3, 20):
+            mv.push(dict(x=float(i)))
+
+        with tempfile.NamedTemporaryFile('w+b', delete=False) as f:
+            pickle.dump(mv, f)
+
+        with open(f.name, 'rb') as f2:
+            pickled = pickle.load(f2)
+            self.assertAlmostEqual(mv.value, pickled.value)
+        os.unlink(f.name)
+
+    def MovingMaxPos(self):
         window = 10
         maxPos = MovingMaxPos(window, dependency='x')
 
@@ -1106,7 +1489,51 @@ class TestStatefulAccumulators(unittest.TestCase):
                                                        "maxPos calculated: {2:f}".format(i, expected,
                                                                                          calculated))
 
-    def testMovingTsMinPos(self):
+    def testMovingMaxPosDeepcopy(self):
+        window = 20
+        mv = MovingMaxPos(window, dependency='x')
+
+        mv.push(dict(x=-1.))
+        mv.push(dict(x=-2.))
+
+        copied = copy.deepcopy(mv)
+        self.assertAlmostEqual(copied.value, mv.value)
+
+        datas = np.random.randn(40)
+        for i in datas:
+            mv.push(dict(x=i))
+
+        copied = copy.deepcopy(mv)
+        self.assertAlmostEqual(copied.value, mv.value)
+
+    def testMovingMaxPosPickle(self):
+        window = 20
+        mv = MovingMaxPos(window, dependency='x')
+
+        mv.push(dict(x=-1.))
+        mv.push(dict(x=-2.))
+
+        with tempfile.NamedTemporaryFile('w+b', delete=False) as f:
+            pickle.dump(mv, f)
+
+        with open(f.name, 'rb') as f2:
+            pickled = pickle.load(f2)
+            self.assertAlmostEqual(mv.value, pickled.value)
+        os.unlink(f.name)
+
+        datas = np.random.randn(40)
+        for i in datas:
+            mv.push(dict(x=i))
+
+        with tempfile.NamedTemporaryFile('w+b', delete=False) as f:
+            pickle.dump(mv, f)
+
+        with open(f.name, 'rb') as f2:
+            pickled = pickle.load(f2)
+            self.assertAlmostEqual(mv.value, pickled.value)
+        os.unlink(f.name)
+
+    def testMovingMinPos(self):
         window = 10
         minPos = MovingMinPos(window, dependency='x')
 
@@ -1122,6 +1549,50 @@ class TestStatefulAccumulators(unittest.TestCase):
                                                        "minPos expected:   {1:f}\n"
                                                        "minPos calculated: {2:f}".format(i, expected,
                                                                                          calculated))
+
+    def testMovingMinPosDeepcopy(self):
+        window = 20
+        mv = MovingMinPos(window, dependency='x')
+
+        mv.push(dict(x=-1.))
+        mv.push(dict(x=-2.))
+
+        copied = copy.deepcopy(mv)
+        self.assertAlmostEqual(copied.value, mv.value)
+
+        datas = np.random.randn(40)
+        for i in datas:
+            mv.push(dict(x=i))
+
+        copied = copy.deepcopy(mv)
+        self.assertAlmostEqual(copied.value, mv.value)
+
+    def testMovingMinPosPickle(self):
+        window = 20
+        mv = MovingMinPos(window, dependency='x')
+
+        mv.push(dict(x=-1.))
+        mv.push(dict(x=-2.))
+
+        with tempfile.NamedTemporaryFile('w+b', delete=False) as f:
+            pickle.dump(mv, f)
+
+        with open(f.name, 'rb') as f2:
+            pickled = pickle.load(f2)
+            self.assertAlmostEqual(mv.value, pickled.value)
+        os.unlink(f.name)
+
+        datas = np.random.randn(40)
+        for i in datas:
+            mv.push(dict(x=i))
+
+        with tempfile.NamedTemporaryFile('w+b', delete=False) as f:
+            pickle.dump(mv, f)
+
+        with open(f.name, 'rb') as f2:
+            pickled = pickle.load(f2)
+            self.assertAlmostEqual(mv.value, pickled.value)
+        os.unlink(f.name)
 
     def testMovingKurtosis(self):
         window = 10
@@ -1141,6 +1612,50 @@ class TestStatefulAccumulators(unittest.TestCase):
                                                                 "kurtosis calculated: {2:f}".format(i, expected,
                                                                                                     calculated))
 
+    def testMovingKurtosisDeepcopy(self):
+        window = 20
+        mv = MovingKurtosis(window, dependency='x')
+
+        mv.push(dict(x=-1.))
+        mv.push(dict(x=-2.))
+
+        copied = copy.deepcopy(mv)
+        self.assertAlmostEqual(copied.value, mv.value)
+
+        datas = np.random.randn(40)
+        for i in datas:
+            mv.push(dict(x=i))
+
+        copied = copy.deepcopy(mv)
+        self.assertAlmostEqual(copied.value, mv.value)
+
+    def testMovingKurtosisPickle(self):
+        window = 20
+        mv = MovingKurtosis(window, dependency='x')
+
+        mv.push(dict(x=-1.))
+        mv.push(dict(x=-2.))
+
+        with tempfile.NamedTemporaryFile('w+b', delete=False) as f:
+            pickle.dump(mv, f)
+
+        with open(f.name, 'rb') as f2:
+            pickled = pickle.load(f2)
+            self.assertAlmostEqual(mv.value, pickled.value)
+        os.unlink(f.name)
+
+        datas = np.random.randn(40)
+        for i in datas:
+            mv.push(dict(x=i))
+
+        with tempfile.NamedTemporaryFile('w+b', delete=False) as f:
+            pickle.dump(mv, f)
+
+        with open(f.name, 'rb') as f2:
+            pickled = pickle.load(f2)
+            self.assertAlmostEqual(mv.value, pickled.value)
+        os.unlink(f.name)
+
     def testMovingRSV(self):
         window = 10
         rsv = MovingRSV(window, dependency='x')
@@ -1159,6 +1674,50 @@ class TestStatefulAccumulators(unittest.TestCase):
                                                                 "rsv calculated: {2:f}".format(i, expected,
                                                                                                calculated))
 
+    def testMovingRSVDeepcopy(self):
+        window = 20
+        mv = MovingRSV(window, dependency='x')
+
+        mv.push(dict(x=-1.))
+        mv.push(dict(x=-2.))
+
+        copied = copy.deepcopy(mv)
+        self.assertAlmostEqual(copied.value, mv.value)
+
+        datas = np.random.randn(40)
+        for i in datas:
+            mv.push(dict(x=i))
+
+        copied = copy.deepcopy(mv)
+        self.assertAlmostEqual(copied.value, mv.value)
+
+    def testMovingRSVPickle(self):
+        window = 20
+        mv = MovingRSV(window, dependency='x')
+
+        mv.push(dict(x=-1.))
+        mv.push(dict(x=-2.))
+
+        with tempfile.NamedTemporaryFile('w+b', delete=False) as f:
+            pickle.dump(mv, f)
+
+        with open(f.name, 'rb') as f2:
+            pickled = pickle.load(f2)
+            self.assertAlmostEqual(mv.value, pickled.value)
+        os.unlink(f.name)
+
+        datas = np.random.randn(40)
+        for i in datas:
+            mv.push(dict(x=i))
+
+        with tempfile.NamedTemporaryFile('w+b', delete=False) as f:
+            pickle.dump(mv, f)
+
+        with open(f.name, 'rb') as f2:
+            pickled = pickle.load(f2)
+            self.assertAlmostEqual(mv.value, pickled.value)
+        os.unlink(f.name)
+
     def testMACD(self):
         macd = MACD(short_win=5, long_win=10, dependency='close')
         short_average = XAverage(window=5, dependency='close')
@@ -1176,6 +1735,48 @@ class TestStatefulAccumulators(unittest.TestCase):
                                                              "calculated x-average: {2:f}".format(i,
                                                                                                   expected,
                                                                                                   calculated))
+
+    def tesMACDDeepcopy(self):
+        mv = MACD(short_win=5, long_win=10, dependency='x')
+
+        mv.push(dict(x=-1.))
+        mv.push(dict(x=-2.))
+
+        copied = copy.deepcopy(mv)
+        self.assertAlmostEqual(copied.value, mv.value)
+
+        datas = np.random.randn(40)
+        for i in datas:
+            mv.push(dict(x=i))
+
+        copied = copy.deepcopy(mv)
+        self.assertAlmostEqual(copied.value, mv.value)
+
+    def testMACDPickle(self):
+        mv = MACD(short_win=5, long_win=10, dependency='x')
+
+        mv.push(dict(x=-1.))
+        mv.push(dict(x=-2.))
+
+        with tempfile.NamedTemporaryFile('w+b', delete=False) as f:
+            pickle.dump(mv, f)
+
+        with open(f.name, 'rb') as f2:
+            pickled = pickle.load(f2)
+            self.assertAlmostEqual(mv.value, pickled.value)
+        os.unlink(f.name)
+
+        datas = np.random.randn(40)
+        for i in datas:
+            mv.push(dict(x=i))
+
+        with tempfile.NamedTemporaryFile('w+b', delete=False) as f:
+            pickle.dump(mv, f)
+
+        with open(f.name, 'rb') as f2:
+            pickled = pickle.load(f2)
+            self.assertAlmostEqual(mv.value, pickled.value)
+        os.unlink(f.name)
 
     def testEMAMACD(self):
         fast = 5
@@ -1214,6 +1815,50 @@ class TestStatefulAccumulators(unittest.TestCase):
                                                                  "expected rank:   {1}\n"
                                                                  "calculated rank: {2}".format(i, expected, calculated))
 
+    def tesMovingRankDeepcopy(self):
+        window = 10
+        mv = MovingRank(window, dependency='x')
+
+        mv.push(dict(x=-1.))
+        mv.push(dict(x=-2.))
+
+        copied = copy.deepcopy(mv)
+        self.assertAlmostEqual(copied.value, mv.value)
+
+        datas = np.random.randn(40)
+        for i in datas:
+            mv.push(dict(x=i))
+
+        copied = copy.deepcopy(mv)
+        self.assertAlmostEqual(copied.value, mv.value)
+
+    def testMovingRankPickle(self):
+        window = 10
+        mv = MovingRank(window, dependency='x')
+
+        mv.push(dict(x=-1.))
+        mv.push(dict(x=-2.))
+
+        with tempfile.NamedTemporaryFile('w+b', delete=False) as f:
+            pickle.dump(mv, f)
+
+        with open(f.name, 'rb') as f2:
+            pickled = pickle.load(f2)
+            self.assertAlmostEqual(mv.value, pickled.value)
+        os.unlink(f.name)
+
+        datas = np.random.randn(40)
+        for i in datas:
+            mv.push(dict(x=i))
+
+        with tempfile.NamedTemporaryFile('w+b', delete=False) as f:
+            pickle.dump(mv, f)
+
+        with open(f.name, 'rb') as f2:
+            pickled = pickle.load(f2)
+            self.assertAlmostEqual(mv.value, pickled.value)
+        os.unlink(f.name)
+
     def testMovingKDJ(self):
         window = 10
         k = 3
@@ -1244,6 +1889,50 @@ class TestStatefulAccumulators(unittest.TestCase):
                                                                 "expected kdj:   {1:f}\n"
                                                                 "calculated kdj: {2:f}".format(i, expected, calculated))
 
+    def tesMovingKDJDeepcopy(self):
+        window = 10
+        mv = MovingKDJ(window, dependency='x')
+
+        mv.push(dict(x=-1.))
+        mv.push(dict(x=-2.))
+
+        copied = copy.deepcopy(mv)
+        self.assertAlmostEqual(copied.value, mv.value)
+
+        datas = np.random.randn(40)
+        for i in datas:
+            mv.push(dict(x=i))
+
+        copied = copy.deepcopy(mv)
+        self.assertAlmostEqual(copied.value, mv.value)
+
+    def testMovingKDJPickle(self):
+        window = 10
+        mv = MovingKDJ(window, dependency='x')
+
+        mv.push(dict(x=-1.))
+        mv.push(dict(x=-2.))
+
+        with tempfile.NamedTemporaryFile('w+b', delete=False) as f:
+            pickle.dump(mv, f)
+
+        with open(f.name, 'rb') as f2:
+            pickled = pickle.load(f2)
+            self.assertAlmostEqual(mv.value, pickled.value)
+        os.unlink(f.name)
+
+        datas = np.random.randn(40)
+        for i in datas:
+            mv.push(dict(x=i))
+
+        with tempfile.NamedTemporaryFile('w+b', delete=False) as f:
+            pickle.dump(mv, f)
+
+        with open(f.name, 'rb') as f2:
+            pickled = pickle.load(f2)
+            self.assertAlmostEqual(mv.value, pickled.value)
+        os.unlink(f.name)
+
     def testMovingBias(self):
         window = 10
         mb = MovingBias(window, dependency='x')
@@ -1261,6 +1950,50 @@ class TestStatefulAccumulators(unittest.TestCase):
                                                                 "expected bias:   {1:f}\n"
                                                                 "calculated bias: {2:f}".format(i, expected,
                                                                                                 calculated))
+
+    def testMovingBiasDeepcopy(self):
+        window = 10
+        mv = MovingBias(window, dependency='x')
+
+        mv.push(dict(x=-1.))
+        mv.push(dict(x=-2.))
+
+        copied = copy.deepcopy(mv)
+        self.assertAlmostEqual(copied.value, mv.value)
+
+        datas = np.random.randn(40)
+        for i in datas:
+            mv.push(dict(x=i))
+
+        copied = copy.deepcopy(mv)
+        self.assertAlmostEqual(copied.value, mv.value)
+
+    def testMovingBiasPickle(self):
+        window = 10
+        mv = MovingBias(window, dependency='x')
+
+        mv.push(dict(x=-1.))
+        mv.push(dict(x=-2.))
+
+        with tempfile.NamedTemporaryFile('w+b', delete=False) as f:
+            pickle.dump(mv, f)
+
+        with open(f.name, 'rb') as f2:
+            pickled = pickle.load(f2)
+            self.assertAlmostEqual(mv.value, pickled.value)
+        os.unlink(f.name)
+
+        datas = np.random.randn(40)
+        for i in datas:
+            mv.push(dict(x=i))
+
+        with tempfile.NamedTemporaryFile('w+b', delete=False) as f:
+            pickle.dump(mv, f)
+
+        with open(f.name, 'rb') as f2:
+            pickled = pickle.load(f2)
+            self.assertAlmostEqual(mv.value, pickled.value)
+        os.unlink(f.name)
 
     def testMovingAroon(self):
         window = 10
@@ -1280,6 +2013,50 @@ class TestStatefulAccumulators(unittest.TestCase):
                                                                 "calculated aroon:{2:f}".format(i, expected,
                                                                                                 calculated))
 
+    def testMovingAroonDeepcopy(self):
+        window = 10
+        mv = MovingAroon(window, dependency='x')
+
+        mv.push(dict(x=-1.))
+        mv.push(dict(x=-2.))
+
+        copied = copy.deepcopy(mv)
+        self.assertAlmostEqual(copied.value, mv.value)
+
+        datas = np.random.randn(40)
+        for i in datas:
+            mv.push(dict(x=i))
+
+        copied = copy.deepcopy(mv)
+        self.assertAlmostEqual(copied.value, mv.value)
+
+    def testMovingAroonPickle(self):
+        window = 10
+        mv = MovingAroon(window, dependency='x')
+
+        mv.push(dict(x=-1.))
+        mv.push(dict(x=-2.))
+
+        with tempfile.NamedTemporaryFile('w+b', delete=False) as f:
+            pickle.dump(mv, f)
+
+        with open(f.name, 'rb') as f2:
+            pickled = pickle.load(f2)
+            self.assertAlmostEqual(mv.value, pickled.value)
+        os.unlink(f.name)
+
+        datas = np.random.randn(40)
+        for i in datas:
+            mv.push(dict(x=i))
+
+        with tempfile.NamedTemporaryFile('w+b', delete=False) as f:
+            pickle.dump(mv, f)
+
+        with open(f.name, 'rb') as f2:
+            pickled = pickle.load(f2)
+            self.assertAlmostEqual(mv.value, pickled.value)
+        os.unlink(f.name)
+
     def testMovingLevel(self):
         window = 10
         ml = MovingLevel(window, dependency='x')
@@ -1297,6 +2074,50 @@ class TestStatefulAccumulators(unittest.TestCase):
                                                                 "expected level:   {1:f}\n"
                                                                 "calculated level: {2:f}".format(i, expected,
                                                                                                  calculated))
+
+    def testMovingLevelDeepcopy(self):
+        window = 10
+        mv = MovingLevel(window, dependency='x')
+
+        mv.push(dict(x=-1.))
+        mv.push(dict(x=-2.))
+
+        copied = copy.deepcopy(mv)
+        self.assertAlmostEqual(copied.value, mv.value)
+
+        datas = np.random.randn(40)
+        for i in datas:
+            mv.push(dict(x=i))
+
+        copied = copy.deepcopy(mv)
+        self.assertAlmostEqual(copied.value, mv.value)
+
+    def testMovingLevelPickle(self):
+        window = 10
+        mv = MovingLevel(window, dependency='x')
+
+        mv.push(dict(x=-1.))
+        mv.push(dict(x=-2.))
+
+        with tempfile.NamedTemporaryFile('w+b', delete=False) as f:
+            pickle.dump(mv, f)
+
+        with open(f.name, 'rb') as f2:
+            pickled = pickle.load(f2)
+            self.assertAlmostEqual(mv.value, pickled.value)
+        os.unlink(f.name)
+
+        datas = np.random.randn(40)
+        for i in datas:
+            mv.push(dict(x=i))
+
+        with tempfile.NamedTemporaryFile('w+b', delete=False) as f:
+            pickle.dump(mv, f)
+
+        with open(f.name, 'rb') as f2:
+            pickled = pickle.load(f2)
+            self.assertAlmostEqual(mv.value, pickled.value)
+        os.unlink(f.name)
 
     def testMovingAutoCorrelation(self):
         window = 10
@@ -1319,6 +2140,46 @@ class TestStatefulAccumulators(unittest.TestCase):
                                                                       "calculated autoCorr:{2:f}".format(i,
                                                                                                          expected[0, 1],
                                                                                                          calculated))
+
+    def testMovingAutoCorrelationDeepcopy(self):
+        window = 10
+        mv = MovingAutoCorrelation(window, dependency='x', lags=1)
+
+        mv.push(dict(x=-1.))
+        mv.push(dict(x=-2.))
+        mv.push(dict(x=-3.))
+        mv.push(dict(x=-4.))
+
+        copied = copy.deepcopy(mv)
+
+        datas = np.random.randn(40)
+        for i in datas:
+            mv.push(dict(x=i))
+            copied.push(dict(x=i))
+
+        self.assertAlmostEqual(copied.value, mv.value)
+
+    def testMovingAutoCorrelationPickle(self):
+        window = 10
+        mv = MovingAutoCorrelation(window, dependency='x', lags=1)
+
+        mv.push(dict(x=-1.))
+        mv.push(dict(x=-2.))
+        mv.push(dict(x=-3.))
+
+        with tempfile.NamedTemporaryFile('w+b', delete=False) as f:
+            pickle.dump(mv, f)
+
+        with open(f.name, 'rb') as f2:
+            pickled = pickle.load(f2)
+
+        datas = np.random.randn(40)
+        for i in datas:
+            mv.push(dict(x=i))
+            pickled.push(dict(x=i))
+
+        self.assertAlmostEqual(mv.value, pickled.value)
+        os.unlink(f.name)
 
 
 if __name__ == '__main__':

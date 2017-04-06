@@ -833,15 +833,15 @@ cdef class MovingNegativeVariance(SingleValuedValueHolder):
 
     def __reduce__(self):
         d = self.collect_attributes()
-        d['_runningSum'] = self._runningSum
-        d['_runningSumSquare'] = self._runningSumSquare
+        d['_runningNegativeSum'] = self._runningNegativeSum
+        d['_runningNegativeSumSquare'] = self._runningNegativeSumSquare
         d['_runningNegativeCount'] = self._runningNegativeCount
         return MovingNegativeVariance, (self._window, self._dependency, self._isPop), d
 
     def __setstate__(self, state):
         self.copy_attributes(state, is_deep=False)
-        self._runningSum = state['_runningSum']
-        self._runningSumSquare = state['_runningSumSquare']
+        self._runningNegativeSum = state['_runningNegativeSum']
+        self._runningNegativeSumSquare = state['_runningNegativeSumSquare']
         self._runningNegativeCount = state['_runningNegativeCount']
 
 

@@ -293,15 +293,31 @@ cdef class XAverage(StatelessSingleValueAccumulator):
 
         if self._count == 0:
             self._average = value
+            self._count += 1
         else:
             self._average += self._exp * (value - self._average)
-        self._count += 1
 
     cpdef object result(self):
         return self._average
 
     def __deepcopy__(self, memo):
-        return XAverage(2.0 / self._exp - 1., self._dependency)
+        copied = XAverage(2.0 / self._exp - 1., self._dependency)
+
+        copied.copy_attributes(self.collect_attributes(), is_deep=True)
+        copied._average = self._average
+        copied._count = self._count
+        return copied
+
+    def __reduce__(self):
+        d = self.collect_attributes()
+        d['_average'] = self._average
+        d['_count'] = self._count
+        return XAverage, (2.0 / self._exp - 1., self._dependency), d
+
+    def __setstate__(self, state):
+        self.copy_attributes(state, is_deep=False)
+        self._average = state['_average']
+        self._count = state['_count']
 
 
 cdef class Variance(StatelessSingleValueAccumulator):

@@ -75,7 +75,7 @@ cpdef transform(data, list expressions, list cols, str category_field=None, bint
 
     for i, e in enumerate(expressions):
         if not flags[i]:
-            df[e] = data[e].values
+            df[cols[i]] = data[e].values
 
     if not dummy_category:
         df[category_field] = total_category

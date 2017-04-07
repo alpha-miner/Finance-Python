@@ -255,6 +255,14 @@ class TestStatefulAccumulators(unittest.TestCase):
         copied = copy.deepcopy(mv)
         self.assertAlmostEqual(mv.value, copied.value)
 
+        data = np.random.randn(20)
+
+        for d in data:
+            mv.push(dict(x=d))
+            copied.push(dict(x=d))
+
+            self.assertAlmostEqual(mv.value, copied.value)
+
     def testMovingPositiveAveragePickle(self):
         mv = MovingPositiveAverage(3, 'x')
         mv.push(dict(x=1.))
@@ -268,6 +276,14 @@ class TestStatefulAccumulators(unittest.TestCase):
             pickled = pickle.load(f2)
 
         self.assertAlmostEqual(mv.value, pickled.value)
+
+        data = np.random.randn(20)
+
+        for d in data:
+            mv.push(dict(x=d))
+            pickled.push(dict(x=d))
+
+            self.assertAlmostEqual(mv.value, pickled.value)
 
     def testMovingPositiveDifferenceAverage(self):
         window = 10
@@ -301,6 +317,13 @@ class TestStatefulAccumulators(unittest.TestCase):
         copied = copy.deepcopy(mv)
         self.assertAlmostEqual(mv.value, copied.value)
 
+        data = np.random.randn(20)
+        for d in data:
+            mv.push(dict(x=d))
+            copied.push(dict(x=d))
+
+            self.assertAlmostEqual(mv.value, copied.value)
+
     def testMovingPositiveDifferenceAveragePickle(self):
         mv = MovingPositiveDifferenceAverage(3, 'x')
         mv.push(dict(x=1.))
@@ -314,6 +337,14 @@ class TestStatefulAccumulators(unittest.TestCase):
             pickled = pickle.load(f2)
 
         self.assertAlmostEqual(mv.value, pickled.value)
+
+        data = np.random.randn(20)
+
+        for d in data:
+            mv.push(dict(x=d))
+            pickled.push(dict(x=d))
+
+            self.assertAlmostEqual(mv.value, pickled.value)
 
     def testMovingNegativeDifferenceAverage(self):
         window = 10
@@ -347,6 +378,13 @@ class TestStatefulAccumulators(unittest.TestCase):
         copied = copy.deepcopy(mv)
         self.assertAlmostEqual(mv.value, copied.value)
 
+        data = np.random.randn(20)
+        for d in data:
+            mv.push(dict(x=d))
+            copied.push(dict(x=d))
+
+            self.assertAlmostEqual(mv.value, copied.value)
+
     def testMovingNegativeDifferenceAveragePickle(self):
         mv = MovingNegativeDifferenceAverage(3, 'x')
         mv.push(dict(x=1.))
@@ -360,6 +398,14 @@ class TestStatefulAccumulators(unittest.TestCase):
             pickled = pickle.load(f2)
 
         self.assertAlmostEqual(mv.value, pickled.value)
+
+        data = np.random.randn(20)
+
+        for d in data:
+            mv.push(dict(x=d))
+            pickled.push(dict(x=d))
+
+            self.assertAlmostEqual(mv.value, pickled.value)
 
     def testMovingRSI(self):
         window = 10

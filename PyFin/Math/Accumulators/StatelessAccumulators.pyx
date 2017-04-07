@@ -148,7 +148,20 @@ cdef class PositivePart(StatelessSingleValueAccumulator):
         return self._pos
 
     def __deepcopy__(self, memo):
-        return PositivePart(self._dependency)
+        copied = PositivePart(self._dependency)
+
+        copied.copy_attributes(self.collect_attributes(), is_deep=True)
+        copied._pos = self._pos
+        return copied
+
+    def __reduce__(self):
+        d = self.collect_attributes()
+        d['_pos'] = self._pos
+        return PositivePart, (self._dependency,), d
+
+    def __setstate__(self, state):
+        self.copy_attributes(state, is_deep=False)
+        self._pos = state['_pos']
 
 
 cdef class NegativePart(StatelessSingleValueAccumulator):
@@ -172,7 +185,20 @@ cdef class NegativePart(StatelessSingleValueAccumulator):
         return self._neg
 
     def __deepcopy__(self, memo):
-        return NegativePart(self._dependency)
+        copied = NegativePart(self._dependency)
+
+        copied.copy_attributes(self.collect_attributes(), is_deep=True)
+        copied._neg = self._neg
+        return copied
+
+    def __reduce__(self):
+        d = self.collect_attributes()
+        d['_neg'] = self._neg
+        return NegativePart, (self._dependency,), d
+
+    def __setstate__(self, state):
+        self.copy_attributes(state, is_deep=False)
+        self._neg = state['_neg']
 
 
 cdef class Max(StatelessSingleValueAccumulator):

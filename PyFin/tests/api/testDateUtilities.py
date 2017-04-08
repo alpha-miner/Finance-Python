@@ -9,6 +9,7 @@ import unittest
 import datetime as dt
 from PyFin.DateUtilities.Date import Date
 from PyFin.DateUtilities.Calendar import Calendar
+from PyFin.DateUtilities.Period import Period
 from PyFin.Enums.BizDayConventions import BizDayConventions
 from PyFin.api.DateUtilities import datesList
 from PyFin.api.DateUtilities import isBizDay
@@ -100,17 +101,17 @@ class TestDateUtilities(unittest.TestCase):
         cal = Calendar('China.SSE')
 
         expected = advanceDateByCalendar('China.SSE', referenceDate.toDateTime(), '2D')
-        calculated = cal.advanceDate(referenceDate, '2D')
+        calculated = cal.advanceDate(referenceDate, Period('2D'))
         self.assertEqual(expected, calculated.toDateTime())
 
         expected = advanceDateByCalendar('China.SSE', referenceDate.toDateTime(), '2D')
-        calculated = cal.advanceDate(referenceDate, '2D')
+        calculated = cal.advanceDate(referenceDate, Period('2D'))
         self.assertEqual(expected, calculated.toDateTime())
 
         expected = advanceDateByCalendar('China.SSE', referenceDate.toDateTime(), '2B')
-        calculated = cal.advanceDate(referenceDate, '2B')
+        calculated = cal.advanceDate(referenceDate, Period('2B'))
         self.assertEqual(expected, calculated.toDateTime())
 
         expected = advanceDateByCalendar('China.SSE', referenceDate.toDateTime(), '1Y')
-        calculated = cal.advanceDate(referenceDate, '1Y')
+        calculated = cal.advanceDate(referenceDate, Period('1Y'))
         self.assertEqual(expected, calculated.toDateTime())

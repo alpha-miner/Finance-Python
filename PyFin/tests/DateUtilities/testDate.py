@@ -30,7 +30,7 @@ class TestDate(unittest.TestCase):
         year = 2015
         month = None
         day = 18
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             _ = Date(year=year, month=month, day=day)
 
     def testBasicFunctions(self):

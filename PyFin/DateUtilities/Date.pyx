@@ -78,7 +78,7 @@ cdef Date _advance(Date date, int n, int units):
 cdef class Date(object):
 
     @cython.cdivision(True)
-    def __init__(self, year=None, month=None, day=None, serialNumber=None):
+    def __init__(self, int year=0, int month=0, int day=0, int serialNumber=0):
         cdef int leap
         cdef int y
         cdef int m
@@ -102,9 +102,9 @@ cdef class Date(object):
             self._month = m
             self._day = d - _monthOffset(m, leap)
             return
-        elif serialNumber is not None and (year is not None or month is not None or day is not None):
+        elif serialNumber and (year or month or day):
             raise ValueError("When serial number is offered, no year or month or day number should be entered")
-        elif year is None or month is None or day is None:
+        elif not (year and month and day):
             raise ValueError("year: {0}, month: {1}, day: {2} can't be null value included".format(year, month, day))
 
         self._calculate_date(year, month, day)

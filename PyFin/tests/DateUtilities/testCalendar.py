@@ -12,6 +12,7 @@ import os
 import pickle
 from PyFin.DateUtilities import Date
 from PyFin.DateUtilities import Calendar
+from PyFin.DateUtilities import Period
 from PyFin.Enums import BizDayConventions
 from PyFin.Enums import Months
 from PyFin.Enums import Weekdays
@@ -165,20 +166,20 @@ class TestCalendar(unittest.TestCase):
         bizDayConv = BizDayConventions.Following
 
         # test null period
-        self.assertEqual(sseCal.advanceDate(referenceDate, '0b', bizDayConv), Date(2014, 2, 7))
+        self.assertEqual(sseCal.advanceDate(referenceDate, Period('0b'), bizDayConv), Date(2014, 2, 7))
 
         # test negative period
-        self.assertEqual(sseCal.advanceDate(referenceDate, '-5b', bizDayConv), Date(2014, 1, 24))
+        self.assertEqual(sseCal.advanceDate(referenceDate, Period('-5b'), bizDayConv), Date(2014, 1, 24))
 
         # The difference is caused by Feb 8 is SSE holiday but a working day for IB market
-        self.assertEqual(sseCal.advanceDate(referenceDate, '2b', bizDayConv), Date(2014, 2, 10))
-        self.assertEqual(sseCal.advanceDate(referenceDate, '2d', bizDayConv), Date(2014, 2, 7))
-        self.assertEqual(ibCal.advanceDate(referenceDate, '2b', bizDayConv), Date(2014, 2, 8))
-        self.assertEqual(ibCal.advanceDate(referenceDate, '2d', bizDayConv), Date(2014, 2, 7))
+        self.assertEqual(sseCal.advanceDate(referenceDate, Period('2b'), bizDayConv), Date(2014, 2, 10))
+        self.assertEqual(sseCal.advanceDate(referenceDate, Period('2d'), bizDayConv), Date(2014, 2, 7))
+        self.assertEqual(ibCal.advanceDate(referenceDate, Period('2b'), bizDayConv), Date(2014, 2, 8))
+        self.assertEqual(ibCal.advanceDate(referenceDate, Period('2d'), bizDayConv), Date(2014, 2, 7))
 
         bizDayConv = BizDayConventions.ModifiedFollowing
         # May 31, 2014 is a holiday
-        self.assertEqual(sseCal.advanceDate(referenceDate, '4m', bizDayConv, True), Date(2014, 5, 30))
+        self.assertEqual(sseCal.advanceDate(referenceDate, Period('4m'), bizDayConv, True), Date(2014, 5, 30))
 
     def testDatesList(self):
 

@@ -5,14 +5,12 @@ Created on 2017-2-1
 @author: cheng.li
 """
 
-import six
 from PyFin.Enums._Weekdays cimport Weekdays
 from PyFin.Enums._TimeUnits cimport TimeUnits
 from PyFin.Enums._Months cimport Months
 from PyFin.Enums._BizDayConventions cimport BizDayConventions
 from PyFin.DateUtilities.Date cimport Date
 from PyFin.DateUtilities.Period cimport Period
-from PyFin.Utilities.Asserts cimport pyFinAssert
 
 
 cdef class Calendar(object):
@@ -105,20 +103,14 @@ cdef class Calendar(object):
             raise ValueError("unknown business-day convention")
         return d1
 
-    cpdef advanceDate(self, Date d, period, int c=BizDayConventions.Following, bint endOfMonth=False):
+    cpdef advanceDate(self, Date d, Period period, int c=BizDayConventions.Following, bint endOfMonth=False):
 
         cdef int n
         cdef int units
         cdef Date d1
-        cdef Period pobj
 
-        if isinstance(period, six.string_types):
-            pobj = Period(period)
-        else:
-            pobj = period
-
-        n = pobj.length()
-        units = pobj.units()
+        n = period.length()
+        units = period.units()
 
         if n == 0:
             return self.adjustDate(d, c)
@@ -138,10 +130,10 @@ cdef class Calendar(object):
                     n += 1
             return d1
         elif units == TimeUnits.Days or units == TimeUnits.Weeks:
-            d1 = d + pobj
+            d1 = d + period
             return self.adjustDate(d1, c)
         else:
-            d1 = d + pobj
+            d1 = d + period
             if endOfMonth and self.isEndOfMonth(d):
                 return self.endOfMonth(d1)
             return self.adjustDate(d1, c)
@@ -150,8 +142,6 @@ cdef class Calendar(object):
         cdef list result = []
         cdef Date d = fromDate
 
-        pyFinAssert(fromDate <= toDate, ValueError, "from date ({0} must be earlier than to date {1}"
-                    .format(fromDate, toDate))
         while d <= toDate:
             if self.isHoliday(d) and (includeWeekEnds or not self.isWeekEnd(d.weekday())):
                 result.append(d)
@@ -161,9 +151,6 @@ cdef class Calendar(object):
     cpdef bizDatesList(self, Date fromDate, Date toDate):
         cdef list result = []
         cdef Date d = fromDate
-
-        pyFinAssert(fromDate <= toDate, ValueError, "from date ({0} must be earlier than to date {1}"
-                    .format(fromDate, toDate))
 
         while d <= toDate:
             if self.isBizDay(d):

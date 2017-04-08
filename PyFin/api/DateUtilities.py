@@ -54,6 +54,7 @@ def adjustDateByCalendar(holidayCenter, referenceDate, convention=BizDayConventi
 def advanceDateByCalendar(holidayCenter, referenceDate, period, convention=BizDayConventions.Following):
     cal = Calendar(holidayCenter)
     refer = check_date(referenceDate)
+    period = Period(period)
     return cal.advanceDate(refer, period, convention).toDateTime()
 
 

@@ -6,6 +6,7 @@ Created on 2015-2-20
 """
 
 from PyFin.DateUtilities.Date cimport Date
+from PyFin.DateUtilities.Period cimport Period
 
 
 cdef class CalendarImpl(object):
@@ -26,6 +27,6 @@ cdef class Calendar(object):
     cpdef endOfMonth(self, Date d)
     cpdef bizDaysBetween(self, Date fromDate, Date toDate, bint includeFirst=*, bint includeLast=*)
     cpdef adjustDate(self, Date d, int c=*)
-    cpdef advanceDate(self, Date d, period, int c=*, bint endOfMonth=*)
+    cpdef advanceDate(self, Date d, Period period, int c=*, bint endOfMonth=*)
     cpdef holDatesList(self, Date fromDate, Date toDate, bint includeWeekEnds=*)
     cpdef bizDatesList(self, Date fromDate, Date toDate)

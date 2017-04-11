@@ -8,6 +8,7 @@ Finance_Python.egg-info/*
 *.cpp
 *.hpp
 *.h
+*.so
 *.pyd
 *.html
 .idea/

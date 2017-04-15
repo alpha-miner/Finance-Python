@@ -170,7 +170,7 @@ setup(
     author_email=AUTHOR_EMAIL,
     url=URL,
     packages=find_packages(),
-    include_package_data=True,
+    include_package_data=False,
     install_requires=io.open(requirements, encoding='utf8').read(),
     classifiers=[],
     cmdclass={"test": test,

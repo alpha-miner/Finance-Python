@@ -12,6 +12,7 @@ from PyFin.Utilities import pyFinAssert
 class SettingsFactory(object):
     def __init__(self):
         self._evaluationDate = None
+        self._includeToday = None
 
     @property
     def evaluationDate(self):
@@ -22,6 +23,14 @@ class SettingsFactory(object):
     @evaluationDate.setter
     def evaluationDate(self, value):
         pyFinAssert(isinstance(value, Date), ValueError, "{0} is not a valid PyFin date object".format(value))
+        self._evaluationDate = value
+
+    @property
+    def includeTodaysCashFlows(self):
+        return self._includeToday
+
+    @includeTodaysCashFlows.setter
+    def includeTodaysCashFlows(self, value):
         self._evaluationDate = value
 
     def resetEvaluationDate(self):

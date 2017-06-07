@@ -8,6 +8,9 @@ Created on 2015-7-23
 from PyFin.tests.Math import Distributions
 from PyFin.tests.Math import Accumulators
 from PyFin.tests.Math import Timeseries
+from PyFin.tests.Math import RootFinder
 
 __all__ = ["Distributions",
-           "Accumulators"]
+           "Accumulators",
+           "Timeseries",
+           "RootFinder"]

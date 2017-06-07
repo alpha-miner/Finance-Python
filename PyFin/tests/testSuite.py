@@ -48,6 +48,7 @@ if __name__ == "__main__":
                               Math.Timeseries.TestNormalizers,
                               Math.Accumulators.TestPerformancers,
                               Math.Timeseries.TestTimeseries,
+                              Math.RootFinder.TestBrent,
                               POpt.TestOptimizer,
                               Utilities.TestAsserts],
                              pyfin_logger)

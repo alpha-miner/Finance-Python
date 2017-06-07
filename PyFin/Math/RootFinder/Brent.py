@@ -5,9 +5,9 @@ Created on 2017-6-7
 @author: cheng.li
 """
 
-from math import inf
 from math import exp
 from math import fabs
+from numpy import inf
 from PyFin.Utilities.Asserts import pyFinAssert
 from PyFin.Math.RootFinder.RootFinderBase import RootFinder
 

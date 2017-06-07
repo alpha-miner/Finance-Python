@@ -34,6 +34,7 @@ install:
   - conda install scipy
   - conda install pandas
   - conda install cython
+  - pip install simpleutils
   - pip install coveralls
 # command to run tests
 script:

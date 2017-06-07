@@ -28,7 +28,7 @@ class TestBrent(unittest.TestCase):
 
         while True and iterations < 100:
             iterations += 1
-            x = brent.next_x()
+            x = brent.nextX()
             if converge.check_converge(brent, root_func(x)):
                 break
 
@@ -49,7 +49,7 @@ class TestBrent(unittest.TestCase):
 
         while True and iterations < 100:
             iterations += 1
-            x = brent.next_x()
+            x = brent.nextX()
             if converge.check_converge(brent, root_func(x)):
                 break
 

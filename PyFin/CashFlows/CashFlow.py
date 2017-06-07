@@ -19,11 +19,11 @@ class CashFlow(object):
     def amount(self):
         pass
 
-    def ex_coupon_date(self):
+    def exCouponDate(self):
         return None
 
-    def trading_ex_coupon(self, ref_date=None):
-        ecd = self.ex_coupon_date()
+    def tradingExCoupon(self, ref_date=None):
+        ecd = self.exCouponDate()
 
         if not ecd:
             return False
@@ -31,7 +31,7 @@ class CashFlow(object):
             ref_date = ref_date if ref_date else Settings.evaluationDate
             return ecd <= ref_date
 
-    def has_occurred(self, ref_date=None, include_ref_date=False):
+    def hasOccurred(self, ref_date=None, include_ref_date=False):
         if ref_date:
             cf = self.date()
             if ref_date < cf:

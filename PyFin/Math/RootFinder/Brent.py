@@ -38,10 +38,10 @@ class BracketedBrent(RootFinder):
         self.bisect = True
         self.d = 0
 
-    def bracket_width(self):
+    def bracketWidth(self):
         return fabs(self.a[0] - self.b[0])
 
-    def put_y(self, y):
+    def putY(self, y):
         s = self.d
         self.d = self.c[0]
         self.c = self.b
@@ -54,7 +54,7 @@ class BracketedBrent(RootFinder):
         if fabs(self.a[1]) < fabs(self.b[1]):
             self.a, self.b = self.b, self.a
 
-    def next_x(self):
+    def nextX(self):
         if self.c[1] != self.a[1] and self.c[1] != self.b[1]:
             # inverse quadratic interpolation
             s = self.a[0] * self.b[1] * self.c[1] / ((self.a[1] - self.b[1]) * (self.a[1] - self.c[1])) \
@@ -87,16 +87,16 @@ class Brent(RootFinder):
         self.known_points = inf, inf
         self.engine = BracketedBrent(tol)
 
-    def next_x(self):
-        return self.engine.next_x() if self.phase == 'bracketed' else self.trial_x
+    def nextX(self):
+        return self.engine.nextX() if self.phase == 'bracketed' else self.trial_x
 
-    def put_y(self, y):
+    def putY(self, y):
         if self.phase == 'init':
             self.known_points = self.trial_x, y
             self.trial_x += self.step_size * (1. if self.increasing else -1.) * (1. if y < 0. else -1.)
             self.phase = 'hunt'
         elif self.phase == 'bracketed':
-            self.engine.put_y(y)
+            self.engine.putY(y)
         elif self.phase == 'hunt':
             if y * self.known_points[1] <= 0.:
                 self.engine.initialize(self.known_points, (self.trial_x, y))
@@ -112,5 +112,5 @@ class Brent(RootFinder):
                                + (1. if self.increasing else -1.) \
                                  * (1. if self.known_points[1] < 0. else -1.) * self.step_size
 
-    def bracket_width(self):
-        return self.engine.bracket_width() if self.phase == 'bracketed' else inf
+    def bracketWidth(self):
+        return self.engine.bracketWidth() if self.phase == 'bracketed' else inf

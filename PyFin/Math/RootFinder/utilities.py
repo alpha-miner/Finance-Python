@@ -16,5 +16,5 @@ class Converged(object):
         self.f_tol = f_tol
 
     def check_converge(self, root_finder, e):
-        root_finder.put_y(e)
-        return fabs(e) < self.f_tol or root_finder.bracket_width() < self.x_tol
+        root_finder.putY(e)
+        return fabs(e) < self.f_tol or root_finder.bracketWidth() < self.x_tol

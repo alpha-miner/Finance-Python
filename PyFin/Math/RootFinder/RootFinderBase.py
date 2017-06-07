@@ -8,11 +8,11 @@ Created on 2017-6-7
 
 class RootFinder(object):
 
-    def put_y(self, y):
+    def putY(self, y):
         pass
 
-    def next_x(self):
+    def nextX(self):
         pass
 
-    def bracket_width(self):
+    def bracketWidth(self):
         pass

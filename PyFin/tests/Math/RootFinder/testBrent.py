@@ -55,6 +55,17 @@ class TestBrent(unittest.TestCase):
 
         self.assertAlmostEqual(x, 1.)
 
+        brent = Brent(-1.5)
+        iterations = 0
+
+        while True and iterations < 100:
+            iterations += 1
+            x = brent.nextX()
+            if converge.check_converge(brent, root_func(x)):
+                break
+
+        self.assertAlmostEqual(x, -1.)
+
 
 if __name__ == '__main__':
     unittest.main()

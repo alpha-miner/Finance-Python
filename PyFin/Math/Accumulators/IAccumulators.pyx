@@ -22,6 +22,7 @@ cimport numpy as np
 import pandas as pd
 from PyFin.Utilities.Asserts cimport pyFinAssert
 from PyFin.Math.MathConstants cimport NAN
+from PyFin.Math.udfs cimport sign
 
 
 cdef class IAccumulator(object):
@@ -884,15 +885,6 @@ cdef class Abs(BasicFunction):
 
     def __setstate__(self, state):
         pass
-
-
-cdef double sign(double x) nogil:
-    if x > 0.:
-        return 1.
-    elif x < 0.:
-        return -1.
-    else:
-        return 0.
 
 
 cdef class Sign(BasicFunction):

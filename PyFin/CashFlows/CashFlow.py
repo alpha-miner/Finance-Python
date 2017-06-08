@@ -22,6 +22,21 @@ class CashFlow(object):
     def exCouponDate(self):
         return None
 
+    def __le__(self, right):
+        return self.date() <= right.date()
+
+    def __lt__(self, right):
+        return self.date() < right.date()
+
+    def __ge__(self, right):
+        return self.date() >= right.date()
+
+    def __gt__(self, right):
+        return self.date() > right.date()
+
+    def __eq__(self, right):
+        return self.date() == right.date()
+
     def tradingExCoupon(self, ref_date=None):
         ecd = self.exCouponDate()
 
@@ -55,14 +70,14 @@ class CashFlow(object):
 class SimpleCashFlow(CashFlow):
 
     def __init__(self, amount, date):
-        self.amount = amount
-        self.date = date
+        self.amount_ = amount
+        self.date_ = date
 
     def date(self):
-        return self.date
+        return self.date_
 
     def amount(self):
-        return self.amount
+        return self.amount_
 
 
 class Redemption(SimpleCashFlow):

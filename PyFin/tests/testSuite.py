@@ -13,6 +13,7 @@ from simpleutils import TestRunner
 from simpleutils import CustomLogger
 import PyFin.tests.api as api
 import PyFin.tests.Analysis as Analysis
+import PyFin.tests.CashFlows as CashFlows
 import PyFin.tests.DateUtilities as DateUtilities
 import PyFin.tests.Env as Env
 import PyFin.tests.Math as Math
@@ -32,6 +33,7 @@ if __name__ == "__main__":
                               Analysis.TechnicalAnalysis.TestStatelessTechnicalAnalysis,
                               Analysis.TechnicalAnalysis.TestStatelessTechnicalAnalysis,
                               Analysis.TechnicalAnalysis.TestStatefulTechnicalAnalysis,
+                              CashFlows.TestCashFlow,
                               DateUtilities.TestCalendar,
                               DateUtilities.TestDate,
                               DateUtilities.TestPeriod,

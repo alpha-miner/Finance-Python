@@ -70,14 +70,14 @@ class CashFlow(object):
 class SimpleCashFlow(CashFlow):
 
     def __init__(self, amount, date):
-        self.amount_ = amount
-        self.date_ = date
+        self._amount = amount
+        self._date = date
 
     def date(self):
-        return self.date_
+        return self._date
 
     def amount(self):
-        return self.amount_
+        return self._amount
 
 
 class Redemption(SimpleCashFlow):

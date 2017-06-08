@@ -50,3 +50,22 @@ class CashFlow(object):
             return self.date() < ref_date
         else:
             return self.date() <= ref_date
+
+
+class SimpleCashFlow(CashFlow):
+
+    def __init__(self, amount, date):
+        self.amount = amount
+        self.date = date
+
+    def date(self):
+        return self.date
+
+    def amount(self):
+        return self.amount
+
+
+class Redemption(SimpleCashFlow):
+
+    def __init__(self, amount, date):
+        super(Redemption, self).__init__(amount, date)

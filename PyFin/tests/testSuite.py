@@ -34,6 +34,7 @@ if __name__ == "__main__":
                               Analysis.TechnicalAnalysis.TestStatelessTechnicalAnalysis,
                               Analysis.TechnicalAnalysis.TestStatefulTechnicalAnalysis,
                               CashFlows.TestCashFlow,
+                              CashFlows.TestInterestRate,
                               DateUtilities.TestCalendar,
                               DateUtilities.TestDate,
                               DateUtilities.TestPeriod,

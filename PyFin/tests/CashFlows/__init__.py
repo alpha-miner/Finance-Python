@@ -6,6 +6,8 @@ Created on 2017-6-8
 """
 
 from PyFin.tests.CashFlows.testCashFlow import TestCashFlow
+from PyFin.tests.CashFlows.testInterestRate import TestInterestRate
 
 
-__all__ = ['TestCashFlow']
+__all__ = ['TestCashFlow',
+           'TestInterestRate']

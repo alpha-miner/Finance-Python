@@ -8,7 +8,6 @@ Created on 2017-6-7
 from PyFin.Env.Settings import Settings
 
 
-
 class CashFlow(object):
 
     def __init__(self):

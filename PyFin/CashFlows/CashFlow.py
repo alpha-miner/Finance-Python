@@ -8,6 +8,7 @@ Created on 2017-6-7
 from PyFin.Env.Settings import Settings
 
 
+
 class CashFlow(object):
 
     def __init__(self):
@@ -84,3 +85,60 @@ class Redemption(SimpleCashFlow):
 
     def __init__(self, amount, date):
         super(Redemption, self).__init__(amount, date)
+
+
+class Coupon(CashFlow):
+
+    def __init__(self,
+                 paymentDate,
+                 norminal,
+                 accrualStartDate,
+                 accrualEndDate,
+                 refPeriodStart=None,
+                 refPeriodEnd=None,
+                 exCouponDate=None):
+        self.paymentDate_ = paymentDate
+        self.norminal_ = norminal
+        self.accrualStartDate_ = accrualStartDate
+        self.accrualEndDate_ = accrualEndDate
+        self.refPeriodStart_ = refPeriodStart
+        self.refPeriodEnd_ = refPeriodEnd
+        self.exCouponDate_ = exCouponDate
+        self.accrualPeriod_ = None
+
+        if not self.refPeriodStart_:
+            self.refPeriodStart_ = self.accrualStartDate_
+
+        if not self.refPeriodEnd_:
+            self.refPeriodEnd_ = self.accrualEndDate_
+
+    def dayCounter(self):
+        pass
+
+    def accrualPeriod(self):
+        if not self.accrualPeriod_:
+            self.accrualPeriod_ = self.dayCounter().yearFraction(self.accrualStartDate_,
+                                                                 self.accrualEndDate_,
+                                                                 self.refPeriodStart_,
+                                                                 self.refPeriodEnd_)
+        return self.accrualPeriod_
+
+    def accrualDays(self):
+        return self.dayCounter().dayCount(self.accrualStartDate_,
+                                          self.accrualEndDate_)
+
+    def accruedPeriodByDate(self, d):
+        if d <= self.accrualStartDate_ or d > self.paymentDate_:
+            return 0.
+        else:
+            return self.dayCounter().yearFraction(self.accrualStartDate_,
+                                                  min(d, self.accrualEndDate_),
+                                                  self.refPeriodStart_,
+                                                  self.refPeriodEnd_)
+
+    def accrualDaysByDate(self, d):
+        if d <= self.accrualStartDate_ or d > self.paymentDate_:
+            return 0
+        else:
+            return self.dayCounter().dayCount(self.accrualStartDate_,
+                                              min(d, self.accrualEndDate_))

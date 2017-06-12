@@ -39,6 +39,7 @@ if __name__ == "__main__":
                               DateUtilities.TestDate,
                               DateUtilities.TestPeriod,
                               DateUtilities.TestSchedule,
+                              DateUtilities.TestDayCounter,
                               Env.TestSettings,
                               Math.Distributions.TestDistribution,
                               PricingEngines.TestBlackFormula,

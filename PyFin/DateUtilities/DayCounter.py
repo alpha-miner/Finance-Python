@@ -5,6 +5,8 @@ Created on 2017-6-11
 @author: cheng.li
 """
 
+from PyFin.DateUtilities.Period import Period
+from PyFin.Enums.TimeUnits import TimeUnits
 from PyFin.Enums.Months import Months
 
 
@@ -84,6 +86,61 @@ class Actual365NoLeap(DayCounterImpl):
         return self.dayCount(d1, d2) / 365.
 
 
+class ActualActualISMAImpl(DayCounterImpl):
+
+    def name(self):
+        return 'Actual/Actual (ISMA)'
+
+    def yearFraction(self, d1, d2, d3, d4):
+
+        if d1 == d2:
+            return 0.
+
+        if d1 > d2:
+            return -self.yearFraction(d2, d1, d3, d4)
+
+        refPeriodStart = d3 if d3 else d1
+        refPeriodEnd = d4 if d4 else d2
+
+        months = int(0.5 + 12. * (refPeriodEnd - refPeriodStart) / 365.)
+
+        if months == 0:
+            refPeriodStart = d1
+            refPeriodEnd = d1 + '1y'
+            months = 12
+
+        period = months / 12.
+
+        if d2 <= refPeriodEnd:
+            if d1 >= refPeriodStart:
+                return period * (d2 - d1) / (refPeriodEnd - refPeriodStart)
+            else:
+                previousRef = refPeriodStart - Period(length=months, units=TimeUnits.Months)
+
+                if d2 > refPeriodStart:
+                    return self.yearFraction(d1, refPeriodStart, previousRef, refPeriodStart) \
+                           + self.yearFraction(refPeriodStart, d2, refPeriodStart, refPeriodEnd)
+                else:
+                    return self.yearFraction(d1, d2, previousRef, refPeriodStart)
+
+        else:
+            sum = self.yearFraction(d1, refPeriodEnd, refPeriodStart, refPeriodEnd)
+            i = 0
+            while True:
+                newRefStart = refPeriodEnd + Period(length=i*months, units=TimeUnits.Months)
+                newRefEnd = refPeriodEnd + Period(length=(i+1)*months, units=TimeUnits.Months)
+
+                if d2 < newRefEnd:
+                    break
+                else:
+                    sum += period
+                    i += 1
+
+            sum += self.yearFraction(newRefStart, d2, newRefStart, newRefEnd)
+            return sum
+
+
 _dcDict = {'actual/360': Actual360,
            'actual/365 (fixed)': Actual365Fixed,
-           'actual/365 (nl)': Actual365NoLeap}
+           'actual/365 (nl)': Actual365NoLeap,
+           'actual/actual (isma)': ActualActualISMAImpl}

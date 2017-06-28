@@ -26,7 +26,7 @@ class DayCounter(object):
     def dayCount(self, d1, d2):
         return self.impl_.dayCount(d1, d2)
 
-    def yearFraction(self, d1, d2, refPeriodStart, refPeriodEnd):
+    def yearFraction(self, d1, d2, refPeriodStart=None, refPeriodEnd=None):
         return self.impl_.yearFraction(d1, d2, refPeriodStart, refPeriodEnd)
 
 

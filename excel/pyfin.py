@@ -30,6 +30,7 @@ def sabrVolatilities(strikes, forward, expiry, alpha, beta, nu, rho):
 @xw.func
 @xw.ret(expand='table')
 @xw.arg('strikes', np.array, dim=1)
+@xw.arg('volatilites', np.array, dim=1)
 def sabrCalibration(strikes,
                     volatilites,
                     forward,
@@ -74,6 +75,7 @@ def sviVolatilities(strikes, forward, expiry, a, b, sigma, rho, m):
 @xw.func
 @xw.ret(expand='table')
 @xw.arg('strikes', np.array, dim=1)
+@xw.arg('volatilites', np.array, dim=1)
 def sviCalibration(strikes,
                    volatilites,
                    forward,

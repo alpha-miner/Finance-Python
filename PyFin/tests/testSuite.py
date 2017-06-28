@@ -56,4 +56,3 @@ if __name__ == "__main__":
                               Utilities.TestAsserts],
                              pyfin_logger)
     test_runner.run()
-

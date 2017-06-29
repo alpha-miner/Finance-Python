@@ -269,6 +269,18 @@ cdef class Schedule(object):
     cpdef size_t size(self):
         return len(self._dates)
 
+    cpdef Calendar calendar(self):
+        return self._cal
+
+    cpdef Period tenor(self):
+        return self._tenor
+
+    cpdef bint endOfMonth(self):
+        return self._endOfMonth
+
+    cpdef bint isRegular(self, size_t i):
+        return self._isRegular[i-1]
+
     def __getitem__(self, item):
         return self._dates[item]
 

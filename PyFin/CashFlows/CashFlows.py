@@ -60,4 +60,11 @@ class IrrFinder(object):
                     'given cash flows cannot result in the given market due to sign change')
 
 
+class CashFlows(object):
+
+    @staticmethod
+    def startDate(leg):
+        return
+
+
 

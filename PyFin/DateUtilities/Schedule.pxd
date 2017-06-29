@@ -26,3 +26,7 @@ cdef class Schedule(object):
     cdef public Date _nextToLastDate
 
     cpdef size_t size(self)
+    cpdef bint isRegular(self, size_t i)
+    cpdef Calendar calendar(self)
+    cpdef Period tenor(self)
+    cpdef bint endOfMonth(self)

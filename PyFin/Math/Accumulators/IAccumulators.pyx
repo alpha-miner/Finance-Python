@@ -305,7 +305,7 @@ cdef class TruncatedValueHolder(Accumulator):
             item = self._start
         else:
             item = slice(self._start, self._stop)
-        return TruncatedValueHolder(self._valueHolder, item)
+        return TruncatedValueHolder(self._dependency, item)
 
     def __reduce__(self):
         d = {}
@@ -315,7 +315,7 @@ cdef class TruncatedValueHolder(Accumulator):
         else:
             item = slice(self._start, self._stop)
 
-        return TruncatedValueHolder, (self._valueHolder, item), d
+        return TruncatedValueHolder, (self._dependency, item), d
 
     def __setstate__(self, state):
         pass

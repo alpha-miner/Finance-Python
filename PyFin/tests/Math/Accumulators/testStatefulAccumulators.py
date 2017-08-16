@@ -52,6 +52,7 @@ from PyFin.Math.Accumulators import MovingBias
 from PyFin.Math.Accumulators import MovingAroon
 from PyFin.Math.Accumulators import MovingLevel
 from PyFin.Math.Accumulators import MovingAutoCorrelation
+from PyFin.Math.Accumulators import MovingResidue
 
 
 class TestStatefulAccumulators(unittest.TestCase):
@@ -2226,6 +2227,30 @@ class TestStatefulAccumulators(unittest.TestCase):
 
         self.assertAlmostEqual(mv.value, pickled.value)
         os.unlink(f.name)
+
+    def testMovingResidue(self):
+        window = 100
+        x_data = np.random.randn(10000)
+
+        mr = MovingResidue(window)
+
+        for i, value in enumerate(zip(x_data, self.sample)):
+            x = value[0]
+            y = value[1]
+
+            mr.push(dict(x=x, y=y))
+
+            if i >= window - 1:
+                series_x = x_data[i-window+1:i+1]
+                series_y = self.sample[i-window+1:i+1]
+
+                expected_res = mr.result()
+                calculated_res = y - np.dot(series_x, series_y) / np.dot(series_x, series_x) * x
+                self.assertAlmostEqual(expected_res, calculated_res, 8, "at index of {0:d}\n"
+                                                                        "expected res:  {1:f}\n"
+                                                                        "calculated res:{2:f}".format(i,
+                                                                                                      expected_res,
+                                                                                                      calculated_res))
 
 
 if __name__ == '__main__':

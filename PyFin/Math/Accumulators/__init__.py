@@ -78,6 +78,7 @@ from PyFin.Math.Accumulators.StatefulAccumulators import MovingAroon
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingBias
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingAutoCorrelation
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingLogReturn
+from PyFin.Math.Accumulators.StatefulAccumulators import MovingResidue
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingAlphaBeta
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingDrawDown
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingAverageDrawdown
@@ -135,6 +136,7 @@ __all__ = ["Exp",
            "MovingVariance",
            "MovingStandardDeviation",
            "MovingLogReturn",
+           "MovingResidue",
            "MovingAlphaBeta",
            "MovingDrawDown",
            "MovingAverageDrawdown",

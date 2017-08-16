@@ -15,6 +15,7 @@ cdef class Accumulator(IAccumulator):
     cdef public bint _isFull
     cdef public object _dependency
     cdef public bint _isValueHolderContained
+    cdef public bint _isStringDependency
     cdef public size_t _window
     cdef public size_t _returnSize
 

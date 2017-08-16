@@ -5,7 +5,7 @@ Created on 2017-6-8
 @author: cheng.li
 """
 
-cdef double sign(double x) nogil:
+cdef inline double sign(double x) nogil:
     if x > 0.:
         return 1.
     elif x < 0.:

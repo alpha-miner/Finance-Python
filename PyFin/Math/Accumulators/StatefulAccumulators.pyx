@@ -1664,15 +1664,16 @@ cdef class MovingSharp(StatefulValueHolder):
         cdef tuple value
         cdef double ret
         cdef double benchmark
+        cdef dict new_data
 
         value = self.extract(data)
         if isnan(value[0]) or isnan(value[1]):
             return NAN
         ret = value[0]
         benchmark = value[1]
-        data = {'x': ret - benchmark}
-        self._mean.push(data)
-        self._var.push(data)
+        new_data = {'x': ret - benchmark}
+        self._mean.push(new_data)
+        self._var.push(new_data)
         self._isFull = self._isFull or (self._mean.isFull() and self._var.isFull())
 
     @cython.cdivision(True)
@@ -1713,15 +1714,16 @@ cdef class MovingSortino(StatefulValueHolder):
         cdef tuple value
         cdef double ret
         cdef double benchmark
+        cdef dict new_data
 
         value = self.extract(data)
         if isnan(value[0]) or isnan(value[1]):
             return NAN
         ret = value[0]
         benchmark = value[1]
-        data = {'x': ret - benchmark}
-        self._mean.push(data)
-        self._negativeVar.push(data)
+        new_data = {'x': ret - benchmark}
+        self._mean.push(new_data)
+        self._negativeVar.push(new_data)
         self._isFull = self._isFull or (self._negativeVar.isFull() and self._mean.isFull())
 
     @cython.cdivision(True)
@@ -1751,6 +1753,79 @@ cdef class MovingSortino(StatefulValueHolder):
         self._negativeVar = state['_negativeVar']
 
 
+cdef class MovingResidue(StatefulValueHolder):
+
+    def __init__(self, window, dependency=('y', 'x')):
+        super(MovingResidue, self).__init__(window, dependency)
+        self._returnSize = 1
+        self._cross = 0.
+        self._xsquare = 0.
+        self._lasty = NAN
+        self._lastx = NAN
+
+    @cython.boundscheck(False)
+    @cython.wraparound(False)
+    cpdef push(self, dict data):
+        cdef double x
+        cdef double y
+        cdef double head_y
+        cdef double head_x
+        cdef tuple value
+
+        value = self.extract(data)
+        x = value[1]
+        y = value[0]
+        if isnan(x) or isnan(y):
+            return NAN
+
+        popout = self._deque.dump(value)
+
+        head_y = popout[0]
+        head_x = popout[1]
+
+        if not isnan(head_x):
+            self._cross += x * y - head_x * head_y
+            self._xsquare += x * x - head_x * head_x
+        else:
+            self._cross += x * y
+            self._xsquare += x * x
+
+        self._lastx = x
+        self._lasty = y
+
+    cpdef bint isFull(self):
+        return self._deque.isFull()
+
+    @cython.cdivision(True)
+    cpdef object result(self):
+        cdef double coef = self._cross / self._xsquare
+        return self._lasty - coef * self._lastx
+
+    def __deepcopy__(self, memo):
+        copied = MovingResidue(self._window, self._dependency)
+        copied.copy_attributes(self.collect_attributes(), is_deep=True)
+        copied._cross = self._cross
+        copied._xsquare = self._xsquare
+        copied._lastx = self._lastx
+        copied._lasty = self._lasty
+        return copied
+
+    def __reduce__(self):
+        d = self.collect_attributes()
+        d['_cross'] = self._cross
+        d['_xsquare'] = self._xsquare
+        d['_lastx'] = self._lastx
+        d['_lasty'] = self._lasty
+        return MovingResidue, (self._window, self._dependency), d
+
+    def __setstate__(self, state):
+        self.copy_attributes(state, is_deep=False)
+        self._cross = state['_cross']
+        self._xsquare = state['_xsquare']
+        self._lastx = state['_lastx']
+        self._lasty = state['_lasty']
+
+
 cdef class MovingAlphaBeta(StatefulValueHolder):
 
     def __init__(self, window, dependency=('pRet', 'mRet', 'riskFree')):
@@ -1767,6 +1842,7 @@ cdef class MovingAlphaBeta(StatefulValueHolder):
         cdef double pReturn
         cdef double mReturn
         cdef double rf
+        cdef dict new_data
 
         value = self.extract(data)
         if isnan(value[0]) or isnan(value[1]) or isnan(value[2]):
@@ -1774,12 +1850,12 @@ cdef class MovingAlphaBeta(StatefulValueHolder):
         pReturn = value[0]
         mReturn = value[1]
         rf = value[2]
-        data = {'x': pReturn - rf, 'y': mReturn - rf}
-        self._pReturnMean.push(data)
-        self._mReturnMean.push(data)
-        self._pReturnVar.push(data)
-        self._mReturnVar.push(data)
-        self._correlationHolder.push(data)
+        new_data = {'x': pReturn - rf, 'y': mReturn - rf}
+        self._pReturnMean.push(new_data)
+        self._mReturnMean.push(new_data)
+        self._pReturnVar.push(new_data)
+        self._mReturnVar.push(new_data)
+        self._correlationHolder.push(new_data)
         self._isFull = self._isFull or (self._pReturnMean.isFull()
                                         and self._mReturnMean.isFull()
                                         and self._pReturnVar.isFull()

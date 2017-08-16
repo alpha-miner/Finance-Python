@@ -82,14 +82,18 @@ cdef class Accumulator(IAccumulator):
         if isinstance(dependency, Accumulator):
             self._isValueHolderContained = True
             self._dependency = deepcopy(dependency)
+            self._isStringDependency = False
         else:
             self._isValueHolderContained = False
             if (isinstance(dependency, tuple) or isinstance(dependency, list)) and len(dependency) > 1:
                 self._dependency = dependency
+                self._isStringDependency=False
             elif (isinstance(dependency, tuple) or isinstance(dependency, list)) and len(dependency) == 1:
                 self._dependency = dependency[0]
+                self._isStringDependency = True
             else:
                 self._dependency = dependency
+                self._isStringDependency = True
 
 
     cdef extract(self, dict data):
@@ -97,9 +101,12 @@ cdef class Accumulator(IAccumulator):
         cdef Accumulator comp
 
         if not self._isValueHolderContained:
-            try:
-                return data[self._dependency]
-            except (TypeError, KeyError) as _:
+            if self._isStringDependency:
+                try:
+                    return data[self._dependency]
+                except KeyError:
+                    return NAN
+            else:
                 try:
                     return tuple(data[p] for p in self._dependency)
                 except KeyError:
@@ -177,6 +184,7 @@ cdef class Accumulator(IAccumulator):
         self._isValueHolderContained = attributes['_isValueHolderContained']
         self._window = attributes['_window']
         self._returnSize = attributes['_returnSize']
+        self._isStringDependency = attributes['_isStringDependency']
 
     cpdef collect_attributes(self):
         attributes = dict()
@@ -185,6 +193,7 @@ cdef class Accumulator(IAccumulator):
         attributes['_isValueHolderContained'] = self._isValueHolderContained
         attributes['_window'] = self._window
         attributes['_returnSize'] = self._returnSize
+        attributes['_isStringDependency'] = self._isStringDependency
         return attributes
 
     def __deepcopy__(self, memo):

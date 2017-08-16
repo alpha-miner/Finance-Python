@@ -358,6 +358,18 @@ cdef class MovingSortino(StatefulValueHolder):
     cpdef object result(self)
 
 
+cdef class MovingResidue(StatefulValueHolder):
+
+    cdef public double _cross
+    cdef public double _xsquare
+    cdef public double _lastx
+    cdef public double _lasty
+
+    cpdef push(self, dict data)
+    cpdef object result(self)
+    cpdef bint isFull(self)
+
+
 cdef class MovingAlphaBeta(StatefulValueHolder):
 
     cdef public MovingAverage _pReturnMean

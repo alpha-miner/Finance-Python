@@ -2244,8 +2244,8 @@ class TestStatefulAccumulators(unittest.TestCase):
                 series_x = x_data[i-window+1:i+1]
                 series_y = self.sample[i-window+1:i+1]
 
-                expected_res = mr.result()
-                calculated_res = y - np.dot(series_x, series_y) / np.dot(series_x, series_x) * x
+                calculated_res = mr.result()
+                expected_res = y - np.dot(series_x, series_y) / np.dot(series_x, series_x) * x
                 self.assertAlmostEqual(expected_res, calculated_res, 8, "at index of {0:d}\n"
                                                                         "expected res:  {1:f}\n"
                                                                         "calculated res:{2:f}".format(i,

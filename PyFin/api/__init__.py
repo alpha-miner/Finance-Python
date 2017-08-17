@@ -53,6 +53,7 @@ from PyFin.api.Analysis import ASIN
 from PyFin.api.Analysis import ASINH
 from PyFin.api.Analysis import SHIFT
 from PyFin.api.Analysis import IIF
+from PyFin.api.Analysis import RES
 
 from PyFin.api.Analysis import CSRank
 from PyFin.api.Analysis import CSMean
@@ -106,6 +107,7 @@ __all__ = ["datesList",
            "ACOSH",
            "ASIN",
            "ASINH",
+           "RES",
            "SHIFT",
            "IIF",
            "CSRank",

@@ -28,6 +28,7 @@ from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingNegativeAverage
 from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingPositiveDifferenceAverage
 from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingNegativeDifferenceAverage
 from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingRSI
+from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingResidue
 from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingHistoricalWindow
 from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingLogReturn
 from PyFin.Math.MathConstants cimport NAN
@@ -393,6 +394,26 @@ cdef class SecurityMovingLogReturn(SecuritySingleValueHolder):
             return SecurityMovingLogReturn, (self._window - self._compHolder._window, self._compHolder), d
         else:
             return SecurityMovingLogReturn, (self._window, self._dependency), d
+
+
+cdef class SecurityMovingResidue(SecuritySingleValueHolder):
+    def __init__(self, window, dependency=('y', 'x')):
+        super(SecurityMovingResidue, self).__init__(window, MovingResidue, dependency)
+
+    def __deepcopy__(self, memo):
+        if self._compHolder:
+            copied = SecurityMovingResidue(self._window - self._compHolder._window, self._compHolder)
+        else:
+            copied = SecurityMovingResidue(self._window, self._dependency)
+        copied.copy_attributes(self.collect_attributes(), is_deep=True)
+        return copied
+
+    def __reduce__(self):
+        d = self.collect_attributes()
+        if self._compHolder:
+            return SecurityMovingResidue, (self._window - self._compHolder._window, self._compHolder), d
+        else:
+            return SecurityMovingResidue, (self._window, self._dependency), d
 
 
 cdef class SecurityMovingHistoricalWindow(SecuritySingleValueHolder):

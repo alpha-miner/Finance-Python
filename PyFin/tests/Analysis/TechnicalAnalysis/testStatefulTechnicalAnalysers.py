@@ -18,7 +18,7 @@ from PyFin.Analysis.TechnicalAnalysis import SecurityMovingAverage
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingVariance
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingStandardDeviation
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingMax
-from PyFin.Analysis.TechnicalAnalysis import SecurityMovingMinimum
+from PyFin.Analysis.TechnicalAnalysis import SecurityMovingMin
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingQuantile
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingAllTrue
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingAnyTrue
@@ -269,7 +269,7 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
 
     def testSecurityMovingMinimum(self):
         window = 10
-        ma1 = SecurityMovingMinimum(window, ['close'])
+        ma1 = SecurityMovingMin(window, ['close'])
 
         for i in range(len(self.aapl['close'])):
             data = dict(aapl=dict(close=self.aapl['close'][i],
@@ -291,13 +291,13 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
                                                                  'calculated: {2:.12f}'.format(i, expected, calculated))
 
         with self.assertRaises(ValueError):
-            _ = SecurityMovingMinimum(window, ['close', 'open'])
+            _ = SecurityMovingMin(window, ['close', 'open'])
 
     def testSecurityMovingMinimumDeepcopy(self):
-        self.template_test_deepcopy(SecurityMovingMinimum, window=10, dependency=['x'])
+        self.template_test_deepcopy(SecurityMovingMin, window=10, dependency=['x'])
 
     def testSecurityMovingMinimumPickle(self):
-        self.template_test_pickle(SecurityMovingMinimum, window=10, dependency=['x'])
+        self.template_test_pickle(SecurityMovingMin, window=10, dependency=['x'])
 
     def testSecurityMovingQuantile(self):
         window = 10

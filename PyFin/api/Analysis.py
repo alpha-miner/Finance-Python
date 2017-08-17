@@ -10,7 +10,7 @@ import functools
 
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingAverage
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingMax
-from PyFin.Analysis.TechnicalAnalysis import SecurityMovingMinimum
+from PyFin.Analysis.TechnicalAnalysis import SecurityMovingMin
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingQuantile
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingAllTrue
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingAnyTrue
@@ -98,7 +98,7 @@ def MMAX(window, dependency='x'):
 
 
 def MMIN(window, dependency='x'):
-    return SecurityMovingMinimum(window, dependency)
+    return SecurityMovingMin(window, dependency)
 
 
 def MQUANTILE(window, dependency='x'):

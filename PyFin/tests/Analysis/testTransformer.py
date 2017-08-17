@@ -11,7 +11,7 @@ import pandas as pd
 from PyFin.Analysis.SecurityValueHolders import SecurityLatestValueHolder
 from PyFin.Analysis.TechnicalAnalysis.StatefulTechnicalAnalysers import SecurityMovingAverage
 from PyFin.Analysis.TechnicalAnalysis.StatefulTechnicalAnalysers import SecurityMovingMax
-from PyFin.Analysis.TechnicalAnalysis.StatefulTechnicalAnalysers import SecurityMovingMinimum
+from PyFin.Analysis.TechnicalAnalysis.StatefulTechnicalAnalysers import SecurityMovingMin
 from PyFin.Analysis.transformer import transform
 
 
@@ -24,7 +24,7 @@ class TestTransformer(unittest.TestCase):
                                index=[1, 1, 1, 1, 2, 2, 2],
                                dtype=float)
 
-        expression = SecurityMovingMax(2, 'b') + SecurityMovingMinimum(2, 'c')
+        expression = SecurityMovingMax(2, 'b') + SecurityMovingMin(2, 'c')
         calculated = transform(test_df, [expression], cols=['user_factor'], category_field='code')
         expected = [13., 13., 13., 13., 11., 9, 9.]
 
@@ -36,7 +36,7 @@ class TestTransformer(unittest.TestCase):
                                index=[1, 2, 3, 4, 5, 6, 7],
                                dtype=float)
 
-        expression = SecurityMovingMax(20, 'b') + SecurityMovingMinimum(20, 'c')
+        expression = SecurityMovingMax(20, 'b') + SecurityMovingMin(20, 'c')
         calculated = transform(test_df, [expression], cols=['user_factor'])
         expected = [13., 13., 13., 13., 12., 11., 10.]
 
@@ -50,8 +50,8 @@ class TestTransformer(unittest.TestCase):
                                dtype=float)
 
         expression1 = SecurityMovingMax(20, 'b')
-        expression2 = SecurityMovingMinimum(20, 'c')
-        expression3 = SecurityMovingMax(20, 'b') + SecurityMovingMinimum(20, 'c')
+        expression2 = SecurityMovingMin(20, 'c')
+        expression3 = SecurityMovingMax(20, 'b') + SecurityMovingMin(20, 'c')
 
         calculated = transform(test_df,
                                [expression1, expression2, expression3],
@@ -71,7 +71,7 @@ class TestTransformer(unittest.TestCase):
                                dtype=float)
 
         expression1 = 'b'
-        expression2 = SecurityMovingMax(20, 'b') + SecurityMovingMinimum(20, 'c')
+        expression2 = SecurityMovingMax(20, 'b') + SecurityMovingMin(20, 'c')
 
         calculated = transform(test_df,
                                [expression1, expression2],

@@ -18,7 +18,7 @@ from PyFin.Math.Accumulators import Latest
 from PyFin.Math.Accumulators import Shift
 from PyFin.Math.Accumulators import Exp
 from PyFin.Math.Accumulators import MovingMax
-from PyFin.Math.Accumulators import MovingMinimum
+from PyFin.Math.Accumulators import MovingMin
 from PyFin.Math.Accumulators import MovingQuantile
 from PyFin.Math.Accumulators import MovingAllTrue
 from PyFin.Math.Accumulators import MovingAnyTrue
@@ -593,7 +593,7 @@ class TestStatefulAccumulators(unittest.TestCase):
     def testMovingMinimum(self):
         window = 120
 
-        mv = MovingMinimum(window, dependency='z')
+        mv = MovingMin(window, dependency='z')
         total = np.random.randn(2500)
         con = deque(maxlen=window)
         for i, value in enumerate(total):
@@ -609,7 +609,7 @@ class TestStatefulAccumulators(unittest.TestCase):
                                                              "Min calculated: {2:f}".format(i, expected, calculated))
 
     def testMovingMinimumDeepcopy(self):
-        test = MovingMinimum(3, 'close')
+        test = MovingMin(3, 'close')
 
         test.push(dict(close=3.0))
         test.push(dict(close=4.0))
@@ -619,7 +619,7 @@ class TestStatefulAccumulators(unittest.TestCase):
         self.assertAlmostEqual(copied.value, test.value)
 
     def testMovingMinimumPickle(self):
-        test = MovingMinimum(3, 'close')
+        test = MovingMin(3, 'close')
 
         test.push(dict(close=3.0))
         test.push(dict(close=4.0))

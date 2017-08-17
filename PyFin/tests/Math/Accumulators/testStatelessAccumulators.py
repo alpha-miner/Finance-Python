@@ -16,7 +16,7 @@ from PyFin.Math.Accumulators.IAccumulators import Sign
 from PyFin.Math.Accumulators.StatelessAccumulators import Average
 from PyFin.Math.Accumulators.StatelessAccumulators import XAverage
 from PyFin.Math.Accumulators.StatelessAccumulators import Max
-from PyFin.Math.Accumulators.StatelessAccumulators import Minimum
+from PyFin.Math.Accumulators.StatelessAccumulators import Min
 from PyFin.Math.Accumulators.StatelessAccumulators import Diff
 from PyFin.Math.Accumulators.StatelessAccumulators import SimpleReturn
 from PyFin.Math.Accumulators.StatelessAccumulators import LogReturn
@@ -98,7 +98,7 @@ class TestStatelessAccumulators(unittest.TestCase):
                                                              "calculated max: {2:f}".format(i, expected, calculated))
 
     def testMinimum(self):
-        mm = Minimum(dependency='close')
+        mm = Min(dependency='close')
 
         for i, value in enumerate(self.samplesClose):
             mm.push(dict(close=value))

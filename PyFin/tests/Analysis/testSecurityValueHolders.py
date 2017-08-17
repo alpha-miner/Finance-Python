@@ -22,7 +22,7 @@ from PyFin.Analysis.SecurityValueHolders import SecurityShiftedValueHolder
 from PyFin.Analysis.SecurityValueHolders import SecurityConstArrayValueHolder
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingAverage
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingMax
-from PyFin.Analysis.TechnicalAnalysis import SecurityMovingMinimum
+from PyFin.Analysis.TechnicalAnalysis import SecurityMovingMin
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingSum
 
 
@@ -976,7 +976,7 @@ class TestSecurityValueHolders(unittest.TestCase):
                                index=[1, 1, 1, 1, 2, 2, 2],
                                dtype=float)
 
-        expression = SecurityMovingMax(20, 'b') + SecurityMovingMinimum(20, 'c')
+        expression = SecurityMovingMax(20, 'b') + SecurityMovingMin(20, 'c')
         calculated = expression.transform(test_df, name='new_factor', category_field='code')
         expected = [13., 13., 13., 13., 11., 9, 9.]
 
@@ -988,7 +988,7 @@ class TestSecurityValueHolders(unittest.TestCase):
                                index=[1, 2, 3, 4, 5, 6, 7],
                                dtype=float)
 
-        expression = SecurityMovingMax(20, 'b') + SecurityMovingMinimum(20, 'c')
+        expression = SecurityMovingMax(20, 'b') + SecurityMovingMin(20, 'c')
         calculated = expression.transform(test_df, name='new_factor')
         expected = [13., 13., 13., 13., 12., 11., 10.]
         np.testing.assert_array_almost_equal(calculated['new_factor'], expected)

@@ -215,9 +215,9 @@ cdef class MovingMax(SortedValueHolder):
         self.copy_attributes(state, is_deep=False)
 
 
-cdef class MovingMinimum(SortedValueHolder):
+cdef class MovingMin(SortedValueHolder):
     def __init__(self, window, dependency='x'):
-        super(MovingMinimum, self).__init__(window, dependency)
+        super(MovingMin, self).__init__(window, dependency)
 
     cpdef object result(self):
         if self._sortedArray:
@@ -226,13 +226,13 @@ cdef class MovingMinimum(SortedValueHolder):
             return NAN
 
     def __deepcopy__(self, memo):
-        copied = MovingMinimum(self._window, self._dependency)
+        copied = MovingMin(self._window, self._dependency)
         copied.copy_attributes(self.collect_attributes(), is_deep=True)
         return copied
 
     def __reduce__(self):
         d = self.collect_attributes()
-        return MovingMinimum, (self._window, self._dependency), d
+        return MovingMin, (self._window, self._dependency), d
 
     def __setstate__(self, state):
         self.copy_attributes(state, is_deep=False)

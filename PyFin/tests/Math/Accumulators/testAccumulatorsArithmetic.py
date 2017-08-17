@@ -34,7 +34,7 @@ from PyFin.Math.Accumulators.StatefulAccumulators import MovingMax
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingCorrelation
 from PyFin.Math.Accumulators.StatelessAccumulators import Sum
 from PyFin.Math.Accumulators.StatelessAccumulators import Average
-from PyFin.Math.Accumulators.StatelessAccumulators import Minimum
+from PyFin.Math.Accumulators.StatelessAccumulators import Min
 from PyFin.Math.Accumulators.StatelessAccumulators import Max
 from PyFin.Math.Accumulators.StatelessAccumulators import Correlation
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingAlphaBeta
@@ -162,8 +162,8 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
 
     def testDivOperator(self):
         mc5 = MovingCorrelation(5, ['open', 'close'])
-        minum = Minimum('open')
-        divRes = Minimum('open') / MovingCorrelation(5, ['open', 'close'])
+        minum = Min('open')
+        divRes = Min('open') / MovingCorrelation(5, ['open', 'close'])
 
         for i, (open, close) in enumerate(zip(self.sampleOpen, self.sampleClose)):
             data = {'close': close, 'open': open}
@@ -238,8 +238,8 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
     def testListedOperator(self):
         ma20 = MovingAverage(20, 'close')
         maxer = Max('open')
-        minimumer = Minimum('close')
-        listHolder = MovingAverage(20, 'close') ^ Max('open') ^ Minimum('close')
+        minimumer = Min('close')
+        listHolder = MovingAverage(20, 'close') ^ Max('open') ^ Min('close')
         listHolder2 = 2.0 ^ MovingAverage(20, 'close')
         listHolder3 = MovingAverage(20, 'close') ^ 2.0
 
@@ -318,9 +318,9 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
             _ = Max('close') >> math.sqrt
 
         with self.assertRaises(ValueError):
-            _ = (Max('close') ^ Minimum('close')) >> MovingCorrelation(20, dependency=('x', 'y', 'z'))
+            _ = (Max('close') ^ Min('close')) >> MovingCorrelation(20, dependency=('x', 'y', 'z'))
 
-        (Max('close') ^ Minimum('close')) >> MovingCorrelation(20, dependency=('x', 'y'))
+        (Max('close') ^ Min('close')) >> MovingCorrelation(20, dependency=('x', 'y'))
 
     def testListedAndCompoundedOperator(self):
         maClose = MovingAverage(20, 'close')
@@ -388,7 +388,7 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
             _ = TruncatedValueHolder(ma20 ^ max5, slice(1, -2))
 
     def testGetItemOperator(self):
-        listHolder = MovingAverage(20, 'close') ^ Max('open') ^ Minimum('close')
+        listHolder = MovingAverage(20, 'close') ^ Max('open') ^ Min('close')
         listHolder1 = listHolder[1]
         listHolder2 = listHolder[1:3]
         maxer = Max('open')
@@ -412,7 +412,7 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
 
     def testLessOrEqualOperators(self):
         m1 = Max('x')
-        m2 = Minimum('x')
+        m2 = Min('x')
         cmp = m1 <= m2
 
         cmp.push(dict(x=1.0))
@@ -421,7 +421,7 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
         self.assertEqual(False, cmp.result())
 
     def testLessOperator(self):
-        m1 = Minimum('x')
+        m1 = Min('x')
         m2 = Max('x')
         cmp = m1 < m2
 
@@ -431,7 +431,7 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
         self.assertEqual(True, cmp.result())
 
     def testGreaterOrEqualOperator(self):
-        m1 = Minimum('x')
+        m1 = Min('x')
         m2 = Max('x')
         cmp = m1 >= m2
 
@@ -442,7 +442,7 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
 
     def testGreaterOperator(self):
         m1 = Max('x')
-        m2 = Minimum('x')
+        m2 = Min('x')
         cmp = m1 > m2
 
         cmp.push(dict(x=1.0))
@@ -537,7 +537,7 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
                                                              "calculated: {2:f}".format(i, expected, calculated))
 
     def testPowFunction(self):
-        ma5min = MovingAverage(5, 'close') >> Minimum
+        ma5min = MovingAverage(5, 'close') >> Min
         holder = Pow(ma5min, 3)
 
         for i, close in enumerate(self.sampleClose):

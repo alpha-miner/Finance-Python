@@ -64,7 +64,7 @@ cdef class Max(StatelessSingleValueAccumulator):
     cpdef object result(self)
 
 
-cdef class Minimum(StatelessSingleValueAccumulator):
+cdef class Min(StatelessSingleValueAccumulator):
 
     cdef public double _currentMin
     cdef public int _first

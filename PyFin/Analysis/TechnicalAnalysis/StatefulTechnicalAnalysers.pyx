@@ -14,7 +14,7 @@ from PyFin.Analysis.SeriesValues cimport SeriesValues
 from PyFin.Analysis.SecurityValueHolders cimport SecurityValueHolder
 from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingAverage
 from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingMax
-from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingMinimum
+from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingMin
 from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingQuantile
 from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingAllTrue
 from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingAnyTrue
@@ -91,24 +91,24 @@ cdef class SecurityMovingMax(SecuritySingleValueHolder):
             return SecurityMovingMax, (self._window, self._dependency), d
 
 
-cdef class SecurityMovingMinimum(SecuritySingleValueHolder):
+cdef class SecurityMovingMin(SecuritySingleValueHolder):
     def __init__(self, window, dependency='x'):
-        super(SecurityMovingMinimum, self).__init__(window, MovingMinimum, dependency)
+        super(SecurityMovingMin, self).__init__(window, MovingMin, dependency)
 
     def __deepcopy__(self, memo):
         if self._compHolder:
-            copied = SecurityMovingMinimum(self._window - self._compHolder._window, self._compHolder)
+            copied = SecurityMovingMin(self._window - self._compHolder._window, self._compHolder)
         else:
-            copied = SecurityMovingMinimum(self._window, self._dependency)
+            copied = SecurityMovingMin(self._window, self._dependency)
         copied.copy_attributes(self.collect_attributes(), is_deep=True)
         return copied
 
     def __reduce__(self):
         d = self.collect_attributes()
         if self._compHolder:
-            return SecurityMovingMinimum, (self._window - self._compHolder._window, self._compHolder), d
+            return SecurityMovingMin, (self._window - self._compHolder._window, self._compHolder), d
         else:
-            return SecurityMovingMinimum, (self._window, self._dependency), d
+            return SecurityMovingMin, (self._window, self._dependency), d
 
 
 cdef class SecurityMovingQuantile(SecuritySingleValueHolder):

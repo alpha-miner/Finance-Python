@@ -27,7 +27,7 @@ from PyFin.Math.Accumulators.StatelessAccumulators import LogReturn
 from PyFin.Math.Accumulators.StatelessAccumulators import PositivePart
 from PyFin.Math.Accumulators.StatelessAccumulators import NegativePart
 from PyFin.Math.Accumulators.StatelessAccumulators import Max
-from PyFin.Math.Accumulators.StatelessAccumulators import Minimum
+from PyFin.Math.Accumulators.StatelessAccumulators import Min
 from PyFin.Math.Accumulators.StatelessAccumulators import Sum
 from PyFin.Math.Accumulators.StatelessAccumulators import Average
 from PyFin.Math.Accumulators.StatelessAccumulators import XAverage
@@ -58,7 +58,7 @@ from PyFin.Math.Accumulators.StatefulAccumulators import MovingNegativeVariance
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingCorrelation
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingCorrelationMatrix
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingMax
-from PyFin.Math.Accumulators.StatefulAccumulators import MovingMinimum
+from PyFin.Math.Accumulators.StatefulAccumulators import MovingMin
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingQuantile
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingAllTrue
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingAnyTrue
@@ -105,7 +105,7 @@ __all__ = ["Exp",
            "PositivePart",
            "NegativePart",
            "Max",
-           "Minimum",
+           "Min",
            "Sum",
            "TruncatedValueHolder",
            "Average",
@@ -129,7 +129,7 @@ __all__ = ["Exp",
            "MovingCorrelation",
            "MovingCorrelationMatrix",
            "MovingMax",
-           "MovingMinimum",
+           "MovingMin",
            "MovingQuantile",
            "MovingAllTrue",
            "MovingAnyTrue",

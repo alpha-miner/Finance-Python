@@ -225,10 +225,10 @@ cdef class Max(StatelessSingleValueAccumulator):
         return Max(self._dependency)
 
 
-cdef class Minimum(StatelessSingleValueAccumulator):
+cdef class Min(StatelessSingleValueAccumulator):
 
     def __init__(self, dependency='x'):
-        super(Minimum, self).__init__(dependency)
+        super(Min, self).__init__(dependency)
         _checkParameterList(dependency)
         self._currentMin = np.inf
         self._returnSize = 1
@@ -246,7 +246,7 @@ cdef class Minimum(StatelessSingleValueAccumulator):
         return self._currentMin
 
     def __deepcopy__(self, memo):
-        return Minimum(self._dependency)
+        return Min(self._dependency)
 
 
 cdef class Sum(StatelessSingleValueAccumulator):

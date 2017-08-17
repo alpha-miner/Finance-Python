@@ -50,7 +50,7 @@ cdef class MovingMax(SortedValueHolder):
     cpdef object result(self)
 
 
-cdef class MovingMinimum(SortedValueHolder):
+cdef class MovingMin(SortedValueHolder):
 
     cpdef object result(self)
 

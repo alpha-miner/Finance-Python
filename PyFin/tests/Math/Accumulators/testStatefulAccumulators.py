@@ -2252,6 +2252,46 @@ class TestStatefulAccumulators(unittest.TestCase):
                                                                                                       expected_res,
                                                                                                       calculated_res))
 
+    def testMovingResidueDeepcopy(self):
+        window = 10
+        mr = MovingResidue(window)
+
+        mr.push(dict(x=-1., y=0))
+        mr.push(dict(x=-2., y=-1))
+        mr.push(dict(x=-3., y=-2))
+        mr.push(dict(x=-4., y=-3))
+
+        copied = copy.deepcopy(mr)
+
+        datas = np.random.randn(40)
+        for i in datas:
+            mr.push(dict(x=i, y=i+1.))
+            copied.push(dict(x=i, y=i+1))
+
+        self.assertAlmostEqual(copied.value, mr.value)
+
+    def testMovingResiduePickle(self):
+        window = 10
+        mr = MovingResidue(window)
+
+        mr.push(dict(x=-1., y=0))
+        mr.push(dict(x=-2., y=-1))
+        mr.push(dict(x=-3., y=-2))
+
+        with tempfile.NamedTemporaryFile('w+b', delete=False) as f:
+            pickle.dump(mr, f)
+
+        with open(f.name, 'rb') as f2:
+            pickled = pickle.load(f2)
+
+        datas = np.random.randn(40)
+        for i in datas:
+            mr.push(dict(x=i, y=i+1.))
+            pickled.push(dict(x=i, y=i+1.))
+
+        self.assertAlmostEqual(mr.value, pickled.value)
+        os.unlink(f.name)
+
 
 if __name__ == '__main__':
     unittest.main()

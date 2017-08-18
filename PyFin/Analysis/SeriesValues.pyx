@@ -152,9 +152,9 @@ cdef class SeriesValues(object):
             if isinstance(self, SeriesValues):
                 return SeriesValues(np.array([self.values, right.values]).T, self.name_mapping)
             else:
-                return SeriesValues(np.array([self, right.values]).T, self.name_mapping)
+                return SeriesValues(np.array([np.ones(len(right.values)) * self, right.values]).T, self.name_mapping)
         else:
-            return SeriesValues(np.array([self.values, right]).T, self.name_mapping)
+            return SeriesValues(np.array([self.values, np.ones(len(self.values)) * right]).T, self.name_mapping)
 
     def __richcmp__(self, right, int op):
 

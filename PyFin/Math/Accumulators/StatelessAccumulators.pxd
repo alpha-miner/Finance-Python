@@ -64,7 +64,24 @@ cdef class Max(StatelessSingleValueAccumulator):
     cpdef object result(self)
 
 
+cdef class Maximum(StatelessSingleValueAccumulator):
+
+    cdef public double _currentMax
+
+    cpdef push(self, dict data)
+    cpdef object result(self)
+
+
 cdef class Min(StatelessSingleValueAccumulator):
+
+    cdef public double _currentMin
+    cdef public int _first
+
+    cpdef push(self, dict data)
+    cpdef object result(self)
+
+
+cdef class Minimum(StatelessSingleValueAccumulator):
 
     cdef public double _currentMin
     cdef public int _first

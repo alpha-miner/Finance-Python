@@ -225,6 +225,25 @@ cdef class Max(StatelessSingleValueAccumulator):
         return Max(self._dependency)
 
 
+cdef class Maximum(StatelessSingleValueAccumulator):
+
+    def __init__(self, dependency=('x', 'y')):
+        super(Maximum, self).__init__(dependency)
+        self._currentMax = NAN
+        self._returnSize = 1
+        self._isFull = False
+
+    cpdef push(self, dict data):
+        cdef object value = self.extract(data)
+        self._currentMax = fmax(value[0], value[1])
+
+    cpdef object result(self):
+        return self._currentMax
+
+    def __deepcopy__(self, memo):
+        return Maximum(self._dependency)
+
+
 cdef class Min(StatelessSingleValueAccumulator):
 
     def __init__(self, dependency='x'):
@@ -247,6 +266,25 @@ cdef class Min(StatelessSingleValueAccumulator):
 
     def __deepcopy__(self, memo):
         return Min(self._dependency)
+
+
+cdef class Minimum(StatelessSingleValueAccumulator):
+
+    def __init__(self, dependency=('x', 'y')):
+        super(Minimum, self).__init__(dependency)
+        self._currentMin = NAN
+        self._returnSize = 1
+        self._isFull = False
+
+    cpdef push(self, dict data):
+        cdef object value = self.extract(data)
+        self._currentMin = fmin(value[0], value[1])
+
+    cpdef object result(self):
+        return self._currentMin
+
+    def __deepcopy__(self, memo):
+        return Minimum(self._dependency)
 
 
 cdef class Sum(StatelessSingleValueAccumulator):

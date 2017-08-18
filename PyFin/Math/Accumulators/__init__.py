@@ -27,7 +27,9 @@ from PyFin.Math.Accumulators.StatelessAccumulators import LogReturn
 from PyFin.Math.Accumulators.StatelessAccumulators import PositivePart
 from PyFin.Math.Accumulators.StatelessAccumulators import NegativePart
 from PyFin.Math.Accumulators.StatelessAccumulators import Max
+from PyFin.Math.Accumulators.StatelessAccumulators import Maximum
 from PyFin.Math.Accumulators.StatelessAccumulators import Min
+from PyFin.Math.Accumulators.StatelessAccumulators import Minimum
 from PyFin.Math.Accumulators.StatelessAccumulators import Sum
 from PyFin.Math.Accumulators.StatelessAccumulators import Average
 from PyFin.Math.Accumulators.StatelessAccumulators import XAverage
@@ -105,7 +107,9 @@ __all__ = ["Exp",
            "PositivePart",
            "NegativePart",
            "Max",
+           "Maximum",
            "Min",
+           "Minimum",
            "Sum",
            "TruncatedValueHolder",
            "Average",

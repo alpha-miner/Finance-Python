@@ -16,7 +16,9 @@ from PyFin.Math.Accumulators.IAccumulators import Sign
 from PyFin.Math.Accumulators.StatelessAccumulators import Average
 from PyFin.Math.Accumulators.StatelessAccumulators import XAverage
 from PyFin.Math.Accumulators.StatelessAccumulators import Max
+from PyFin.Math.Accumulators.StatelessAccumulators import Maximum
 from PyFin.Math.Accumulators.StatelessAccumulators import Min
+from PyFin.Math.Accumulators.StatelessAccumulators import Minimum
 from PyFin.Math.Accumulators.StatelessAccumulators import Diff
 from PyFin.Math.Accumulators.StatelessAccumulators import SimpleReturn
 from PyFin.Math.Accumulators.StatelessAccumulators import LogReturn
@@ -97,7 +99,19 @@ class TestStatelessAccumulators(unittest.TestCase):
                                                              "expected max:   {1:f}\n"
                                                              "calculated max: {2:f}".format(i, expected, calculated))
 
-    def testMinimum(self):
+    def testMaximum(self):
+        mm = Maximum(dependency=('open', 'close'))
+
+        for i, value in enumerate(zip(self.samplesOpen, self.samplesClose)):
+            mm.push(dict(open=value[0], close=value[1]))
+            expected = max(self.samplesOpen[i], self.samplesClose[i])
+            calculated = mm.result()
+
+            self.assertAlmostEqual(expected, calculated, 10, "at index {0:d}\n"
+                                                             "expected max:   {1:f}\n"
+                                                             "calculated max: {2:f}".format(i, expected, calculated))
+
+    def testMin(self):
         mm = Min(dependency='close')
 
         for i, value in enumerate(self.samplesClose):
@@ -108,6 +122,18 @@ class TestStatelessAccumulators(unittest.TestCase):
             self.assertAlmostEqual(expected, calculated, 10, "at index {0:d}\n"
                                                              "expected min:   {1:f}\n"
                                                              "calculated min: {2:f}".format(i, expected, calculated))
+
+    def testMinimum(self):
+        mm = Minimum(dependency=('open', 'close'))
+
+        for i, value in enumerate(zip(self.samplesOpen, self.samplesClose)):
+            mm.push(dict(open=value[0], close=value[1]))
+            expected = min(self.samplesOpen[i], self.samplesClose[i])
+            calculated = mm.result()
+
+            self.assertAlmostEqual(expected, calculated, 10, "at index {0:d}\n"
+                                                             "expected max:   {1:f}\n"
+                                                             "calculated max: {2:f}".format(i, expected, calculated))
 
     def testDiff(self):
         mm = Diff(dependency='close')

@@ -145,6 +145,23 @@ class TestSecurityValues(unittest.TestCase):
         np.testing.assert_array_equal(calculated.values, expected.values)
         self.assertEqual(calculated.name_mapping, expected.name_mapping)
 
+    def testSecurityValuesXor(self):
+        data1 = np.array([3, 2, 2., 1., 4., 5.])
+        data2 = -np.array([3, 2, 2., 1., 4., 5.])
+        index = [1, 2, 3, 4, 5, 6]
+
+        test1 = SeriesValues(data1, index)
+        test2 = SeriesValues(data2, index)
+
+        calculated = test1 ^ test2
+
+        expected = SeriesValues(np.array([data1, data2]).T, index=index)
+        np.testing.assert_array_equal(calculated.values, expected.values)
+        self.assertEqual(calculated.name_mapping, expected.name_mapping)
+
+        for name in index:
+            np.testing.assert_array_almost_equal(calculated[name], expected[name])
+
     def testSecurityValuesDiv(self):
 
         data1 = np.array([3, 2, 2., 1., 4., 5.])

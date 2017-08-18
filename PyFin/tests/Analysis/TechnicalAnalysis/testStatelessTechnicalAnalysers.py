@@ -21,6 +21,8 @@ from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import Securit
 from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import SecuritySqrtValueHolder
 from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import SecurityAbsValueHolder
 from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import SecurityMACDValueHolder
+from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import SecurityMaximumValueHolder
+from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import SecurityMinimumValueHolder
 
 
 class TestStatelessTechnicalAnalysis(unittest.TestCase):
@@ -290,3 +292,41 @@ class TestStatelessTechnicalAnalysis(unittest.TestCase):
             for name in ma.value.index():
                 self.assertAlmostEqual(ma.value[name], pickled.value[name])
         os.unlink(f.name)
+
+    def testSecurityMaximumValueHolder(self):
+        mm = SecurityMaximumValueHolder(('open', 'close'))
+
+        for i in range(len(self.aapl['close'])):
+            data = dict(aapl=dict(close=self.aapl['close'][i],
+                                  open=self.aapl['open'][i]),
+                        ibm=dict(close=self.ibm['close'][i],
+                                 open=self.ibm['open'][i]))
+            mm.push(data)
+
+            value = mm.value
+            for name in value.index():
+                expected = max(getattr(self, name)['open'][i], getattr(self, name)['close'][i])
+                calculated = value[name]
+                self.assertAlmostEqual(expected, calculated, 12, 'at index {0}\n'
+                                                                 'expected:   {1:.12f}\n'
+                                                                 'calculat: {2:.12f}'
+                                       .format(i, expected, calculated))
+
+    def testSecurityMinimumValueHolder(self):
+        mm = SecurityMinimumValueHolder(('open', 'close'))
+
+        for i in range(len(self.aapl['close'])):
+            data = dict(aapl=dict(close=self.aapl['close'][i],
+                                  open=self.aapl['open'][i]),
+                        ibm=dict(close=self.ibm['close'][i],
+                                 open=self.ibm['open'][i]))
+            mm.push(data)
+
+            value = mm.value
+            for name in value.index():
+                expected = min(getattr(self, name)['open'][i], getattr(self, name)['close'][i])
+                calculated = value[name]
+                self.assertAlmostEqual(expected, calculated, 12, 'at index {0}\n'
+                                                                 'expected:   {1:.12f}\n'
+                                                                 'calculat: {2:.12f}'
+                                       .format(i, expected, calculated))

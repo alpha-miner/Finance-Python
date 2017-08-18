@@ -217,6 +217,12 @@ cdef class SecurityValueHolder(object):
     def __ror__(self, left):
         return SecurityOrOperatorValueHolder(left, self)
 
+    def __xor__(self, right):
+        return SecurityXorValuedHolder(self, right)
+
+    def __rxor__(self, left):
+        return SecurityXorValuedHolder(left, self)
+
     cpdef copy_attributes(self, dict attributes, bint is_deep=True):
         self._dependency = copy.deepcopy(attributes['_dependency']) if is_deep else attributes['_dependency']
         self._compHolder = copy.deepcopy(attributes['_compHolder']) if is_deep else attributes['_compHolder']
@@ -654,6 +660,28 @@ cdef class SecurityCombinedValueHolder(SecurityValueHolder):
 
     def __deepcopy__(self, memo):
         return SecurityCombinedValueHolder(self._left, self._right, self._op)
+
+
+cdef class SecurityXorValuedHolder(SecurityCombinedValueHolder):
+    def __init__(self, left, right):
+        super(SecurityXorValuedHolder, self).__init__(
+            left, right, operator.xor)
+
+    cpdef value_by_name(self, name):
+        if self.updated:
+            return self.cached[name]
+        else:
+            return np.array([self._left.value_by_name(name), self._right.value_by_name(name)])
+
+    def __deepcopy__(self, memo):
+        return SecurityXorValuedHolder(self._left, self._right)
+
+    def __reduce__(self):
+        d = {}
+        return SecurityXorValuedHolder, (self._left, self._right), d
+
+    def __setstate__(self, state):
+        pass
 
 
 cdef class SecurityAddedValueHolder(SecurityCombinedValueHolder):

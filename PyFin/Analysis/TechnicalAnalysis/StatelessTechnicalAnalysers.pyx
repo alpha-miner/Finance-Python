@@ -19,6 +19,8 @@ from PyFin.Math.Accumulators.IAccumulators cimport Acos
 from PyFin.Math.Accumulators.IAccumulators cimport Acosh
 from PyFin.Math.Accumulators.IAccumulators cimport Asin
 from PyFin.Math.Accumulators.IAccumulators cimport Asinh
+from PyFin.Math.Accumulators.StatelessAccumulators cimport Maximum
+from PyFin.Math.Accumulators.StatelessAccumulators cimport Minimum
 from PyFin.Math.Accumulators.StatelessAccumulators cimport Diff
 from PyFin.Math.Accumulators.StatelessAccumulators cimport SimpleReturn
 from PyFin.Math.Accumulators.StatelessAccumulators cimport LogReturn
@@ -379,6 +381,48 @@ cdef class SecurityLogReturnValueHolder(SecurityStatelessSingleValueHolder):
             return SecurityLogReturnValueHolder, (self._compHolder,), d
         else:
             return SecurityLogReturnValueHolder, (self._dependency,), d
+
+    def __setstate__(self, state):
+        pass
+
+
+cdef class SecurityMaximumValueHolder(SecurityStatelessSingleValueHolder):
+    def __init__(self, dependency=('x', 'y')):
+        super(SecurityMaximumValueHolder, self).__init__(holderType=Maximum,
+                                                         dependency=dependency)
+    def __deepcopy__(self, memo):
+        if self._compHolder:
+            return SecurityMaximumValueHolder(self._compHolder)
+        else:
+            return SecurityMaximumValueHolder(self._dependency)
+
+    def __reduce__(self):
+        d = {}
+        if self._compHolder:
+            return SecurityMaximumValueHolder, (self._compHolder,), d
+        else:
+            return SecurityMaximumValueHolder, (self._dependency,), d
+
+    def __setstate__(self, state):
+        pass
+
+
+cdef class SecurityMinimumValueHolder(SecurityStatelessSingleValueHolder):
+    def __init__(self, dependency=('x', 'y')):
+        super(SecurityMinimumValueHolder, self).__init__(holderType=Minimum,
+                                                         dependency=dependency)
+    def __deepcopy__(self, memo):
+        if self._compHolder:
+            return SecurityMinimumValueHolder(self._compHolder)
+        else:
+            return SecurityMinimumValueHolder(self._dependency)
+
+    def __reduce__(self):
+        d = {}
+        if self._compHolder:
+            return SecurityMinimumValueHolder, (self._compHolder,), d
+        else:
+            return SecurityMinimumValueHolder, (self._dependency,), d
 
     def __setstate__(self, state):
         pass

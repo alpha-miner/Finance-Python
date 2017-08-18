@@ -147,6 +147,15 @@ cdef class SeriesValues(object):
         else:
             return SeriesValues(self.values | right, self.name_mapping)
 
+    def __xor__(self, right):
+        if isinstance(right, SeriesValues):
+            if isinstance(self, SeriesValues):
+                return SeriesValues(np.array([self.values, right.values]).T, self.name_mapping)
+            else:
+                return SeriesValues(np.array([self, right.values]).T, self.name_mapping)
+        else:
+            return SeriesValues(np.array([self.values, right]).T, self.name_mapping)
+
     def __richcmp__(self, right, int op):
 
         if isinstance(right, SeriesValues):

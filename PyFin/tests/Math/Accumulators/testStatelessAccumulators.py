@@ -13,6 +13,7 @@ import os
 import math
 import numpy as np
 from PyFin.Math.Accumulators.IAccumulators import Sign
+from PyFin.Math.Accumulators.IAccumulators import Latest
 from PyFin.Math.Accumulators.StatelessAccumulators import Average
 from PyFin.Math.Accumulators.StatelessAccumulators import XAverage
 from PyFin.Math.Accumulators.StatelessAccumulators import Max
@@ -111,6 +112,18 @@ class TestStatelessAccumulators(unittest.TestCase):
                                                              "expected max:   {1:f}\n"
                                                              "calculated max: {2:f}".format(i, expected, calculated))
 
+    def testMaximumWithListedOperator(self):
+        mm = Maximum(dependency=Latest('open') ^ Latest('close'))
+
+        for i, value in enumerate(zip(self.samplesOpen, self.samplesClose)):
+            mm.push(dict(open=value[0], close=value[1]))
+            expected = max(self.samplesOpen[i], self.samplesClose[i])
+            calculated = mm.result()
+
+            self.assertAlmostEqual(expected, calculated, 10, "at index {0:d}\n"
+                                                             "expected max:   {1:f}\n"
+                                                             "calculated max: {2:f}".format(i, expected, calculated))
+
     def testMin(self):
         mm = Min(dependency='close')
 
@@ -125,6 +138,18 @@ class TestStatelessAccumulators(unittest.TestCase):
 
     def testMinimum(self):
         mm = Minimum(dependency=('open', 'close'))
+
+        for i, value in enumerate(zip(self.samplesOpen, self.samplesClose)):
+            mm.push(dict(open=value[0], close=value[1]))
+            expected = min(self.samplesOpen[i], self.samplesClose[i])
+            calculated = mm.result()
+
+            self.assertAlmostEqual(expected, calculated, 10, "at index {0:d}\n"
+                                                             "expected max:   {1:f}\n"
+                                                             "calculated max: {2:f}".format(i, expected, calculated))
+
+    def testMinimumWithListedOperator(self):
+        mm = Minimum(dependency=Latest('open') ^ Latest('close'))
 
         for i, value in enumerate(zip(self.samplesOpen, self.samplesClose)):
             mm.push(dict(open=value[0], close=value[1]))

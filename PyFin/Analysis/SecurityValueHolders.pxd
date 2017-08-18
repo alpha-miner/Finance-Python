@@ -88,6 +88,10 @@ cdef class SecurityCombinedValueHolder(SecurityValueHolder):
     cpdef value_by_names(self, list names)
     cpdef push(self, dict data)
 
+cdef class SecurityXorValueHolder(SecurityCombinedValueHolder):
+
+    cpdef value_by_name(self, name)
+
 
 cdef class SecurityAddedValueHolder(SecurityCombinedValueHolder):
     pass

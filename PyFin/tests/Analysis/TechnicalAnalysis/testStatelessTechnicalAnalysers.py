@@ -12,6 +12,7 @@ import copy
 import pickle
 import tempfile
 import os
+from PyFin.Analysis.SecurityValueHolders import SecurityLatestValueHolder
 from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import SecurityDiffValueHolder
 from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import SecuritySignValueHolder
 from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import SecurityXAverageValueHolder
@@ -312,8 +313,50 @@ class TestStatelessTechnicalAnalysis(unittest.TestCase):
                                                                  'calculat: {2:.12f}'
                                        .format(i, expected, calculated))
 
+    def testSecurityMaximumValueHolderWithValueHolder(self):
+        exp1 = SecurityLatestValueHolder('open')
+        exp2 = SecurityLatestValueHolder('close')
+        mm = SecurityMaximumValueHolder(exp1 ^ exp2)
+
+        for i in range(len(self.aapl['close'])):
+            data = dict(aapl=dict(close=self.aapl['close'][i],
+                                  open=self.aapl['open'][i]),
+                        ibm=dict(close=self.ibm['close'][i],
+                                 open=self.ibm['open'][i]))
+            mm.push(data)
+
+            value = mm.value
+            for name in value.index():
+                expected = max(getattr(self, name)['open'][i], getattr(self, name)['close'][i])
+                calculated = value[name]
+                self.assertAlmostEqual(expected, calculated, 12, 'at index {0}\n'
+                                                                 'expected:   {1:.12f}\n'
+                                                                 'calculat: {2:.12f}'
+                                       .format(i, expected, calculated))
+
     def testSecurityMinimumValueHolder(self):
         mm = SecurityMinimumValueHolder(('open', 'close'))
+
+        for i in range(len(self.aapl['close'])):
+            data = dict(aapl=dict(close=self.aapl['close'][i],
+                                  open=self.aapl['open'][i]),
+                        ibm=dict(close=self.ibm['close'][i],
+                                 open=self.ibm['open'][i]))
+            mm.push(data)
+
+            value = mm.value
+            for name in value.index():
+                expected = min(getattr(self, name)['open'][i], getattr(self, name)['close'][i])
+                calculated = value[name]
+                self.assertAlmostEqual(expected, calculated, 12, 'at index {0}\n'
+                                                                 'expected:   {1:.12f}\n'
+                                                                 'calculat: {2:.12f}'
+                                       .format(i, expected, calculated))
+
+    def testSecurityMinimumValueHolderWithValueHolder(self):
+        exp1 = SecurityLatestValueHolder('open')
+        exp2 = SecurityLatestValueHolder('close')
+        mm = SecurityMinimumValueHolder(exp1 ^ exp2)
 
         for i in range(len(self.aapl['close'])):
             data = dict(aapl=dict(close=self.aapl['close'][i],

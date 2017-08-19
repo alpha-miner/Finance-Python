@@ -24,7 +24,7 @@ cdef class Deque:
     @cython.cdivision(True)
     @cython.boundscheck(False)
     @cython.wraparound(False)
-    cdef dump(self, value):
+    cdef dump(self, value, default=NAN):
         cdef size_t n = self.start
         cdef size_t window = self.window
         cdef list con = self.con
@@ -35,14 +35,9 @@ cdef class Deque:
             self.start = (n + 1) % window
             return popout
         else:
-
             con.append(value)
             self.is_full = len(con) == window
-
-            if hasattr(value, '__len__'):
-                return np.array([NAN] * len(value))
-            else:
-                return NAN
+            return default
 
     cdef size_t size(self):
         return len(self.con)

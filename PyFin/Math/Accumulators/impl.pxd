@@ -14,7 +14,7 @@ cdef class Deque:
     cdef public list con
     cdef public size_t start
 
-    cdef dump(self, value)
+    cdef dump(self, value, default=*)
     cdef size_t size(self)
     cdef bint isFull(self)
     cdef np.ndarray as_array(self)

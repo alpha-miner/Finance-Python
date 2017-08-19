@@ -282,8 +282,8 @@ cdef class MovingAllTrue(SingleValuedValueHolder):
 
         if value:
             addedTrue += 1
-        popout = self._deque.dump(value)
-        if not isnan(popout) and popout:
+        popout = self._deque.dump(value, False)
+        if popout:
             addedTrue -= 1
 
         self._countedTrue += addedTrue
@@ -327,8 +327,8 @@ cdef class MovingAnyTrue(SingleValuedValueHolder):
 
         if value:
             addedTrue += 1
-        popout = self._deque.dump(value)
-        if not isnan(popout) and popout:
+        popout = self._deque.dump(value, False)
+        if popout:
             addedTrue -= 1
 
         self._countedTrue += addedTrue
@@ -367,11 +367,9 @@ cdef class MovingSum(SingleValuedValueHolder):
         value = self._push(data)
         if isnan(value):
             return NAN
-        popout = self._deque.dump(value)
-        if not isnan(popout):
-            self._runningSum = self._runningSum - popout + value
-        else:
-            self._runningSum = self._runningSum + value
+        popout = self._deque.dump(value, 0.)
+        self._runningSum = self._runningSum - popout + value
+
         self._isFull = self._isFull or self._deque.isFull()
 
     cpdef object result(self):
@@ -406,11 +404,8 @@ cdef class MovingAverage(SingleValuedValueHolder):
 
         if isnan(value):
             return NAN
-        popout = self._deque.dump(value)
-        if isnan(popout):
-            self._runningSum += value
-        else:
-            self._runningSum += value - popout
+        popout = self._deque.dump(value, 0.)
+        self._runningSum += value - popout
         self._isFull = self._isFull or self._deque.isFull()
 
     @cython.cdivision(True)
@@ -453,7 +448,7 @@ cdef class MovingPositiveAverage(SingleValuedValueHolder):
         value = self._push(data)
         if isnan(value):
             return NAN
-        popout = self._deque.dump(value)
+        popout = self._deque.dump(value, -1.)
         if value > 0.0:
             self._runningPositiveCount += 1
             self._runningPositiveSum += value
@@ -605,7 +600,7 @@ cdef class MovingNegativeAverage(SingleValuedValueHolder):
 
         if isnan(value):
             return NAN
-        popout = self._deque.dump(value)
+        popout = self._deque.dump(value, 1.)
         if value < 0.0:
             self._runningNegativeCount += 1
             self._runningNegativeSum += value
@@ -659,14 +654,10 @@ cdef class MovingVariance(SingleValuedValueHolder):
 
         if isnan(value):
             return NAN
-        popout = self._deque.dump(value)
+        popout = self._deque.dump(value, 0.)
 
-        if isnan(popout):
-            self._runningSum += value
-            self._runningSumSquare += value * value
-        else:
-            self._runningSum += value - popout
-            self._runningSumSquare += value * value - popout * popout
+        self._runningSum += value - popout
+        self._runningSumSquare += value * value - popout * popout
         self._isFull = self._isFull or self._deque.isFull()
 
     @cython.cdivision(True)
@@ -724,14 +715,10 @@ cdef class MovingStandardDeviation(SingleValuedValueHolder):
 
         if isnan(value):
             return NAN
-        popout = self._deque.dump(value)
+        popout = self._deque.dump(value, 0.)
 
-        if isnan(popout):
-            self._runningSum += value
-            self._runningSumSquare += value * value
-        else:
-            self._runningSum += value - popout
-            self._runningSumSquare += value * value - popout * popout
+        self._runningSum += value - popout
+        self._runningSumSquare += value * value - popout * popout
         self._isFull = self._isFull or self._deque.isFull()
 
     @cython.cdivision(True)
@@ -790,7 +777,7 @@ cdef class MovingNegativeVariance(SingleValuedValueHolder):
 
         if isnan(value):
             return NAN
-        popout = self._deque.dump(value)
+        popout = self._deque.dump(value, 1.)
 
         if value < 0:
             self._runningNegativeSum += value
@@ -859,7 +846,7 @@ cdef class MovingCountedPositive(SingleValuedValueHolder):
 
         if isnan(value):
             return NAN
-        popout = self._deque.dump(value)
+        popout = self._deque.dump(value, -1.)
 
         if value > 0:
             self._counts += 1
@@ -900,7 +887,7 @@ cdef class MovingCountedNegative(SingleValuedValueHolder):
 
         if isnan(value):
             return NAN
-        popout = self._deque.dump(value)
+        popout = self._deque.dump(value, 1)
 
         if value < 0:
             self._counts += 1
@@ -981,29 +968,25 @@ cdef class MovingCorrelation(StatefulValueHolder):
         self._runningSumSquareLeft = 0.0
         self._runningSumSquareRight = 0.0
         self._runningSumCrossSquare = 0.0
+        self._default = (0., 0.)
 
     cpdef push(self, dict data):
+        cdef double headLeft
+        cdef double headRight
+
         value = self.extract(data)
         if isnan(value[0]) or isnan(value[1]):
             return NAN
-        popout = self._deque.dump(value)
-        if not isnan(popout[0]):
-            headLeft = popout[0]
-            headRight = popout[1]
+        popout = self._deque.dump(value, self._default)
+        headLeft = popout[0]
+        headRight = popout[1]
 
-            # updating cached values
-            self._runningSumLeft = self._runningSumLeft - headLeft + value[0]
-            self._runningSumRight = self._runningSumRight - headRight + value[1]
-            self._runningSumSquareLeft = self._runningSumSquareLeft - headLeft * headLeft + value[0] * value[0]
-            self._runningSumSquareRight = self._runningSumSquareRight - headRight * headRight + value[1] * value[1]
-            self._runningSumCrossSquare = self._runningSumCrossSquare - headLeft * headRight + value[0] * value[1]
-        else:
-            # updating cached values
-            self._runningSumLeft = self._runningSumLeft + value[0]
-            self._runningSumRight = self._runningSumRight + value[1]
-            self._runningSumSquareLeft = self._runningSumSquareLeft + value[0] * value[0]
-            self._runningSumSquareRight = self._runningSumSquareRight + value[1] * value[1]
-            self._runningSumCrossSquare = self._runningSumCrossSquare + value[0] * value[1]
+        # updating cached values
+        self._runningSumLeft = self._runningSumLeft - headLeft + value[0]
+        self._runningSumRight = self._runningSumRight - headRight + value[1]
+        self._runningSumSquareLeft = self._runningSumSquareLeft - headLeft * headLeft + value[0] * value[0]
+        self._runningSumSquareRight = self._runningSumSquareRight - headRight * headRight + value[1] * value[1]
+        self._runningSumCrossSquare = self._runningSumCrossSquare - headLeft * headRight + value[0] * value[1]
         self._isFull = self._isFull or self._deque.isFull()
 
     cpdef object result(self):
@@ -1762,6 +1745,7 @@ cdef class MovingResidue(StatefulValueHolder):
         self._xsquare = 0.
         self._lasty = NAN
         self._lastx = NAN
+        self._default = (0., 0.)
 
     @cython.boundscheck(False)
     @cython.wraparound(False)
@@ -1778,17 +1762,13 @@ cdef class MovingResidue(StatefulValueHolder):
         if isnan(x) or isnan(y):
             return NAN
 
-        popout = self._deque.dump(value)
+        popout = self._deque.dump(value, self._default)
 
         head_y = popout[0]
         head_x = popout[1]
 
-        if not isnan(head_x):
-            self._cross += x * y - head_x * head_y
-            self._xsquare += x * x - head_x * head_x
-        else:
-            self._cross += x * y
-            self._xsquare += x * x
+        self._cross += x * y - head_x * head_y
+        self._xsquare += x * x - head_x * head_x
 
         self._lastx = x
         self._lasty = y

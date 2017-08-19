@@ -195,6 +195,7 @@ cdef class MovingCorrelation(StatefulValueHolder):
     cdef public double _runningSumSquareLeft
     cdef public double _runningSumSquareRight
     cdef public double _runningSumCrossSquare
+    cdef public tuple _default
 
     cpdef push(self, dict data)
     cpdef object result(self)
@@ -364,6 +365,7 @@ cdef class MovingResidue(StatefulValueHolder):
     cdef public double _xsquare
     cdef public double _lastx
     cdef public double _lasty
+    cdef public tuple _default
 
     cpdef push(self, dict data)
     cpdef object result(self)

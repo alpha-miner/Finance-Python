@@ -10,6 +10,7 @@ from PyFin.api.DateUtilities import bizDatesList
 from PyFin.api.DateUtilities import holDatesList
 from PyFin.api.DateUtilities import advanceDate
 from PyFin.api.DateUtilities import BizDayConventions
+from PyFin.api.DateUtilities import DateGeneration
 from PyFin.api.DateUtilities import isBizDay
 from PyFin.api.DateUtilities import adjustDateByCalendar
 from PyFin.api.DateUtilities import advanceDateByCalendar
@@ -72,6 +73,7 @@ __all__ = ["datesList",
            "isBizDay",
            "advanceDate",
            "BizDayConventions",
+           "DateGeneration",
            "adjustDateByCalendar",
            "advanceDateByCalendar",
            "nthWeekDay",

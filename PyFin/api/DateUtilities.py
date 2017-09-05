@@ -10,7 +10,9 @@ from PyFin.DateUtilities import Calendar
 from PyFin.DateUtilities import Period
 from PyFin.DateUtilities import Schedule
 from PyFin.Enums import BizDayConventions
+from PyFin.Enums import DateGeneration
 from PyFin.DateUtilities import check_date
+from PyFin.DateUtilities import check_period
 
 
 def isBizDay(holidayCenter, ref):
@@ -54,7 +56,7 @@ def adjustDateByCalendar(holidayCenter, referenceDate, convention=BizDayConventi
 def advanceDateByCalendar(holidayCenter, referenceDate, period, convention=BizDayConventions.Following):
     cal = Calendar(holidayCenter)
     refer = check_date(referenceDate)
-    period = Period(period)
+    period = check_period(period)
     return cal.advanceDate(refer, period, convention).toDateTime()
 
 
@@ -67,11 +69,12 @@ def makeSchedule(firstDate,
                  endDate,
                  tenor,
                  calendar='NullCalendar',
-                 dateRule=BizDayConventions.Following):
+                 dateRule=BizDayConventions.Following,
+                 dateGenerationRule=DateGeneration.Forward):
 
     cal = Calendar(calendar)
     firstDate = check_date(firstDate)
     endDate = check_date(endDate)
-    tenor = Period(tenor)
-    schedule = Schedule(firstDate, endDate, tenor, cal, convention=dateRule)
+    tenor = check_period(tenor)
+    schedule = Schedule(firstDate, endDate, tenor, cal, convention=dateRule, dateGenerationRule=dateGenerationRule)
     return [d.toDateTime() for d in schedule]

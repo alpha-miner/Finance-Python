@@ -223,6 +223,13 @@ cdef class Period(object):
         pass
 
 
+cpdef check_period(p):
+    if isinstance(p, Period):
+        return p
+    else:
+        return Period(p)
+
+
 # implementation detail
 
 cdef bint _lt_cmp(Period p1, Period p2) except -1:

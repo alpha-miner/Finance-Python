@@ -30,6 +30,7 @@ from PyFin.Analysis.TechnicalAnalysis import SecurityMovingNegativeDifferenceAve
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingRSI
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingLogReturn
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingResidue
+from PyFin.Analysis.TechnicalAnalysis import SecurityMovingCorrelation
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingHistoricalWindow
 
 
@@ -810,3 +811,74 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
                 for name in ma.value.index():
                     self.assertAlmostEqual(ma.value[name], pickled.value[name])
 
+    def testSecurityMovingCorrelation(self):
+        window = 100
+        mr = SecurityMovingCorrelation(window, ('y', 'x'))
+        for i in range(len(self.aapl['close'])):
+            data = {'aapl': {'y': self.aapl['close'][i], 'x': self.aapl['open'][i]},
+                    'ibm': {'y': self.ibm['close'][i], 'x': self.ibm['open'][i]}}
+            mr.push(data)
+
+            if i >= window - 1:
+                for name in mr.value.index():
+                    series_x = getattr(self, name)['open'][i - window + 1:i + 1]
+                    series_y = getattr(self, name)['close'][i - window + 1:i + 1]
+                    expected_res = np.corrcoef(series_x, series_y)[0, 1]
+                    self.assertAlmostEqual(mr.value[name], expected_res, msg= \
+                        "at index {0} and symbol {1}\n"
+                        "expected:   {2}\n"
+                        "calculated: {3}".format(i, name, expected_res, mr.value[name]))
+
+    def testSecurityMovingCorrelationDeepcopy(self):
+        ma = SecurityMovingCorrelation(10, ['y', 'x'])
+
+        data = dict(aapl=dict(x=1., y=2),
+                    ibm=dict(x=2., y=3))
+        data2 = dict(aapl=dict(x=2., y=3),
+                     ibm=dict(x=3., y=4))
+
+        ma.push(data)
+        ma.push(data2)
+
+        copied = copy.deepcopy(ma)
+
+        for i, v in enumerate(np.random.rand(20)):
+            data['aapl']['x'] = v
+            data['aapl']['y'] = v + 1
+            data['ibm']['x'] = v + 1.
+            data['ibm']['y'] = v + 2.
+            ma.push(data)
+            copied.push(data)
+            if i >= 10:
+                for name in ma.value.index():
+                    self.assertAlmostEqual(ma.value[name], copied.value[name])
+
+    def testSecurityMovingCorrelationPickle(self):
+        ma = SecurityMovingCorrelation(10, ['y', 'x'])
+
+        data = dict(aapl=dict(x=1., y=2),
+                    ibm=dict(x=2., y=3))
+        data2 = dict(aapl=dict(x=2., y=3),
+                     ibm=dict(x=3., y=4))
+
+        ma.push(data)
+        ma.push(data2)
+
+        with tempfile.NamedTemporaryFile('w+b', delete=False) as f:
+            pickle.dump(ma, f)
+
+        with open(f.name, 'rb') as f2:
+            pickled = pickle.load(f2)
+        os.unlink(f.name)
+
+        for i, v in enumerate(np.random.rand(20)):
+            data['aapl']['x'] = v
+            data['aapl']['y'] = v + 1
+            data['ibm']['x'] = v + 1.
+            data['ibm']['y'] = v + 2.
+            ma.push(data)
+            pickled.push(data)
+
+            if i >= 10:
+                for name in ma.value.index():
+                    self.assertAlmostEqual(ma.value[name], pickled.value[name])

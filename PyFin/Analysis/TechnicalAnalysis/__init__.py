@@ -42,6 +42,7 @@ from PyFin.Analysis.TechnicalAnalysis.StatefulTechnicalAnalysers import Security
 from PyFin.Analysis.TechnicalAnalysis.StatefulTechnicalAnalysers import SecurityMovingHistoricalWindow
 from PyFin.Analysis.TechnicalAnalysis.StatefulTechnicalAnalysers import SecurityMovingLogReturn
 from PyFin.Analysis.TechnicalAnalysis.StatefulTechnicalAnalysers import SecurityMovingResidue
+from PyFin.Analysis.TechnicalAnalysis.StatefulTechnicalAnalysers import SecurityMovingCorrelation
 
 __all__ = ['SecuritySignValueHolder',
            'SecurityXAverageValueHolder',
@@ -77,4 +78,5 @@ __all__ = ['SecuritySignValueHolder',
            'SecurityMovingRSI',
            'SecurityMovingHistoricalWindow',
            'SecurityMovingLogReturn',
-           'SecurityMovingResidue']
+           'SecurityMovingResidue',
+           'SecurityMovingCorrelation']

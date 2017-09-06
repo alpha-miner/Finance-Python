@@ -39,6 +39,7 @@ from PyFin.Analysis.TechnicalAnalysis import SecurityAcoshValueHolder
 from PyFin.Analysis.TechnicalAnalysis import SecurityAsinValueHolder
 from PyFin.Analysis.TechnicalAnalysis import SecurityAsinhValueHolder
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingResidue
+from PyFin.Analysis.TechnicalAnalysis import SecurityMovingCorrelation
 from PyFin.Analysis.SecurityValueHolders import SecurityShiftedValueHolder
 from PyFin.Analysis.SecurityValueHolders import SecurityLatestValueHolder
 from PyFin.Analysis.SecurityValueHolders import SecurityIIFValueHolder
@@ -89,6 +90,10 @@ def RSI(window, dependency='x'):
 
 def RES(window, dependency=('y', 'x')):
     return SecurityMovingResidue(window, dependency)
+
+
+def CORR(window, dependency=('x', 'y')):
+    return SecurityMovingCorrelation(window, dependency)
 
 
 def MA(window, dependency='x'):

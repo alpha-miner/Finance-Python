@@ -1352,10 +1352,10 @@ cdef class MACD(StatelessSingleValueAccumulator):
 cdef class MovingRank(SortedValueHolder):
     def __init__(self, window, dependency='x'):
         super(MovingRank, self).__init__(window, dependency)
-        self._runningRank = []
+        self._runningRank = NAN
 
     cpdef object result(self):
-        self._runningRank = [bisect.bisect_left(self._sortedArray, x) for x in self._deque.as_list()]
+        self._runningRank = bisect.bisect_left(self._sortedArray, self._deque[self._deque.size() - 1])
         return self._runningRank
 
     def __deepcopy__(self, memo):

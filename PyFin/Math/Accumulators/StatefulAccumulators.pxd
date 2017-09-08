@@ -282,7 +282,7 @@ cdef class MACD(StatelessSingleValueAccumulator):
 
 cdef class MovingRank(SortedValueHolder):
 
-    cdef public list _runningRank
+    cdef public double _runningRank
 
     cpdef object result(self)
 

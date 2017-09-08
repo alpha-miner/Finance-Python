@@ -650,7 +650,8 @@ class TestStatefulAccumulators(unittest.TestCase):
                 expected = sorted_con.index(value) / (len(sorted_con) - 1.)
                 self.assertAlmostEqual(calculated, expected, 15, "at index {0:d}\n"
                                                                  "Quantile expected:   {1:f}\n"
-                                                                 "Quantile calculated: {2:f}".format(i, expected, calculated))
+                                                                 "Quantile calculated: {2:f}".format(i, expected,
+                                                                                                     calculated))
 
     def testMovingQuantileDeepcopy(self):
         test = MovingQuantile(10, 'close')
@@ -1841,9 +1842,9 @@ class TestStatefulAccumulators(unittest.TestCase):
             expected = macd.value - ema_macd.value
             calculated = macd_diff.value
             self.assertAlmostEqual(expected, calculated, 10, "at index {0:d}\n"
-                                                            "expected ema macd diff:   {1:f}\n"
-                                                            "calculated ema macd diff: {2:f}".format(i, expected,
-                                                                                                     calculated))
+                                                             "expected ema macd diff:   {1:f}\n"
+                                                             "calculated ema macd diff: {2:f}".format(i, expected,
+                                                                                                      calculated))
 
     def testMovingRank(self):
         window = 10
@@ -1857,10 +1858,10 @@ class TestStatefulAccumulators(unittest.TestCase):
                 con = con[1:]
             if i >= window - 1:
                 calculated = mk.result()
-                expected = np.argsort(np.argsort(con))
-                self.assertListEqual(list(expected), calculated, "at index {0:d}\n"
-                                                                 "expected rank:   {1}\n"
-                                                                 "calculated rank: {2}".format(i, expected, calculated))
+                expected = np.argsort(np.argsort(con))[-1]
+                self.assertEqual(expected, calculated, "at index {0:d}\n"
+                                                       "expected rank:   {1}\n"
+                                                       "calculated rank: {2}".format(i, expected, calculated))
 
     def tesMovingRankDeepcopy(self):
         window = 10
@@ -2241,8 +2242,8 @@ class TestStatefulAccumulators(unittest.TestCase):
             mr.push(dict(x=x, y=y))
 
             if i >= window - 1:
-                series_x = x_data[i-window+1:i+1]
-                series_y = self.sample[i-window+1:i+1]
+                series_x = x_data[i - window + 1:i + 1]
+                series_y = self.sample[i - window + 1:i + 1]
 
                 calculated_res = mr.result()
                 expected_res = y - np.dot(series_x, series_y) / np.dot(series_x, series_x) * x
@@ -2265,8 +2266,8 @@ class TestStatefulAccumulators(unittest.TestCase):
 
         datas = np.random.randn(40)
         for i in datas:
-            mr.push(dict(x=i, y=i+1.))
-            copied.push(dict(x=i, y=i+1))
+            mr.push(dict(x=i, y=i + 1.))
+            copied.push(dict(x=i, y=i + 1))
 
         self.assertAlmostEqual(copied.value, mr.value)
 
@@ -2286,8 +2287,8 @@ class TestStatefulAccumulators(unittest.TestCase):
 
         datas = np.random.randn(40)
         for i in datas:
-            mr.push(dict(x=i, y=i+1.))
-            pickled.push(dict(x=i, y=i+1.))
+            mr.push(dict(x=i, y=i + 1.))
+            pickled.push(dict(x=i, y=i + 1.))
 
         self.assertAlmostEqual(mr.value, pickled.value)
         os.unlink(f.name)

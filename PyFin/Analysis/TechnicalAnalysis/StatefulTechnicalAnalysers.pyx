@@ -32,6 +32,7 @@ from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingResidue
 from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingHistoricalWindow
 from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingLogReturn
 from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingCorrelation
+from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingRank
 from PyFin.Math.MathConstants cimport NAN
 
 
@@ -435,6 +436,27 @@ cdef class SecurityMovingCorrelation(SecuritySingleValueHolder):
             return SecurityMovingCorrelation, (self._window - self._compHolder._window, self._compHolder), d
         else:
             return SecurityMovingCorrelation, (self._window, self._dependency), d
+
+
+cdef class SecurityMovingRank(SecuritySingleValueHolder):
+
+    def __init__(self, window, dependency='x'):
+        super(SecurityMovingRank, self).__init__(window, MovingRank, dependency)
+
+    def __deepcopy__(self, memo):
+        if self._compHolder:
+            copied = SecurityMovingRank(self._window - self._compHolder._window, self._compHolder)
+        else:
+            copied = SecurityMovingRank(self._window, self._dependency)
+        copied.copy_attributes(self.collect_attributes(), is_deep=True)
+        return copied
+
+    def __reduce__(self):
+        d = self.collect_attributes()
+        if self._compHolder:
+            return SecurityMovingRank, (self._window - self._compHolder._window, self._compHolder), d
+        else:
+            return SecurityMovingRank, (self._window, self._dependency), d
 
 
 cdef class SecurityMovingHistoricalWindow(SecuritySingleValueHolder):

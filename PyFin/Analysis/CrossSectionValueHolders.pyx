@@ -150,6 +150,67 @@ cdef class CSAverageSecurityValueHolder(CrossSectionValueHolder):
         pass
 
 
+cdef class CSPercentileSecurityValueHolder(CrossSectionValueHolder):
+
+    cdef double percentile
+
+    def __init__(self, percentile, innerValue):
+        super(CSPercentileSecurityValueHolder, self).__init__(innerValue)
+        self.percentile = percentile
+
+    @property
+    def value(self):
+
+        cdef SeriesValues raw_values
+        cdef np.ndarray[double, ndim=1] per_value
+
+        if self.updated:
+            return self.cached
+        else:
+            raw_values = self._inner.value
+            per_value = np.array([raw_values.percentile(self.percentile)] * len(raw_values))
+            per_value[np.isnan(raw_values.values)] = NAN
+            self.cached = SeriesValues(per_value, raw_values.name_mapping)
+            self.updated = 1
+            return self.cached
+
+    cpdef value_by_name(self, name):
+
+        cdef SeriesValues raw_values
+        cdef np.ndarray[double, ndim=1] per_value
+
+        if self.updated:
+            return self.cached[name]
+        else:
+            raw_values = self._inner.value
+            per_value = np.array([raw_values.percentile(self.percentile)] * len(raw_values))
+            per_value[np.isnan(raw_values.values)] = NAN
+            self.cached = SeriesValues(per_value, raw_values.name_mapping)
+            self.updated = 1
+            return self.cached[name]
+
+    cpdef value_by_names(self, list names):
+
+        cdef SeriesValues raw_values
+        cdef np.ndarray[double, ndim=1] per_value
+
+        raw_values = self._inner.value_by_names(names)
+        per_value = np.array([raw_values.percentile(self.percentile)] * len(raw_values))
+        per_value[np.isnan(raw_values.values)] = NAN
+        raw_values = SeriesValues(per_value, raw_values.name_mapping)
+        return raw_values[names]
+
+    def __deepcopy__(self, memo):
+        return CSPercentileSecurityValueHolder(self.percentile, self._inner)
+
+    def __reduce__(self):
+        d = {}
+        return CSPercentileSecurityValueHolder, (self.percentile, self._inner), d
+
+    def __setstate__(self, state):
+        pass
+
+
 cdef class CSAverageAdjustedSecurityValueHolder(CrossSectionValueHolder):
     def __init__(self, innerValue):
         super(CSAverageAdjustedSecurityValueHolder, self).__init__(innerValue)

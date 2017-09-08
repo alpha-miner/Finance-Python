@@ -10,6 +10,7 @@ import numpy as np
 cimport numpy as np
 from numpy import nansum
 from numpy import nanmean
+from numpy import percentile
 from PyFin.Math.MathConstants cimport NAN
 
 
@@ -211,6 +212,9 @@ cdef class SeriesValues(object):
 
     cpdef double mean(self):
         return nanmean(self.values)
+
+    cpdef double percentile(self, double per):
+        return percentile(self.values, per)
 
     cpdef double dot(self, SeriesValues right):
         return np.dot(self.values, right.values)

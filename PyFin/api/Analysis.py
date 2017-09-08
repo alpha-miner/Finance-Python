@@ -66,7 +66,7 @@ def CSMeanAdjusted(dependency):
     return CSAverageAdjustedSecurityValueHolder(dependency)
 
 
-def CSQuantile(dependency):
+def CSQuantiles(dependency):
     return CSQuantileSecurityValueHolder(dependency)
 
 

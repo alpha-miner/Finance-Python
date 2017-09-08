@@ -15,6 +15,7 @@ from PyFin.Analysis.CrossSectionValueHolders import CSAverageSecurityValueHolder
 from PyFin.Analysis.CrossSectionValueHolders import CSAverageAdjustedSecurityValueHolder
 from PyFin.Analysis.CrossSectionValueHolders import CSQuantileSecurityValueHolder
 from PyFin.Analysis.CrossSectionValueHolders import CSZScoreSecurityValueHolder
+from PyFin.Analysis.CrossSectionValueHolders import CSPercentileSecurityValueHolder
 
 
 class TestCrossSectionValueHolder(unittest.TestCase):
@@ -68,6 +69,21 @@ class TestCrossSectionValueHolder(unittest.TestCase):
             meanHolder.push(data)
             benchmarkValues = benchmark.value
             np.testing.assert_array_almost_equal(benchmarkValues.mean(), meanHolder.value.values)
+
+    def testCSPercentileSecurityValueHolder(self):
+        percent = 50
+        benchmark = SecurityLatestValueHolder(dependency='close')
+        perHolder = CSPercentileSecurityValueHolder(percent, benchmark)
+
+        for i in range(len(self.datas['aapl']['close'])):
+            data = {'aapl': {Factors.CLOSE: self.datas['aapl'][Factors.CLOSE][i],
+                             Factors.OPEN: self.datas['aapl'][Factors.OPEN][i]},
+                    'ibm': {Factors.CLOSE: self.datas['ibm'][Factors.CLOSE][i],
+                            Factors.OPEN: self.datas['ibm'][Factors.OPEN][i]}}
+            benchmark.push(data)
+            perHolder.push(data)
+            benchmarkValues = benchmark.value
+            np.testing.assert_array_almost_equal(np.percentile(benchmarkValues.values, 50), perHolder.value.values)
 
     def testCSAverageAdjustedSecurityValueHolder(self):
         benchmark = SecurityLatestValueHolder(dependency='close')

@@ -63,7 +63,7 @@ from PyFin.api.Analysis import RANK
 from PyFin.api.Analysis import CSRank
 from PyFin.api.Analysis import CSMean
 from PyFin.api.Analysis import CSMeanAdjusted
-from PyFin.api.Analysis import CSQuantile
+from PyFin.api.Analysis import CSQuantiles
 from PyFin.api.Analysis import CSPercentile
 from PyFin.api.Analysis import CSZScore
 
@@ -126,7 +126,7 @@ __all__ = ["datesList",
            "CSRank",
            "CSMean",
            "CSMeanAdjusted",
-           "CSQuantile",
+           "CSQuantiles",
            "CSZScore",
            "CSPercentile",
            "pyFinAssert"]

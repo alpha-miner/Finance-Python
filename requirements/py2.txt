@@ -1,4 +1,4 @@
-cython>=0.25.0
+cython
 enum34>=1.0.4
 numpy>=1.10.1
 pandas>=0.18.0

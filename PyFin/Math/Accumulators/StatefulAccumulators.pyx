@@ -1754,18 +1754,13 @@ cdef class MovingResidue(StatefulValueHolder):
         cdef double y
         cdef double head_y
         cdef double head_x
-        cdef tuple value
 
         value = self.extract(data)
-        x = value[1]
-        y = value[0]
+        y, x = value
         if isnan(x) or isnan(y):
             return NAN
 
-        popout = self._deque.dump(value, self._default)
-
-        head_y = popout[0]
-        head_x = popout[1]
+        head_y, head_x = self._deque.dump(value, self._default)
 
         self._cross += x * y - head_x * head_y
         self._xsquare += x * x - head_x * head_x

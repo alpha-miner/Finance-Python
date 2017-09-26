@@ -671,7 +671,7 @@ cdef class SecurityXorValuedHolder(SecurityCombinedValueHolder):
         if self.updated:
             return self.cached[name]
         else:
-            return np.array([self._left.value_by_name(name), self._right.value_by_name(name)])
+            return self._left.value_by_name(name), self._right.value_by_name(name)
 
     def __deepcopy__(self, memo):
         return SecurityXorValuedHolder(self._left, self._right)

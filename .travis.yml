@@ -15,7 +15,7 @@ addons:
 install:
   # We do this conditionally because it saves us some downloading if the
   # version is the same.
-  - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
+  - wget https://repo.continuum.io/miniconda/Miniconda3-4.3.21-Linux-x86_64.sh -O miniconda.sh
   - bash miniconda.sh -b -p $HOME/miniconda
   - export PATH="$HOME/miniconda/bin:$PATH"
   - hash -r
@@ -34,7 +34,6 @@ install:
   - conda install scipy
   - conda install pandas
   - conda install cython
-  - conda install libgcc
   - pip install simpleutils
   - pip install coveralls
 # command to run tests

@@ -10,6 +10,7 @@ import numpy as np
 cimport numpy as np
 from numpy import nansum
 from numpy import nanmean
+from numpy import nanstd
 from numpy import percentile
 from PyFin.Math.MathConstants cimport NAN
 
@@ -204,7 +205,7 @@ cdef class SeriesValues(object):
 
     cpdef SeriesValues zscore(self):
         cdef np.ndarray[double, ndim=1] data = self.values
-        return SeriesValues((data - data.mean()) / data.std(), self.name_mapping)
+        return SeriesValues((data - nanmean(data)) / nanstd(data), self.name_mapping)
 
     cpdef SeriesValues unit(self):
         cdef np.ndarray[double, ndim=1] data = self.values

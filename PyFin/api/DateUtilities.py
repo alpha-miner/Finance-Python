@@ -11,6 +11,7 @@ from PyFin.DateUtilities import Period
 from PyFin.DateUtilities import Schedule
 from PyFin.Enums import BizDayConventions
 from PyFin.Enums import DateGeneration
+from PyFin.Enums import TimeUnits
 from PyFin.DateUtilities import check_date
 from PyFin.DateUtilities import check_period
 
@@ -76,5 +77,20 @@ def makeSchedule(firstDate,
     firstDate = check_date(firstDate)
     endDate = check_date(endDate)
     tenor = check_period(tenor)
-    schedule = Schedule(firstDate, endDate, tenor, cal, convention=dateRule, dateGenerationRule=dateGenerationRule)
+
+    if tenor.units() == TimeUnits.BDays:
+        schedule = []
+        if dateGenerationRule == DateGeneration.Forward:
+            d = cal.adjustDate(firstDate, dateRule)
+            while d <= endDate:
+                schedule.append(d)
+                d = cal.advanceDate(d, tenor, dateRule)
+        elif dateGenerationRule == DateGeneration.Backward:
+            d = cal.adjustDate(endDate, dateRule)
+            while d >= firstDate:
+                schedule.append(d)
+                d = cal.advanceDate(d, -tenor, dateRule)
+            schedule = sorted(schedule)
+    else:
+        schedule = Schedule(firstDate, endDate, tenor, cal, convention=dateRule, dateGenerationRule=dateGenerationRule)
     return [d.toDateTime() for d in schedule]

@@ -433,3 +433,10 @@ cdef class CSResidueSecurityValueHolder(CrossBinarySectionValueHolder):
 
     def __init__(self, left, right):
         super(CSResidueSecurityValueHolder, self).__init__(left, right, res)
+
+    def __deepcopy__(self, memo):
+        return CSResidueSecurityValueHolder(self._left, self._right)
+
+    def __reduce__(self):
+        d = {}
+        return CSResidueSecurityValueHolder, (self._left, self._right), d

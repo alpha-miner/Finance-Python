@@ -429,7 +429,7 @@ cdef class CrossBinarySectionValueHolder(SecurityValueHolder):
         pass
 
 
-cdef class CSZResidueSecurityValueHolder(CrossBinarySectionValueHolder):
+cdef class CSResidueSecurityValueHolder(CrossBinarySectionValueHolder):
 
     def __init__(self, left, right):
-        super(CSZResidueSecurityValueHolder, self).__init__(left, right, res)
+        super(CSResidueSecurityValueHolder, self).__init__(left, right, res)

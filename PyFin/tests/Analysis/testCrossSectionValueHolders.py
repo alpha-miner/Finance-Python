@@ -16,6 +16,7 @@ from PyFin.Analysis.CrossSectionValueHolders import CSAverageAdjustedSecurityVal
 from PyFin.Analysis.CrossSectionValueHolders import CSQuantileSecurityValueHolder
 from PyFin.Analysis.CrossSectionValueHolders import CSZScoreSecurityValueHolder
 from PyFin.Analysis.CrossSectionValueHolders import CSPercentileSecurityValueHolder
+from PyFin.Analysis.CrossSectionValueHolders import CSResidueSecurityValueHolder
 
 
 class TestCrossSectionValueHolder(unittest.TestCase):
@@ -139,3 +140,29 @@ class TestCrossSectionValueHolder(unittest.TestCase):
         expected = (data - data.mean()) / data.std()
 
         np.testing.assert_array_almost_equal(expected, calculated.values)
+
+    def tesCSZResidueSecurityValueHolder(self):
+        y = SecurityLatestValueHolder(dependency='close')
+        x = SecurityLatestValueHolder(dependency='open')
+
+        res = CSResidueSecurityValueHolder(y, x)
+
+        for i in range(len(self.datas['aapl']['close'])):
+            data = {'aapl': {Factors.CLOSE: self.datas['aapl'][Factors.CLOSE][i],
+                             Factors.OPEN: self.datas['aapl'][Factors.OPEN][i]},
+                    'ibm': {Factors.CLOSE: self.datas['ibm'][Factors.CLOSE][i],
+                            Factors.OPEN: self.datas['ibm'][Factors.OPEN][i]}}
+            y.push(data)
+            x.push(data)
+            res.push(data)
+
+            calculated = res.value.values
+            y_values = y.value.values
+            x_values = x.value.values
+
+            beta = np.dot(y_values, x_values) / np.dot(x_values, x_values)
+            expected = y_values - beta * x_values
+            np.testing.assert_array_almost_equal(calculated, expected)
+
+
+

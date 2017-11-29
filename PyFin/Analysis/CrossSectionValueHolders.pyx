@@ -11,9 +11,10 @@ import numpy as np
 cimport numpy as np
 cimport cython
 from PyFin.Analysis.SeriesValues cimport SeriesValues
-from PyFin.Analysis.SeriesValues cimport res
+from PyFin.Analysis.SeriesValues cimport residue
 from PyFin.Analysis.SecurityValueHolders cimport SecurityValueHolder
 from PyFin.Analysis.SecurityValueHolders cimport SecurityLatestValueHolder
+from PyFin.Analysis.SecurityValueHolders import _merge2set
 from PyFin.Math.MathConstants cimport NAN
 
 
@@ -358,19 +359,26 @@ cdef class CrossBinarySectionValueHolder(SecurityValueHolder):
     cdef public SecurityValueHolder _left
     cdef public SecurityValueHolder _right
 
-    def __init__(self, left, right, op):
+    def __init__(self, left, right):
         if isinstance(left, SecurityValueHolder):
             self._left = copy.deepcopy(left)
         elif isinstance(left, six.string_types):
             self._left = SecurityLatestValueHolder(left)
         else:
             raise ValueError("Currently only value holder input is allowed for binary cross sectional value holder.")
+
+        if isinstance(right, SecurityValueHolder):
+            self._right = copy.deepcopy(right)
+        elif isinstance(right, six.string_types):
+            self._right = SecurityLatestValueHolder(right)
+        else:
+            raise ValueError("Currently only value holder input is allowed for binary cross sectional value holder.")
+
         self._window = max(self._left.window, self._right._window)
         self._returnSize = self._left.valueSize
-        self._dependency = list(set(self._inner._dependency).union(self._right._dependency))
+        self._dependency = _merge2set(self._left._dependency, self._right._dependency)
         self.updated = 0
         self.cached = None
-        self.op = op
 
     @property
     def symbolList(self):
@@ -431,8 +439,11 @@ cdef class CrossBinarySectionValueHolder(SecurityValueHolder):
 
 cdef class CSResidueSecurityValueHolder(CrossBinarySectionValueHolder):
 
+    cdef public object op
+
     def __init__(self, left, right):
-        super(CSResidueSecurityValueHolder, self).__init__(left, right, res)
+        super(CSResidueSecurityValueHolder, self).__init__(left, right)
+        self.op = residue
 
     def __deepcopy__(self, memo):
         return CSResidueSecurityValueHolder(self._left, self._right)

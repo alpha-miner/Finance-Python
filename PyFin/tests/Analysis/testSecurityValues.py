@@ -12,7 +12,6 @@ import tempfile
 import os
 import numpy as np
 from PyFin.Analysis.SeriesValues import SeriesValues
-from PyFin.Analysis.SeriesValues import res
 
 
 class TestSecurityValues(unittest.TestCase):
@@ -211,7 +210,7 @@ class TestSecurityValues(unittest.TestCase):
         test1 = SeriesValues(data1, index)
         test2 = SeriesValues(data2, index)
 
-        calculated = res(test1, test2)
+        calculated = test1.res(test2)
         expected = SeriesValues(data1 - np.dot(data2, data1) / np.dot(data2, data2) * data2, index)
 
         np.testing.assert_array_almost_equal(calculated.values, expected.values)

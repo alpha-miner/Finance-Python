@@ -15,6 +15,15 @@ from numpy import percentile
 from PyFin.Math.MathConstants cimport NAN
 
 
+@cython.cdivision(True)
+cdef SeriesValues residue(SeriesValues left, SeriesValues right):
+    cdef np.ndarray[double, ndim=1] y = left.values
+    cdef np.ndarray[double, ndim=1] x = right.values
+
+    cdef double beta = nansum(x * y) / nansum(x * x)
+    return SeriesValues(y - beta * x, left.name_mapping)
+
+
 cdef class SeriesValues(object):
 
     def __init__(self, data, index=None):
@@ -220,13 +229,9 @@ cdef class SeriesValues(object):
     cpdef double dot(self, SeriesValues right):
         return np.dot(self.values, right.values)
 
-    @cython.cdivision(True)
-    cpdef SeriesValues res(self, SeriesValues right):
-        cdef np.ndarray[double, ndim=1] y = self.values
-        cdef np.ndarray[double, ndim=1] x = right.values
 
-        cdef double beta = nansum(x * y) / nansum(x * x)
-        return SeriesValues(y - beta * x, self.name_mapping)
+    cpdef SeriesValues res(self, SeriesValues right):
+        return residue(self, right)
 
     cpdef dict to_dict(self):
         keys = self.name_mapping.keys()
@@ -249,5 +254,3 @@ cdef class SeriesValues(object):
         return self.to_dict().__str__()
 
 
-cpdef SeriesValues res(SeriesValues left, SeriesValues right):
-    return left.res(right)

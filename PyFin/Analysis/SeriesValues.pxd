@@ -26,4 +26,4 @@ cdef class SeriesValues(object):
     cpdef dict to_dict(self)
 
 
-cpdef SeriesValues res(SeriesValues left, SeriesValues right)
+cdef SeriesValues residue(SeriesValues left, SeriesValues right)

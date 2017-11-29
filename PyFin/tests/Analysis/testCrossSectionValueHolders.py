@@ -141,7 +141,7 @@ class TestCrossSectionValueHolder(unittest.TestCase):
 
         np.testing.assert_array_almost_equal(expected, calculated.values)
 
-    def tesCSZResidueSecurityValueHolder(self):
+    def testCSZResidueSecurityValueHolder(self):
         y = SecurityLatestValueHolder(dependency='close')
         x = SecurityLatestValueHolder(dependency='open')
 

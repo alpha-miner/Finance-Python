@@ -24,3 +24,6 @@ cdef class SeriesValues(object):
     cpdef double dot(self, SeriesValues right)
     cpdef SeriesValues res(self, SeriesValues right)
     cpdef dict to_dict(self)
+
+
+cpdef SeriesValues res(SeriesValues left, SeriesValues right)

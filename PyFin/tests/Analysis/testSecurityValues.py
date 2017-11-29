@@ -189,6 +189,32 @@ class TestSecurityValues(unittest.TestCase):
         np.testing.assert_array_equal(calculated.values, expected.values)
         self.assertEqual(calculated.name_mapping, expected.name_mapping)
 
+    def testSecurityValuesRes(self):
+        data1 = np.array([3, 2, 2., 1., 4., 5.])
+        data2 = -np.array([3, 2, 2., 1., 4., 5.])
+        index = [1, 2, 3, 4, 5, 6]
+
+        test1 = SeriesValues(data1, index)
+        test2 = SeriesValues(data2, index)
+
+        calculated = test1.res(test2)
+        expected = SeriesValues(np.zeros(len(data1)), index)
+
+        np.testing.assert_array_almost_equal(calculated.values, expected.values)
+        self.assertEqual(calculated.name_mapping, expected.name_mapping)
+
+        data1 = np.random.randn(100)
+        data2 = np.random.randn(100)
+
+        test1 = SeriesValues(data1, index)
+        test2 = SeriesValues(data2, index)
+
+        calculated = test1.res(test2)
+        expected = SeriesValues(data1 - np.dot(data2, data1) / np.dot(data2, data2) * data2, index)
+
+        np.testing.assert_array_equal(calculated.values, expected.values)
+        self.assertEqual(calculated.name_mapping, expected.name_mapping)
+
     def testSecurityValuesPickle(self):
         data = np.array([3, 2, np.nan, np.nan, 4, 5])
         index = [1, 2, 3, 4, 5, 6]

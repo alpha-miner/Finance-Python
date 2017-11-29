@@ -220,6 +220,14 @@ cdef class SeriesValues(object):
     cpdef double dot(self, SeriesValues right):
         return np.dot(self.values, right.values)
 
+    @cython.cdivision(True)
+    cpdef SeriesValues res(self, SeriesValues right):
+        cdef np.ndarray[double, ndim=1] y = self.values
+        cdef np.ndarray[double, ndim=1] x = right.values
+
+        cdef double beta = np.dot(x, y) / np.dot(x, x)
+        return SeriesValues(y - beta * x, self.name_mapping)
+
     cpdef dict to_dict(self):
         keys = self.name_mapping.keys()
         return {k: self.values[self.name_mapping[k]] for k in keys}

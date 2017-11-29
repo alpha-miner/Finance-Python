@@ -11,6 +11,7 @@ import numpy as np
 cimport numpy as np
 cimport cython
 from PyFin.Analysis.SeriesValues cimport SeriesValues
+from PyFin.Analysis.SeriesValues cimport res
 from PyFin.Analysis.SecurityValueHolders cimport SecurityValueHolder
 from PyFin.Analysis.SecurityValueHolders cimport SecurityLatestValueHolder
 from PyFin.Math.MathConstants cimport NAN
@@ -26,7 +27,7 @@ cdef class CrossSectionValueHolder(SecurityValueHolder):
         elif isinstance(innerValue, six.string_types):
             self._inner = SecurityLatestValueHolder(innerValue)
         else:
-            raise ValueError("Currently only value holder input is allowed for rank holder.")
+            raise ValueError("Currently only value holder input is allowed for cross sectional value holder.")
         self._window = self._inner.window
         self._returnSize = self._inner.valueSize
         self._dependency = copy.deepcopy(self._inner._dependency)
@@ -36,10 +37,6 @@ cdef class CrossSectionValueHolder(SecurityValueHolder):
     @property
     def symbolList(self):
         return self._inner.symbolList
-
-    @property
-    def holders(self):
-        return self._inner.holders
 
     cpdef push(self, dict data):
         self._inner.push(data)
@@ -354,3 +351,85 @@ cdef class CSZScoreSecurityValueHolder(CrossSectionValueHolder):
 
     def __setstate__(self, state):
         pass
+
+
+cdef class CrossBinarySectionValueHolder(SecurityValueHolder):
+
+    cdef public SecurityValueHolder _left
+    cdef public SecurityValueHolder _right
+
+    def __init__(self, left, right, op):
+        if isinstance(left, SecurityValueHolder):
+            self._left = copy.deepcopy(left)
+        elif isinstance(left, six.string_types):
+            self._left = SecurityLatestValueHolder(left)
+        else:
+            raise ValueError("Currently only value holder input is allowed for binary cross sectional value holder.")
+        self._window = max(self._left.window, self._right._window)
+        self._returnSize = self._left.valueSize
+        self._dependency = list(set(self._inner._dependency).union(self._right._dependency))
+        self.updated = 0
+        self.cached = None
+        self.op = op
+
+    @property
+    def symbolList(self):
+        return self._left.symbolList
+
+    cpdef push(self, dict data):
+        self._left.push(data)
+        self._right.push(data)
+        self.updated = 0
+
+    @property
+    def value(self):
+
+        cdef SeriesValues left_raw_values
+        cdef SeriesValues right_raw_values
+
+        if self.updated:
+            return self.cached
+        else:
+            left_raw_values = self._left.value
+            right_raw_values = self._right.value
+            self.cached = self.op(left_raw_values, right_raw_values)
+            self.updated = 1
+            return self.cached
+
+    cpdef value_by_name(self, name):
+
+        cdef SeriesValues left_raw_values
+        cdef SeriesValues right_raw_values
+
+        if self.updated:
+            return self.cached[name]
+        else:
+            left_raw_values = self._left.value
+            right_raw_values = self._right.value
+            self.cached = self.op(left_raw_values, right_raw_values)
+            self.updated = 1
+            return self.cached[name]
+
+    cpdef value_by_names(self, list names):
+        cdef SeriesValues left_raw_values
+        cdef SeriesValues right_raw_values
+        left_raw_values = self._left.value_by_names(names)
+        right_raw_values = self._right.value_by_names(names)
+        raw_values = self.op(left_raw_values, right_raw_values)
+        return raw_values
+
+    def __deepcopy__(self, memo):
+        return CrossBinarySectionValueHolder(self._left, self._right, self.op)
+
+    def __reduce__(self):
+        d = {}
+        return CrossBinarySectionValueHolder, (self._left, self._right, self.op), d
+
+    def __setstate__(self, state):
+        pass
+
+
+cdef class CSZResidueSecurityValueHolder(CrossBinarySectionValueHolder):
+
+    def __init__(self, left, right):
+        super(CSZResidueSecurityValueHolder, self).__init__(left, right, res)

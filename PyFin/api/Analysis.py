@@ -45,13 +45,13 @@ from PyFin.Analysis.SecurityValueHolders import SecurityShiftedValueHolder
 from PyFin.Analysis.SecurityValueHolders import SecurityLatestValueHolder
 from PyFin.Analysis.SecurityValueHolders import SecurityIIFValueHolder
 
-
 from PyFin.Analysis.CrossSectionValueHolders import CSRankedSecurityValueHolder
 from PyFin.Analysis.CrossSectionValueHolders import CSAverageSecurityValueHolder
 from PyFin.Analysis.CrossSectionValueHolders import CSAverageAdjustedSecurityValueHolder
 from PyFin.Analysis.CrossSectionValueHolders import CSZScoreSecurityValueHolder
 from PyFin.Analysis.CrossSectionValueHolders import CSPercentileSecurityValueHolder
 from PyFin.Analysis.CrossSectionValueHolders import CSQuantileSecurityValueHolder
+from PyFin.Analysis.CrossSectionValueHolders import CSResidueSecurityValueHolder
 
 
 def CSRank(dependency):
@@ -76,6 +76,10 @@ def CSPercentile(percent, dependency):
 
 def CSZScore(dependency):
     return CSZScoreSecurityValueHolder(dependency)
+
+
+def CSRes(left, right):
+    return CSResidueSecurityValueHolder(left, right)
 
 
 def SIGN(dependency='x'):

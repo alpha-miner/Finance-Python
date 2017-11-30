@@ -48,6 +48,10 @@ cdef class IAccumulator(object):
             return LtOperatorValueHolder(self, right)
         elif op == 1:
             return LeOperatorValueHolder(self, right)
+        elif op == 2:
+            return EqOperatorValueHolder(self, right)
+        elif op == 3:
+            return NeOperatorValueHolder(self, right)
         elif op == 4:
             return GtOperatorValueHolder(self, right)
         elif op == 5:
@@ -220,6 +224,9 @@ cdef class Negative(Accumulator):
         self._dependency.push(data)
         self._isFull = self._dependency.isFull()
 
+    def __str__(self):
+        return "-{0}".format(str(self._dependency))
+
     cpdef object result(self):
         res = self._dependency.result()
         try:
@@ -255,6 +262,9 @@ cdef class ListedValueHolder(Accumulator):
         self._left.push(data)
         self._right.push(data)
         self._isFull =  self._isFull or (self._left.isFull() and self._right.isFull())
+
+    def __str__(self):
+        return "({0}, {1})".format(str(self._left), str(self._right))
 
     cpdef object result(self):
         resLeft = self._left.result()
@@ -371,6 +381,9 @@ cdef class AddedValueHolder(CombinedValueHolder):
 
         return res1 + res2
 
+    def __str__(self):
+        return "{0} + {1}".format(str(self._left), str(self._right))
+
     def __deepcopy__(self, memo):
         return AddedValueHolder(self._left, self._right)
 
@@ -393,6 +406,9 @@ cdef class MinusedValueHolder(CombinedValueHolder):
 
         return res1 - res2
 
+    def __str__(self):
+        return "{0} - {1}".format(str(self._left), str(self._right))
+
     def __deepcopy__(self, memo):
         return MinusedValueHolder(self._left, self._right)
 
@@ -414,6 +430,20 @@ cdef class MultipliedValueHolder(CombinedValueHolder):
         cdef double res2 = self._right.result()
 
         return res1 * res2
+
+    def __str__(self):
+
+        if isinstance(self._left, (AddedValueHolder, MinusedValueHolder)):
+            s1 = "({0})".format(str(self._left))
+        else:
+            s1 = "{0}".format(str(self._left))
+
+        if isinstance(self._right,  (AddedValueHolder, MinusedValueHolder)):
+            s2 = "({0})".format(str(self._right))
+        else:
+            s2 = "{0}".format(str(self._right))
+
+        return "{0} \\times {1}".format(s1, s2)
 
     def __deepcopy__(self, memo):
         return MultipliedValueHolder(self._left, self._right)
@@ -438,6 +468,9 @@ cdef class DividedValueHolder(CombinedValueHolder):
 
         return res1 / res2
 
+    def __str__(self):
+        return "\\frac{{{0}}}{{{1}}}".format(str(self._left), str(self._right))
+
     def __deepcopy__(self, memo):
         return DividedValueHolder(self._left, self._right)
 
@@ -459,6 +492,20 @@ cdef class LtOperatorValueHolder(CombinedValueHolder):
         cdef double res2 = self._right.result()
 
         return res1 < res2
+
+    def __str__(self):
+
+        if isinstance(self._left, CombinedValueHolder):
+            s1 = "({0})".format(str(self._left))
+        else:
+            s1 = "{0}".format(str(self._left))
+
+        if isinstance(self._right,  CombinedValueHolder):
+            s2 = "({0})".format(str(self._right))
+        else:
+            s2 = "{0}".format(str(self._right))
+
+        return "{0} \lt {1}".format(s1, s2)
 
     def __deepcopy__(self, memo):
         return LtOperatorValueHolder(self._left, self._right)
@@ -482,6 +529,21 @@ cdef class LeOperatorValueHolder(CombinedValueHolder):
 
         return res1 <= res2
 
+    def __str__(self):
+
+        if isinstance(self._left, CombinedValueHolder):
+            s1 = "({0})".format(str(self._left))
+        else:
+            s1 = "{0}".format(str(self._left))
+
+        if isinstance(self._right,  CombinedValueHolder):
+            s2 = "({0})".format(str(self._right))
+        else:
+            s2 = "{0}".format(str(self._right))
+
+        return "{0} \le {1}".format(s1, s2)
+
+
     def __deepcopy__(self, memo):
         return LeOperatorValueHolder(self._left, self._right)
 
@@ -503,6 +565,21 @@ cdef class GtOperatorValueHolder(CombinedValueHolder):
         cdef double res2 = self._right.result()
 
         return res1 > res2
+
+    def __str__(self):
+
+        if isinstance(self._left, CombinedValueHolder):
+            s1 = "({0})".format(str(self._left))
+        else:
+            s1 = "{0}".format(str(self._left))
+
+        if isinstance(self._right,  CombinedValueHolder):
+            s2 = "({0})".format(str(self._right))
+        else:
+            s2 = "{0}".format(str(self._right))
+
+        return "{0} \gt {1}".format(s1, s2)
+
 
     def __deepcopy__(self, memo):
         return GtOperatorValueHolder(self._left, self._right)
@@ -526,6 +603,21 @@ cdef class GeOperatorValueHolder(CombinedValueHolder):
 
         return res1 >= res2
 
+    def __str__(self):
+
+        if isinstance(self._left, CombinedValueHolder):
+            s1 = "({0})".format(str(self._left))
+        else:
+            s1 = "{0}".format(str(self._left))
+
+        if isinstance(self._right,  CombinedValueHolder):
+            s2 = "({0})".format(str(self._right))
+        else:
+            s2 = "{0}".format(str(self._right))
+
+        return "{0} \ge {1}".format(s1, s2)
+
+
     def __deepcopy__(self, memo):
         return GeOperatorValueHolder(self._left, self._right)
 
@@ -548,6 +640,21 @@ cdef class EqOperatorValueHolder(CombinedValueHolder):
 
         return res1 == res2
 
+    def __str__(self):
+
+        if isinstance(self._left, CombinedValueHolder):
+            s1 = "({0})".format(str(self._left))
+        else:
+            s1 = "{0}".format(str(self._left))
+
+        if isinstance(self._right,  CombinedValueHolder):
+            s2 = "({0})".format(str(self._right))
+        else:
+            s2 = "{0}".format(str(self._right))
+
+        return "{0} = {1}".format(s1, s2)
+
+
     def __deepcopy__(self, memo):
         return EqOperatorValueHolder(self._left, self._right)
 
@@ -569,6 +676,21 @@ cdef class NeOperatorValueHolder(CombinedValueHolder):
         cdef double res2 = self._right.result()
 
         return res1 != res2
+
+    def __str__(self):
+
+        if isinstance(self._left, CombinedValueHolder):
+            s1 = "({0})".format(str(self._left))
+        else:
+            s1 = "{0}".format(str(self._left))
+
+        if isinstance(self._right,  CombinedValueHolder):
+            s2 = "({0})".format(str(self._right))
+        else:
+            s2 = "{0}".format(str(self._right))
+
+        return "{0} \\neq {1}".format(s1, s2)
+
 
     def __deepcopy__(self, memo):
         return NeOperatorValueHolder(self._left, self._right)
@@ -596,6 +718,9 @@ cdef class Identity(Accumulator):
 
     cpdef object result(self):
         return self._value
+
+    def __str__(self):
+        return str(self._value)
 
     def __deepcopy__(self, memo):
         return Identity(self._value)
@@ -654,6 +779,12 @@ cdef class Latest(StatelessSingleValueAccumulator):
 
     cpdef push(self, dict data):
         self._latest = self._push(data)
+
+    def __str__(self):
+        if self._isValueHolderContained:
+            return "{0}".format(str(self._dependency))
+        else:
+            return "''{0}''".format(str(self._dependency))
 
     cpdef object result(self):
         return self._latest
@@ -805,6 +936,12 @@ cdef class Exp(BasicFunction):
     cpdef object result(self):
         return exp(self._origValue)
 
+    def __str__(self):
+        if self._isValueHolderContained:
+            return "\\exp({0})".format(str(self._dependency))
+        else:
+            return "\\exp(''{0}'')".format(str(self._dependency))
+
     def __deepcopy__(self, memo):
         return Exp(self._dependency, self._origValue)
 
@@ -824,6 +961,12 @@ cdef class Log(BasicFunction):
     cpdef object result(self):
         return log(self._origValue)
 
+    def __str__(self):
+        if self._isValueHolderContained:
+            return "\\ln({0})".format(str(self._dependency))
+        else:
+            return "\\ln(''{0}'')".format(str(self._dependency))
+
     def __deepcopy__(self, memo):
         return Log(self._dependency, self._origValue)
 
@@ -842,6 +985,12 @@ cdef class Sqrt(BasicFunction):
 
     cpdef object result(self):
         return sqrt(self._origValue)
+
+    def __str__(self):
+        if self._isValueHolderContained:
+            return "\\sqrt{{{0}}}".format(str(self._dependency))
+        else:
+            return "\\sqrt{{''{0}''}}".format(str(self._dependency))
 
     def __deepcopy__(self, memo):
         return Sqrt(self._dependency, self._origValue)
@@ -865,6 +1014,12 @@ cdef class Pow(BasicFunction):
     cpdef object result(self):
         return self._origValue ** self._n
 
+    def __str__(self):
+        if self._isValueHolderContained:
+            return "{0} ^ {{{1}}}".format(str(self._dependency), self._n)
+        else:
+            return "''{0}'' ^ {{{1}}}".format(str(self._dependency), self._n)
+
     def __deepcopy__(self, memo):
         return Pow(self._dependency, self._n, self._origValue)
 
@@ -883,6 +1038,12 @@ cdef class Abs(BasicFunction):
 
     cpdef object result(self):
         return fabs(self._origValue)
+
+    def __str__(self):
+        if self._isValueHolderContained:
+            return "\\left| {0} \\right|".format(str(self._dependency))
+        else:
+            return "\\left|  ''{0}'' \\right|".format(str(self._dependency))
 
     def __deepcopy__(self, memo):
         return Abs(self._dependency, self._origValue)
@@ -903,6 +1064,12 @@ cdef class Sign(BasicFunction):
     cpdef object result(self):
         return sign(self._origValue)
 
+    def __str__(self):
+        if self._isValueHolderContained:
+            return "\\mathrm{{sign}}({0})".format(str(self._dependency))
+        else:
+            return "\\mathrm{{sign}}(''{0}'')".format(str(self._dependency))
+
     def __deepcopy__(self, memo):
         return Sign(self._dependency, self._origValue)
 
@@ -921,6 +1088,12 @@ cdef class Acos(BasicFunction):
 
     cpdef object result(self):
         return acos(self._origValue)
+
+    def __str__(self):
+        if self._isValueHolderContained:
+            return "\\arccos({0})".format(str(self._dependency))
+        else:
+            return "\\arccos(''{0}'')".format(str(self._dependency))
 
     def __deepcopy__(self, memo):
         return Acos(self._dependency, self._origValue)
@@ -941,6 +1114,12 @@ cdef class Acosh(BasicFunction):
     cpdef object result(self):
         return acosh(self._origValue)
 
+    def __str__(self):
+        if self._isValueHolderContained:
+            return "\\mathrm{{arccosh}}({0})".format(str(self._dependency))
+        else:
+            return "\\mathrm{{arccosh}}(''{0}'')".format(str(self._dependency))
+
     def __deepcopy__(self, memo):
         return Acosh(self._dependency, self._origValue)
 
@@ -960,6 +1139,12 @@ cdef class Asin(BasicFunction):
     cpdef object result(self):
         return asin(self._origValue)
 
+    def __str__(self):
+        if self._isValueHolderContained:
+            return "\\arcsin({0})".format(str(self._dependency))
+        else:
+            return "\\arcsin(''{0}'')".format(str(self._dependency))
+
     def __deepcopy__(self, memo):
         return Asin(self._dependency, self._origValue)
 
@@ -978,6 +1163,12 @@ cdef class Asinh(BasicFunction):
 
     cpdef object result(self):
         return asinh(self._origValue)
+
+    def __str__(self):
+        if self._isValueHolderContained:
+            return "\\mathrm{{arcsinh}}({0})".format(str(self._dependency))
+        else:
+            return "\\mathrm{{arcsinh}}(''{0}'')".format(str(self._dependency))
 
     def __deepcopy__(self, memo):
         return Asinh(self._dependency, self._origValue)

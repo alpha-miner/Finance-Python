@@ -17,6 +17,7 @@ from PyFin.Math.Accumulators.IAccumulators import Acosh
 from PyFin.Math.Accumulators.IAccumulators import Asin
 from PyFin.Math.Accumulators.IAccumulators import Asinh
 from PyFin.Math.Accumulators.IAccumulators import Latest
+from PyFin.Math.Accumulators.IAccumulators import Identity
 from PyFin.Math.Accumulators.IAccumulators import IIF
 from PyFin.Math.Accumulators.IAccumulators import Sign
 from PyFin.Math.Accumulators.IAccumulators import Negative
@@ -119,6 +120,7 @@ __all__ = ["Exp",
            "Correlation",
            "Shift",
            "IIF",
+           "Identity",
            "MovingAverage",
            "MovingPositiveAverage",
            "MovingNegativeAverage",

@@ -95,6 +95,10 @@ cdef class Shift(StatefulValueHolder):
     cpdef int lag(self):
         return self._window - self._valueHolder.window
 
+    def __str__(self):
+        return '\mathrm{{Shift}}({0}, {1})'.format(str(self._valueHolder),
+                                                   self._window - self._valueHolder.window)
+
     def __deepcopy__(self, memo):
         copied = Shift(self._valueHolder, self.lag())
         copied.copy_attributes(self.collect_attributes(), is_deep=True)
@@ -202,6 +206,12 @@ cdef class MovingMax(SortedValueHolder):
         else:
             return NAN
 
+    def __str__(self):
+        if self._isValueHolderContained:
+            return "\\mathrm{{mmax}}({0}, {1})".format(str(self._dependency), self._window)
+        else:
+            return "\\mathrm{{mmax}}(''{0}'', {1})".format(str(self._dependency), self._window)
+
     def __deepcopy__(self, memo):
         copied = MovingMax(self._window, self._dependency)
         copied.copy_attributes(self.collect_attributes(), is_deep=True)
@@ -224,6 +234,12 @@ cdef class MovingMin(SortedValueHolder):
             return self._sortedArray[0]
         else:
             return NAN
+
+    def __str__(self):
+        if self._isValueHolderContained:
+            return "\\mathrm{{mmin}}({0}, {1})".format(str(self._dependency), self._window)
+        else:
+            return "\\mathrm{{mmin}}(''{0}'', {1})".format(str(self._dependency), self._window)
 
     def __deepcopy__(self, memo):
         copied = MovingMin(self._window, self._dependency)
@@ -249,6 +265,12 @@ cdef class MovingQuantile(SortedValueHolder):
             return self._sortedArray.index(self._deque[n-1]) / (n - 1.)
         else:
             return NAN
+
+    def __str__(self):
+        if self._isValueHolderContained:
+            return "\\mathrm{{mquantile}}({0}, {1})".format(str(self._dependency), self._window)
+        else:
+            return "\\mathrm{{mquantile}}(''{0}'', {1})".format(str(self._dependency), self._window)
 
     def __deepcopy__(self, memo):
         copied = MovingQuantile(self._window, self._dependency)
@@ -291,6 +313,12 @@ cdef class MovingAllTrue(SingleValuedValueHolder):
 
     cpdef object result(self):
         return self._countedTrue == self.size()
+
+    def __str__(self):
+        if self._isValueHolderContained:
+            return "\\mathrm{{malltrue}}({0}, {1})".format(str(self._dependency), self._window)
+        else:
+            return "\\mathrm{{malltrue}}(''{0}'', {1})".format(str(self._dependency), self._window)
 
     def __deepcopy__(self, memo):
         copied = MovingAllTrue(self._window, self._dependency)
@@ -337,6 +365,12 @@ cdef class MovingAnyTrue(SingleValuedValueHolder):
     cpdef object result(self):
         return self._countedTrue != 0
 
+    def __str__(self):
+        if self._isValueHolderContained:
+            return "\\mathrm{{manytrue}}({0}, {1})".format(str(self._dependency), self._window)
+        else:
+            return "\\mathrm{{manytrue}}(''{0}'', {1})".format(str(self._dependency), self._window)
+
     def __deepcopy__(self, memo):
         copied = MovingAnyTrue(self._window, self._dependency)
         copied.copy_attributes(self.collect_attributes(), is_deep=True)
@@ -374,6 +408,12 @@ cdef class MovingSum(SingleValuedValueHolder):
 
     cpdef object result(self):
         return self._runningSum
+
+    def __str__(self):
+        if self._isValueHolderContained:
+            return "\\mathrm{{msum}}({0}, {1})".format(str(self._dependency), self._window)
+        else:
+            return "\\mathrm{{msum}}(''{0}'', {1})".format(str(self._dependency), self._window)
 
     def __deepcopy__(self, memo):
         copied = MovingSum(self._window, self._dependency)
@@ -415,6 +455,12 @@ cdef class MovingAverage(SingleValuedValueHolder):
             return self._runningSum / size
         else:
             return NAN
+
+    def __str__(self):
+        if self._isValueHolderContained:
+            return "\\mathrm{{mavg}}({0}, {1})".format(str(self._dependency), self._window)
+        else:
+            return "\\mathrm{{mavg}}(''{0}'', {1})".format(str(self._dependency), self._window)
 
     def __deepcopy__(self, memo):
         copied = MovingAverage(self._window, self._dependency)
@@ -465,6 +511,12 @@ cdef class MovingPositiveAverage(SingleValuedValueHolder):
         else:
             return self._runningPositiveSum / self._runningPositiveCount
 
+    def __str__(self):
+        if self._isValueHolderContained:
+            return "\\mathrm{{mposavg}}({0}, {1})".format(str(self._dependency), self._window)
+        else:
+            return "\\mathrm{{mposavg}}(''{0}'', {1})".format(str(self._dependency), self._window)
+
     def __deepcopy__(self, memo):
         copied = MovingPositiveAverage(self._window, self._dependency)
 
@@ -499,6 +551,12 @@ cdef class MovingPositiveDifferenceAverage(SingleValuedValueHolder):
     cpdef object result(self):
         return self._runningAverage.result()
 
+    def __str__(self):
+        if self._isValueHolderContained:
+            return "\\mathrm{{mposdiffavg}}({0}, {1})".format(str(self._dependency), self._window)
+        else:
+            return "\\mathrm{{mposdiffavg}}(''{0}'', {1})".format(str(self._dependency), self._window)
+
     def __deepcopy__(self, memo):
         copied = MovingPositiveDifferenceAverage(self._window, self._dependency)
         copied.copy_attributes(self.collect_attributes(), is_deep=True)
@@ -528,6 +586,12 @@ cdef class MovingNegativeDifferenceAverage(SingleValuedValueHolder):
 
     cpdef object result(self):
         return self._runningAverage.result()
+
+    def __str__(self):
+        if self._isValueHolderContained:
+            return "\\mathrm{{mnegdiffavg}}({0}, {1})".format(str(self._dependency), self._window)
+        else:
+            return "\\mathrm{{mnegdiffavg}}(''{0}'', {1})".format(str(self._dependency), self._window)
 
     def __deepcopy__(self, memo):
         copied = MovingNegativeDifferenceAverage(self._window, self._dependency)
@@ -566,6 +630,12 @@ cdef class MovingRSI(SingleValuedValueHolder):
             return 100. * nominator / denominator
         else:
             return 50.
+
+    def __str__(self):
+        if self._isValueHolderContained:
+            return "\\mathrm{{mrsi}}({0}, {1})".format(str(self._dependency), self._window)
+        else:
+            return "\\mathrm{{mrsi}}(''{0}'', {1})".format(str(self._dependency), self._window)
 
     def __deepcopy__(self, memo):
         copied = MovingRSI(self._window, self._dependency)
@@ -616,6 +686,12 @@ cdef class MovingNegativeAverage(SingleValuedValueHolder):
             return self._runningNegativeSum / self._runningNegativeCount
         else:
             return 0.
+
+    def __str__(self):
+        if self._isValueHolderContained:
+            return "\\mathrm{{mnegavg}}({0}, {1})".format(str(self._dependency), self._window)
+        else:
+            return "\\mathrm{{mnegavg}}(''{0}'', {1})".format(str(self._dependency), self._window)
 
     def __deepcopy__(self, memo):
         copied = MovingNegativeAverage(self._window, self._dependency)
@@ -678,6 +754,12 @@ cdef class MovingVariance(SingleValuedValueHolder):
             else:
                 return NAN
 
+    def __str__(self):
+        if self._isValueHolderContained:
+            return "\\mathrm{{mvar}}({0}, {1}, {2})".format(str(self._dependency), self._window, self._isPop)
+        else:
+            return "\\mathrm{{mvar}}(''{0}'', {1}, {2})".format(str(self._dependency), self._window, self._isPop)
+
     def __deepcopy__(self, memo):
         copied = MovingVariance(self._window, self._dependency, self._isPop)
 
@@ -738,6 +820,12 @@ cdef class MovingStandardDeviation(SingleValuedValueHolder):
                 return sqrt(tmp / (length - 1))
             else:
                 return NAN
+
+    def __str__(self):
+        if self._isValueHolderContained:
+            return "\\mathrm{{mstd}}({0}, {1}, {2})".format(str(self._dependency), self._window, self._isPop)
+        else:
+            return "\\mathrm{{mstd}}(''{0}'', {1}, {2})".format(str(self._dependency), self._window, self._isPop)
 
     def __deepcopy__(self, memo):
         copied = MovingStandardDeviation(self._window, self._dependency, self._isPop)
@@ -810,6 +898,12 @@ cdef class MovingNegativeVariance(SingleValuedValueHolder):
             else:
                 return NAN
 
+    def __str__(self):
+        if self._isValueHolderContained:
+            return "\\mathrm{{mnegvar}}({0}, {1}, {2})".format(str(self._dependency), self._window, self._isPop)
+        else:
+            return "\\mathrm{{mnegvar}}(''{0}'', {1}, {2})".format(str(self._dependency), self._window, self._isPop)
+
     def __deepcopy__(self, memo):
         copied = MovingNegativeVariance(self._window, self._dependency, self._isPop)
 
@@ -857,6 +951,12 @@ cdef class MovingCountedPositive(SingleValuedValueHolder):
     cpdef object result(self):
         return self._counts
 
+    def __str__(self):
+        if self._isValueHolderContained:
+            return "\\mathrm{{mposcount}}({0}, {1})".format(str(self._dependency), self._window)
+        else:
+            return "\\mathrm{{mposcount}}(''{0}'', {1}".format(str(self._dependency), self._window)
+
     def __deepcopy__(self, memo):
         copied = MovingCountedPositive(self._window, self._dependency)
 
@@ -897,6 +997,12 @@ cdef class MovingCountedNegative(SingleValuedValueHolder):
 
     cpdef object result(self):
         return self._counts
+
+    def __str__(self):
+        if self._isValueHolderContained:
+            return "\\mathrm{{mnegcount}}({0}, {1})".format(str(self._dependency), self._window)
+        else:
+            return "\\mathrm{{mnegcount}}(''{0}'', {1}".format(str(self._dependency), self._window)
 
     def __deepcopy__(self, memo):
         copied = MovingCountedNegative(self._window, self._dependency)
@@ -1003,6 +1109,12 @@ cdef class MovingCorrelation(StatefulValueHolder):
         else:
             return NAN
 
+    def __str__(self):
+        if self._isValueHolderContained:
+            return "\\mathrm{{mcorr}}({0}, {1})".format(str(self._dependency), self._window)
+        else:
+            return "\\mathrm{{mcorr}}(''{0}'', {1}".format(str(self._dependency), self._window)
+
     def __deepcopy__(self, memo):
         return MovingCorrelation(self._window, self._dependency)
 
@@ -1090,6 +1202,12 @@ cdef class MovingProduct(SingleValuedValueHolder):
 
     cpdef object result(self):
         return self._runningProduct
+
+    def __str__(self):
+        if self._isValueHolderContained:
+            return "\\mathrm{{mprod}}({0}, {1})".format(str(self._dependency), self._window)
+        else:
+            return "\\mathrm{{mprod}}(''{0}'', {1}".format(str(self._dependency), self._window)
 
     def __deepcopy__(self, memo):
         copied = MovingProduct(self._window, self._dependency)

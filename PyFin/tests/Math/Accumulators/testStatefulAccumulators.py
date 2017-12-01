@@ -2293,6 +2293,52 @@ class TestStatefulAccumulators(unittest.TestCase):
         self.assertAlmostEqual(mr.value, pickled.value)
         os.unlink(f.name)
 
+    def testShiftStr(self):
+        s = Shift(Latest('roe'), 2)
+        self.assertEqual("\mathrm{Shift}(''roe'', 2)", str(s))
+
+    def testMovingMaxStr(self):
+        s = MovingMax(10, 'roe')
+        self.assertEqual("\mathrm{mmax}(''roe'', 10)", str(s))
+
+        s = MovingMax(10, Latest('roe') + Latest('y'))
+        self.assertEqual("\mathrm{mmax}(''roe'' + ''y'', 10)", str(s))
+
+    def testMovingMinStr(self):
+        s = MovingMin(10, 'roe')
+        self.assertEqual("\mathrm{mmin}(''roe'', 10)", str(s))
+
+        s = MovingMin(10, Latest('roe') + Latest('y'))
+        self.assertEqual("\mathrm{mmin}(''roe'' + ''y'', 10)", str(s))
+
+    def testMovingQuantileStr(self):
+        s = MovingQuantile(10, 'roe')
+        self.assertEqual("\mathrm{mquantile}(''roe'', 10)", str(s))
+
+        s = MovingQuantile(10, Latest('roe') + Latest('y'))
+        self.assertEqual("\mathrm{mquantile}(''roe'' + ''y'', 10)", str(s))
+
+    def testMovingAllTrueStr(self):
+        s = MovingAllTrue(10, 'roe')
+        self.assertEqual("\mathrm{malltrue}(''roe'', 10)", str(s))
+
+        s = MovingAllTrue(10, Latest('roe') + Latest('y'))
+        self.assertEqual("\mathrm{malltrue}(''roe'' + ''y'', 10)", str(s))
+
+    def testMovingAnyTrueStr(self):
+        s = MovingAnyTrue(10, 'roe')
+        self.assertEqual("\mathrm{manytrue}(''roe'', 10)", str(s))
+
+        s = MovingAnyTrue(10, Latest('roe') + Latest('y'))
+        self.assertEqual("\mathrm{manytrue}(''roe'' + ''y'', 10)", str(s))
+
+    def testMovingSumStr(self):
+        s = MovingSum(10, 'roe')
+        self.assertEqual("\mathrm{msum}(''roe'', 10)", str(s))
+
+        s = MovingSum(10, Latest('roe') + Latest('y'))
+        self.assertEqual("\mathrm{msum}(''roe'' + ''y'', 10)", str(s))
+
 
 if __name__ == '__main__':
     unittest.main()

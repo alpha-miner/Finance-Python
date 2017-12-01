@@ -56,6 +56,12 @@ cdef class SecurityMovingAverage(SecuritySingleValueHolder):
     def __init__(self, window, dependency='x'):
         super(SecurityMovingAverage, self).__init__(window, MovingAverage, dependency)
 
+    def __str__(self):
+        if self._compHolder:
+            return "\\mathrm{{MA}}({0}, {1})".format(self._window - self._compHolder._window, str(self._compHolder))
+        else:
+            return str(self._holderTemplate)
+
     def __deepcopy__(self, memo):
         if self._compHolder:
             copied = SecurityMovingAverage(self._window - self._compHolder._window, self._compHolder)
@@ -77,6 +83,12 @@ cdef class SecurityMovingMax(SecuritySingleValueHolder):
     def __init__(self, window, dependency='x'):
         super(SecurityMovingMax, self).__init__(window, MovingMax, dependency)
 
+    def __str__(self):
+        if self._compHolder:
+            return "\\mathrm{{MMax}}({0}, {1})".format(self._window - self._compHolder._window, str(self._compHolder))
+        else:
+            return str(self._holderTemplate)
+
     def __deepcopy__(self, memo):
         if self._compHolder:
             copied = SecurityMovingMax(self._window - self._compHolder._window, self._compHolder)
@@ -96,6 +108,12 @@ cdef class SecurityMovingMax(SecuritySingleValueHolder):
 cdef class SecurityMovingMin(SecuritySingleValueHolder):
     def __init__(self, window, dependency='x'):
         super(SecurityMovingMin, self).__init__(window, MovingMin, dependency)
+
+    def __str__(self):
+        if self._compHolder:
+            return "\\mathrm{{MMin}}({0}, {1})".format(self._window - self._compHolder._window, str(self._compHolder))
+        else:
+            return str(self._holderTemplate)
 
     def __deepcopy__(self, memo):
         if self._compHolder:
@@ -117,6 +135,12 @@ cdef class SecurityMovingQuantile(SecuritySingleValueHolder):
     def __init__(self, window, dependency='x'):
         super(SecurityMovingQuantile, self).__init__(window, MovingQuantile, dependency)
 
+    def __str__(self):
+        if self._compHolder:
+            return "\\mathrm{{MQuantile}}({0}, {1})".format(self._window - self._compHolder._window, str(self._compHolder))
+        else:
+            return str(self._holderTemplate)
+
     def __deepcopy__(self, memo):
         if self._compHolder:
             copied = SecurityMovingQuantile(self._window - self._compHolder._window, self._compHolder)
@@ -136,6 +160,12 @@ cdef class SecurityMovingQuantile(SecuritySingleValueHolder):
 cdef class SecurityMovingAllTrue(SecuritySingleValueHolder):
     def __init__(self, window, dependency='x'):
         super(SecurityMovingAllTrue, self).__init__(window, MovingAllTrue, dependency)
+
+    def __str__(self):
+        if self._compHolder:
+            return "\\mathrm{{MAllTrue}}({0}, {1})".format(self._window - self._compHolder._window, str(self._compHolder))
+        else:
+            return str(self._holderTemplate)
 
     def __deepcopy__(self, memo):
         if self._compHolder:
@@ -157,6 +187,12 @@ cdef class SecurityMovingAnyTrue(SecuritySingleValueHolder):
     def __init__(self, window, dependency='x'):
         super(SecurityMovingAnyTrue, self).__init__(window, MovingAnyTrue, dependency)
 
+    def __str__(self):
+        if self._compHolder:
+            return "\\mathrm{{MAnyTrue}}({0}, {1})".format(self._window - self._compHolder._window, str(self._compHolder))
+        else:
+            return str(self._holderTemplate)
+
     def __deepcopy__(self, memo):
         if self._compHolder:
             copied = SecurityMovingAnyTrue(self._window - self._compHolder._window, self._compHolder)
@@ -176,6 +212,12 @@ cdef class SecurityMovingAnyTrue(SecuritySingleValueHolder):
 cdef class SecurityMovingSum(SecuritySingleValueHolder):
     def __init__(self, window, dependency='x'):
         super(SecurityMovingSum, self).__init__(window, MovingSum, dependency)
+
+    def __str__(self):
+        if self._compHolder:
+            return "\\mathrm{{MSum}}({0}, {1})".format(self._window - self._compHolder._window, str(self._compHolder))
+        else:
+            return str(self._holderTemplate)
 
     def __deepcopy__(self, memo):
         if self._compHolder:
@@ -197,6 +239,12 @@ cdef class SecurityMovingVariance(SecuritySingleValueHolder):
     def __init__(self, window, dependency='x'):
         super(SecurityMovingVariance, self).__init__(window, MovingVariance, dependency)
 
+    def __str__(self):
+        if self._compHolder:
+            return "\\mathrm{{MVariance}}({0}, {1})".format(self._window - self._compHolder._window, str(self._compHolder))
+        else:
+            return str(self._holderTemplate)
+
     def __deepcopy__(self, memo):
         if self._compHolder:
             copied = SecurityMovingVariance(self._window - self._compHolder._window, self._compHolder)
@@ -216,6 +264,12 @@ cdef class SecurityMovingVariance(SecuritySingleValueHolder):
 cdef class SecurityMovingStandardDeviation(SecuritySingleValueHolder):
     def __init__(self, window, dependency='x'):
         super(SecurityMovingStandardDeviation, self).__init__(window, MovingStandardDeviation, dependency)
+
+    def __str__(self):
+        if self._compHolder:
+            return "\\mathrm{{MStd}}({0}, {1})".format(self._window - self._compHolder._window, str(self._compHolder))
+        else:
+            return str(self._holderTemplate)
 
     def __deepcopy__(self, memo):
         if self._compHolder:
@@ -401,6 +455,12 @@ cdef class SecurityMovingLogReturn(SecuritySingleValueHolder):
 cdef class SecurityMovingResidue(SecuritySingleValueHolder):
     def __init__(self, window, dependency=('y', 'x')):
         super(SecurityMovingResidue, self).__init__(window, MovingResidue, dependency)
+
+    def __str__(self):
+        if self._compHolder:
+            return "\\mathrm{{Res}}({0}, {1})".format(self._window - self._compHolder._window, str(self._compHolder))
+        else:
+            return str(self._holderTemplate)
 
     def __deepcopy__(self, memo):
         if self._compHolder:

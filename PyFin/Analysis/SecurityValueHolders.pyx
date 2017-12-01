@@ -689,6 +689,10 @@ cdef class SecurityAddedValueHolder(SecurityCombinedValueHolder):
         super(SecurityAddedValueHolder, self).__init__(
             left, right, operator.add)
 
+    def __str__(self):
+        return "{0} + {1}".format(str(self._left), str(self._right))
+
+
     def __deepcopy__(self, memo):
         return SecurityAddedValueHolder(self._left, self._right)
 
@@ -704,6 +708,9 @@ cdef class SecuritySubbedValueHolder(SecurityCombinedValueHolder):
     def __init__(self, left, right):
         super(SecuritySubbedValueHolder, self).__init__(
             left, right, operator.sub)
+
+    def __str__(self):
+        return "{0} - {1}".format(str(self._left), str(self._right))
 
     def __deepcopy__(self, memo):
         return SecuritySubbedValueHolder(self._left, self._right)
@@ -721,6 +728,20 @@ cdef class SecurityMultipliedValueHolder(SecurityCombinedValueHolder):
         super(SecurityMultipliedValueHolder, self).__init__(
             left, right, operator.mul)
 
+    def __str__(self):
+
+        if isinstance(self._left, (SecurityAddedValueHolder, SecuritySubbedValueHolder)):
+            s1 = "({0})".format(str(self._left))
+        else:
+            s1 = "{0}".format(str(self._left))
+
+        if isinstance(self._right,  (SecurityAddedValueHolder, SecuritySubbedValueHolder)):
+            s2 = "({0})".format(str(self._right))
+        else:
+            s2 = "{0}".format(str(self._right))
+
+        return "{0} \\times {1}".format(s1, s2)
+
     def __deepcopy__(self, memo):
         return SecurityMultipliedValueHolder(self._left, self._right)
 
@@ -736,6 +757,9 @@ cdef class SecurityDividedValueHolder(SecurityCombinedValueHolder):
     def __init__(self, left, right):
         super(SecurityDividedValueHolder, self).__init__(
             left, right, getattr(operator, div_attr))
+
+    def __str__(self):
+        return "\\frac{{{0}}}{{{1}}}".format(str(self._left), str(self._right))
 
     def __deepcopy__(self, memo):
         return SecurityDividedValueHolder(self._left, self._right)
@@ -888,6 +912,13 @@ cdef class SecurityShiftedValueHolder(SecurityValueHolder):
         self._innerHolders = {
             name: copy.deepcopy(self._holderTemplate) for name in self._compHolder.symbolList
         }
+
+    def __str__(self):
+        if self._compHolder:
+            return "\\mathrm{{Shift}}({0}, {1})".format(str(self._compHolder), self._holderTemplate.lag())
+        else:
+            return "\\mathrm{{Shift}}(''{0}'', {1})".format(self._dependency, self._holderTemplate.lag())
+
 
     def __deepcopy__(self, memo):
         if self._compHolder:

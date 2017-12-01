@@ -144,7 +144,7 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
             ma.push(data)
 
             for name in data:
-                res = data[name]['open'] / data[name]['close']
+                res = data[name]['open'] / data[name]['close'] if data[name]['close'] != 0. else np.nan
                 if res != np.inf and res != -np.inf and not math.isnan(res):
                     container[name].append(res)
 

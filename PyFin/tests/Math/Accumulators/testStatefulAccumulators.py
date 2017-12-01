@@ -361,9 +361,9 @@ class TestStatefulAccumulators(unittest.TestCase):
             last = value
             neg_list = np.minimum(diff_list[-window:], 0.)
 
-            expected = 0. if np.isnan(np.mean(neg_list)) else np.mean(neg_list)
-            calculated = mv.result()
-            if i > 0:
+            if i > 0 and len(neg_list) > 0:
+                expected = 0. if np.isnan(np.mean(neg_list)) else np.mean(neg_list)
+                calculated = mv.result()
                 self.assertAlmostEqual(calculated, expected, 8, "at index {0:d}\n"
                                                                 "negative average expected:   {1:f}\n"
                                                                 "negative average calculated: {2:f}".format(i,
@@ -2299,45 +2299,52 @@ class TestStatefulAccumulators(unittest.TestCase):
 
     def testMovingMaxStr(self):
         s = MovingMax(10, 'roe')
-        self.assertEqual("\mathrm{mmax}(''roe'', 10)", str(s))
+        self.assertEqual("\mathrm{MMax}(10, ''roe'')", str(s))
 
         s = MovingMax(10, Latest('roe') + Latest('y'))
-        self.assertEqual("\mathrm{mmax}(''roe'' + ''y'', 10)", str(s))
+        self.assertEqual("\mathrm{MMax}(10, ''roe'' + ''y'')", str(s))
 
     def testMovingMinStr(self):
         s = MovingMin(10, 'roe')
-        self.assertEqual("\mathrm{mmin}(''roe'', 10)", str(s))
+        self.assertEqual("\mathrm{MMin}(10, ''roe'')", str(s))
 
         s = MovingMin(10, Latest('roe') + Latest('y'))
-        self.assertEqual("\mathrm{mmin}(''roe'' + ''y'', 10)", str(s))
+        self.assertEqual("\mathrm{MMin}(10, ''roe'' + ''y'')", str(s))
 
     def testMovingQuantileStr(self):
         s = MovingQuantile(10, 'roe')
-        self.assertEqual("\mathrm{mquantile}(''roe'', 10)", str(s))
+        self.assertEqual("\mathrm{MQuantile}(10, ''roe'')", str(s))
 
         s = MovingQuantile(10, Latest('roe') + Latest('y'))
-        self.assertEqual("\mathrm{mquantile}(''roe'' + ''y'', 10)", str(s))
+        self.assertEqual("\mathrm{MQuantile}(10, ''roe'' + ''y'')", str(s))
 
     def testMovingAllTrueStr(self):
         s = MovingAllTrue(10, 'roe')
-        self.assertEqual("\mathrm{malltrue}(''roe'', 10)", str(s))
+        self.assertEqual("\mathrm{MAllTrue}(10, ''roe'')", str(s))
 
         s = MovingAllTrue(10, Latest('roe') + Latest('y'))
-        self.assertEqual("\mathrm{malltrue}(''roe'' + ''y'', 10)", str(s))
+        self.assertEqual("\mathrm{MAllTrue}(10, ''roe'' + ''y'')", str(s))
 
     def testMovingAnyTrueStr(self):
         s = MovingAnyTrue(10, 'roe')
-        self.assertEqual("\mathrm{manytrue}(''roe'', 10)", str(s))
+        self.assertEqual("\mathrm{MAnyTrue}(10, ''roe'')", str(s))
 
         s = MovingAnyTrue(10, Latest('roe') + Latest('y'))
-        self.assertEqual("\mathrm{manytrue}(''roe'' + ''y'', 10)", str(s))
+        self.assertEqual("\mathrm{MAnyTrue}(10, ''roe'' + ''y'')", str(s))
 
     def testMovingSumStr(self):
         s = MovingSum(10, 'roe')
-        self.assertEqual("\mathrm{msum}(''roe'', 10)", str(s))
+        self.assertEqual("\mathrm{MSum}(10, ''roe'')", str(s))
 
         s = MovingSum(10, Latest('roe') + Latest('y'))
-        self.assertEqual("\mathrm{msum}(''roe'' + ''y'', 10)", str(s))
+        self.assertEqual("\mathrm{MSum}(10, ''roe'' + ''y'')", str(s))
+
+    def testMovingResidueRes(self):
+        s = MovingResidue(10, ('roe', 'y'))
+        self.assertEqual("\mathrm{Res}(10, ('roe', 'y'))", str(s))
+
+        s = MovingResidue(10, Latest('roe') ^ Latest('y'))
+        self.assertEqual("\mathrm{Res}(10, (''roe'', ''y''))", str(s))
 
 
 if __name__ == '__main__':

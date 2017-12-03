@@ -2295,56 +2295,56 @@ class TestStatefulAccumulators(unittest.TestCase):
 
     def testShiftStr(self):
         s = Shift(Latest('roe'), 2)
-        self.assertEqual("\mathrm{Shift}(''roe'', 2)", str(s))
+        self.assertEqual("\mathrm{Shift}(''\\text{roe}'', 2)", str(s))
 
     def testMovingMaxStr(self):
         s = MovingMax(10, 'roe')
-        self.assertEqual("\mathrm{MMax}(10, ''roe'')", str(s))
+        self.assertEqual("\mathrm{MMax}(10, ''\\text{roe}'')", str(s))
 
         s = MovingMax(10, Latest('roe') + Latest('y'))
-        self.assertEqual("\mathrm{MMax}(10, ''roe'' + ''y'')", str(s))
+        self.assertEqual("\mathrm{MMax}(10, ''\\text{roe}'' + ''\\text{y}'')", str(s))
 
     def testMovingMinStr(self):
         s = MovingMin(10, 'roe')
-        self.assertEqual("\mathrm{MMin}(10, ''roe'')", str(s))
+        self.assertEqual("\mathrm{MMin}(10, ''\\text{roe}'')", str(s))
 
         s = MovingMin(10, Latest('roe') + Latest('y'))
-        self.assertEqual("\mathrm{MMin}(10, ''roe'' + ''y'')", str(s))
+        self.assertEqual("\mathrm{MMin}(10, ''\\text{roe}'' + ''\\text{y}'')", str(s))
 
     def testMovingQuantileStr(self):
         s = MovingQuantile(10, 'roe')
-        self.assertEqual("\mathrm{MQuantile}(10, ''roe'')", str(s))
+        self.assertEqual("\mathrm{MQuantile}(10, ''\\text{roe}'')", str(s))
 
         s = MovingQuantile(10, Latest('roe') + Latest('y'))
-        self.assertEqual("\mathrm{MQuantile}(10, ''roe'' + ''y'')", str(s))
+        self.assertEqual("\mathrm{MQuantile}(10, ''\\text{roe}'' + ''\\text{y}'')", str(s))
 
     def testMovingAllTrueStr(self):
         s = MovingAllTrue(10, 'roe')
-        self.assertEqual("\mathrm{MAllTrue}(10, ''roe'')", str(s))
+        self.assertEqual("\mathrm{MAllTrue}(10, ''\\text{roe}'')", str(s))
 
         s = MovingAllTrue(10, Latest('roe') + Latest('y'))
-        self.assertEqual("\mathrm{MAllTrue}(10, ''roe'' + ''y'')", str(s))
+        self.assertEqual("\mathrm{MAllTrue}(10, ''\\text{roe}'' + ''\\text{y}'')", str(s))
 
     def testMovingAnyTrueStr(self):
         s = MovingAnyTrue(10, 'roe')
-        self.assertEqual("\mathrm{MAnyTrue}(10, ''roe'')", str(s))
+        self.assertEqual("\mathrm{MAnyTrue}(10, ''\\text{roe}'')", str(s))
 
         s = MovingAnyTrue(10, Latest('roe') + Latest('y'))
-        self.assertEqual("\mathrm{MAnyTrue}(10, ''roe'' + ''y'')", str(s))
+        self.assertEqual("\mathrm{MAnyTrue}(10, ''\\text{roe}'' + ''\\text{y}'')", str(s))
 
     def testMovingSumStr(self):
         s = MovingSum(10, 'roe')
-        self.assertEqual("\mathrm{MSum}(10, ''roe'')", str(s))
+        self.assertEqual("\mathrm{MSum}(10, ''\\text{roe}'')", str(s))
 
         s = MovingSum(10, Latest('roe') + Latest('y'))
-        self.assertEqual("\mathrm{MSum}(10, ''roe'' + ''y'')", str(s))
+        self.assertEqual("\mathrm{MSum}(10, ''\\text{roe}'' + ''\\text{y}'')", str(s))
 
     def testMovingResidueRes(self):
         s = MovingResidue(10, ('roe', 'y'))
-        self.assertEqual("\mathrm{Res}(10, ('roe', 'y'))", str(s))
+        self.assertEqual("\mathrm{Res}(10, \\text{('roe', 'y')})", str(s))
 
         s = MovingResidue(10, Latest('roe') ^ Latest('y'))
-        self.assertEqual("\mathrm{Res}(10, (''roe'', ''y''))", str(s))
+        self.assertEqual("\mathrm{Res}(10, (''\\text{roe}'', ''\\text{y}''))", str(s))
 
 
 if __name__ == '__main__':

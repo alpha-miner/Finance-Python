@@ -815,95 +815,95 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
 
     def testLatestStr(self):
         s = Latest('roe')
-        self.assertEqual("''roe''", str(s))
+        self.assertEqual("''\\text{roe}''", str(s))
 
     def testExpStr(self):
         s = Exp('roe')
-        self.assertEqual("\exp(''roe'')", str(s))
+        self.assertEqual("\exp(''\\text{roe}'')", str(s))
 
     def testLogStr(self):
         s = Log('roe')
-        self.assertEqual("\ln(''roe'')", str(s))
+        self.assertEqual("\ln(''\\text{roe}'')", str(s))
 
     def testSqrtStr(self):
         s = Sqrt('roe')
-        self.assertEqual("\sqrt{''roe''}", str(s))
+        self.assertEqual("\sqrt{''\\text{roe}''}", str(s))
 
     def testPowStr(self):
         s = Pow('roe', 3)
-        self.assertEqual("''roe'' ^ {3.0}", str(s))
+        self.assertEqual("''\\text{roe}'' ^ {3.0}", str(s))
 
     def testAbsStr(self):
         s = Abs('roe')
-        self.assertEqual("\\left|  ''roe'' \\right|", str(s))
+        self.assertEqual("\\left|  ''\\text{roe}'' \\right|", str(s))
 
     def testSignStr(self):
         s = Sign('roe')
-        self.assertEqual("\mathrm{sign}(''roe'')", str(s))
+        self.assertEqual("\mathrm{sign}(''\\text{roe}'')", str(s))
 
     def testAcosStr(self):
         s = Acos('roe')
-        self.assertEqual("\mathrm{ACos}(''roe'')", str(s))
+        self.assertEqual("\mathrm{ACos}(''\\text{roe}'')", str(s))
 
     def testAcoshStr(self):
         s = Acosh('roe')
-        self.assertEqual("\mathrm{ACosh}(''roe'')", str(s))
+        self.assertEqual("\mathrm{ACosh}(''\\text{roe}'')", str(s))
 
     def testAsinStr(self):
         s = Asin('roe')
-        self.assertEqual("\mathrm{ASin}(''roe'')", str(s))
+        self.assertEqual("\mathrm{ASin}(''\\text{roe}'')", str(s))
 
     def testAsinhStr(self):
         s = Asinh('roe')
-        self.assertEqual("\mathrm{ASinh}(''roe'')", str(s))
+        self.assertEqual("\mathrm{ASinh}(''\\text{roe}'')", str(s))
 
     def testNegStr(self):
         s = -Asinh('roe')
-        self.assertEqual("-\mathrm{ASinh}(''roe'')", str(s))
+        self.assertEqual("-\mathrm{ASinh}(''\\text{roe}'')", str(s))
 
     def testListedStr(self):
         s = Latest('ret') ^ Identity(2.)
-        self.assertEqual("(''ret'', 2.0)", str(s))
+        self.assertEqual("(''\\text{ret}'', 2.0)", str(s))
 
     def testAddedStr(self):
         s = Latest('x') + Latest('y')
-        self.assertEqual("''x'' + ''y''", str(s))
+        self.assertEqual("''\\text{x}'' + ''\\text{y}''", str(s))
 
     def testMinusStr(self):
         s = Latest('x') - Latest('y')
-        self.assertEqual("''x'' - ''y''", str(s))
+        self.assertEqual("''\\text{x}'' - ''\\text{y}''", str(s))
 
     def testMultiplyStr(self):
         s = Latest('x') * Latest('y')
-        self.assertEqual("''x'' \\times ''y''", str(s))
+        self.assertEqual("''\\text{x}'' \\times ''\\text{y}''", str(s))
 
         s = (Latest('x') + Latest('y')) * (Latest('x') - Latest('y'))
-        self.assertEqual("(''x'' + ''y'') \\times (''x'' - ''y'')", str(s))
+        self.assertEqual("(''\\text{x}'' + ''\\text{y}'') \\times (''\\text{x}'' - ''\\text{y}'')", str(s))
 
     def testDividedStr(self):
         s = (Latest('x') + Latest('y')) / (Latest('x') - Latest('y'))
-        self.assertEqual("\\frac{''x'' + ''y''}{''x'' - ''y''}", str(s))
+        self.assertEqual("\\frac{''\\text{x}'' + ''\\text{y}''}{''\\text{x}'' - ''\\text{y}''}", str(s))
 
     def testLtOperatorStr(self):
         s = (Latest('x') + Latest('y')) < (Latest('x') - Latest('y'))
-        self.assertEqual("(''x'' + ''y'') \lt (''x'' - ''y'')", str(s))
+        self.assertEqual("(''\\text{x}'' + ''\\text{y}'') \lt (''\\text{x}'' - ''\\text{y}'')", str(s))
 
     def testLeOperatorStr(self):
         s = (Latest('x') * Latest('y')) <= (Latest('x') - Latest('y'))
-        self.assertEqual("(''x'' \\times ''y'') \le (''x'' - ''y'')", str(s))
+        self.assertEqual("(''\\text{x}'' \\times ''\\text{y}'') \le (''\\text{x}'' - ''\\text{y}'')", str(s))
 
     def testGeOperatorStr(self):
         s = (Latest('x') * Latest('y')) >= (Latest('x') - Latest('y'))
-        self.assertEqual("(''x'' \\times ''y'') \ge (''x'' - ''y'')", str(s))
+        self.assertEqual("(''\\text{x}'' \\times ''\\text{y}'') \ge (''\\text{x}'' - ''\\text{y}'')", str(s))
 
     def testGtOperatorStr(self):
         s = (Latest('x') * Latest('y')) > (Latest('x') - Latest('y'))
-        self.assertEqual("(''x'' \\times ''y'') \gt (''x'' - ''y'')", str(s))
+        self.assertEqual("(''\\text{x}'' \\times ''\\text{y}'') \gt (''\\text{x}'' - ''\\text{y}'')", str(s))
 
     def testEqOperatorStr(self):
         s = (Latest('x') * Latest('y')) == (Latest('x') - Latest('y'))
-        self.assertEqual("(''x'' \\times ''y'') = (''x'' - ''y'')", str(s))
+        self.assertEqual("(''\\text{x}'' \\times ''\\text{y}'') = (''\\text{x}'' - ''\\text{y}'')", str(s))
 
     def testEqOperatorStr(self):
         s = (Latest('x') * Latest('y')) != (Latest('x') - Latest('y'))
-        self.assertEqual("(''x'' \\times ''y'') \\neq (''x'' - ''y'')", str(s))
+        self.assertEqual("(''\\text{x}'' \\times ''\\text{y}'') \\neq (''\\text{x}'' - ''\\text{y}'')", str(s))

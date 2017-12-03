@@ -402,6 +402,9 @@ cdef class IdentitySecurityValueHolder(SecurityValueHolder):
         super(IdentitySecurityValueHolder, self).__init__([])
         self._value = value
 
+    def __str__(self):
+        return str(self._value)
+
     def isFullByName(self, name):
         return True
 
@@ -537,6 +540,9 @@ cdef class SecurityNegValueHolder(SecurityUnitoryValueHolder):
         super(SecurityNegValueHolder, self).__init__(
             right, operator.neg)
 
+    def __str__(self):
+        return "-{0}".format(str(self._right))
+
     def __deepcopy__(self, memo):
         return SecurityNegValueHolder(self._right)
 
@@ -576,6 +582,12 @@ cdef class SecurityLatestValueHolder(SecurityValueHolder):
                 }
         else:
             self._holderTemplate = Latest(dependency=self._dependency)
+
+    def __str__(self):
+        if self._compHolder:
+            return "{0}".format(str(self._compHolder))
+        else:
+            return str(self._holderTemplate)
 
     def __deepcopy__(self, memo):
         if self._compHolder:
@@ -672,6 +684,9 @@ cdef class SecurityXorValuedHolder(SecurityCombinedValueHolder):
             return self.cached[name]
         else:
             return self._left.value_by_name(name), self._right.value_by_name(name)
+
+    def __str__(self):
+        return "({0}, {1})".format(str(self._left), str(self._right))
 
     def __deepcopy__(self, memo):
         return SecurityXorValuedHolder(self._left, self._right)
@@ -917,8 +932,7 @@ cdef class SecurityShiftedValueHolder(SecurityValueHolder):
         if self._compHolder:
             return "\\mathrm{{Shift}}({0}, {1})".format(str(self._compHolder), self._holderTemplate.lag())
         else:
-            return "\\mathrm{{Shift}}(''{0}'', {1})".format(self._dependency, self._holderTemplate.lag())
-
+            return "\\mathrm{{Shift}}(''\\text{{{0}}}'', {1})".format(self._dependency, self._holderTemplate.lag())
 
     def __deepcopy__(self, memo):
         if self._compHolder:

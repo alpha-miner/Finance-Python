@@ -784,7 +784,7 @@ cdef class Latest(StatelessSingleValueAccumulator):
         if self._isValueHolderContained:
             return "{0}".format(str(self._dependency))
         else:
-            return "''{0}''".format(str(self._dependency))
+            return "''\\text{{{0}}}''".format(str(self._dependency))
 
     cpdef object result(self):
         return self._latest
@@ -940,7 +940,7 @@ cdef class Exp(BasicFunction):
         if self._isValueHolderContained:
             return "\\exp({0})".format(str(self._dependency))
         else:
-            return "\\exp(''{0}'')".format(str(self._dependency))
+            return "\\exp(''\\text{{{0}}}'')".format(str(self._dependency))
 
     def __deepcopy__(self, memo):
         return Exp(self._dependency, self._origValue)
@@ -965,7 +965,7 @@ cdef class Log(BasicFunction):
         if self._isValueHolderContained:
             return "\\ln({0})".format(str(self._dependency))
         else:
-            return "\\ln(''{0}'')".format(str(self._dependency))
+            return "\\ln(''\\text{{{0}}}'')".format(str(self._dependency))
 
     def __deepcopy__(self, memo):
         return Log(self._dependency, self._origValue)
@@ -990,7 +990,7 @@ cdef class Sqrt(BasicFunction):
         if self._isValueHolderContained:
             return "\\sqrt{{{0}}}".format(str(self._dependency))
         else:
-            return "\\sqrt{{''{0}''}}".format(str(self._dependency))
+            return "\\sqrt{{''\\text{{{0}}}''}}".format(str(self._dependency))
 
     def __deepcopy__(self, memo):
         return Sqrt(self._dependency, self._origValue)
@@ -1018,7 +1018,7 @@ cdef class Pow(BasicFunction):
         if self._isValueHolderContained:
             return "{0} ^ {{{1}}}".format(str(self._dependency), self._n)
         else:
-            return "''{0}'' ^ {{{1}}}".format(str(self._dependency), self._n)
+            return "''\\text{{{0}}}'' ^ {{{1}}}".format(str(self._dependency), self._n)
 
     def __deepcopy__(self, memo):
         return Pow(self._dependency, self._n, self._origValue)
@@ -1043,7 +1043,7 @@ cdef class Abs(BasicFunction):
         if self._isValueHolderContained:
             return "\\left| {0} \\right|".format(str(self._dependency))
         else:
-            return "\\left|  ''{0}'' \\right|".format(str(self._dependency))
+            return "\\left|  ''\\text{{{0}}}'' \\right|".format(str(self._dependency))
 
     def __deepcopy__(self, memo):
         return Abs(self._dependency, self._origValue)
@@ -1068,7 +1068,7 @@ cdef class Sign(BasicFunction):
         if self._isValueHolderContained:
             return "\\mathrm{{sign}}({0})".format(str(self._dependency))
         else:
-            return "\\mathrm{{sign}}(''{0}'')".format(str(self._dependency))
+            return "\\mathrm{{sign}}(''\\text{{{0}}}'')".format(str(self._dependency))
 
     def __deepcopy__(self, memo):
         return Sign(self._dependency, self._origValue)
@@ -1093,7 +1093,7 @@ cdef class Acos(BasicFunction):
         if self._isValueHolderContained:
             return "\\mathrm{{ACos}}({0})".format(str(self._dependency))
         else:
-            return "\\mathrm{{ACos}}(''{0}'')".format(str(self._dependency))
+            return "\\mathrm{{ACos}}(''\\text{{{0}}}'')".format(str(self._dependency))
 
     def __deepcopy__(self, memo):
         return Acos(self._dependency, self._origValue)
@@ -1118,7 +1118,7 @@ cdef class Acosh(BasicFunction):
         if self._isValueHolderContained:
             return "\\mathrm{{ACosh}}({0})".format(str(self._dependency))
         else:
-            return "\\mathrm{{ACosh}}(''{0}'')".format(str(self._dependency))
+            return "\\mathrm{{ACosh}}(''\\text{{{0}}}'')".format(str(self._dependency))
 
     def __deepcopy__(self, memo):
         return Acosh(self._dependency, self._origValue)
@@ -1143,7 +1143,7 @@ cdef class Asin(BasicFunction):
         if self._isValueHolderContained:
             return "\\mathrm{{ASin}}({0})".format(str(self._dependency))
         else:
-            return "\\mathrm{{ASin}}(''{0}'')".format(str(self._dependency))
+            return "\\mathrm{{ASin}}(''\\text{{{0}}}'')".format(str(self._dependency))
 
     def __deepcopy__(self, memo):
         return Asin(self._dependency, self._origValue)
@@ -1168,7 +1168,7 @@ cdef class Asinh(BasicFunction):
         if self._isValueHolderContained:
             return "\\mathrm{{ASinh}}({0})".format(str(self._dependency))
         else:
-            return "\\mathrm{{ASinh}}(''{0}'')".format(str(self._dependency))
+            return "\\mathrm{{ASinh}}(''\\text{{{0}}}'')".format(str(self._dependency))
 
     def __deepcopy__(self, memo):
         return Asinh(self._dependency, self._origValue)

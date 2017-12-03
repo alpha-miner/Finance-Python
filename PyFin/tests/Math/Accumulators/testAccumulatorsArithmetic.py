@@ -843,23 +843,23 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
 
     def testAcosStr(self):
         s = Acos('roe')
-        self.assertEqual("\\arccos(''roe'')", str(s))
+        self.assertEqual("\mathrm{ACos}(''roe'')", str(s))
 
     def testAcoshStr(self):
         s = Acosh('roe')
-        self.assertEqual("\mathrm{arccosh}(''roe'')", str(s))
+        self.assertEqual("\mathrm{ACosh}(''roe'')", str(s))
 
     def testAsinStr(self):
         s = Asin('roe')
-        self.assertEqual("\\arcsin(''roe'')", str(s))
+        self.assertEqual("\mathrm{ASin}(''roe'')", str(s))
 
     def testAsinhStr(self):
         s = Asinh('roe')
-        self.assertEqual("\mathrm{arcsinh}(''roe'')", str(s))
+        self.assertEqual("\mathrm{ASinh}(''roe'')", str(s))
 
     def testNegStr(self):
         s = -Asinh('roe')
-        self.assertEqual("-\mathrm{arcsinh}(''roe'')", str(s))
+        self.assertEqual("-\mathrm{ASinh}(''roe'')", str(s))
 
     def testListedStr(self):
         s = Latest('ret') ^ Identity(2.)

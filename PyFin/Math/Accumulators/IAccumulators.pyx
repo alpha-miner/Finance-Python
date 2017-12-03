@@ -1091,9 +1091,9 @@ cdef class Acos(BasicFunction):
 
     def __str__(self):
         if self._isValueHolderContained:
-            return "\\arccos({0})".format(str(self._dependency))
+            return "\\mathrm{{ACos}}({0})".format(str(self._dependency))
         else:
-            return "\\arccos(''{0}'')".format(str(self._dependency))
+            return "\\mathrm{{ACos}}(''{0}'')".format(str(self._dependency))
 
     def __deepcopy__(self, memo):
         return Acos(self._dependency, self._origValue)
@@ -1116,9 +1116,9 @@ cdef class Acosh(BasicFunction):
 
     def __str__(self):
         if self._isValueHolderContained:
-            return "\\mathrm{{arccosh}}({0})".format(str(self._dependency))
+            return "\\mathrm{{ACosh}}({0})".format(str(self._dependency))
         else:
-            return "\\mathrm{{arccosh}}(''{0}'')".format(str(self._dependency))
+            return "\\mathrm{{ACosh}}(''{0}'')".format(str(self._dependency))
 
     def __deepcopy__(self, memo):
         return Acosh(self._dependency, self._origValue)
@@ -1141,9 +1141,9 @@ cdef class Asin(BasicFunction):
 
     def __str__(self):
         if self._isValueHolderContained:
-            return "\\arcsin({0})".format(str(self._dependency))
+            return "\\mathrm{{ASin}}({0})".format(str(self._dependency))
         else:
-            return "\\arcsin(''{0}'')".format(str(self._dependency))
+            return "\\mathrm{{ASin}}(''{0}'')".format(str(self._dependency))
 
     def __deepcopy__(self, memo):
         return Asin(self._dependency, self._origValue)
@@ -1166,9 +1166,9 @@ cdef class Asinh(BasicFunction):
 
     def __str__(self):
         if self._isValueHolderContained:
-            return "\\mathrm{{arcsinh}}({0})".format(str(self._dependency))
+            return "\\mathrm{{ASinh}}({0})".format(str(self._dependency))
         else:
-            return "\\mathrm{{arcsinh}}(''{0}'')".format(str(self._dependency))
+            return "\\mathrm{{ASinh}}(''{0}'')".format(str(self._dependency))
 
     def __deepcopy__(self, memo):
         return Asinh(self._dependency, self._origValue)

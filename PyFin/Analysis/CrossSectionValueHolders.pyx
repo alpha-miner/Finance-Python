@@ -80,6 +80,9 @@ cdef class CSRankedSecurityValueHolder(CrossSectionValueHolder):
         raw_values = raw_values.rank()
         return raw_values
 
+    def __str__(self):
+        return "\mathrm{{CSRank}}({0})".format(str(self._inner))
+
     def __deepcopy__(self, memo):
         return CSRankedSecurityValueHolder(self._inner)
 
@@ -136,6 +139,9 @@ cdef class CSAverageSecurityValueHolder(CrossSectionValueHolder):
         mean_value[np.isnan(raw_values.values)] = NAN
         raw_values = SeriesValues(mean_value, raw_values.name_mapping)
         return raw_values[names]
+
+    def __str__(self):
+        return "\mathrm{{CSMean}}({0})".format(str(self._inner))
 
     def __deepcopy__(self, memo):
         return CSAverageSecurityValueHolder(self._inner)
@@ -198,6 +204,9 @@ cdef class CSPercentileSecurityValueHolder(CrossSectionValueHolder):
         raw_values = SeriesValues(per_value, raw_values.name_mapping)
         return raw_values[names]
 
+    def __str__(self):
+        return "\mathrm{{CSPercentile}}({0})".format(str(self._inner))
+
     def __deepcopy__(self, memo):
         return CSPercentileSecurityValueHolder(self.percentile, self._inner)
 
@@ -242,6 +251,9 @@ cdef class CSAverageAdjustedSecurityValueHolder(CrossSectionValueHolder):
         raw_values = self._inner.value_by_names(names)
         raw_values = raw_values - raw_values.mean()
         return raw_values[names]
+
+    def __str__(self):
+        return "\mathrm{{CSMeanAdjusted}}({0})".format(str(self._inner))
 
     def __deepcopy__(self, memo):
         return CSAverageAdjustedSecurityValueHolder(self._inner)
@@ -293,6 +305,9 @@ cdef class CSQuantileSecurityValueHolder(CrossSectionValueHolder):
         raw_values = (raw_values.rank() - 1.) / (len(raw_values) - 1.)
         return raw_values[names]
 
+    def __str__(self):
+        return "\mathrm{{CSQuantiles}}({0})".format(str(self._inner))
+
     def __deepcopy__(self, memo):
         return CSQuantileSecurityValueHolder(self._inner)
 
@@ -342,6 +357,9 @@ cdef class CSZScoreSecurityValueHolder(CrossSectionValueHolder):
         raw_values = self._inner.value_by_names(names)
         raw_values = raw_values.zscore()
         return raw_values[names]
+
+    def __str__(self):
+        return "\mathrm{{CSZScore}}({0})".format(str(self._inner))
 
     def __deepcopy__(self, memo):
         return CSZScoreSecurityValueHolder(self._inner)
@@ -444,6 +462,9 @@ cdef class CSResidueSecurityValueHolder(CrossBinarySectionValueHolder):
     def __init__(self, left, right):
         super(CSResidueSecurityValueHolder, self).__init__(left, right)
         self.op = residue
+
+    def __str__(self):
+        return "\mathrm{{CSRes}}({0}, {1})".format(str(self._left), str(self._right))
 
     def __deepcopy__(self, memo):
         return CSResidueSecurityValueHolder(self._left, self._right)

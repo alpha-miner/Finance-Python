@@ -904,6 +904,6 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
         s = (Latest('x') * Latest('y')) == (Latest('x') - Latest('y'))
         self.assertEqual("(''\\text{x}'' \\times ''\\text{y}'') = (''\\text{x}'' - ''\\text{y}'')", str(s))
 
-    def testEqOperatorStr(self):
+    def testNeqOperatorStr(self):
         s = (Latest('x') * Latest('y')) != (Latest('x') - Latest('y'))
         self.assertEqual("(''\\text{x}'' \\times ''\\text{y}'') \\neq (''\\text{x}'' - ''\\text{y}'')", str(s))

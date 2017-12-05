@@ -96,7 +96,15 @@ class TestCalendar(unittest.TestCase):
                        Date(2017, 4, 2), Date(2017, 4, 3), Date(2017, 4, 4),
                        Date(2017, 5, 1),
                        Date(2017, 5, 28), Date(2017, 5, 29), Date(2017, 5, 30),
-                       Date(2017, 10, 1), Date(2017, 10, 2), Date(2017, 10, 3), Date(2017, 10, 4), Date(2017, 10, 5), Date(2017, 10, 6), Date(2017, 10, 7), Date(2017, 10, 8)]
+                       Date(2017, 10, 1), Date(2017, 10, 2), Date(2017, 10, 3), Date(2017, 10, 4), Date(2017, 10, 5), Date(2017, 10, 6), Date(2017, 10, 7), Date(2017, 10, 8),
+        # China Shanghai Securities Exchange holiday list in the year 2018
+                       Date(2018, 1, 1),
+                       Date(2018, 2, 15), Date(2018, 2, 16), Date(2018, 2, 17), Date(2018, 2, 18), Date(2018, 2, 19), Date(2018, 2, 20), Date(2018, 2, 21),
+                       Date(2018, 4, 5), Date(2018, 4, 6), Date(2018, 4, 7),
+                       Date(2018, 4, 29), Date(2018, 4, 30), Date(2018, 5, 1),
+                       Date(2018, 6, 16), Date(2018, 6, 17), Date(2018, 6, 18),
+                       Date(2018, 9, 22), Date(2018, 9, 23), Date(2018, 9, 24),
+                       Date(2018, 10, 1), Date(2018, 10, 2), Date(2018, 10, 3), Date(2018, 10, 4), Date(2018, 10, 5), Date(2018, 10, 6), Date(2018, 10 ,7)]
 
         cal = Calendar('China.SSE')
 
@@ -131,7 +139,14 @@ class TestCalendar(unittest.TestCase):
                                   Date(2017, 2, 4),
                                   Date(2017, 4, 1),
                                   Date(2017, 5, 27),
-                                  Date(2017, 9, 30)]
+                                  Date(2017, 9, 30),
+        # China Inter Bank working weekend list in the year 2018
+                                  Date(2018, 2, 11),
+                                  Date(2018, 2, 24),
+                                  Date(2018, 4, 8),
+                                  Date(2018, 4, 28),
+                                  Date(2018, 9, 29),
+                                  Date(2018, 9, 30)]
 
         cal = Calendar('China.IB')
 

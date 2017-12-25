@@ -142,3 +142,18 @@ class TestTransformer(unittest.TestCase):
         expected = test_df[test_df.b >= 5]
         np.testing.assert_array_almost_equal(expected.b, calculated['filtered_b'])
         np.testing.assert_array_equal(expected.code, calculated['code'])
+
+    def test_transformer_with_category_for_comparing(self):
+        test_df = pd.DataFrame({'code': [1, 2, 3, 4, 1, 2, 3],
+                                'b': [4, 5, 6, 7, 6, 5, 4],
+                                'c': [9, 8, 7, 6, 5, 4, 3]},
+                               index=[1, 1, 1, 1, 2, 2, 2],
+                               dtype=float)
+
+        value_holder = SecurityLatestValueHolder('b') > 4.
+        calculated = transform(test_df,
+                               [value_holder],
+                               cols=['filter'],
+                               category_field='code')
+        expected = [0., 1., 1., 1., 1., 1., 0.]
+        np.testing.assert_array_almost_equal(expected, calculated['filter'])

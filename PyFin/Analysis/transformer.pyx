@@ -62,7 +62,7 @@ cpdef transform(data, list expressions, list cols, str category_field=None, bint
                     exp = e
                     exp.push(dict_data)
                     end_count = start_count + len(dict_data)
-                    narr_view = exp.value_by_names(split_category[j]).values
+                    narr_view = exp.value_by_names(split_category[j]).values.astype(float)
                     output_values[start_count:end_count, i] = narr_view
                     start_count = end_count
             else:

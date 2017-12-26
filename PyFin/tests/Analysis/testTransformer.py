@@ -143,7 +143,8 @@ class TestTransformer(unittest.TestCase):
         np.testing.assert_array_almost_equal(expected.b, calculated['filtered_b'])
         np.testing.assert_array_equal(expected.code, calculated['code'])
 
-    def test_transformer_with_category_for_comparing(self):
+    @staticmethod
+    def test_transformer_with_category_for_comparing():
         test_df = pd.DataFrame({'code': [1, 2, 3, 4, 1, 2, 3],
                                 'b': [4, 5, 6, 7, 6, 5, 4],
                                 'c': [9, 8, 7, 6, 5, 4, 3]},

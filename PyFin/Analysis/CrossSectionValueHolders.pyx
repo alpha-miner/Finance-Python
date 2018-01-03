@@ -11,7 +11,6 @@ import numpy as np
 cimport numpy as np
 cimport cython
 from PyFin.Analysis.SeriesValues cimport SeriesValues
-from PyFin.Analysis.SeriesValues cimport residue
 from PyFin.Analysis.SecurityValueHolders cimport SecurityValueHolder
 from PyFin.Analysis.SecurityValueHolders cimport SecurityLatestValueHolder
 from PyFin.Analysis.SecurityValueHolders import _merge2set
@@ -312,7 +311,7 @@ cdef class CSZScoreSecurityValueHolder(CrossSectionValueHolder):
         return "\mathrm{{CSZScore}}({0})".format(str(self._inner))
 
 
-cdef class CrossBinarySectionValueHolder(SecurityValueHolder):
+cdef class CSResidueSecurityValueHolder(SecurityValueHolder):
 
     cdef public SecurityValueHolder _left
     cdef public SecurityValueHolder _right
@@ -358,7 +357,7 @@ cdef class CrossBinarySectionValueHolder(SecurityValueHolder):
         else:
             left_raw_values = self._left.value
             right_raw_values = self._right.value
-            self.cached = self.op(left_raw_values, right_raw_values)
+            self.cached = left_raw_values.res(right_raw_values)
             self.updated = 1
             return self.cached
 
@@ -372,7 +371,7 @@ cdef class CrossBinarySectionValueHolder(SecurityValueHolder):
         else:
             left_raw_values = self._left.value
             right_raw_values = self._right.value
-            self.cached = self.op(left_raw_values, right_raw_values)
+            self.cached = left_raw_values.res(right_raw_values)
             self.updated = 1
             return self.cached[name]
 
@@ -383,15 +382,6 @@ cdef class CrossBinarySectionValueHolder(SecurityValueHolder):
         right_raw_values = self._right.value_by_names(names)
         raw_values = self.op(left_raw_values, right_raw_values)
         return raw_values
-
-
-cdef class CSResidueSecurityValueHolder(CrossBinarySectionValueHolder):
-
-    cdef public object op
-
-    def __init__(self, left, right):
-        super(CSResidueSecurityValueHolder, self).__init__(left, right)
-        self.op = residue
 
     def __str__(self):
         return "\mathrm{{CSRes}}({0}, {1})".format(str(self._left), str(self._right))

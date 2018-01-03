@@ -229,9 +229,12 @@ cdef class SeriesValues(object):
     cpdef double dot(self, SeriesValues right):
         return np.dot(self.values, right.values)
 
-
     cpdef SeriesValues res(self, SeriesValues right):
-        return residue(self, right)
+        cdef np.ndarray[double, ndim=1] y = self.values
+        cdef np.ndarray[double, ndim=1] x = right.values
+
+        cdef double beta = nansum(x * y) / nansum(x * x)
+        return SeriesValues(y - beta * x, self.name_mapping)
 
     cpdef dict to_dict(self):
         keys = self.name_mapping.keys()

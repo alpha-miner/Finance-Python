@@ -237,16 +237,6 @@ cdef class SeriesValues(object):
         keys = self.name_mapping.keys()
         return {k: self.values[self.name_mapping[k]] for k in keys}
 
-    def __deepcopy__(self, memo):
-        return SeriesValues(self.values, self.name_mapping)
-
-    def __reduce__(self):
-        d = {}
-        return SeriesValues, (self.values, self.name_mapping), d
-
-    def __setstate__(self, state):
-        pass
-
     def __repr__(self):
         return 'SeriesValues({0})'.format(self.__str__())
 

@@ -78,16 +78,3 @@ cdef class Deque:
                    or self.is_full != other.is_full \
                    or self.con != other.con \
                    or self.start != other.start
-
-    def __reduce__(self):
-        d = {
-            'is_full': self.is_full,
-            'con': self.con,
-            'start': self.start
-            }
-        return Deque, (self.window,), d
-
-    def __setstate__(self, state):
-        self.is_full = state['is_full']
-        self.con = state['con']
-        self.start = state['start']

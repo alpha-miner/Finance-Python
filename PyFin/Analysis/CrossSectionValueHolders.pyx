@@ -83,16 +83,6 @@ cdef class CSRankedSecurityValueHolder(CrossSectionValueHolder):
     def __str__(self):
         return "\mathrm{{CSRank}}({0})".format(str(self._inner))
 
-    def __deepcopy__(self, memo):
-        return CSRankedSecurityValueHolder(self._inner)
-
-    def __reduce__(self):
-        d = {}
-        return CSRankedSecurityValueHolder, (self._inner, ), d
-
-    def __setstate__(self, state):
-        pass
-
 
 cdef class CSAverageSecurityValueHolder(CrossSectionValueHolder):
     def __init__(self, innerValue):
@@ -142,16 +132,6 @@ cdef class CSAverageSecurityValueHolder(CrossSectionValueHolder):
 
     def __str__(self):
         return "\mathrm{{CSMean}}({0})".format(str(self._inner))
-
-    def __deepcopy__(self, memo):
-        return CSAverageSecurityValueHolder(self._inner)
-
-    def __reduce__(self):
-        d = {}
-        return CSAverageSecurityValueHolder, (self._inner, ), d
-
-    def __setstate__(self, state):
-        pass
 
 
 cdef class CSPercentileSecurityValueHolder(CrossSectionValueHolder):
@@ -207,16 +187,6 @@ cdef class CSPercentileSecurityValueHolder(CrossSectionValueHolder):
     def __str__(self):
         return "\mathrm{{CSPercentile}}({0})".format(str(self._inner))
 
-    def __deepcopy__(self, memo):
-        return CSPercentileSecurityValueHolder(self.percentile, self._inner)
-
-    def __reduce__(self):
-        d = {}
-        return CSPercentileSecurityValueHolder, (self.percentile, self._inner), d
-
-    def __setstate__(self, state):
-        pass
-
 
 cdef class CSAverageAdjustedSecurityValueHolder(CrossSectionValueHolder):
     def __init__(self, innerValue):
@@ -254,16 +224,6 @@ cdef class CSAverageAdjustedSecurityValueHolder(CrossSectionValueHolder):
 
     def __str__(self):
         return "\mathrm{{CSMeanAdjusted}}({0})".format(str(self._inner))
-
-    def __deepcopy__(self, memo):
-        return CSAverageAdjustedSecurityValueHolder(self._inner)
-
-    def __reduce__(self):
-        d = {}
-        return CSAverageAdjustedSecurityValueHolder, (self._inner, ), d
-
-    def __setstate__(self, state):
-        pass
 
 
 cdef class CSQuantileSecurityValueHolder(CrossSectionValueHolder):
@@ -308,16 +268,6 @@ cdef class CSQuantileSecurityValueHolder(CrossSectionValueHolder):
     def __str__(self):
         return "\mathrm{{CSQuantiles}}({0})".format(str(self._inner))
 
-    def __deepcopy__(self, memo):
-        return CSQuantileSecurityValueHolder(self._inner)
-
-    def __reduce__(self):
-        d = {}
-        return CSQuantileSecurityValueHolder, (self._inner, ), d
-
-    def __setstate__(self, state):
-        pass
-
 
 cdef class CSZScoreSecurityValueHolder(CrossSectionValueHolder):
     def __init__(self, innerValue):
@@ -360,16 +310,6 @@ cdef class CSZScoreSecurityValueHolder(CrossSectionValueHolder):
 
     def __str__(self):
         return "\mathrm{{CSZScore}}({0})".format(str(self._inner))
-
-    def __deepcopy__(self, memo):
-        return CSZScoreSecurityValueHolder(self._inner)
-
-    def __reduce__(self):
-        d = {}
-        return CSZScoreSecurityValueHolder, (self._inner, ), d
-
-    def __setstate__(self, state):
-        pass
 
 
 cdef class CrossBinarySectionValueHolder(SecurityValueHolder):
@@ -444,16 +384,6 @@ cdef class CrossBinarySectionValueHolder(SecurityValueHolder):
         raw_values = self.op(left_raw_values, right_raw_values)
         return raw_values
 
-    def __deepcopy__(self, memo):
-        return CrossBinarySectionValueHolder(self._left, self._right, self.op)
-
-    def __reduce__(self):
-        d = {}
-        return CrossBinarySectionValueHolder, (self._left, self._right, self.op), d
-
-    def __setstate__(self, state):
-        pass
-
 
 cdef class CSResidueSecurityValueHolder(CrossBinarySectionValueHolder):
 
@@ -465,10 +395,3 @@ cdef class CSResidueSecurityValueHolder(CrossBinarySectionValueHolder):
 
     def __str__(self):
         return "\mathrm{{CSRes}}({0}, {1})".format(str(self._left), str(self._right))
-
-    def __deepcopy__(self, memo):
-        return CSResidueSecurityValueHolder(self._left, self._right)
-
-    def __reduce__(self):
-        d = {}
-        return CSResidueSecurityValueHolder, (self._left, self._right), d

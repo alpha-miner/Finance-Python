@@ -47,25 +47,6 @@ cdef class Diff(StatelessSingleValueAccumulator):
     cpdef object result(self):
         return self._curr - self._previous
 
-    def __deepcopy__(self, memo):
-        copied = Diff(self._dependency)
-
-        copied.copy_attributes(self.collect_attributes(), is_deep=True)
-        copied._curr = self._curr
-        copied._previous = self._previous
-        return copied
-
-    def __reduce__(self):
-        d = self.collect_attributes()
-        d['_curr'] = self._curr
-        d['_previous'] = self._previous
-        return Diff, (self._dependency,), d
-
-    def __setstate__(self, state):
-        self.copy_attributes(state, is_deep=False)
-        self._curr = state['_curr']
-        self._previous = state['_previous']
-
 
 cdef class SimpleReturn(StatelessSingleValueAccumulator):
 
@@ -94,9 +75,6 @@ cdef class SimpleReturn(StatelessSingleValueAccumulator):
         else:
             return NAN
 
-    def __deepcopy__(self, memo):
-        return SimpleReturn(self._dependency)
-
 
 cdef class LogReturn(StatelessSingleValueAccumulator):
 
@@ -124,9 +102,6 @@ cdef class LogReturn(StatelessSingleValueAccumulator):
         else:
             return NAN
 
-    def __deepcopy__(self, memo):
-        return LogReturn(self._dependency)
-
 
 cdef class PositivePart(StatelessSingleValueAccumulator):
 
@@ -146,22 +121,6 @@ cdef class PositivePart(StatelessSingleValueAccumulator):
 
     cpdef object result(self):
         return self._pos
-
-    def __deepcopy__(self, memo):
-        copied = PositivePart(self._dependency)
-
-        copied.copy_attributes(self.collect_attributes(), is_deep=True)
-        copied._pos = self._pos
-        return copied
-
-    def __reduce__(self):
-        d = self.collect_attributes()
-        d['_pos'] = self._pos
-        return PositivePart, (self._dependency,), d
-
-    def __setstate__(self, state):
-        self.copy_attributes(state, is_deep=False)
-        self._pos = state['_pos']
 
 
 cdef class NegativePart(StatelessSingleValueAccumulator):
@@ -184,22 +143,6 @@ cdef class NegativePart(StatelessSingleValueAccumulator):
     cpdef object result(self):
         return self._neg
 
-    def __deepcopy__(self, memo):
-        copied = NegativePart(self._dependency)
-
-        copied.copy_attributes(self.collect_attributes(), is_deep=True)
-        copied._neg = self._neg
-        return copied
-
-    def __reduce__(self):
-        d = self.collect_attributes()
-        d['_neg'] = self._neg
-        return NegativePart, (self._dependency,), d
-
-    def __setstate__(self, state):
-        self.copy_attributes(state, is_deep=False)
-        self._neg = state['_neg']
-
 
 cdef class Max(StatelessSingleValueAccumulator):
 
@@ -221,10 +164,6 @@ cdef class Max(StatelessSingleValueAccumulator):
     cpdef object result(self):
         return self._currentMax
 
-    def __deepcopy__(self, memo):
-        return Max(self._dependency)
-
-
 cdef class Maximum(StatelessSingleValueAccumulator):
 
     def __init__(self, dependency=('x', 'y')):
@@ -239,9 +178,6 @@ cdef class Maximum(StatelessSingleValueAccumulator):
 
     cpdef object result(self):
         return self._currentMax
-
-    def __deepcopy__(self, memo):
-        return Maximum(self._dependency)
 
 
 cdef class Min(StatelessSingleValueAccumulator):
@@ -264,9 +200,6 @@ cdef class Min(StatelessSingleValueAccumulator):
     cpdef object result(self):
         return self._currentMin
 
-    def __deepcopy__(self, memo):
-        return Min(self._dependency)
-
 
 cdef class Minimum(StatelessSingleValueAccumulator):
 
@@ -282,9 +215,6 @@ cdef class Minimum(StatelessSingleValueAccumulator):
 
     cpdef object result(self):
         return self._currentMin
-
-    def __deepcopy__(self, memo):
-        return Minimum(self._dependency)
 
 
 cdef class Sum(StatelessSingleValueAccumulator):
@@ -306,9 +236,6 @@ cdef class Sum(StatelessSingleValueAccumulator):
 
     cpdef object result(self):
         return self._currentSum
-
-    def __deepcopy__(self, memo):
-        return Sum(self._dependency)
 
 
 cdef class Average(StatelessSingleValueAccumulator):
@@ -337,9 +264,6 @@ cdef class Average(StatelessSingleValueAccumulator):
         else:
             return NAN
 
-    def __deepcopy__(self, memo):
-        return Average(self._dependency)
-
 
 cdef class XAverage(StatelessSingleValueAccumulator):
 
@@ -364,25 +288,6 @@ cdef class XAverage(StatelessSingleValueAccumulator):
 
     cpdef object result(self):
         return self._average
-
-    def __deepcopy__(self, memo):
-        copied = XAverage(2.0 / self._exp - 1., self._dependency)
-
-        copied.copy_attributes(self.collect_attributes(), is_deep=True)
-        copied._average = self._average
-        copied._count = self._count
-        return copied
-
-    def __reduce__(self):
-        d = self.collect_attributes()
-        d['_average'] = self._average
-        d['_count'] = self._count
-        return XAverage, (2.0 / self._exp - 1., self._dependency), d
-
-    def __setstate__(self, state):
-        self.copy_attributes(state, is_deep=False)
-        self._average = state['_average']
-        self._count = state['_count']
 
 
 cdef class Variance(StatelessSingleValueAccumulator):
@@ -419,9 +324,6 @@ cdef class Variance(StatelessSingleValueAccumulator):
         else:
             return NAN
 
-    def __deepcopy__(self, memo):
-        return Variance(self._dependency, self._isPop)
-
 
 cdef class Product(StatelessSingleValueAccumulator):
 
@@ -439,9 +341,6 @@ cdef class Product(StatelessSingleValueAccumulator):
 
     cpdef object result(self):
         return self._product
-
-    def __deepcopy__(self, memo):
-        return Product(self._dependency)
 
 
 cdef class CenterMoment(StatelessSingleValueAccumulator):
@@ -465,9 +364,6 @@ cdef class CenterMoment(StatelessSingleValueAccumulator):
     cpdef object result(self):
         return self._moment
 
-    def __deepcopy__(self, memo):
-        return CenterMoment(self._order, self._dependency)
-
 
 cdef class Skewness(StatelessSingleValueAccumulator):
 
@@ -486,9 +382,6 @@ cdef class Skewness(StatelessSingleValueAccumulator):
         except ZeroDivisionError:
             return NAN
 
-    def __deepcopy__(self, memo):
-        return Skewness(self._dependency)
-
 
 cdef class Kurtosis(StatelessSingleValueAccumulator):
 
@@ -506,9 +399,6 @@ cdef class Kurtosis(StatelessSingleValueAccumulator):
             return self._kurtosis.result()
         except ZeroDivisionError:
             return NAN
-
-    def __deepcopy__(self, memo):
-        return Kurtosis(self._dependency)
 
 
 cdef class Rank(StatelessSingleValueAccumulator):
@@ -532,9 +422,6 @@ cdef class Rank(StatelessSingleValueAccumulator):
     cpdef object result(self):
         self._rank = [bisect.bisect_left(self._sortedList, x) for x in self._thisList]
         return self._rank
-
-    def __deepcopy__(self, memo):
-        return Rank(self._dependency)
 
 
 cdef class LevelList(StatelessSingleValueAccumulator):
@@ -560,9 +447,6 @@ cdef class LevelList(StatelessSingleValueAccumulator):
     cpdef object result(self):
         return self._levelList
 
-    def __deepcopy__(self, memo):
-        return LevelList(self._dependency)
-
 
 cdef class LevelValue(StatelessSingleValueAccumulator):
 
@@ -586,9 +470,6 @@ cdef class LevelValue(StatelessSingleValueAccumulator):
 
     cpdef object result(self):
         return self._levelValue
-
-    def __deepcopy__(self, memo):
-        return LevelValue(self._dependency)
 
 
 cdef class AutoCorrelation(StatelessSingleValueAccumulator):
@@ -623,9 +504,6 @@ cdef class AutoCorrelation(StatelessSingleValueAccumulator):
                 return NAN
             return self._AutoCorrMatrix[0, 1]
 
-    def __deepcopy__(self, memo):
-        return AutoCorrelation(self._lags, self._dependency)
-
 
 cdef class StatelessMultiValueAccumulator(Accumulator):
 
@@ -644,9 +522,6 @@ cdef class StatelessMultiValueAccumulator(Accumulator):
             self._dependency.push(data)
             value = self._dependency.result()
         return value
-
-    def __deepcopy__(self, memo):
-        return StatelessMultiValueAccumulator(self._dependency)
 
 
 cdef class Correlation(StatelessMultiValueAccumulator):
@@ -685,6 +560,3 @@ cdef class Correlation(StatelessMultiValueAccumulator):
             return nominator / denominator
         else:
             return NAN
-
-    def __deepcopy__(self, memo):
-        return Correlation(self._dependency)

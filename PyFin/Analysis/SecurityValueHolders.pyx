@@ -383,18 +383,6 @@ cdef class FilteredSecurityValueHolder(SecurityValueHolder):
         self._filter.push(data)
         self.updated = 0
 
-    def __deepcopy__(self, memo):
-        return FilteredSecurityValueHolder(self._computer, self._filter)
-
-    def __reduce__(self):
-        d = {}
-
-        return FilteredSecurityValueHolder, (self._computer, self._filter), d
-
-    def __setstate__(self, state):
-        pass
-
-
 
 cdef class IdentitySecurityValueHolder(SecurityValueHolder):
 
@@ -424,17 +412,6 @@ cdef class IdentitySecurityValueHolder(SecurityValueHolder):
 
     cpdef value_by_names(self, list names):
         return self._value
-
-    def __deepcopy__(self, memo):
-        return IdentitySecurityValueHolder(self._value)
-
-    def __reduce__(self):
-        d = {}
-
-        return IdentitySecurityValueHolder, (self._value,), d
-
-    def __setstate__(self, state):
-        pass
 
 
 cdef class SecurityConstArrayValueHolder(SecurityValueHolder):
@@ -472,17 +449,6 @@ cdef class SecurityConstArrayValueHolder(SecurityValueHolder):
     @property
     def value(self):
         return self._values
-
-    def __deepcopy__(self, memo):
-        return SecurityConstArrayValueHolder(self._values)
-
-    def __reduce__(self):
-        d = {}
-
-        return SecurityConstArrayValueHolder, (self._values,), d
-
-    def __setstate__(self, state):
-        pass
 
 
 cdef class SecurityUnitoryValueHolder(SecurityValueHolder):
@@ -543,33 +509,11 @@ cdef class SecurityNegValueHolder(SecurityUnitoryValueHolder):
     def __str__(self):
         return "-{0}".format(str(self._right))
 
-    def __deepcopy__(self, memo):
-        return SecurityNegValueHolder(self._right)
-
-    def __reduce__(self):
-        d = {}
-
-        return SecurityNegValueHolder, (self._right,), d
-
-    def __setstate__(self, state):
-        pass
-
 
 cdef class SecurityInvertValueHolder(SecurityUnitoryValueHolder):
     def __init__(self, right):
         super(SecurityInvertValueHolder, self).__init__(
             right, operator.invert)
-
-    def __deepcopy__(self, memo):
-        return SecurityInvertValueHolder(self._right)
-
-    def __reduce__(self):
-        d = {}
-
-        return SecurityInvertValueHolder, (self._right,), d
-
-    def __setstate__(self, state):
-        pass
 
 
 cdef class SecurityLatestValueHolder(SecurityValueHolder):
@@ -597,16 +541,6 @@ cdef class SecurityLatestValueHolder(SecurityValueHolder):
 
         copied.copy_attributes(self.collect_attributes(), is_deep=True)
         return copied
-
-    def __reduce__(self):
-        d = self.collect_attributes()
-        if self._compHolder:
-            return SecurityLatestValueHolder, (self._compHolder,), d
-        else:
-            return SecurityLatestValueHolder, (self._dependency,), d
-
-    def __setstate__(self, state):
-        self.copy_attributes(state, is_deep=False)
 
 
 cdef class SecurityCombinedValueHolder(SecurityValueHolder):
@@ -670,9 +604,6 @@ cdef class SecurityCombinedValueHolder(SecurityValueHolder):
         else:
             return self._op(self._left.value_by_names(names), self._right.value_by_names(names))
 
-    def __deepcopy__(self, memo):
-        return SecurityCombinedValueHolder(self._left, self._right, self._op)
-
 
 cdef class SecurityXorValuedHolder(SecurityCombinedValueHolder):
     def __init__(self, left, right):
@@ -688,16 +619,6 @@ cdef class SecurityXorValuedHolder(SecurityCombinedValueHolder):
     def __str__(self):
         return "({0}, {1})".format(str(self._left), str(self._right))
 
-    def __deepcopy__(self, memo):
-        return SecurityXorValuedHolder(self._left, self._right)
-
-    def __reduce__(self):
-        d = {}
-        return SecurityXorValuedHolder, (self._left, self._right), d
-
-    def __setstate__(self, state):
-        pass
-
 
 cdef class SecurityAddedValueHolder(SecurityCombinedValueHolder):
     def __init__(self, left, right):
@@ -708,17 +629,6 @@ cdef class SecurityAddedValueHolder(SecurityCombinedValueHolder):
         return "{0} + {1}".format(str(self._left), str(self._right))
 
 
-    def __deepcopy__(self, memo):
-        return SecurityAddedValueHolder(self._left, self._right)
-
-    def __reduce__(self):
-        d = {}
-        return SecurityAddedValueHolder, (self._left, self._right), d
-
-    def __setstate__(self, state):
-        pass
-
-
 cdef class SecuritySubbedValueHolder(SecurityCombinedValueHolder):
     def __init__(self, left, right):
         super(SecuritySubbedValueHolder, self).__init__(
@@ -726,16 +636,6 @@ cdef class SecuritySubbedValueHolder(SecurityCombinedValueHolder):
 
     def __str__(self):
         return "{0} - {1}".format(str(self._left), str(self._right))
-
-    def __deepcopy__(self, memo):
-        return SecuritySubbedValueHolder(self._left, self._right)
-
-    def __reduce__(self):
-        d = {}
-        return SecuritySubbedValueHolder, (self._left, self._right), d
-
-    def __setstate__(self, state):
-        pass
 
 
 cdef class SecurityMultipliedValueHolder(SecurityCombinedValueHolder):
@@ -757,16 +657,6 @@ cdef class SecurityMultipliedValueHolder(SecurityCombinedValueHolder):
 
         return "{0} \\times {1}".format(s1, s2)
 
-    def __deepcopy__(self, memo):
-        return SecurityMultipliedValueHolder(self._left, self._right)
-
-    def __reduce__(self):
-        d = {}
-        return SecurityMultipliedValueHolder, (self._left, self._right), d
-
-    def __setstate__(self, state):
-        pass
-
 
 cdef class SecurityDividedValueHolder(SecurityCombinedValueHolder):
     def __init__(self, left, right):
@@ -776,31 +666,11 @@ cdef class SecurityDividedValueHolder(SecurityCombinedValueHolder):
     def __str__(self):
         return "\\frac{{{0}}}{{{1}}}".format(str(self._left), str(self._right))
 
-    def __deepcopy__(self, memo):
-        return SecurityDividedValueHolder(self._left, self._right)
-
-    def __reduce__(self):
-        d = {}
-        return SecurityDividedValueHolder, (self._left, self._right), d
-
-    def __setstate__(self, state):
-        pass
-
 
 cdef class SecurityLtOperatorValueHolder(SecurityCombinedValueHolder):
     def __init__(self, left, right):
         super(SecurityLtOperatorValueHolder, self).__init__(
             left, right, operator.lt)
-
-    def __deepcopy__(self, memo):
-        return SecurityLtOperatorValueHolder(self._left, self._right)
-
-    def __reduce__(self):
-        d = {}
-        return SecurityLtOperatorValueHolder, (self._left, self._right), d
-
-    def __setstate__(self, state):
-        pass
 
 
 cdef class SecurityLeOperatorValueHolder(SecurityCombinedValueHolder):
@@ -808,31 +678,11 @@ cdef class SecurityLeOperatorValueHolder(SecurityCombinedValueHolder):
         super(SecurityLeOperatorValueHolder, self).__init__(
             left, right, operator.le)
 
-    def __deepcopy__(self, memo):
-        return SecurityLeOperatorValueHolder(self._left, self._right)
-
-    def __reduce__(self):
-        d = {}
-        return SecurityLeOperatorValueHolder, (self._left, self._right), d
-
-    def __setstate__(self, state):
-        pass
-
 
 cdef class SecurityGtOperatorValueHolder(SecurityCombinedValueHolder):
     def __init__(self, left, right):
         super(SecurityGtOperatorValueHolder, self).__init__(
             left, right, operator.gt)
-
-    def __deepcopy__(self, memo):
-        return SecurityGtOperatorValueHolder(self._left, self._right)
-
-    def __reduce__(self):
-        d = {}
-        return SecurityGtOperatorValueHolder, (self._left, self._right), d
-
-    def __setstate__(self, state):
-        pass
 
 
 cdef class SecurityGeOperatorValueHolder(SecurityCombinedValueHolder):
@@ -840,31 +690,11 @@ cdef class SecurityGeOperatorValueHolder(SecurityCombinedValueHolder):
         super(SecurityGeOperatorValueHolder, self).__init__(
             left, right, operator.ge)
 
-    def __deepcopy__(self, memo):
-        return SecurityGeOperatorValueHolder(self._left, self._right)
-
-    def __reduce__(self):
-        d = {}
-        return SecurityGeOperatorValueHolder, (self._left, self._right), d
-
-    def __setstate__(self, state):
-        pass
-
 
 cdef class SecurityEqOperatorValueHolder(SecurityCombinedValueHolder):
     def __init__(self, left, right):
         super(SecurityEqOperatorValueHolder, self).__init__(
             left, right, operator.eq)
-
-    def __deepcopy__(self, memo):
-        return SecurityEqOperatorValueHolder(self._left, self._right)
-
-    def __reduce__(self):
-        d = {}
-        return SecurityEqOperatorValueHolder, (self._left, self._right), d
-
-    def __setstate__(self, state):
-        pass
 
 
 cdef class SecurityNeOperatorValueHolder(SecurityCombinedValueHolder):
@@ -872,47 +702,17 @@ cdef class SecurityNeOperatorValueHolder(SecurityCombinedValueHolder):
         super(SecurityNeOperatorValueHolder, self).__init__(
             left, right, operator.ne)
 
-    def __deepcopy__(self, memo):
-        return SecurityNeOperatorValueHolder(self._left, self._right)
-
-    def __reduce__(self):
-        d = {}
-        return SecurityNeOperatorValueHolder, (self._left, self._right), d
-
-    def __setstate__(self, state):
-        pass
-
 
 cdef class SecurityAndOperatorValueHolder(SecurityCombinedValueHolder):
     def __init__(self, left, right):
         super(SecurityAndOperatorValueHolder, self).__init__(
             left, right, operator.__and__)
 
-    def __deepcopy__(self, memo):
-        return SecurityAndOperatorValueHolder(self._left, self._right)
-
-    def __reduce__(self):
-        d = {}
-        return SecurityAndOperatorValueHolder, (self._left, self._right), d
-
-    def __setstate__(self, state):
-        pass
-
 
 cdef class SecurityOrOperatorValueHolder(SecurityCombinedValueHolder):
     def __init__(self, left, right):
         super(SecurityOrOperatorValueHolder, self).__init__(
             left, right, operator.__or__)
-
-    def __deepcopy__(self, memo):
-        return SecurityOrOperatorValueHolder(self._left, self._right)
-
-    def __reduce__(self):
-        d = {}
-        return SecurityOrOperatorValueHolder, (self._left, self._right), d
-
-    def __setstate__(self, state):
-        pass
 
 
 cdef class SecurityShiftedValueHolder(SecurityValueHolder):
@@ -933,25 +733,6 @@ cdef class SecurityShiftedValueHolder(SecurityValueHolder):
             return "\\mathrm{{Shift}}({0}, {1})".format(str(self._compHolder), self._holderTemplate.lag())
         else:
             return "\\mathrm{{Shift}}(''\\text{{{0}}}'', {1})".format(self._dependency, self._holderTemplate.lag())
-
-    def __deepcopy__(self, memo):
-        if self._compHolder:
-            copied = SecurityShiftedValueHolder(self._compHolder, self._holderTemplate.lag())
-        else:
-            copied = SecurityShiftedValueHolder(self._dependency, self._holderTemplate.lag())
-
-        copied.copy_attributes(self.collect_attributes(), is_deep=True)
-        return copied
-
-    def __reduce__(self):
-        d = self.collect_attributes()
-        if self._compHolder:
-            return SecurityShiftedValueHolder, (self._compHolder, self._holderTemplate.lag()), d
-        else:
-            return SecurityShiftedValueHolder, (self._dependency, self._holderTemplate.lag()), d
-
-    def __setstate__(self, state):
-        self.copy_attributes(state, is_deep=False)
 
 
 cdef class SecurityIIFValueHolder(SecurityValueHolder):
@@ -1066,16 +847,6 @@ cdef class SecurityIIFValueHolder(SecurityValueHolder):
                                          left_value,
                                          right_value),
                                 flag_value.name_mapping)
-
-    def __deepcopy__(self, memo):
-        return SecurityIIFValueHolder(self._flag, self._left, self._right)
-
-    def __reduce__(self):
-        d = {}
-        return SecurityIIFValueHolder, (self._flag, self._left, self._right), d
-
-    def __setstate__(self, state):
-        pass
 
 
 def dependencyCalculator(*args):

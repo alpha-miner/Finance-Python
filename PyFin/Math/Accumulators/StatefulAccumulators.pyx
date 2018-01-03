@@ -61,17 +61,6 @@ cdef class StatefulValueHolder(Accumulator):
         attributes['_deque'] = self._deque
         return attributes
 
-    def __deepcopy__(self, memo):
-        return StatefulValueHolder(self._window, self._dependency)
-
-    def __reduce__(self):
-        d = {}
-
-        return StatefulValueHolder, (self._window, self._dependency), d
-
-    def __setstate__(self, state):
-        pass
-
 
 cdef class Shift(StatefulValueHolder):
 
@@ -99,24 +88,6 @@ cdef class Shift(StatefulValueHolder):
         return '\mathrm{{Shift}}({0}, {1})'.format(str(self._valueHolder),
                                                    self._window - self._valueHolder.window)
 
-    def __deepcopy__(self, memo):
-        copied = Shift(self._valueHolder, self.lag())
-        copied.copy_attributes(self.collect_attributes(), is_deep=True)
-        copied._valueHolder = copy.deepcopy(self._valueHolder)
-        copied._popout = self._popout
-        return copied
-
-    def __reduce__(self):
-        d = self.collect_attributes()
-        d['_valueHolder'] = self._valueHolder
-        d['_popout'] = self._popout
-        return Shift, (self._valueHolder, self.lag()), d
-
-    def __setstate__(self, state):
-        self.copy_attributes(state, is_deep=False)
-        self._valueHolder = state['_valueHolder']
-        self._popout = state['_popout']
-
 
 cdef class SingleValuedValueHolder(StatefulValueHolder):
     def __init__(self, window, dependency):
@@ -138,17 +109,6 @@ cdef class SingleValuedValueHolder(StatefulValueHolder):
             return comp.result()
         else:
             return NAN
-
-    def __deepcopy__(self, memo):
-        return SingleValuedValueHolder(self._window, self._dependency)
-
-    def __reduce__(self):
-        d = {}
-
-        return SingleValuedValueHolder, (self._window, self._dependency), d
-
-    def __setstate__(self, state):
-        pass
 
 
 cdef class SortedValueHolder(SingleValuedValueHolder):
@@ -184,17 +144,6 @@ cdef class SortedValueHolder(SingleValuedValueHolder):
         attributes['_sortedArray'] = self._sortedArray
         return attributes
 
-    def __deepcopy__(self, memo):
-        return SortedValueHolder(self._window, self._dependency)
-
-    def __reduce__(self):
-        d = {}
-
-        return SortedValueHolder, (self._window, self._dependency), d
-
-    def __setstate__(self, state):
-        pass
-
 
 cdef class MovingMax(SortedValueHolder):
     def __init__(self, window, dependency='x'):
@@ -212,18 +161,6 @@ cdef class MovingMax(SortedValueHolder):
         else:
             return "\\mathrm{{MMax}}({0}, ''\\text{{{1}}}'')".format(self._window, str(self._dependency))
 
-    def __deepcopy__(self, memo):
-        copied = MovingMax(self._window, self._dependency)
-        copied.copy_attributes(self.collect_attributes(), is_deep=True)
-        return copied
-
-    def __reduce__(self):
-        d = self.collect_attributes()
-        return MovingMax, (self._window, self._dependency), d
-
-    def __setstate__(self, state):
-        self.copy_attributes(state, is_deep=False)
-
 
 cdef class MovingMin(SortedValueHolder):
     def __init__(self, window, dependency='x'):
@@ -240,18 +177,6 @@ cdef class MovingMin(SortedValueHolder):
             return "\\mathrm{{MMin}}({0}, {1})".format(self._window, str(self._dependency))
         else:
             return "\\mathrm{{MMin}}({0}, ''\\text{{{1}}}'')".format(self._window, str(self._dependency))
-
-    def __deepcopy__(self, memo):
-        copied = MovingMin(self._window, self._dependency)
-        copied.copy_attributes(self.collect_attributes(), is_deep=True)
-        return copied
-
-    def __reduce__(self):
-        d = self.collect_attributes()
-        return MovingMin, (self._window, self._dependency), d
-
-    def __setstate__(self, state):
-        self.copy_attributes(state, is_deep=False)
 
 
 cdef class MovingQuantile(SortedValueHolder):
@@ -271,18 +196,6 @@ cdef class MovingQuantile(SortedValueHolder):
             return "\\mathrm{{MQuantile}}({0}, {1})".format(self._window, str(self._dependency))
         else:
             return "\\mathrm{{MQuantile}}({0}, ''\\text{{{1}}}'')".format(self._window, str(self._dependency))
-
-    def __deepcopy__(self, memo):
-        copied = MovingQuantile(self._window, self._dependency)
-        copied.copy_attributes(self.collect_attributes(), is_deep=True)
-        return copied
-
-    def __reduce__(self):
-        d = self.collect_attributes()
-        return MovingQuantile, (self._window, self._dependency), d
-
-    def __setstate__(self, state):
-        self.copy_attributes(state, is_deep=False)
 
 
 cdef class MovingAllTrue(SingleValuedValueHolder):
@@ -320,21 +233,6 @@ cdef class MovingAllTrue(SingleValuedValueHolder):
         else:
             return "\\mathrm{{MAllTrue}}({0}, ''\\text{{{1}}}'')".format(self._window, str(self._dependency))
 
-    def __deepcopy__(self, memo):
-        copied = MovingAllTrue(self._window, self._dependency)
-        copied.copy_attributes(self.collect_attributes(), is_deep=True)
-        copied._countedTrue = self._countedTrue
-        return copied
-
-    def __reduce__(self):
-        d = self.collect_attributes()
-        d['_countedTrue'] = self._countedTrue
-        return MovingAllTrue, (self._window, self._dependency), d
-
-    def __setstate__(self, state):
-        self.copy_attributes(state, is_deep=False)
-        self._countedTrue = state['_countedTrue']
-
 
 cdef class MovingAnyTrue(SingleValuedValueHolder):
 
@@ -371,21 +269,6 @@ cdef class MovingAnyTrue(SingleValuedValueHolder):
         else:
             return "\\mathrm{{MAnyTrue}}({0}, ''\\text{{{1}}}'')".format(self._window, str(self._dependency))
 
-    def __deepcopy__(self, memo):
-        copied = MovingAnyTrue(self._window, self._dependency)
-        copied.copy_attributes(self.collect_attributes(), is_deep=True)
-        copied._countedTrue = self._countedTrue
-        return copied
-
-    def __reduce__(self):
-        d = self.collect_attributes()
-        d['_countedTrue'] = self._countedTrue
-        return MovingAnyTrue, (self._window, self._dependency), d
-
-    def __setstate__(self, state):
-        self.copy_attributes(state, is_deep=False)
-        self._countedTrue = state['_countedTrue']
-
 
 cdef class MovingSum(SingleValuedValueHolder):
 
@@ -414,21 +297,6 @@ cdef class MovingSum(SingleValuedValueHolder):
             return "\\mathrm{{MSum}}({0}, {1})".format(self._window, str(self._dependency))
         else:
             return "\\mathrm{{MSum}}({0}, ''\\text{{{1}}}'')".format(self._window, str(self._dependency))
-
-    def __deepcopy__(self, memo):
-        copied = MovingSum(self._window, self._dependency)
-        copied.copy_attributes(self.collect_attributes(), is_deep=True)
-        copied._runningSum = self._runningSum
-        return copied
-
-    def __reduce__(self):
-        d = self.collect_attributes()
-        d['_runningSum'] = self._runningSum
-        return MovingSum, (self._window, self._dependency), d
-
-    def __setstate__(self, state):
-        self.copy_attributes(state, is_deep=False)
-        self._runningSum = state['_runningSum']
 
 
 cdef class MovingAverage(SingleValuedValueHolder):
@@ -461,22 +329,6 @@ cdef class MovingAverage(SingleValuedValueHolder):
             return "\\mathrm{{MA}}({0}, {1})".format(self._window, str(self._dependency))
         else:
             return "\\mathrm{{MA}}({0}, ''\\text{{{1}}}'')".format(self._window, str(self._dependency))
-
-    def __deepcopy__(self, memo):
-        copied = MovingAverage(self._window, self._dependency)
-
-        copied.copy_attributes(self.collect_attributes(), is_deep=True)
-        copied._runningSum = self._runningSum
-        return copied
-
-    def __reduce__(self):
-        d = self.collect_attributes()
-        d['_runningSum'] = self._runningSum
-        return MovingAverage, (self._window, self._dependency), d
-
-    def __setstate__(self, state):
-        self.copy_attributes(state, is_deep=False)
-        self._runningSum = state['_runningSum']
 
 
 cdef class MovingPositiveAverage(SingleValuedValueHolder):
@@ -517,25 +369,6 @@ cdef class MovingPositiveAverage(SingleValuedValueHolder):
         else:
             return "\\mathrm{{mposavg}}({0}, ''\\text{{{1}}}'')".format(self._window, str(self._dependency))
 
-    def __deepcopy__(self, memo):
-        copied = MovingPositiveAverage(self._window, self._dependency)
-
-        copied.copy_attributes(self.collect_attributes(), is_deep=True)
-        copied._runningPositiveCount = self._runningPositiveCount
-        copied._runningPositiveSum = self._runningPositiveSum
-        return copied
-
-    def __reduce__(self):
-        d = self.collect_attributes()
-        d['_runningPositiveCount'] = self._runningPositiveCount
-        d['_runningPositiveSum'] = self._runningPositiveSum
-        return MovingPositiveAverage, (self._window, self._dependency), d
-
-    def __setstate__(self, state):
-        self.copy_attributes(state, is_deep=False)
-        self._runningPositiveCount = state['_runningPositiveCount']
-        self._runningPositiveSum = state['_runningPositiveSum']
-
 
 cdef class MovingPositiveDifferenceAverage(SingleValuedValueHolder):
 
@@ -557,21 +390,6 @@ cdef class MovingPositiveDifferenceAverage(SingleValuedValueHolder):
         else:
             return "\\mathrm{{mposdiffavg}}({0}, ''\\text{{{1}}}'')".format(self._window, str(self._dependency))
 
-    def __deepcopy__(self, memo):
-        copied = MovingPositiveDifferenceAverage(self._window, self._dependency)
-        copied.copy_attributes(self.collect_attributes(), is_deep=True)
-        copied._runningAverage = copy.deepcopy(self._runningAverage)
-        return copied
-
-    def __reduce__(self):
-        d = self.collect_attributes()
-        d['_runningAverage'] = self._runningAverage
-        return MovingPositiveDifferenceAverage, (self._window, self._dependency), d
-
-    def __setstate__(self, state):
-        self.copy_attributes(state, is_deep=False)
-        self._runningAverage = state['_runningAverage']
-
 
 cdef class MovingNegativeDifferenceAverage(SingleValuedValueHolder):
 
@@ -592,22 +410,6 @@ cdef class MovingNegativeDifferenceAverage(SingleValuedValueHolder):
             return "\\mathrm{{mnegdiffavg}}({0}, {1})".format(self._window, str(self._dependency))
         else:
             return "\\mathrm{{mnegdiffavg}}({0}, ''\\text{{{1}}}'')".format(self._window, str(self._dependency))
-
-    def __deepcopy__(self, memo):
-        copied = MovingNegativeDifferenceAverage(self._window, self._dependency)
-
-        copied.copy_attributes(self.collect_attributes(), is_deep=True)
-        copied._runningAverage = copy.deepcopy(self._runningAverage)
-        return copied
-
-    def __reduce__(self):
-        d = self.collect_attributes()
-        d['_runningAverage'] = self._runningAverage
-        return MovingNegativeDifferenceAverage, (self._window, self._dependency), d
-
-    def __setstate__(self, state):
-        self.copy_attributes(state, is_deep=False)
-        self._runningAverage = state['_runningAverage']
 
 
 cdef class MovingRSI(SingleValuedValueHolder):
@@ -636,25 +438,6 @@ cdef class MovingRSI(SingleValuedValueHolder):
             return "\\mathrm{{mrsi}}({0}, {1})".format(self._window, str(self._dependency))
         else:
             return "\\mathrm{{mrsi}}({0}, ''\\text{{{1}}}'')".format(self._window, str(self._dependency))
-
-    def __deepcopy__(self, memo):
-        copied = MovingRSI(self._window, self._dependency)
-
-        copied.copy_attributes(self.collect_attributes(), is_deep=True)
-        copied._posDiffAvg = copy.deepcopy(self._posDiffAvg)
-        copied._negDiffAvg = copy.deepcopy(self._negDiffAvg)
-        return copied
-
-    def __reduce__(self):
-        d = self.collect_attributes()
-        d['_posDiffAvg'] = self._posDiffAvg
-        d['_negDiffAvg'] = self._negDiffAvg
-        return MovingRSI, (self._window, self._dependency), d
-
-    def __setstate__(self, state):
-        self.copy_attributes(state, is_deep=False)
-        self._posDiffAvg = state['_posDiffAvg']
-        self._negDiffAvg = state['_negDiffAvg']
 
 
 cdef class MovingNegativeAverage(SingleValuedValueHolder):
@@ -692,25 +475,6 @@ cdef class MovingNegativeAverage(SingleValuedValueHolder):
             return "\\mathrm{{mnegavg}}({0}, {1})".format(self._window, str(self._dependency))
         else:
             return "\\mathrm{{mnegavg}}({0}, ''\\text{{{1}}}'')".format(self._window, str(self._dependency))
-
-    def __deepcopy__(self, memo):
-        copied = MovingNegativeAverage(self._window, self._dependency)
-
-        copied.copy_attributes(self.collect_attributes(), is_deep=True)
-        copied._runningNegativeSum = self._runningNegativeSum
-        copied._runningNegativeCount = self._runningNegativeCount
-        return copied
-
-    def __reduce__(self):
-        d = self.collect_attributes()
-        d['_runningNegativeSum'] = self._runningNegativeSum
-        d['_runningNegativeCount'] = self._runningNegativeCount
-        return MovingNegativeAverage, (self._window, self._dependency), d
-
-    def __setstate__(self, state):
-        self.copy_attributes(state, is_deep=False)
-        self._runningNegativeSum = state['_runningNegativeSum']
-        self._runningNegativeCount = state['_runningNegativeCount']
 
 
 cdef class MovingVariance(SingleValuedValueHolder):
@@ -760,25 +524,6 @@ cdef class MovingVariance(SingleValuedValueHolder):
         else:
             return "\\mathrm{{mvar}}({0}, ''\\text{{{1}}}'', {2})".format(self._window, str(self._dependency), self._isPop)
 
-    def __deepcopy__(self, memo):
-        copied = MovingVariance(self._window, self._dependency, self._isPop)
-
-        copied.copy_attributes(self.collect_attributes(), is_deep=True)
-        copied._runningSum = self._runningSum
-        copied._runningSumSquare = self._runningSumSquare
-        return copied
-
-    def __reduce__(self):
-        d = self.collect_attributes()
-        d['_runningSum'] = self._runningSum
-        d['_runningSumSquare'] = self._runningSumSquare
-        return MovingVariance, (self._window, self._dependency, self._isPop), d
-
-    def __setstate__(self, state):
-        self.copy_attributes(state, is_deep=False)
-        self._runningSum = state['_runningSum']
-        self._runningSumSquare = state['_runningSumSquare']
-
 
 cdef class MovingStandardDeviation(SingleValuedValueHolder):
 
@@ -826,25 +571,6 @@ cdef class MovingStandardDeviation(SingleValuedValueHolder):
             return "\\mathrm{{mstd}}({0}, {1}, {2})".format(self._window, str(self._dependency), self._isPop)
         else:
             return "\\mathrm{{mstd}}({0}, ''\\text{{{1}}}'', {2})".format(self._window, str(self._dependency), self._isPop)
-
-    def __deepcopy__(self, memo):
-        copied = MovingStandardDeviation(self._window, self._dependency, self._isPop)
-
-        copied.copy_attributes(self.collect_attributes(), is_deep=True)
-        copied._runningSum = self._runningSum
-        copied._runningSumSquare = self._runningSumSquare
-        return copied
-
-    def __reduce__(self):
-        d = self.collect_attributes()
-        d['_runningSum'] = self._runningSum
-        d['_runningSumSquare'] = self._runningSumSquare
-        return MovingStandardDeviation, (self._window, self._dependency, self._isPop), d
-
-    def __setstate__(self, state):
-        self.copy_attributes(state, is_deep=False)
-        self._runningSum = state['_runningSum']
-        self._runningSumSquare = state['_runningSumSquare']
 
 
 cdef class MovingNegativeVariance(SingleValuedValueHolder):
@@ -904,28 +630,6 @@ cdef class MovingNegativeVariance(SingleValuedValueHolder):
         else:
             return "\\mathrm{{mnegvar}}({0}, ''\\text{{{1}}}'', {2})".format(self._window, str(self._dependency), self._isPop)
 
-    def __deepcopy__(self, memo):
-        copied = MovingNegativeVariance(self._window, self._dependency, self._isPop)
-
-        copied.copy_attributes(self.collect_attributes(), is_deep=True)
-        copied._runningNegativeSum = self._runningNegativeSum
-        copied._runningNegativeSumSquare = self._runningNegativeSumSquare
-        copied._runningNegativeCount = self._runningNegativeCount
-        return copied
-
-    def __reduce__(self):
-        d = self.collect_attributes()
-        d['_runningNegativeSum'] = self._runningNegativeSum
-        d['_runningNegativeSumSquare'] = self._runningNegativeSumSquare
-        d['_runningNegativeCount'] = self._runningNegativeCount
-        return MovingNegativeVariance, (self._window, self._dependency, self._isPop), d
-
-    def __setstate__(self, state):
-        self.copy_attributes(state, is_deep=False)
-        self._runningNegativeSum = state['_runningNegativeSum']
-        self._runningNegativeSumSquare = state['_runningNegativeSumSquare']
-        self._runningNegativeCount = state['_runningNegativeCount']
-
 
 cdef class MovingCountedPositive(SingleValuedValueHolder):
 
@@ -956,22 +660,6 @@ cdef class MovingCountedPositive(SingleValuedValueHolder):
             return "\\mathrm{{mposcount}}({0}, {1})".format(self._window, str(self._dependency))
         else:
             return "\\mathrm{{mposcount}}({0}, ''\\text{{{1}}}''".format(self._window, str(self._dependency))
-
-    def __deepcopy__(self, memo):
-        copied = MovingCountedPositive(self._window, self._dependency)
-
-        copied.copy_attributes(self.collect_attributes(), is_deep=True)
-        copied._counts = self._counts
-        return copied
-
-    def __reduce__(self):
-        d = self.collect_attributes()
-        d['_counts'] = self._counts
-        return MovingCountedPositive, (self._window, self._dependency), d
-
-    def __setstate__(self, state):
-        self.copy_attributes(state, is_deep=False)
-        self._counts = state['_counts']
 
 
 cdef class MovingCountedNegative(SingleValuedValueHolder):
@@ -1004,22 +692,6 @@ cdef class MovingCountedNegative(SingleValuedValueHolder):
         else:
             return "\\mathrm{{mnegcount}}({0}, ''\\text{{{1}}}''".format(self._window, str(self._dependency))
 
-    def __deepcopy__(self, memo):
-        copied = MovingCountedNegative(self._window, self._dependency)
-
-        copied.copy_attributes(self.collect_attributes(), is_deep=True)
-        copied._counts = self._counts
-        return copied
-
-    def __reduce__(self):
-        d = self.collect_attributes()
-        d['_counts'] = self._counts
-        return MovingCountedNegative, (self._window, self._dependency), d
-
-    def __setstate__(self, state):
-        self.copy_attributes(state, is_deep=False)
-        self._counts = state['_counts']
-
 
 cdef class MovingHistoricalWindow(StatefulValueHolder):
     def __init__(self, window, dependency='x'):
@@ -1049,19 +721,6 @@ cdef class MovingHistoricalWindow(StatefulValueHolder):
 
     cpdef object result(self):
         return [self.__getitem__(i) for i in range(self.size())]
-
-    def __deepcopy__(self, memo):
-        copied = MovingHistoricalWindow(self._window, self._dependency)
-
-        copied.copy_attributes(self.collect_attributes(), is_deep=True)
-        return copied
-
-    def __reduce__(self):
-        d = self.collect_attributes()
-        return MovingHistoricalWindow, (self._window, self._dependency), d
-
-    def __setstate__(self, state):
-        self.copy_attributes(state, is_deep=False)
 
 
 # Calculator for one pair of series
@@ -1115,17 +774,6 @@ cdef class MovingCorrelation(StatefulValueHolder):
         else:
             return "\\mathrm{{mcorr}}({0}, ''\\text{{{1}}}''".format(self._window, str(self._dependency))
 
-    def __deepcopy__(self, memo):
-        return MovingCorrelation(self._window, self._dependency)
-
-    def __reduce__(self):
-        d = {}
-
-        return MovingCorrelation, (self._window, self._dependency), d
-
-    def __setstate__(self, state):
-        pass
-
 
 # Calculator for several series
 cdef class MovingCorrelationMatrix(StatefulValueHolder):
@@ -1167,17 +815,6 @@ cdef class MovingCorrelationMatrix(StatefulValueHolder):
         else:
             return np.ones(len(self._runningSum)) * NAN
 
-    def __deepcopy__(self, memo):
-        return MovingCorrelationMatrix(self._window, self._dependency)
-
-    def __reduce__(self):
-        d = {}
-
-        return MovingCorrelationMatrix, (self._window, self._dependency), d
-
-    def __setstate__(self, state):
-        pass
-
 
 cdef class MovingProduct(SingleValuedValueHolder):
 
@@ -1209,21 +846,6 @@ cdef class MovingProduct(SingleValuedValueHolder):
         else:
             return "\\mathrm{{mprod}}({0}, ''\\text{{{1}}}''".format(self._window, str(self._dependency))
 
-    def __deepcopy__(self, memo):
-        copied = MovingProduct(self._window, self._dependency)
-        copied.copy_attributes(self.collect_attributes(), is_deep=True)
-        copied._runningProduct = self._runningProduct
-        return copied
-
-    def __reduce__(self):
-        d = self.collect_attributes()
-        d['_runningProduct'] = self._runningProduct
-        return MovingProduct, (self._window, self._dependency), d
-
-    def __setstate__(self, state):
-        self.copy_attributes(state, is_deep=False)
-        self._runningProduct = state['_runningProduct']
-
 
 cdef class MovingCenterMoment(SingleValuedValueHolder):
 
@@ -1247,21 +869,6 @@ cdef class MovingCenterMoment(SingleValuedValueHolder):
     cpdef object result(self):
         return self._runningMoment
 
-    def __deepcopy__(self, memo):
-        copied = MovingCenterMoment(self._window, self._order, self._dependency)
-        copied.copy_attributes(self.collect_attributes(), is_deep=True)
-        copied._runningMoment = self._runningMoment
-        return copied
-
-    def __reduce__(self):
-        d = self.collect_attributes()
-        d['_runningMoment'] = self._runningMoment
-        return MovingCenterMoment, (self._window, self._order, self._dependency), d
-
-    def __setstate__(self, state):
-        self.copy_attributes(state, is_deep=False)
-        self._runningMoment = state['_runningMoment']
-
 
 cdef class MovingSkewness(SingleValuedValueHolder):
 
@@ -1277,21 +884,6 @@ cdef class MovingSkewness(SingleValuedValueHolder):
 
     cpdef object result(self):
         return self._runningSkewness.result()
-
-    def __deepcopy__(self, memo):
-        copied = MovingSkewness(self._window, self._dependency)
-        copied.copy_attributes(self.collect_attributes(), is_deep=True)
-        copied._runningSkewness = copy.deepcopy(self._runningSkewness)
-        return copied
-
-    def __reduce__(self):
-        d = self.collect_attributes()
-        d['_runningSkewness'] = self._runningSkewness
-        return MovingSkewness, (self._window, self._dependency), d
-
-    def __setstate__(self, state):
-        self.copy_attributes(state, is_deep=False)
-        self._runningSkewness = state['_runningSkewness']
 
 
 cdef class MovingMaxPos(SortedValueHolder):
@@ -1309,24 +901,6 @@ cdef class MovingMaxPos(SortedValueHolder):
         self._runningTsMaxPos = tmpList.index(self._max)
         return self._runningTsMaxPos
 
-    def __deepcopy__(self, memo):
-        copied = MovingMaxPos(self._window, self._dependency)
-        copied.copy_attributes(self.collect_attributes(), is_deep=True)
-        copied._runningTsMaxPos = self._runningTsMaxPos
-        copied._max = self._max
-        return copied
-
-    def __reduce__(self):
-        d = self.collect_attributes()
-        d['_runningTsMaxPos'] = self._runningTsMaxPos
-        d['_max'] = self._max
-        return MovingMaxPos, (self._window, self._dependency), d
-
-    def __setstate__(self, state):
-        self.copy_attributes(state, is_deep=False)
-        self._runningTsMaxPos = state['_runningTsMaxPos']
-        self._max = state['_max']
-
 
 cdef class MovingMinPos(SortedValueHolder):
 
@@ -1343,24 +917,6 @@ cdef class MovingMinPos(SortedValueHolder):
         cdef list tmpList = self._deque.as_list()
         self._runningTsMinPos = tmpList.index(self._min)
         return self._runningTsMinPos
-
-    def __deepcopy__(self, memo):
-        copied = MovingMinPos(self._window, self._dependency)
-        copied.copy_attributes(self.collect_attributes(), is_deep=True)
-        copied._runningTsMinPos = self._runningTsMinPos
-        copied._min = self._min
-        return copied
-
-    def __reduce__(self):
-        d = self.collect_attributes()
-        d['_runningTsMinPos'] = self._runningTsMinPos
-        d['_min'] = self._min
-        return MovingMinPos, (self._window, self._dependency), d
-
-    def __setstate__(self, state):
-        self.copy_attributes(state, is_deep=False)
-        self._runningTsMinPos = state['_runningTsMinPos']
-        self._min = state['_min']
 
 
 cdef class MovingKurtosis(SingleValuedValueHolder):
@@ -1380,22 +936,6 @@ cdef class MovingKurtosis(SingleValuedValueHolder):
             return self._runningKurtosis.result()
         except ZeroDivisionError:
                 return NAN
-
-    def __deepcopy__(self, memo):
-        copied = MovingKurtosis(self._window, self._dependency)
-        copied.copy_attributes(self.collect_attributes(), is_deep=True)
-        copied._runningKurtosis = copy.deepcopy(self._runningKurtosis)
-        return copied
-
-    def __reduce__(self):
-        d = self.collect_attributes()
-        d['_runningKurtosis'] = self._runningKurtosis
-        return MovingKurtosis, (self._window, self._dependency), d
-
-    def __setstate__(self, state):
-        self.copy_attributes(state, is_deep=False)
-        self._runningKurtosis = state['_runningKurtosis']
-
 
 cdef class MovingRSV(SingleValuedValueHolder):
 
@@ -1417,21 +957,6 @@ cdef class MovingRSV(SingleValuedValueHolder):
         cdef list con = self._deque.as_list()
         return (self._cached_value - min(con)) / (max(con) - min(con))
 
-    def __deepcopy__(self, memo):
-        copied = MovingRSV(self._window, self._dependency)
-        copied.copy_attributes(self.collect_attributes(), is_deep=True)
-        copied._cached_value = self._cached_value
-        return copied
-
-    def __reduce__(self):
-        d = self.collect_attributes()
-        d['_cached_value'] = self._cached_value
-        return MovingRSV, (self._window, self._dependency), d
-
-    def __setstate__(self, state):
-        self.copy_attributes(state, is_deep=False)
-        self._cached_value = state['_cached_value']
-
 
 cdef class MACD(StatelessSingleValueAccumulator):
 
@@ -1448,24 +973,6 @@ cdef class MACD(StatelessSingleValueAccumulator):
     cpdef object result(self):
         return self._short_average.result() - self._long_average.result()
 
-    def __deepcopy__(self, memo):
-        copied = MACD(2. / self._short_average._exp - 1., 2. / self._long_average._exp - 1., self._dependency, type(self._short_average))
-        copied.copy_attributes(self.collect_attributes(), is_deep=True)
-        copied._short_average = copy.deepcopy(self._short_average)
-        copied._long_average = copy.deepcopy(self._long_average)
-        return copied
-
-    def __reduce__(self):
-        d = self.collect_attributes()
-        d['_short_average'] = self._short_average
-        d['_long_average'] = self._long_average
-        return MACD, (2. / self._short_average._exp - 1., 2. / self._long_average._exp - 1., self._dependency, type(self._short_average)), d
-
-    def __setstate__(self, state):
-        self.copy_attributes(state, is_deep=False)
-        self._short_average = state['_short_average']
-        self._long_average = state['_long_average']
-
 
 cdef class MovingRank(SortedValueHolder):
     def __init__(self, window, dependency='x'):
@@ -1475,21 +982,6 @@ cdef class MovingRank(SortedValueHolder):
     cpdef object result(self):
         self._runningRank = bisect.bisect_left(self._sortedArray, self._deque[self._deque.size() - 1])
         return self._runningRank
-
-    def __deepcopy__(self, memo):
-        copied = MovingRank(self._window, self._dependency)
-        copied.copy_attributes(self.collect_attributes(), is_deep=True)
-        copied._runningRank = copy.deepcopy(self._runningRank)
-        return copied
-
-    def __reduce__(self):
-        d = self.collect_attributes()
-        d['_runningRank'] = self._runningRank
-        return MovingRank, (self._window, self._dependency), d
-
-    def __setstate__(self, state):
-        self.copy_attributes(state, is_deep=False)
-        self._runningRank = state['_runningRank']
 
 
 # runningJ can be more than 1 or less than 0.
@@ -1525,27 +1017,6 @@ cdef class MovingKDJ(StatefulValueHolder):
     cpdef object result(self):
         return self._runningJ
 
-    def __deepcopy__(self, memo):
-        copied = MovingKDJ(self._window, self._k, self._d, self._dependency)
-        copied.copy_attributes(self.collect_attributes(), is_deep=True)
-        copied._runningJ = self._runningJ
-        copied._runningK = self._runningK
-        copied._runningD = self._runningD
-        return copied
-
-    def __reduce__(self):
-        d = self.collect_attributes()
-        d['_runningJ'] = self._runningJ
-        d['_runningK'] = self._runningK
-        d['_runningD'] = self._runningD
-        return MovingKDJ, (self._window, self._k, self._d, self._dependency), d
-
-    def __setstate__(self, state):
-        self.copy_attributes(state, is_deep=False)
-        self._runningJ = state['_runningJ']
-        self._runningK = state['_runningK']
-        self._runningD = state['_runningD']
-
 
 cdef class MovingAroon(SingleValuedValueHolder):
 
@@ -1566,18 +1037,6 @@ cdef class MovingAroon(SingleValuedValueHolder):
         cdef double runningAroonOsc = (tmpList.index(np.max(tmpList)) - tmpList.index(np.min(tmpList))) / self.window
         return runningAroonOsc
 
-    def __deepcopy__(self, memo):
-        copied = MovingAroon(self._window, self._dependency)
-        copied.copy_attributes(self.collect_attributes(), is_deep=True)
-        return copied
-
-    def __reduce__(self):
-        d = self.collect_attributes()
-        return MovingAroon, (self._window, self._dependency), d
-
-    def __setstate__(self, state):
-        self.copy_attributes(state, is_deep=False)
-
 
 cdef class MovingBias(SingleValuedValueHolder):
 
@@ -1597,21 +1056,6 @@ cdef class MovingBias(SingleValuedValueHolder):
 
     cpdef object result(self):
         return self._runningBias
-
-    def __deepcopy__(self, memo):
-        copied = MovingBias(self._window, self._dependency)
-        copied.copy_attributes(self.collect_attributes(), is_deep=True)
-        copied._runningBias = self._runningBias
-        return copied
-
-    def __reduce__(self):
-        d = self.collect_attributes()
-        d['_runningBias'] = self._runningBias
-        return MovingBias, (self._window, self._dependency), d
-
-    def __setstate__(self, state):
-        self.copy_attributes(state, is_deep=False)
-        self._runningBias = state['_runningBias']
 
 
 cdef class MovingLevel(SingleValuedValueHolder):
@@ -1635,21 +1079,6 @@ cdef class MovingLevel(SingleValuedValueHolder):
 
     cpdef object result(self):
         return self._runningLevel
-
-    def __deepcopy__(self, memo):
-        copied = MovingLevel(self._window, self._dependency)
-        copied.copy_attributes(self.collect_attributes(), is_deep=True)
-        copied._runningLevel = self._runningLevel
-        return copied
-
-    def __reduce__(self):
-        d = self.collect_attributes()
-        d['_runningLevel'] = self._runningLevel
-        return MovingLevel, (self._window, self._dependency), d
-
-    def __setstate__(self, state):
-        self.copy_attributes(state, is_deep=False)
-        self._runningLevel = state['_runningLevel']
 
 
 cdef class MovingAutoCorrelation(SingleValuedValueHolder):
@@ -1687,27 +1116,6 @@ cdef class MovingAutoCorrelation(SingleValuedValueHolder):
                 return NAN
             return self._runningAutoCorrMatrix[0, 1]
 
-    def __deepcopy__(self, memo):
-        copied = MovingAutoCorrelation(self._window, self._lags, self._dependency)
-        copied.copy_attributes(self.collect_attributes(), is_deep=True)
-        copied._runningVecForward = copy.deepcopy(self._runningVecForward)
-        copied._runningVecBackward = copy.deepcopy(self._runningVecBackward)
-        copied._runningAutoCorrMatrix = copy.deepcopy(self._runningAutoCorrMatrix)
-        return copied
-
-    def __reduce__(self):
-        d = self.collect_attributes()
-        d['_runningVecForward'] = self._runningVecForward
-        d['_runningVecBackward'] = self._runningVecBackward
-        d['_runningAutoCorrMatrix'] = self._runningAutoCorrMatrix
-        return MovingAutoCorrelation, (self._window, self._lags, self._dependency), d
-
-    def __setstate__(self, state):
-        self.copy_attributes(state, is_deep=False)
-        self._runningVecForward = state['_runningVecForward']
-        self._runningVecBackward = state['_runningVecBackward']
-        self._runningAutoCorrMatrix = state['_runningAutoCorrMatrix']
-
 '''
 performancer
 '''
@@ -1736,21 +1144,6 @@ cdef class MovingLogReturn(SingleValuedValueHolder):
             return self._runningReturn
         else:
             return NAN
-
-    def __deepcopy__(self, memo):
-        copied = MovingLogReturn(self._window, self._dependency)
-        copied.copy_attributes(self.collect_attributes(), is_deep=True)
-        copied._runningReturn = self._runningReturn
-        return copied
-
-    def __reduce__(self):
-        d = self.collect_attributes()
-        d['_runningReturn'] = self._runningReturn
-        return MovingLogReturn, (self._window, self._dependency), d
-
-    def __setstate__(self, state):
-        self.copy_attributes(state, is_deep=False)
-        self._runningReturn = state['_runningReturn']
 
 
 cdef class MovingSharp(StatefulValueHolder):
@@ -1785,24 +1178,6 @@ cdef class MovingSharp(StatefulValueHolder):
         else:
             return NAN
 
-    def __deepcopy__(self, memo):
-        copied = MovingSharp(self._window, self._dependency)
-        copied.copy_attributes(self.collect_attributes(), is_deep=True)
-        copied._mean = copy.deepcopy(self._mean)
-        copied._var = copy.deepcopy(self._var)
-        return copied
-
-    def __reduce__(self):
-        d = self.collect_attributes()
-        d['_mean'] = self._mean
-        d['_var'] = self._var
-        return MovingSharp, (self._window, self._dependency), d
-
-    def __setstate__(self, state):
-        self.copy_attributes(state, is_deep=False)
-        self._mean = state['_mean']
-        self._var = state['_var']
-
 
 cdef class MovingSortino(StatefulValueHolder):
 
@@ -1834,24 +1209,6 @@ cdef class MovingSortino(StatefulValueHolder):
             return self._mean.result() /sqrt(self._negativeVar.result())
         else:
             return NAN
-
-    def __deepcopy__(self, memo):
-        copied = MovingSortino(self._window, self._dependency)
-        copied.copy_attributes(self.collect_attributes(), is_deep=True)
-        copied._mean = copy.deepcopy(self._mean)
-        copied._negativeVar = copy.deepcopy(self._negativeVar)
-        return copied
-
-    def __reduce__(self):
-        d = self.collect_attributes()
-        d['_mean'] = self._mean
-        d['_negativeVar'] = self._negativeVar
-        return MovingSortino, (self._window, self._dependency), d
-
-    def __setstate__(self, state):
-        self.copy_attributes(state, is_deep=False)
-        self._mean = state['_mean']
-        self._negativeVar = state['_negativeVar']
 
 
 cdef class MovingResidue(StatefulValueHolder):
@@ -1899,30 +1256,6 @@ cdef class MovingResidue(StatefulValueHolder):
             return "\\mathrm{{Res}}({0}, {1})".format(self._window, str(self._dependency))
         else:
             return "\\mathrm{{Res}}({0}, \\text{{{1}}})".format(self._window, str(self._dependency))
-
-    def __deepcopy__(self, memo):
-        copied = MovingResidue(self._window, self._dependency)
-        copied.copy_attributes(self.collect_attributes(), is_deep=True)
-        copied._cross = self._cross
-        copied._xsquare = self._xsquare
-        copied._lastx = self._lastx
-        copied._lasty = self._lasty
-        return copied
-
-    def __reduce__(self):
-        d = self.collect_attributes()
-        d['_cross'] = self._cross
-        d['_xsquare'] = self._xsquare
-        d['_lastx'] = self._lastx
-        d['_lasty'] = self._lasty
-        return MovingResidue, (self._window, self._dependency), d
-
-    def __setstate__(self, state):
-        self.copy_attributes(state, is_deep=False)
-        self._cross = state['_cross']
-        self._xsquare = state['_xsquare']
-        self._lastx = state['_lastx']
-        self._lasty = state['_lasty']
 
 
 cdef class MovingAlphaBeta(StatefulValueHolder):
@@ -1989,33 +1322,6 @@ cdef class MovingAlphaBeta(StatefulValueHolder):
         alpha = self._pReturnMean.result() - beta * self._mReturnMean.result()
         return alpha, beta
 
-    def __deepcopy__(self, memo):
-        copied = MovingAlphaBeta(self._window, self._dependency)
-        copied.copy_attributes(self.collect_attributes(), is_deep=True)
-        copied._mReturnMean = copy.deepcopy(self._mReturnMean)
-        copied._pReturnMean = copy.deepcopy(self._pReturnMean)
-        copied._mReturnVar = copy.deepcopy(self._mReturnVar)
-        copied._mReturnVar = copy.deepcopy(self._pReturnVar)
-        copied._correlationHolder = copy.deepcopy(self._correlationHolder)
-        return copied
-
-    def __reduce__(self):
-        d = self.collect_attributes()
-        d['_mReturnMean'] = self._mReturnMean
-        d['_pReturnMean'] = self._pReturnMean
-        d['_mReturnVar'] = self._mReturnVar
-        d['_pReturnVar'] = self._pReturnVar
-        d['_correlationHolder'] = self._correlationHolder
-        return MovingAlphaBeta, (self._window, self._dependency), d
-
-    def __setstate__(self, state):
-        self.copy_attributes(state, is_deep=False)
-        self._mReturnMean = state['_mReturnMean']
-        self._pReturnMean = state['_pReturnMean']
-        self._mReturnVar = state['_mReturnVar']
-        self._pReturnVar = state['_pReturnVar']
-        self._correlationHolder = state['_correlationHolder']
-
 
 cdef class MovingDrawDown(StatefulValueHolder):
 
@@ -2045,33 +1351,6 @@ cdef class MovingDrawDown(StatefulValueHolder):
 
     cpdef object result(self):
         return self._runningCum - self._currentMax, self._runningIndex - self._highIndex, self._highIndex
-
-    def __deepcopy__(self, memo):
-        copied = MovingDrawDown(self._window, self._dependency)
-        copied.copy_attributes(self.collect_attributes(), is_deep=True)
-        copied._maxer = copy.deepcopy(self._maxer)
-        copied._runningCum = copy.deepcopy(self._runningCum)
-        copied._currentMax = self._currentMax
-        copied._highIndex = self._highIndex
-        copied._runningIndex = self._runningIndex
-        return copied
-
-    def __reduce__(self):
-        d = self.collect_attributes()
-        d['_maxer'] = self._maxer
-        d['_runningCum'] = self._runningCum
-        d['_currentMax'] = self._currentMax
-        d['_highIndex'] = self._highIndex
-        d['_runningIndex'] = self._runningIndex
-        return MovingDrawDown, (self._window, self._dependency), d
-
-    def __setstate__(self, state):
-        self.copy_attributes(state, is_deep=False)
-        self._maxer = state['_maxer']
-        self._runningCum = state['_runningCum']
-        self._currentMax = state['_currentMax']
-        self._highIndex = state['_highIndex']
-        self._runningIndex = state['_runningIndex']
 
 
 cdef class MovingAverageDrawdown(StatefulValueHolder):
@@ -2103,27 +1382,6 @@ cdef class MovingAverageDrawdown(StatefulValueHolder):
     cpdef object result(self):
         return self._drawdownMean.result(), self._durationMean.result()
 
-    def __deepcopy__(self, memo):
-        copied = MovingAverageDrawdown(self._window, self._dependency)
-        copied.copy_attributes(self.collect_attributes(), is_deep=True)
-        copied._drawdownCalculator = copy.deepcopy(self._drawdownCalculator)
-        copied._drawdownMean = copy.deepcopy(self._drawdownMean)
-        copied._durationMean = copy.deepcopy(self._durationMean)
-        return copied
-
-    def __reduce__(self):
-        d = self.collect_attributes()
-        d['_drawdownCalculator'] = self._drawdownCalculator
-        d['_drawdownMean'] = self._drawdownMean
-        d['_durationMean'] = self._durationMean
-        return MovingAverageDrawdown, (self._window, self._dependency), d
-
-    def __setstate__(self, state):
-        self.copy_attributes(state, is_deep=False)
-        self._drawdownCalculator = state['_drawdownCalculator']
-        self._drawdownMean = state['_drawdownMean']
-        self._durationMean = state['_durationMean']
-
 
 cdef class MovingMaxDrawdown(StatefulValueHolder):
 
@@ -2149,18 +1407,3 @@ cdef class MovingMaxDrawdown(StatefulValueHolder):
     cpdef object result(self):
         cdef np.ndarray[double, ndim=1] values = np.array([self._deque[i][0] for i in range(self.size())])
         return self._deque[values.argmin()]
-
-    def __deepcopy__(self, memo):
-        copied = MovingMaxDrawdown(self._window, self._dependency)
-        copied.copy_attributes(self.collect_attributes(), is_deep=True)
-        copied._drawdownCalculator = copy.deepcopy(self._drawdownCalculator)
-        return copied
-
-    def __reduce__(self):
-        d = self.collect_attributes()
-        d['_drawdownCalculator'] = self._drawdownCalculator
-        return MovingMaxDrawdown, (self._window, self._dependency), d
-
-    def __setstate__(self, state):
-        self.copy_attributes(state, is_deep=False)
-        self._drawdownCalculator = state['_drawdownCalculator']

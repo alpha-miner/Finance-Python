@@ -380,7 +380,7 @@ cdef class CSResidueSecurityValueHolder(SecurityValueHolder):
         cdef SeriesValues right_raw_values
         left_raw_values = self._left.value_by_names(names)
         right_raw_values = self._right.value_by_names(names)
-        raw_values = self.op(left_raw_values, right_raw_values)
+        raw_values = left_raw_values.res(right_raw_values)
         return raw_values
 
     def __str__(self):

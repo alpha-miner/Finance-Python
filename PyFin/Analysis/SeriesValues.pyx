@@ -232,6 +232,10 @@ cdef class SeriesValues(object):
     cpdef SeriesValues res(self, SeriesValues right):
         cdef np.ndarray[double, ndim=1] y = self.values
         cdef np.ndarray[double, ndim=1] x = right.values
+        cdef y_bar = nanmean(y)
+        cdef x_bar = nanmean(x)
+        y -= y_bar
+        x -= x_bar
 
         cdef double beta = nansum(x * y) / nansum(x * x)
         return SeriesValues(y - beta * x, self.name_mapping)

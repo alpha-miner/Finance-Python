@@ -159,9 +159,10 @@ class TestCrossSectionValueHolder(unittest.TestCase):
             calculated = res.value.values
             y_values = y.value.values
             x_values = x.value.values
+            x_values = np.concatenate([np.ones(shape=(len(x_values), 1)), x_values.reshape(-1, 1)], axis=1)
 
-            beta = np.dot(y_values, x_values) / np.dot(x_values, x_values)
-            expected = y_values - beta * x_values
+            beta = np.dot(np.linalg.inv(np.dot(x_values.T, x_values)), np.dot(x_values.T, y_values.reshape(-1, 1)))
+            expected = y_values - np.dot(x_values, beta).flatten()
             np.testing.assert_array_almost_equal(calculated, expected)
 
 

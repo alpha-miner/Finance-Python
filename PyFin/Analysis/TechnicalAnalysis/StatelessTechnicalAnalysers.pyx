@@ -30,12 +30,15 @@ cdef class SecurityStatelessSingleValueHolder(SecurityValueHolder):
     def __init__(self, holderType, dependency='x', **kwargs):
         super(SecurityStatelessSingleValueHolder, self).__init__(dependency)
         if self._compHolder:
-            self._holderTemplate = holderType(dependency='x', **kwargs)
+            self._holderTemplate = holderType(dependency=str(self._compHolder), **kwargs)
             self._innerHolders = {
                 name: copy.deepcopy(self._holderTemplate) for name in self._compHolder.symbolList
                 }
         else:
             self._holderTemplate = holderType(dependency=self._dependency, **kwargs)
+
+    def __str__(self):
+        return str(self._holderTemplate)
 
 
 cdef class SecurityXAverageValueHolder(SecurityStatelessSingleValueHolder):

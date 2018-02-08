@@ -136,7 +136,7 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
         container = {'aapl': deque(maxlen=window), 'ibm': deque(maxlen=window)}
 
         for i in range(len(self.aapl['close'])):
-            data = dict(aapl=dict(close=1.0 if self.aapl['close'][i] >= 1.0 else 0.,
+            data = dict(aapl=dict(close=1.0 if self.aapl['close'][i] >= 1.0 else 0.0,
                                   open=self.aapl['open'][i]),
                         ibm=dict(close=self.ibm['close'][i],
                                  open=self.ibm['open'][i]))

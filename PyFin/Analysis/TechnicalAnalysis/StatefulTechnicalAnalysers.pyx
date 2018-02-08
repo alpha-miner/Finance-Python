@@ -41,7 +41,7 @@ cdef class SecuritySingleValueHolder(SecurityValueHolder):
         super(SecuritySingleValueHolder, self).__init__(dependency)
         self._window += window
         if self._compHolder:
-            self._holderTemplate = HolderType(window=window, dependency='x')
+            self._holderTemplate = HolderType(window=window, dependency=str(self._compHolder))
             self._innerHolders = {
                 name: copy.deepcopy(self._holderTemplate) for name in self._compHolder.symbolList
                 }

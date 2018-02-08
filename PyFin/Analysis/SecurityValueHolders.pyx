@@ -70,21 +70,23 @@ cdef class SecurityValueHolder(object):
 
         cdef SeriesValues sec_values
         cdef Accumulator holder
+        cdef str dummy_name
         self.updated = 0
 
         if self._compHolder:
+            dummy_name = str(self._compHolder)
             self._compHolder.push(data)
             sec_values = self._compHolder.value
 
             for name in sec_values.index():
                 try:
                     holder = self._innerHolders[name]
-                    holder.push({'x': sec_values[name]})
+                    holder.push({dummy_name: sec_values[name]})
                 except KeyError:
                     holder = copy.deepcopy(self._holderTemplate)
-                    holder.push({'x':  sec_values[name]})
+                    holder.push({dummy_name:  sec_values[name]})
                     self._innerHolders[name] = holder
-
+                    self._innerHolders[name] = holder
         else:
             for name in data:
                 try:
@@ -520,7 +522,7 @@ cdef class SecurityLatestValueHolder(SecurityValueHolder):
     def __init__(self, dependency='x'):
         super(SecurityLatestValueHolder, self).__init__(dependency)
         if self._compHolder:
-            self._holderTemplate = Latest(dependency='x')
+            self._holderTemplate = Latest(dependency=str(self._compHolder))
             self._innerHolders = {
                 name: copy.deepcopy(self._holderTemplate) for name in self._compHolder.symbolList
                 }
@@ -719,10 +721,11 @@ cdef class SecurityShiftedValueHolder(SecurityValueHolder):
 
     def __init__(self, right, n):
         super(SecurityShiftedValueHolder, self).__init__(right)
-        self._returnSize = right.valueSize
-        self._window = right.window + n
-        self._dependency = copy.deepcopy(right._dependency)
-        self._holderTemplate = Shift(Latest('x'), n)
+
+        self._returnSize = self._compHolder.valueSize
+        self._window = self._compHolder.window + n
+        self._dependency = copy.deepcopy(self._compHolder._dependency)
+        self._holderTemplate = Shift(Latest(str(self._compHolder)), n)
 
         self._innerHolders = {
             name: copy.deepcopy(self._holderTemplate) for name in self._compHolder.symbolList

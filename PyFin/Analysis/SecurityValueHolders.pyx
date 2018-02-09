@@ -711,7 +711,7 @@ cdef class SecurityEqOperatorValueHolder(SecurityCombinedValueHolder):
             left, right, operator.eq)
 
     def __str__(self):
-        return "{0} = {1}".format(str(self._left), str(self._right))
+        return "{0} == {1}".format(str(self._left), str(self._right))
 
 
 cdef class SecurityNeOperatorValueHolder(SecurityCombinedValueHolder):

@@ -1079,3 +1079,35 @@ class TestSecurityValueHolders(unittest.TestCase):
                 self.assertAlmostEqual(data[name]['x'], calculated[name])
 
         os.unlink(f.name)
+
+    def testSecurityLtOperatorValueHolderStr(self):
+        holder = SecurityLatestValueHolder('x') < SecurityLatestValueHolder('y')
+        self.assertEqual(str(holder), "''\\text{x}'' \\lt ''\\text{y}''")
+
+    def testSecurityLeOperatorValueHolderStr(self):
+        holder = SecurityLatestValueHolder('x') <= SecurityLatestValueHolder('y')
+        self.assertEqual(str(holder), "''\\text{x}'' \\le ''\\text{y}''")
+
+    def testSecurityGtOperatorValueHolderStr(self):
+        holder = SecurityLatestValueHolder('x') > SecurityLatestValueHolder('y')
+        self.assertEqual(str(holder), "''\\text{x}'' \\gt ''\\text{y}''")
+
+    def testSecurityGeOperatorValueHolderStr(self):
+        holder = SecurityLatestValueHolder('x') >= SecurityLatestValueHolder('y')
+        self.assertEqual(str(holder), "''\\text{x}'' \\ge ''\\text{y}''")
+
+    def testSecurityEqOperatorValueHolderStr(self):
+        holder = SecurityLatestValueHolder('x') == SecurityLatestValueHolder('y')
+        self.assertEqual(str(holder), "''\\text{x}'' == ''\\text{y}''")
+
+    def testSecurityNeOperatorValueHolderStr(self):
+        holder = SecurityLatestValueHolder('x') != SecurityLatestValueHolder('y')
+        self.assertEqual(str(holder), "''\\text{x}'' \\neq ''\\text{y}''")
+
+    def testSecurityAndOperatorValueHolderStr(self):
+        holder = SecurityLatestValueHolder('x') & SecurityLatestValueHolder('y')
+        self.assertEqual(str(holder), "''\\text{x}'' \& ''\\text{y}''")
+
+    def testSecurityOrOperatorValueHolderStr(self):
+        holder = SecurityLatestValueHolder('x') | SecurityLatestValueHolder('y')
+        self.assertEqual(str(holder), "''\\text{x}'' | ''\\text{y}''")

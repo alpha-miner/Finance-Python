@@ -2339,7 +2339,7 @@ class TestStatefulAccumulators(unittest.TestCase):
         s = MovingSum(10, Latest('roe') + Latest('y'))
         self.assertEqual("\mathrm{MSum}(10, ''\\text{roe}'' + ''\\text{y}'')", str(s))
 
-    def testMovingResidueRes(self):
+    def testMovingResidueResStr(self):
         s = MovingResidue(10, ('roe', 'y'))
         self.assertEqual("\mathrm{Res}(10, \\text{('roe', 'y')})", str(s))
 

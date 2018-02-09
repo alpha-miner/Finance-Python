@@ -674,11 +674,17 @@ cdef class SecurityLtOperatorValueHolder(SecurityCombinedValueHolder):
         super(SecurityLtOperatorValueHolder, self).__init__(
             left, right, operator.lt)
 
+    def __str__(self):
+        return "{0} \\lt {1}".format(str(self._left), str(self._right))
+
 
 cdef class SecurityLeOperatorValueHolder(SecurityCombinedValueHolder):
     def __init__(self, left, right):
         super(SecurityLeOperatorValueHolder, self).__init__(
             left, right, operator.le)
+
+    def __str__(self):
+        return "{0} \\le {1}".format(str(self._left), str(self._right))
 
 
 cdef class SecurityGtOperatorValueHolder(SecurityCombinedValueHolder):
@@ -686,11 +692,17 @@ cdef class SecurityGtOperatorValueHolder(SecurityCombinedValueHolder):
         super(SecurityGtOperatorValueHolder, self).__init__(
             left, right, operator.gt)
 
+    def __str__(self):
+        return "{0} \\gt {1}".format(str(self._left), str(self._right))
+
 
 cdef class SecurityGeOperatorValueHolder(SecurityCombinedValueHolder):
     def __init__(self, left, right):
         super(SecurityGeOperatorValueHolder, self).__init__(
             left, right, operator.ge)
+
+    def __str__(self):
+        return "{0} \\ge {1}".format(str(self._left), str(self._right))
 
 
 cdef class SecurityEqOperatorValueHolder(SecurityCombinedValueHolder):
@@ -698,11 +710,17 @@ cdef class SecurityEqOperatorValueHolder(SecurityCombinedValueHolder):
         super(SecurityEqOperatorValueHolder, self).__init__(
             left, right, operator.eq)
 
+    def __str__(self):
+        return "{0} = {1}".format(str(self._left), str(self._right))
+
 
 cdef class SecurityNeOperatorValueHolder(SecurityCombinedValueHolder):
     def __init__(self, left, right):
         super(SecurityNeOperatorValueHolder, self).__init__(
             left, right, operator.ne)
+
+    def __str__(self):
+        return "{0} \\neq {1}".format(str(self._left), str(self._right))
 
 
 cdef class SecurityAndOperatorValueHolder(SecurityCombinedValueHolder):
@@ -710,11 +728,17 @@ cdef class SecurityAndOperatorValueHolder(SecurityCombinedValueHolder):
         super(SecurityAndOperatorValueHolder, self).__init__(
             left, right, operator.__and__)
 
+    def __str__(self):
+        return "{0} \\& {1}".format(str(self._left), str(self._right))
+
 
 cdef class SecurityOrOperatorValueHolder(SecurityCombinedValueHolder):
     def __init__(self, left, right):
         super(SecurityOrOperatorValueHolder, self).__init__(
             left, right, operator.__or__)
+
+    def __str__(self):
+        return "{0} | {1}".format(str(self._left), str(self._right))
 
 
 cdef class SecurityShiftedValueHolder(SecurityValueHolder):

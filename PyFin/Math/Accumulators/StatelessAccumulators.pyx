@@ -47,6 +47,12 @@ cdef class Diff(StatelessSingleValueAccumulator):
     cpdef object result(self):
         return self._curr - self._previous
 
+    def __str__(self):
+        if self._isValueHolderContained:
+            return "\\mathrm{{Diff}}({0})".format(str(self._dependency))
+        else:
+            return "\\mathrm{{Diff}}(''\\text{{{0}}}'')".format(str(self._dependency))
+
 
 cdef class SimpleReturn(StatelessSingleValueAccumulator):
 

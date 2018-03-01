@@ -5,6 +5,7 @@ Created on 2015-7-25
 @author: cheng.li
 """
 
+import copy
 import math
 import numpy as np
 cimport numpy as np
@@ -14,8 +15,10 @@ from libc.math cimport isnan
 from libc.math cimport log
 from libc.math cimport fmax
 from libc.math cimport fmin
+from libc.math cimport sqrt
 from PyFin.Math.Accumulators.IAccumulators cimport Accumulator
 from PyFin.Math.Accumulators.IAccumulators cimport Pow
+from PyFin.Math.Accumulators.IAccumulators cimport Latest
 from PyFin.Math.Accumulators.IAccumulators cimport StatelessSingleValueAccumulator
 from PyFin.Math.MathConstants cimport NAN
 import bisect
@@ -172,15 +175,21 @@ cdef class Max(StatelessSingleValueAccumulator):
 
 cdef class Maximum(StatelessSingleValueAccumulator):
 
-    def __init__(self, dependency=('x', 'y')):
-        super(Maximum, self).__init__(dependency)
+    def __init__(self, x, y):
+        super(Maximum, self).__init__([x.dependency if isinstance(x, Accumulator) else x,
+                                       y.dependency if isinstance(y, Accumulator) else y,])
         self._currentMax = NAN
         self._returnSize = 1
         self._isFull = False
+        self._x = copy.deepcopy(x) if isinstance(x, Accumulator) else Latest(x)
+        self._y = copy.deepcopy(y) if isinstance(y, Accumulator) else Latest(y)
 
     cpdef push(self, dict data):
-        cdef object value = self.extract(data)
-        self._currentMax = fmax(value[0], value[1])
+        self._x.push(data)
+        cdef double left = self._x.result()
+        self._y.push(data)
+        cdef double right = self._y.result()
+        self._currentMax = fmax(left, right)
 
     cpdef object result(self):
         return self._currentMax
@@ -209,15 +218,21 @@ cdef class Min(StatelessSingleValueAccumulator):
 
 cdef class Minimum(StatelessSingleValueAccumulator):
 
-    def __init__(self, dependency=('x', 'y')):
-        super(Minimum, self).__init__(dependency)
+    def __init__(self, x, y):
+        super(Minimum, self).__init__([x.dependency if isinstance(x, Accumulator) else x,
+                                       y.dependency if isinstance(y, Accumulator) else y,])
         self._currentMin = NAN
         self._returnSize = 1
         self._isFull = False
+        self._x = copy.deepcopy(x) if isinstance(x, Accumulator) else Latest(x)
+        self._y = copy.deepcopy(y) if isinstance(y, Accumulator) else Latest(y)
 
     cpdef push(self, dict data):
-        cdef object value = self.extract(data)
-        self._currentMin = fmin(value[0], value[1])
+        self._x.push(data)
+        cdef double left = self._x.result()
+        self._y.push(data)
+        cdef double right = self._y.result()
+        self._currentMin = fmin(left, right)
 
     cpdef object result(self):
         return self._currentMin
@@ -532,8 +547,9 @@ cdef class StatelessMultiValueAccumulator(Accumulator):
 
 cdef class Correlation(StatelessMultiValueAccumulator):
 
-    def __init__(self, dependency=('x', 'y')):
-        super(Correlation, self).__init__(dependency)
+    def __init__(self, x, y):
+        super(Correlation, self).__init__([x.dependency if isinstance(x, Accumulator) else x,
+                                           y.dependency if isinstance(y, Accumulator) else y])
         self._runningSumLeft = 0.0
         self._runningSumRight = 0.0
         self._runningSumSquareLeft = 0.0
@@ -541,27 +557,31 @@ cdef class Correlation(StatelessMultiValueAccumulator):
         self._runningSumCrossSquare = 0.0
         self._currentCount = 0
         self._returnSize = 1
+        self._x = copy.deepcopy(x) if isinstance(x, Accumulator) else Latest(x)
+        self._y = copy.deepcopy(y) if isinstance(y, Accumulator) else Latest(y)
 
     cpdef push(self, dict data):
-        value = self._push(data)
-        if isnan(value[0]) or isnan(value[1]):
+        self._x.push(data)
+        cdef double x = self._x.result()
+        self._y.push(data)
+        cdef double y = self._y.result()
+        if isnan(x) or isnan(y):
             return NAN
 
         self._isFull = True
-
-        self._runningSumLeft = self._runningSumLeft + value[0]
-        self._runningSumRight = self._runningSumRight + value[1]
-        self._runningSumSquareLeft = self._runningSumSquareLeft + value[0] * value[0]
-        self._runningSumSquareRight = self._runningSumSquareRight + value[1] * value[1]
-        self._runningSumCrossSquare = self._runningSumCrossSquare + value[0] * value[1]
+        self._runningSumLeft = self._runningSumLeft + x
+        self._runningSumRight = self._runningSumRight + y
+        self._runningSumSquareLeft = self._runningSumSquareLeft + x * x
+        self._runningSumSquareRight = self._runningSumSquareRight + y * y
+        self._runningSumCrossSquare = self._runningSumCrossSquare + x * y
         self._currentCount += 1
 
     cpdef object result(self):
-        n = self._currentCount
-        nominator = n * self._runningSumCrossSquare - self._runningSumLeft * self._runningSumRight
-        denominator = (n * self._runningSumSquareLeft - self._runningSumLeft * self._runningSumLeft) \
+        cdef int n = self._currentCount
+        cdef double nominator = n * self._runningSumCrossSquare - self._runningSumLeft * self._runningSumRight
+        cdef double denominator = (n * self._runningSumSquareLeft - self._runningSumLeft * self._runningSumLeft) \
                       * (n * self._runningSumSquareRight - self._runningSumRight * self._runningSumRight)
-        denominator = math.sqrt(denominator)
+        denominator = sqrt(denominator)
         if denominator != 0:
             return nominator / denominator
         else:

@@ -125,7 +125,7 @@ cdef class SecurityValueHolder(object):
 
     @cython.boundscheck(False)
     @cython.wraparound(False)
-    cpdef value_by_names(self, list names):
+    cpdef SeriesValues value_by_names(self, list names):
         cdef Accumulator holder
         cdef np.ndarray res
         cdef int i
@@ -141,7 +141,7 @@ cdef class SecurityValueHolder(object):
                 res[i] = holder.result()
             return SeriesValues(res, index=names)
 
-    cpdef value_by_name(self, name):
+    cpdef double value_by_name(self, name):
         cdef Accumulator holder
         if self.updated:
             return self.cached[name]
@@ -355,7 +355,7 @@ cdef class FilteredSecurityValueHolder(SecurityValueHolder):
             self.updated = 1
             return self.cached
 
-    cpdef value_by_name(self, name):
+    cpdef double value_by_name(self, name):
 
         cdef double filter_value
 
@@ -368,7 +368,7 @@ cdef class FilteredSecurityValueHolder(SecurityValueHolder):
             else:
                 return NAN
 
-    cpdef value_by_names(self, list names):
+    cpdef SeriesValues value_by_names(self, list names):
 
         cdef SeriesValues filter_value
         cdef SeriesValues orig_values
@@ -409,11 +409,11 @@ cdef class IdentitySecurityValueHolder(SecurityValueHolder):
     def value(self):
         return self._value
 
-    cpdef value_by_name(self, name):
+    cpdef double value_by_name(self, name):
         return self._value
 
-    cpdef value_by_names(self, list names):
-        return self._value
+    cpdef SeriesValues value_by_names(self, list names):
+        return SeriesValues({n: self._value for n in names})
 
 
 cdef class SecurityConstArrayValueHolder(SecurityValueHolder):
@@ -439,13 +439,13 @@ cdef class SecurityConstArrayValueHolder(SecurityValueHolder):
     cpdef push(self, dict data):
         pass
 
-    cpdef value_by_name(self, name):
+    cpdef double value_by_name(self, name):
         if name in self._values:
             return self._values[name]
         else:
             return NAN
 
-    cpdef value_by_names(self, list names):
+    cpdef SeriesValues value_by_names(self, list names):
         return self._values[names]
 
     @property
@@ -490,13 +490,13 @@ cdef class SecurityUnitoryValueHolder(SecurityValueHolder):
             self.updated = 1
             return self.cached
 
-    cpdef value_by_name(self, name):
+    cpdef double value_by_name(self, name):
         if self.updated:
             return self.cached[name]
         else:
             return self._op(self._right.value_by_name(name))
 
-    cpdef value_by_names(self, list names):
+    cpdef SeriesValues value_by_names(self, list names):
         if self.updated:
             return self.cached[names]
         else:
@@ -594,13 +594,13 @@ cdef class SecurityCombinedValueHolder(SecurityValueHolder):
             self.updated = 1
             return self.cached
 
-    cpdef value_by_name(self, name):
+    cpdef double value_by_name(self, name):
         if self.updated:
             return self.cached[name]
         else:
             return self._op(self._left.value_by_name(name), self._right.value_by_name(name))
 
-    cpdef value_by_names(self, list names):
+    cpdef SeriesValues value_by_names(self, list names):
         if self.updated:
             return self.cached[names]
         else:
@@ -612,7 +612,7 @@ cdef class SecurityXorValuedHolder(SecurityCombinedValueHolder):
         super(SecurityXorValuedHolder, self).__init__(
             left, right, operator.xor)
 
-    cpdef value_by_name(self, name):
+    cpdef double value_by_name(self, name):
         if self.updated:
             return self.cached[name]
         else:
@@ -841,7 +841,7 @@ cdef class SecurityIIFValueHolder(SecurityValueHolder):
             self.updated = 1
             return self.cached
 
-    cpdef value_by_name(self, name):
+    cpdef double value_by_name(self, name):
         if self.updated:
             return self.cached[name]
         else:
@@ -850,7 +850,7 @@ cdef class SecurityIIFValueHolder(SecurityValueHolder):
             else:
                 return self._right.value_by_name(name)
 
-    cpdef value_by_names(self, list names):
+    cpdef SeriesValues value_by_names(self, list names):
 
         cdef SeriesValues flag_value
 

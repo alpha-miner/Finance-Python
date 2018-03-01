@@ -57,9 +57,6 @@ cdef class IAccumulator(object):
         elif op == 5:
             return GeOperatorValueHolder(self, right)
 
-    def __xor__(self, right):
-        return ListedValueHolder(self, right)
-
     def __rshift__(self, right):
         if isinstance(right, IAccumulator):
             return CompoundedValueHolder(self, right)
@@ -71,9 +68,6 @@ cdef class IAccumulator(object):
 
     def __neg__(self):
         return Negative(self)
-
-    def __getitem__(self, item):
-        return TruncatedValueHolder(self, item)
 
 
 cdef class Accumulator(IAccumulator):
@@ -217,81 +211,8 @@ cdef class Negative(Accumulator):
         return "-{0}".format(str(self._dependency))
 
     cpdef object result(self):
-        res = self._dependency.result()
-        try:
-            return -res
-        except TypeError:
-            return [-r for r in res]
-
-
-cdef class ListedValueHolder(Accumulator):
-
-    def __init__(self, left, right):
-        super(ListedValueHolder, self).__init__([])
-        self._left = build_holder(left)
-        self._right = build_holder(right)
-        self._returnSize = self._left.valueSize + self._right.valueSize
-        self._dependency = list(set(self._left.dependency).union(set(self._right.dependency)))
-        self._window = max(self._left.window, self._right.window)
-        self._isValueHolderContained = True
-        self._isFull = False
-
-    cpdef push(self, dict data):
-        self._left.push(data)
-        self._right.push(data)
-        self._isFull =  self._isFull or (self._left.isFull() and self._right.isFull())
-
-    def __str__(self):
-        return "({0}, {1})".format(str(self._left), str(self._right))
-
-    cpdef object result(self):
-        resLeft = self._left.result()
-        resRight = self._right.result()
-
-        if not hasattr(resLeft, '__iter__'):
-            resLeft = np.array([resLeft])
-        if not hasattr(resRight, '__iter__'):
-            resRight = np.array([resRight])
-        return np.concatenate([resLeft, resRight])
-
-
-cdef class TruncatedValueHolder(Accumulator):
-
-    def __init__(self, valueHolder, item):
-        super(TruncatedValueHolder, self).__init__(valueHolder)
-        if valueHolder.valueSize == 1:
-            raise TypeError("scalar valued holder ({0}) can't be sliced".format(valueHolder))
-        if isinstance(item, slice):
-            self._start = item.start
-            self._stop = item.stop
-            length = item.stop - item.start
-            if length < 0:
-                length += valueHolder.valueSize
-            if length < 0:
-                raise ValueError('start {0:d} and end {0:d} are not compatible'.format(item.start, item.stop))
-            self._returnSize = length
-        else:
-            self._start = item
-            self._stop = -1
-            self._returnSize = 1
-        self._window = valueHolder.window
-        self._isFull = 0
-
-    cpdef push(self, dict data):
-        self._dependency.push(data)
-        self._isFull = self._dependency.isFull()
-
-    cpdef object result(self):
-        if self._stop == -1:
-            return self._dependency.result()[self._start]
-        return self._dependency.result()[self._start:self._stop]
-
-    def __deepcopy__(self, memo):
-        if self._stop == -1:
-            item = self._start
-        else:
-            item = slice(self._start, self._stop)
-        return TruncatedValueHolder(self._dependency, item)
+        cdef double res = self._dependency.result()
+        return -res
 
 
 cdef class CombinedValueHolder(Accumulator):

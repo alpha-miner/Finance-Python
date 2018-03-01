@@ -61,7 +61,7 @@ cdef class CSRankedSecurityValueHolder(CrossSectionValueHolder):
             self.updated = 1
             return self.cached
 
-    cpdef value_by_name(self, name):
+    cpdef double value_by_name(self, name):
 
         cdef SeriesValues raw_values
 
@@ -73,7 +73,7 @@ cdef class CSRankedSecurityValueHolder(CrossSectionValueHolder):
             self.updated = 1
             return self.cached[name]
 
-    cpdef value_by_names(self, list names):
+    cpdef SeriesValues value_by_names(self, list names):
         cdef SeriesValues raw_values
         raw_values = self._inner.value_by_names(names)
         raw_values = raw_values.rank()
@@ -103,7 +103,7 @@ cdef class CSAverageSecurityValueHolder(CrossSectionValueHolder):
             self.updated = 1
             return self.cached
 
-    cpdef value_by_name(self, name):
+    cpdef double value_by_name(self, name):
 
         cdef SeriesValues raw_values
         cdef np.ndarray[double, ndim=1] mean_value
@@ -118,7 +118,7 @@ cdef class CSAverageSecurityValueHolder(CrossSectionValueHolder):
             self.updated = 1
             return self.cached[name]
 
-    cpdef value_by_names(self, list names):
+    cpdef SeriesValues value_by_names(self, list names):
 
         cdef SeriesValues raw_values
         cdef np.ndarray[double, ndim=1] mean_value
@@ -157,7 +157,7 @@ cdef class CSPercentileSecurityValueHolder(CrossSectionValueHolder):
             self.updated = 1
             return self.cached
 
-    cpdef value_by_name(self, name):
+    cpdef double value_by_name(self, name):
 
         cdef SeriesValues raw_values
         cdef np.ndarray[double, ndim=1] per_value
@@ -172,7 +172,7 @@ cdef class CSPercentileSecurityValueHolder(CrossSectionValueHolder):
             self.updated = 1
             return self.cached[name]
 
-    cpdef value_by_names(self, list names):
+    cpdef SeriesValues value_by_names(self, list names):
 
         cdef SeriesValues raw_values
         cdef np.ndarray[double, ndim=1] per_value
@@ -204,7 +204,7 @@ cdef class CSAverageAdjustedSecurityValueHolder(CrossSectionValueHolder):
             self.updated = 1
             return self.cached
 
-    cpdef value_by_name(self, name):
+    cpdef double value_by_name(self, name):
 
         cdef SeriesValues raw_values
 
@@ -216,7 +216,7 @@ cdef class CSAverageAdjustedSecurityValueHolder(CrossSectionValueHolder):
             self.updated = 1
             return self.cached[name]
 
-    cpdef value_by_names(self, list names):
+    cpdef SeriesValues value_by_names(self, list names):
         raw_values = self._inner.value_by_names(names)
         raw_values = raw_values - raw_values.mean()
         return raw_values[names]
@@ -243,7 +243,7 @@ cdef class CSQuantileSecurityValueHolder(CrossSectionValueHolder):
             return self.cached
 
     @cython.cdivision(True)
-    cpdef value_by_name(self, name):
+    cpdef double value_by_name(self, name):
 
         cdef SeriesValues raw_values
 
@@ -256,7 +256,7 @@ cdef class CSQuantileSecurityValueHolder(CrossSectionValueHolder):
             return self.cached[name]
 
     @cython.cdivision(True)
-    cpdef value_by_names(self, list names):
+    cpdef SeriesValues value_by_names(self, list names):
 
         cdef SeriesValues raw_values
 
@@ -286,7 +286,7 @@ cdef class CSZScoreSecurityValueHolder(CrossSectionValueHolder):
             return self.cached
 
     @cython.cdivision(True)
-    cpdef value_by_name(self, name):
+    cpdef double value_by_name(self, name):
 
         cdef SeriesValues raw_values
 
@@ -299,7 +299,7 @@ cdef class CSZScoreSecurityValueHolder(CrossSectionValueHolder):
             return self.cached[name]
 
     @cython.cdivision(True)
-    cpdef value_by_names(self, list names):
+    cpdef SeriesValues value_by_names(self, list names):
 
         cdef SeriesValues raw_values
 
@@ -361,7 +361,7 @@ cdef class CSResidueSecurityValueHolder(SecurityValueHolder):
             self.updated = 1
             return self.cached
 
-    cpdef value_by_name(self, name):
+    cpdef double value_by_name(self, name):
 
         cdef SeriesValues left_raw_values
         cdef SeriesValues right_raw_values
@@ -375,7 +375,7 @@ cdef class CSResidueSecurityValueHolder(SecurityValueHolder):
             self.updated = 1
             return self.cached[name]
 
-    cpdef value_by_names(self, list names):
+    cpdef SeriesValues value_by_names(self, list names):
         cdef SeriesValues left_raw_values
         cdef SeriesValues right_raw_values
         left_raw_values = self._left.value_by_names(names)

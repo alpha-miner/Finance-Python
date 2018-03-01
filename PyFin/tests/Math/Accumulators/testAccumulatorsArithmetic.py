@@ -26,7 +26,6 @@ from PyFin.Math.Accumulators.IAccumulators import Acos
 from PyFin.Math.Accumulators.IAccumulators import Acosh
 from PyFin.Math.Accumulators.IAccumulators import Asin
 from PyFin.Math.Accumulators.IAccumulators import Asinh
-from PyFin.Math.Accumulators.IAccumulators import TruncatedValueHolder
 from PyFin.Math.Accumulators.IAccumulators import IIF
 from PyFin.Math.Accumulators.IAccumulators import Latest
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingAverage
@@ -37,8 +36,6 @@ from PyFin.Math.Accumulators.StatelessAccumulators import Sum
 from PyFin.Math.Accumulators.StatelessAccumulators import Average
 from PyFin.Math.Accumulators.StatelessAccumulators import Min
 from PyFin.Math.Accumulators.StatelessAccumulators import Max
-from PyFin.Math.Accumulators.StatelessAccumulators import Correlation
-from PyFin.Math.Accumulators.StatefulAccumulators import MovingAlphaBeta
 
 
 class TestAccumulatorsArithmetic(unittest.TestCase):
@@ -216,13 +213,11 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
     def testNegativeOperator(self):
         ma20 = MovingAverage(20, 'close')
         negma20 = -ma20
-        negma20square = -(ma20 ^ ma20)
 
         for i, close in enumerate(self.sampleClose):
             data = {'close': close}
             ma20.push(data)
             negma20.push(data)
-            negma20square.push(data)
 
             expected = -ma20.result()
             calculated = negma20.result()
@@ -230,59 +225,11 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
                                                              "expected:   {1:f}\n"
                                                              "calculated: {2:f}".format(i, expected, calculated))
 
-            calculated = negma20square.result()
-            for cal in calculated:
-                self.assertAlmostEqual(cal, expected, 12, "at index {0:d}\n"
-                                                          "expected:   {1:f}\n"
-                                                          "calculated: {2:f}".format(i, expected, cal))
-
-    def testListedOperator(self):
-        ma20 = MovingAverage(20, 'close')
-        maxer = Max('open')
-        minimumer = Min('close')
-        listHolder = MovingAverage(20, 'close') ^ Max('open') ^ Min('close')
-        listHolder2 = 2.0 ^ MovingAverage(20, 'close')
-        listHolder3 = MovingAverage(20, 'close') ^ 2.0
-
-        for i, (open, close) in enumerate(zip(self.sampleOpen, self.sampleClose)):
-            data = {'close': close, 'open': open}
-            ma20.push(data)
-            maxer.push(data)
-            minimumer.push(data)
-            listHolder.push(data)
-            listHolder2.push(data)
-            listHolder3.push(data)
-
-            expected = (ma20.result(), maxer.result(), minimumer.result())
-            calculated = listHolder.result()
-            for ev, cv in zip(expected, calculated):
-                self.assertAlmostEqual(ev, cv, 12, "at index {0:d}\n"
-                                                   "expected:   {1}\n"
-                                                   "calculated: {2}".format(i, expected, calculated))
-
-            expected = (2.0, ma20.result())
-            calculated = listHolder2.result()
-            for ev, cv in zip(expected, calculated):
-                self.assertAlmostEqual(ev, cv, 12, "at index {0:d}\n"
-                                                   "expected:   {1}\n"
-                                                   "calculated: {2}".format(i, expected, calculated))
-
-            expected = (ma20.result(), 2.0)
-            calculated = listHolder3.result()
-            for ev, cv in zip(expected, calculated):
-                self.assertAlmostEqual(ev, cv, 12, "at index {0:d}\n"
-                                                   "expected:   {1}\n"
-                                                   "calculated: {2}".format(i, expected, calculated))
-
     def testCompoundedOperator(self):
         ma5 = MovingAverage(5, 'x')
         maxer = Max('close')
         max5ma = Max('close') >> MovingAverage(5)
         max5ma2 = MovingAverage(5, Max('close'))
-        average = Average('close')
-        sumM = Sum('close')
-        mvTest = Correlation(dependency=('x', 'y'))
-        mvCorr = (Average('close') ^ Sum('close')) >> Correlation(dependency=('x', 'y'))
 
         for i, close in enumerate(self.sampleClose):
             data = {'close': close, 'open': 1.}
@@ -291,11 +238,6 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
             ma5.push(data2)
             max5ma.push(data)
             max5ma2.push(data)
-            average.push(data)
-            sumM.push(data)
-            data3 = {'x': average.result(), 'y': sumM.result()}
-            mvTest.push(data3)
-            mvCorr.push(data)
 
             expected = ma5.result()
             calculated = max5ma.result()
@@ -308,108 +250,8 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
                                                              "expected:   {1:f}\n"
                                                              "calculated: {2:f}".format(i, expected, calculated))
 
-            if i >= 1:
-                expected = mvTest.result()
-                calculated = mvCorr.result()
-                self.assertAlmostEqual(calculated, expected, 12, "at index {0:d}\n"
-                                                                 "expected:   {1:f}\n"
-                                                                 "calculated: {2:f}".format(i, expected, calculated))
-
         with self.assertRaises(ValueError):
             _ = Max('close') >> math.sqrt
-
-        with self.assertRaises(ValueError):
-            _ = (Max('close') ^ Min('close')) >> MovingCorrelation(20, dependency=('x', 'y', 'z'))
-
-        (Max('close') ^ Min('close')) >> MovingCorrelation(20, dependency=('x', 'y'))
-
-    def testListedAndCompoundedOperator(self):
-        maClose = MovingAverage(20, 'close')
-        maOpen = MovingAverage(10, 'open')
-        maRf = MovingAverage(10, 'rf')
-        listHolder = MovingAverage(20, 'close') ^ MovingAverage(10, 'open') ^ MovingAverage(10, 'rf')
-        mc = MovingAlphaBeta(20, listHolder)
-
-        maCloseContainer = deque(maxlen=20)
-        maOpenContainer = deque(maxlen=20)
-
-        for i, (open, close, rf) in enumerate(zip(self.sampleOpen, self.sampleClose, self.sampleRf)):
-            data = {'close': close, 'open': open, 'rf': rf}
-            maClose.push(data)
-            maOpen.push(data)
-            maRf.push(data)
-            mc.push(data)
-            maCloseContainer.append(maClose.result() - maRf.result())
-            maOpenContainer.append(maOpen.result() - maRf.result())
-
-            if i >= 2:
-                expected = linregress(maOpenContainer, maCloseContainer)
-                calculated = mc.result()
-
-                # check alpha
-                self.assertAlmostEqual(expected[1], calculated[0], 10, "at index {0:d}\n"
-                                                                       "expected alpha:   {1:f}\n"
-                                                                       "calculated alpha: {2:f}".format(i, expected[1],
-                                                                                                        calculated[0]))
-
-                # check beta
-                self.assertAlmostEqual(expected[0], calculated[1], 10, "at index {0:d}\n"
-                                                                       "expected beta:   {1:f}\n"
-                                                                       "calculated beta: {2:f}".format(i, expected[0],
-                                                                                                       calculated[1]))
-
-    def testTruncatedValueHolder(self):
-        ma20 = MovingAverage(20, 'close')
-        max5 = MovingMax(5, 'open')
-
-        with self.assertRaises(TypeError):
-            _ = TruncatedValueHolder(ma20, 1)
-
-        test = TruncatedValueHolder(ma20 ^ max5, 1)
-        test.push(dict(close=10.0, open=5.0))
-        test.push(dict(close=10.0, open=20.0))
-        self.assertAlmostEqual(test.result(), 20.0, 15)
-
-        test = TruncatedValueHolder(ma20 ^ max5, 0)
-        test.push(dict(close=10.0, open=5.0))
-        test.push(dict(close=15.0, open=20.0))
-        self.assertAlmostEqual(test.result(), 12.50, 15)
-
-        test = TruncatedValueHolder(ma20 ^ max5, slice(1, 2))
-        test.push(dict(close=10.0, open=5.0))
-        test.push(dict(close=15.0, open=20.0))
-        self.assertAlmostEqual(test.result(), [20.0], 15)
-
-        test = TruncatedValueHolder(ma20 ^ max5, slice(0, -1))
-        test.push(dict(close=10.0, open=5.0))
-        test.push(dict(close=15.0, open=20.0))
-        self.assertAlmostEqual(test.result(), [12.5], 15)
-
-        with self.assertRaises(ValueError):
-            _ = TruncatedValueHolder(ma20 ^ max5, slice(1, -2))
-
-    def testGetItemOperator(self):
-        listHolder = MovingAverage(20, 'close') ^ Max('open') ^ Min('close')
-        listHolder1 = listHolder[1]
-        listHolder2 = listHolder[1:3]
-        maxer = Max('open')
-
-        for i, (open, close) in enumerate(zip(self.sampleOpen, self.sampleClose)):
-            data = {'close': close, 'open': open}
-            listHolder1.push(data)
-            listHolder2.push(data)
-            maxer.push(data)
-
-            expected = maxer.result()
-            calculated = listHolder1.result()
-            self.assertAlmostEqual(expected, calculated, 12, "at index {0:d}\n"
-                                                             "expected beta:   {1:f}\n"
-                                                             "calculated beta: {2:f}".format(i, expected, calculated))
-
-            calculated = listHolder2.result()[0]
-            self.assertAlmostEqual(expected, calculated, 12, "at index {0:d}\n"
-                                                             "expected beta:   {1:f}\n"
-                                                             "calculated beta: {2:f}".format(i, expected, calculated))
 
     def testLessOrEqualOperators(self):
         m1 = Max('x')
@@ -860,10 +702,6 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
     def testNegStr(self):
         s = -Asinh('roe')
         self.assertEqual("-\mathrm{ASinh}(''\\text{roe}'')", str(s))
-
-    def testListedStr(self):
-        s = Latest('ret') ^ Identity(2.)
-        self.assertEqual("(''\\text{ret}'', 2.0)", str(s))
 
     def testAddedStr(self):
         s = Latest('x') + Latest('y')

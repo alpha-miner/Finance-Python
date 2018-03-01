@@ -14,7 +14,7 @@ cdef class SeriesValues(object):
     cdef public np.ndarray name_array
 
     cpdef SeriesValues mask(self, flags)
-    cpdef object index(self)
+    cpdef list index(self)
     cpdef SeriesValues rank(self)
     cpdef SeriesValues zscore(self)
     cpdef SeriesValues unit(self)

@@ -256,7 +256,7 @@ cdef class SecurityMovingHistoricalWindow(SecuritySingleValueHolder):
 
     @cython.boundscheck(False)
     @cython.wraparound(False)
-    cpdef value_by_names(self, list names):
+    cpdef SeriesValues value_by_names(self, list names):
         cdef Accumulator holder
         cdef list res
         cdef int i
@@ -272,7 +272,7 @@ cdef class SecurityMovingHistoricalWindow(SecuritySingleValueHolder):
                 res[i] = holder.result()
             return SeriesValues(np.array(res), index=dict(zip(names, range(n))))
 
-    cpdef value_by_name(self, name):
+    cpdef double value_by_name(self, name):
         cdef Accumulator holder
         if self.updated:
             return self.cached[name]

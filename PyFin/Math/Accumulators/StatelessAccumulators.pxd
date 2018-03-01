@@ -67,6 +67,8 @@ cdef class Max(StatelessSingleValueAccumulator):
 cdef class Maximum(StatelessSingleValueAccumulator):
 
     cdef public double _currentMax
+    cdef Accumulator _x
+    cdef Accumulator _y
 
     cpdef push(self, dict data)
     cpdef object result(self)
@@ -85,6 +87,8 @@ cdef class Minimum(StatelessSingleValueAccumulator):
 
     cdef public double _currentMin
     cdef public int _first
+    cdef Accumulator _x
+    cdef Accumulator _y
 
     cpdef push(self, dict data)
     cpdef object result(self)
@@ -216,6 +220,8 @@ cdef class Correlation(StatelessMultiValueAccumulator):
     cdef public double _runningSumSquareRight
     cdef public double _runningSumCrossSquare
     cdef public int _currentCount
+    cdef Accumulator _x
+    cdef Accumulator _y
 
     cpdef push(self, dict data)
     cpdef object result(self)

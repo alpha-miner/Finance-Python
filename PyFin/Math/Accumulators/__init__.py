@@ -5,7 +5,6 @@ Created on 2015-8-8
 @author: cheng.li
 """
 
-from PyFin.Math.Accumulators.IAccumulators import TruncatedValueHolder
 from PyFin.Math.Accumulators.IAccumulators import Exp
 from PyFin.Math.Accumulators.IAccumulators import Log
 from PyFin.Math.Accumulators.IAccumulators import Sqrt
@@ -82,10 +81,6 @@ from PyFin.Math.Accumulators.StatefulAccumulators import MovingBias
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingAutoCorrelation
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingLogReturn
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingResidue
-from PyFin.Math.Accumulators.StatefulAccumulators import MovingAlphaBeta
-from PyFin.Math.Accumulators.StatefulAccumulators import MovingDrawDown
-from PyFin.Math.Accumulators.StatefulAccumulators import MovingAverageDrawdown
-from PyFin.Math.Accumulators.StatefulAccumulators import MovingMaxDrawdown
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingSharp
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingSortino
 
@@ -143,10 +138,6 @@ __all__ = ["Exp",
            "MovingStandardDeviation",
            "MovingLogReturn",
            "MovingResidue",
-           "MovingAlphaBeta",
-           "MovingDrawDown",
-           "MovingAverageDrawdown",
-           "MovingMaxDrawdown",
            "MovingSharp",
            "MovingSortino",
            "Product",

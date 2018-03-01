@@ -196,8 +196,8 @@ cdef class SeriesValues(object):
             elif op == 5:
                 return SeriesValues(self.values >= right, self.name_mapping)
 
-    cpdef object index(self):
-        return self.name_mapping.keys()
+    cpdef list index(self):
+        return list(self.name_mapping.keys())
 
     def __contains__(self, key):
         return key in self.name_mapping

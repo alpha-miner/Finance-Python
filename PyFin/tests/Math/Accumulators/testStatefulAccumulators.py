@@ -2233,7 +2233,7 @@ class TestStatefulAccumulators(unittest.TestCase):
         window = 100
         x_data = np.random.randn(10000)
 
-        mr = MovingResidue(window)
+        mr = MovingResidue(window, x='x', y='y')
 
         for i, value in enumerate(zip(x_data, self.sample)):
             x = value[0]
@@ -2255,7 +2255,7 @@ class TestStatefulAccumulators(unittest.TestCase):
 
     def testMovingResidueDeepcopy(self):
         window = 10
-        mr = MovingResidue(window)
+        mr = MovingResidue(window, x='x', y='y')
 
         mr.push(dict(x=-1., y=0))
         mr.push(dict(x=-2., y=-1))
@@ -2273,7 +2273,7 @@ class TestStatefulAccumulators(unittest.TestCase):
 
     def testMovingResiduePickle(self):
         window = 10
-        mr = MovingResidue(window)
+        mr = MovingResidue(window, x='x', y='y')
 
         mr.push(dict(x=-1., y=0))
         mr.push(dict(x=-2., y=-1))
@@ -2340,11 +2340,11 @@ class TestStatefulAccumulators(unittest.TestCase):
         self.assertEqual("\mathrm{MSum}(10, ''\\text{roe}'' + ''\\text{y}'')", str(s))
 
     def testMovingResidueResStr(self):
-        s = MovingResidue(10, ('roe', 'y'))
-        self.assertEqual("\mathrm{Res}(10, \\text{('roe', 'y')})", str(s))
+        s = MovingResidue(10, x='roe', y='y')
+        self.assertEqual("\mathrm{Res}(10, ''\\text{roe}'', ''\\text{y}'')", str(s))
 
-        s = MovingResidue(10, Latest('roe') ^ Latest('y'))
-        self.assertEqual("\mathrm{Res}(10, (''\\text{roe}'', ''\\text{y}''))", str(s))
+        s = MovingResidue(10, x=Latest('roe'), y=Latest('y'))
+        self.assertEqual("\mathrm{Res}(10, ''\\text{roe}'', ''\\text{y}'')", str(s))
 
 
 if __name__ == '__main__':

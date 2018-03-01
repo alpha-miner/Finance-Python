@@ -101,7 +101,7 @@ class TestStatelessAccumulators(unittest.TestCase):
                                                              "calculated max: {2:f}".format(i, expected, calculated))
 
     def testMaximum(self):
-        mm = Maximum(dependency=('open', 'close'))
+        mm = Maximum(x='open', y='close')
 
         for i, value in enumerate(zip(self.samplesOpen, self.samplesClose)):
             mm.push(dict(open=value[0], close=value[1]))
@@ -112,8 +112,8 @@ class TestStatelessAccumulators(unittest.TestCase):
                                                              "expected max:   {1:f}\n"
                                                              "calculated max: {2:f}".format(i, expected, calculated))
 
-    def testMaximumWithListedOperator(self):
-        mm = Maximum(dependency=Latest('open') ^ Latest('close'))
+    def testMaximumWithAccumulator(self):
+        mm = Maximum(x=Latest('open'), y=Latest('close'))
 
         for i, value in enumerate(zip(self.samplesOpen, self.samplesClose)):
             mm.push(dict(open=value[0], close=value[1]))
@@ -137,7 +137,7 @@ class TestStatelessAccumulators(unittest.TestCase):
                                                              "calculated min: {2:f}".format(i, expected, calculated))
 
     def testMinimum(self):
-        mm = Minimum(dependency=('open', 'close'))
+        mm = Minimum(x='open', y='close')
 
         for i, value in enumerate(zip(self.samplesOpen, self.samplesClose)):
             mm.push(dict(open=value[0], close=value[1]))
@@ -148,8 +148,8 @@ class TestStatelessAccumulators(unittest.TestCase):
                                                              "expected max:   {1:f}\n"
                                                              "calculated max: {2:f}".format(i, expected, calculated))
 
-    def testMinimumWithListedOperator(self):
-        mm = Minimum(dependency=Latest('open') ^ Latest('close'))
+    def testMinimumWithAccumulator(self):
+        mm = Minimum(x=Latest('open'), y=Latest('close'))
 
         for i, value in enumerate(zip(self.samplesOpen, self.samplesClose)):
             mm.push(dict(open=value[0], close=value[1]))
@@ -289,7 +289,7 @@ class TestStatelessAccumulators(unittest.TestCase):
                                                                                                 calculated))
 
     def testCorrelation(self):
-        mm = Correlation(dependency=['close', 'open'])
+        mm = Correlation(x='close', y='open')
 
         for i, (openPrice, closePrice) in enumerate(zip(self.samplesOpen, self.samplesClose)):
             mm.push(dict(open=openPrice, close=closePrice))

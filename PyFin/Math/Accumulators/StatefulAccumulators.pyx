@@ -16,6 +16,7 @@ from libc.math cimport log
 from libc.math cimport sqrt
 from copy import deepcopy
 from PyFin.Math.Accumulators.IAccumulators cimport Accumulator
+from PyFin.Math.Accumulators.IAccumulators cimport Latest
 from PyFin.Math.Accumulators.IAccumulators cimport StatelessSingleValueAccumulator
 from PyFin.Math.Accumulators.IAccumulators cimport build_holder
 from PyFin.Math.Accumulators.StatelessAccumulators cimport PositivePart
@@ -1213,14 +1214,17 @@ cdef class MovingSortino(StatefulValueHolder):
 
 cdef class MovingResidue(StatefulValueHolder):
 
-    def __init__(self, window, dependency=('y', 'x')):
-        super(MovingResidue, self).__init__(window, dependency)
+    def __init__(self, window, x, y):
+        super(MovingResidue, self).__init__(window, (x.dependency if isinstance(x, Accumulator) else x,
+                                                     y.dependency if isinstance(y, Accumulator) else y))
         self._returnSize = 1
         self._cross = 0.
         self._xsquare = 0.
         self._lasty = NAN
         self._lastx = NAN
-        self._default = (0., 0.)
+        self._x = copy.deepcopy(x) if isinstance(x, Accumulator) else Latest(x)
+        self._y = copy.deepcopy(y) if isinstance(y, Accumulator) else Latest(y)
+        self._deque_y = Deque(window)
 
     @cython.boundscheck(False)
     @cython.wraparound(False)
@@ -1230,12 +1234,15 @@ cdef class MovingResidue(StatefulValueHolder):
         cdef double head_y
         cdef double head_x
 
-        value = self.extract(data)
-        y, x = value
+        self._x.push(data)
+        x = self._x.result()
+        self._y.push(data)
+        y = self._y.result()
         if isnan(x) or isnan(y):
             return NAN
 
-        head_y, head_x = self._deque.dump(value, self._default)
+        head_x = self._deque.dump(x, 0.)
+        head_y = self._deque_y.dump(y, 0.)
 
         self._cross += x * y - head_x * head_y
         self._xsquare += x * x - head_x * head_x
@@ -1252,158 +1259,4 @@ cdef class MovingResidue(StatefulValueHolder):
         return self._lasty - coef * self._lastx
 
     def __str__(self):
-        if isinstance(self._dependency, Accumulator):
-            return "\\mathrm{{Res}}({0}, {1})".format(self._window, str(self._dependency))
-        else:
-            return "\\mathrm{{Res}}({0}, \\text{{{1}}})".format(self._window, str(self._dependency))
-
-
-cdef class MovingAlphaBeta(StatefulValueHolder):
-
-    def __init__(self, window, dependency=('pRet', 'mRet', 'riskFree')):
-        super(MovingAlphaBeta, self).__init__(window, dependency)
-        self._returnSize = 2
-        self._pReturnMean = MovingAverage(window, dependency='x')
-        self._mReturnMean = MovingAverage(window, dependency='y')
-        self._pReturnVar = MovingVariance(window, dependency='x')
-        self._mReturnVar = MovingVariance(window, dependency='y')
-        self._correlationHolder = MovingCorrelation(window, dependency=['x', 'y'])
-
-    cpdef push(self, dict data):
-
-        cdef double pReturn
-        cdef double mReturn
-        cdef double rf
-        cdef dict new_data
-
-        value = self.extract(data)
-        if isnan(value[0]) or isnan(value[1]) or isnan(value[2]):
-            return NAN
-        pReturn = value[0]
-        mReturn = value[1]
-        rf = value[2]
-        new_data = {'x': pReturn - rf, 'y': mReturn - rf}
-        self._pReturnMean.push(new_data)
-        self._mReturnMean.push(new_data)
-        self._pReturnVar.push(new_data)
-        self._mReturnVar.push(new_data)
-        self._correlationHolder.push(new_data)
-        self._isFull = self._isFull or (self._pReturnMean.isFull()
-                                        and self._mReturnMean.isFull()
-                                        and self._pReturnVar.isFull()
-                                        and self._mReturnVar.isFull()
-                                        and self._correlationHolder.isFull())
-
-    @cython.cdivision(True)
-    cpdef object result(self):
-        cdef double corr
-        cdef double tmp
-        cdef double pStd
-        cdef double mStd
-        cdef double beta
-        cdef double alpha
-
-        corr = self._correlationHolder.result()
-        tmp = self._pReturnVar.result()
-        if not isClose(tmp, 0.):
-            pStd = sqrt(tmp)
-        else:
-            pStd = 0.
-        tmp = self._mReturnVar.result()
-        if not isClose(tmp, 0.):
-            mStd = sqrt(tmp)
-        else:
-            mStd = 0.
-
-        if not isClose(tmp, 0.):
-            beta = corr * pStd / mStd
-        else:
-            beta = 0.
-        alpha = self._pReturnMean.result() - beta * self._mReturnMean.result()
-        return alpha, beta
-
-
-cdef class MovingDrawDown(StatefulValueHolder):
-
-    def __init__(self, window, dependency='ret'):
-        super(MovingDrawDown, self).__init__(window, dependency)
-        self._returnSize = 3
-        self._maxer = MovingMax(window + 1, dependency='x')
-        self._maxer.push(dict(x=0.0))
-        self._runningCum = 0.0
-        self._currentMax = NAN
-        self._highIndex = 0
-        self._runningIndex = -1
-
-    cpdef push(self, dict data):
-
-        cdef double value = self.extract(data)
-
-        if isnan(value):
-            return NAN
-        self._runningIndex += 1
-        self._runningCum += value
-        self._maxer.push(dict(x=self._runningCum))
-        self._currentMax = self._maxer.result()
-        if self._runningCum >= self._currentMax:
-            self._highIndex = self._runningIndex
-        self._isFull = self._isFull or self._maxer.isFull()
-
-    cpdef object result(self):
-        return self._runningCum - self._currentMax, self._runningIndex - self._highIndex, self._highIndex
-
-
-cdef class MovingAverageDrawdown(StatefulValueHolder):
-
-    def __init__(self, window, dependency='ret'):
-        super(MovingAverageDrawdown, self).__init__(window, dependency)
-        self._returnSize = 2
-        self._drawdownCalculator = MovingDrawDown(window, dependency='ret')
-        self._drawdownMean = MovingAverage(window, dependency='drawdown')
-        self._durationMean = MovingAverage(window, dependency='duration')
-
-    cpdef push(self, dict data):
-
-        cdef double value
-        cdef double drawdown
-        cdef double duration
-
-        value = self.extract(data)
-        if isnan(value):
-            return NAN
-        self._drawdownCalculator.push(dict(ret=value))
-        drawdown, duration, _ = self._drawdownCalculator.result()
-        self._drawdownMean.push(dict(drawdown=drawdown))
-        self._durationMean.push(dict(duration=duration))
-        self._isFull = self._isFull or (self._drawdownCalculator.isFull()
-                                        and self._drawdownMean.isFull()
-                                        and self._durationMean.isFull())
-
-    cpdef object result(self):
-        return self._drawdownMean.result(), self._durationMean.result()
-
-
-cdef class MovingMaxDrawdown(StatefulValueHolder):
-
-    def __init__(self, window, dependency='ret'):
-        super(MovingMaxDrawdown, self).__init__(window, dependency)
-        self._returnSize = 2
-        self._drawdownCalculator = MovingDrawDown(window, 'x')
-
-    cpdef push(self, dict data):
-        cdef double value
-        cdef double drawdown
-        cdef double duration
-        cdef int lastHighIndex
-
-        value = self.extract(data)
-        if isnan(value):
-            return NAN
-        self._drawdownCalculator.push(dict(x=value))
-        drawdown, duration, lastHighIndex = self._drawdownCalculator.result()
-        self._deque.dump((drawdown, duration, lastHighIndex))
-        self._isFull = self._isFull or self._deque.isFull()
-
-    cpdef object result(self):
-        cdef np.ndarray[double, ndim=1] values = np.array([self._deque[i][0] for i in range(self.size())])
-        return self._deque[values.argmin()]
+        return "\\mathrm{{Res}}({0}, {1}, {2})".format(self._window, str(self._x), str(self._y))

@@ -14,8 +14,6 @@ from PyFin.POpt.Calculators import calculate_annualized_return
 from PyFin.POpt.Calculators import calculate_volatility
 from PyFin.POpt.Calculators import calculate_sharp
 from PyFin.POpt.Calculators import calculate_sortino
-from PyFin.POpt.Calculators import calculate_max_drawdown
-from PyFin.POpt.Calculators import calculate_mean_drawdown
 
 
 def portfolio_returns(weights, nav_table, rebalance):
@@ -34,49 +32,30 @@ def utility_calculator(returns, opt_type, multiplier):
         return np.exp(calculate_annualized_return(returns, multiplier)) - 1.0
     elif opt_type == OptTarget.VOL:
         return -calculate_volatility(returns, multiplier)
-    elif opt_type == OptTarget.MAX_DRAWDOWN:
-        return np.exp(-calculate_max_drawdown(returns)) - 1.0
-    elif opt_type == OptTarget.MEAN_DRAWDOWN:
-        return np.exp(-calculate_mean_drawdown(returns)) - 1.0
     elif opt_type == OptTarget.SHARP:
         return calculate_sharp(returns, multiplier)
     elif opt_type == OptTarget.SORTINO:
         return calculate_sortino(returns, multiplier)
-    elif opt_type == OptTarget.RETURN_D_MAX_DRAWDOWN:
-        annual_return = np.exp(calculate_annualized_return(returns, multiplier)) - 1.0
-        max_draw_down = 1.0 - np.exp(-calculate_max_drawdown(returns))
-        return annual_return / max_draw_down
 
 
 @unique
 class OptTarget(str, Enum):
     RETURN = 'RETURN'
     VOL = 'VOL'
-    MAX_DRAWDOWN = 'MAX_DRAWDOWN'
-    MEAN_DRAWDOWN = 'MEAN_DRAWDOWN'
     SHARP = 'SHARP'
     SORTINO = 'SORTINO'
-    RETURN_D_MAX_DRAWDOWN = 'RETURN_D_MAX_DRAWDOWN'
 
 
 def portfolio_optimization(weights, nav_table, opt_type, multiplier, rebalance=False, lb=0., ub=1.):
-    if not rebalance and \
-            (opt_type == OptTarget.SORTINO
-             or opt_type == OptTarget.RETURN_D_MAX_DRAWDOWN
-             or opt_type == OptTarget.MAX_DRAWDOWN):
+    if not rebalance and opt_type == OptTarget.SORTINO:
         raise ValueError("Portfolio optimization target can't be set as "
-                         "maximize sortino ratio"
-                         "or minimize max draw down "
-                         "or maximuze return to max draw down.")
+                         "maximize sortino ratio")
 
     if opt_type == OptTarget.SORTINO or \
                     opt_type == OptTarget.RETURN or \
                     opt_type == OptTarget.VOL or \
                     opt_type == OptTarget.SHARP or \
-                    opt_type == OptTarget.MEAN_DRAWDOWN or \
-            (rebalance and (opt_type == OptTarget.MAX_DRAWDOWN or
-                                   opt_type == OptTarget.RETURN_D_MAX_DRAWDOWN or
-                                   opt_type == OptTarget.SORTINO)):
+            (rebalance and opt_type == OptTarget.SORTINO):
         x0 = weights
 
         bounds = [(lb, ub) for _ in weights]

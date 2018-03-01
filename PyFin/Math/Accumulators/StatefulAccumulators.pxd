@@ -365,50 +365,10 @@ cdef class MovingResidue(StatefulValueHolder):
     cdef public double _xsquare
     cdef public double _lastx
     cdef public double _lasty
-    cdef public tuple _default
+    cdef Accumulator _x
+    cdef Accumulator _y
+    cdef Deque _deque_y
 
     cpdef push(self, dict data)
     cpdef object result(self)
     cpdef bint isFull(self)
-
-
-cdef class MovingAlphaBeta(StatefulValueHolder):
-
-    cdef public MovingAverage _pReturnMean
-    cdef public MovingAverage _mReturnMean
-    cdef public MovingVariance _pReturnVar
-    cdef public MovingVariance _mReturnVar
-    cdef public MovingCorrelation _correlationHolder
-
-    cpdef push(self, dict data)
-    cpdef object result(self)
-
-
-cdef class MovingDrawDown(StatefulValueHolder):
-
-    cdef public MovingMax _maxer
-    cdef public double _runningCum
-    cdef public double _currentMax
-    cdef public int _highIndex
-    cdef public int _runningIndex
-
-    cpdef push(self, dict data)
-    cpdef object result(self)
-
-
-cdef class MovingAverageDrawdown(StatefulValueHolder):
-
-    cdef public MovingDrawDown _drawdownCalculator
-    cdef public MovingAverage _drawdownMean
-    cdef public MovingAverage _durationMean
-
-    cpdef push(self, dict data)
-    cpdef object result(self)
-
-
-cdef class MovingMaxDrawdown(StatefulValueHolder):
-
-    cdef public MovingDrawDown _drawdownCalculator
-
-    cpdef push(self, dict data)
-    cpdef object result(self)

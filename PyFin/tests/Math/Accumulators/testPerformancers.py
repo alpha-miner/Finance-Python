@@ -14,13 +14,14 @@ from PyFin.Math.Accumulators.StatefulAccumulators import MovingSortino
 
 
 class TestPerformancers(unittest.TestCase):
+
     def testMovingSharp(self):
         dirName = os.path.dirname(os.path.abspath(__file__))
         filePath = os.path.join(dirName, 'data/sharp.csv')
 
         with open(filePath, 'r') as fileHandler:
             reader = csv.reader(fileHandler)
-            mv = MovingSharp(20)
+            mv = MovingSharp(20, x='ret', y='riskFree')
 
             for i, row in enumerate(reader):
                 if i == 0:
@@ -45,7 +46,7 @@ class TestPerformancers(unittest.TestCase):
 
         with open(filePath, 'r') as fileHandler:
             reader = csv.reader(fileHandler)
-            mv = MovingSortino(window)
+            mv = MovingSortino(window, x='ret', y='riskFree')
             for i, row in enumerate(reader):
                 if i == 0:
                     continue

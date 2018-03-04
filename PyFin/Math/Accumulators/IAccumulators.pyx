@@ -72,52 +72,14 @@ cdef class IAccumulator(object):
 
 cdef class Accumulator(IAccumulator):
 
-    def __init__(self, dependency):
+    def __init__(self):
         self._isFull = False
         self._window = 0
-        self._returnSize = 1
-
-        if isinstance(dependency, Accumulator):
-            self._isValueHolderContained = True
-            self._dependency = deepcopy(dependency)
-            self._isStringDependency = False
-        else:
-            self._isValueHolderContained = False
-            if (isinstance(dependency, tuple) or isinstance(dependency, list)) and len(dependency) > 1:
-                self._dependency = dependency
-                self._isStringDependency=False
-            elif (isinstance(dependency, tuple) or isinstance(dependency, list)) and len(dependency) == 1:
-                self._dependency = dependency[0]
-                self._isStringDependency = True
-            else:
-                self._dependency = dependency
-                self._isStringDependency = True
-
-
-    cdef extract(self, dict data):
-        cdef str p
-        cdef Accumulator comp
-
-        if not self._isValueHolderContained:
-            if self._isStringDependency:
-                try:
-                    return data[self._dependency]
-                except KeyError:
-                    return NAN
-            else:
-                try:
-                    return tuple(data[p] for p in self._dependency)
-                except KeyError:
-                    return NAN
-        else:
-            comp = self._dependency
-            comp.push(data)
-            return comp.result()
 
     cpdef push(self, dict data):
         pass
 
-    cpdef object result(self):
+    cpdef double result(self):
         pass
 
     @cython.boundscheck(False)
@@ -166,63 +128,37 @@ cdef class Accumulator(IAccumulator):
         return self._window
 
     @property
-    def valueSize(self):
-        return self._returnSize
-
-    @property
     def dependency(self):
-        if isinstance(self._dependency, six.string_types) or hasattr(self._dependency, '__iter__'):
-            return self._dependency
-        else:
-            return self._dependency.dependency
-
-    cpdef copy_attributes(self, dict attributes, bint is_deep=True):
-        self._isFull = attributes['_isFull']
-        self._dependency = copy.deepcopy(attributes['_dependency']) if is_deep else attributes['_dependency']
-        self._isValueHolderContained = attributes['_isValueHolderContained']
-        self._window = attributes['_window']
-        self._returnSize = attributes['_returnSize']
-        self._isStringDependency = attributes['_isStringDependency']
-
-    cpdef collect_attributes(self):
-        attributes = dict()
-        attributes['_isFull'] = self._isFull
-        attributes['_dependency'] = self._dependency
-        attributes['_isValueHolderContained'] = self._isValueHolderContained
-        attributes['_window'] = self._window
-        attributes['_returnSize'] = self._returnSize
-        attributes['_isStringDependency'] = self._isStringDependency
-        return attributes
+        return self._dependency
 
 
 cdef class Negative(Accumulator):
 
-    def __init__(self, valueHolder):
-        super(Negative, self).__init__(valueHolder)
-        self._returnSize = valueHolder.valueSize
-        self._window = valueHolder.window
+    def __init__(self, x):
+        super(Negative, self).__init__()
+        self._window = x.window
         self._isFull = False
+        self._inner = copy.deepcopy(x)
+        self._dependency = self._inner.dependency
 
     cpdef push(self, dict data):
-        self._dependency.push(data)
-        self._isFull = self._dependency.isFull()
+        self._inner.push(data)
+        self._isFull = self._isFull if self._isFull else self._inner.isFull()
 
     def __str__(self):
-        return "-{0}".format(str(self._dependency))
+        return "-{0}".format(str(self._inner))
 
-    cpdef object result(self):
-        cdef double res = self._dependency.result()
-        return -res
+    cpdef double result(self):
+        return -self._inner.result()
 
 
 cdef class CombinedValueHolder(Accumulator):
 
     def __init__(self, left, right):
-        super(CombinedValueHolder, self).__init__([])
+        super(CombinedValueHolder, self).__init__()
         self._left = build_holder(left)
         self._right = build_holder(right)
-        self._returnSize = self._left.valueSize
-        self._dependency = list(set(self._left.dependency).union(set(self._right.dependency)))
+        self._dependency = list(set(self._left.dependency + self._right.dependency))
         self._window = max(self._left.window, self._right.window)
         self._isFull = False
 
@@ -231,18 +167,14 @@ cdef class CombinedValueHolder(Accumulator):
         self._right.push(data)
         self._isFull = self._isFull or (self._left.isFull() and self._right.isFull())
 
-    cpdef bint isFull(self):
-        return self._isFull
-
 
 cdef class AddedValueHolder(CombinedValueHolder):
     def __init__(self, left, right):
         super(AddedValueHolder, self).__init__(left, right)
 
-    cpdef object result(self):
+    cpdef double result(self):
         cdef double res1 = self._left.result()
         cdef double res2 = self._right.result()
-
         return res1 + res2
 
     def __str__(self):
@@ -253,10 +185,9 @@ cdef class MinusedValueHolder(CombinedValueHolder):
     def __init__(self, left, right):
         super(MinusedValueHolder, self).__init__(left, right)
 
-    cpdef object result(self):
+    cpdef double result(self):
         cdef double res1 = self._left.result()
         cdef double res2 = self._right.result()
-
         return res1 - res2
 
     def __str__(self):
@@ -267,10 +198,9 @@ cdef class MultipliedValueHolder(CombinedValueHolder):
     def __init__(self, left, right):
         super(MultipliedValueHolder, self).__init__(left, right)
 
-    cpdef object result(self):
+    cpdef double result(self):
         cdef double res1 = self._left.result()
         cdef double res2 = self._right.result()
-
         return res1 * res2
 
     def __str__(self):
@@ -293,10 +223,9 @@ cdef class DividedValueHolder(CombinedValueHolder):
         super(DividedValueHolder, self).__init__(left, right)
 
     @cython.cdivision(True)
-    cpdef object result(self):
+    cpdef double result(self):
         cdef double res1 = self._left.result()
         cdef double res2 = self._right.result()
-
         return res1 / res2
 
     def __str__(self):
@@ -307,10 +236,9 @@ cdef class LtOperatorValueHolder(CombinedValueHolder):
     def __init__(self, left, right):
         super(LtOperatorValueHolder, self).__init__(left, right)
 
-    cpdef object result(self):
+    cpdef double result(self):
         cdef double res1 = self._left.result()
         cdef double res2 = self._right.result()
-
         return res1 < res2
 
     def __str__(self):
@@ -332,10 +260,9 @@ cdef class LeOperatorValueHolder(CombinedValueHolder):
     def __init__(self, left, right):
         super(LeOperatorValueHolder, self).__init__(left, right)
 
-    cpdef object result(self):
+    cpdef double result(self):
         cdef double res1 = self._left.result()
         cdef double res2 = self._right.result()
-
         return res1 <= res2
 
     def __str__(self):
@@ -357,10 +284,9 @@ cdef class GtOperatorValueHolder(CombinedValueHolder):
     def __init__(self, left, right):
         super(GtOperatorValueHolder, self).__init__(left, right)
 
-    cpdef object result(self):
+    cpdef double result(self):
         cdef double res1 = self._left.result()
         cdef double res2 = self._right.result()
-
         return res1 > res2
 
     def __str__(self):
@@ -382,10 +308,9 @@ cdef class GeOperatorValueHolder(CombinedValueHolder):
     def __init__(self, left, right):
         super(GeOperatorValueHolder, self).__init__(left, right)
 
-    cpdef object result(self):
+    cpdef double result(self):
         cdef double res1 = self._left.result()
         cdef double res2 = self._right.result()
-
         return res1 >= res2
 
     def __str__(self):
@@ -407,10 +332,9 @@ cdef class EqOperatorValueHolder(CombinedValueHolder):
     def __init__(self, left, right):
         super(EqOperatorValueHolder, self).__init__(left, right)
 
-    cpdef object result(self):
+    cpdef double result(self):
         cdef double res1 = self._left.result()
         cdef double res2 = self._right.result()
-
         return res1 == res2
 
     def __str__(self):
@@ -432,10 +356,9 @@ cdef class NeOperatorValueHolder(CombinedValueHolder):
     def __init__(self, left, right):
         super(NeOperatorValueHolder, self).__init__(left, right)
 
-    cpdef object result(self):
+    cpdef double result(self):
         cdef double res1 = self._left.result()
         cdef double res2 = self._right.result()
-
         return res1 != res2
 
     def __str__(self):
@@ -459,61 +382,37 @@ cdef class Identity(Accumulator):
         self._dependency = []
         self._window = 0
         self._value = value
-        self._returnSize = 1
         self._isFull = True
 
     cpdef push(self, dict data):
         pass
 
-    cpdef object result(self):
+    cpdef double result(self):
         return self._value
 
     def __str__(self):
         return str(self._value)
 
 
-cdef class StatelessSingleValueAccumulator(Accumulator):
+cdef class Latest(Accumulator):
 
-    def __init__(self, dependency='x'):
-        super(StatelessSingleValueAccumulator, self).__init__(dependency)
-        self._returnSize = 1
+    def __init__(self, x='x', current_value=NAN):
+        super(Latest, self).__init__()
         self._window = 0
-
-    cdef _push(self, dict data):
-
-        cdef Accumulator comp
-
-        if not self._isValueHolderContained:
-            try:
-                value = data[self._dependency]
-            except KeyError:
-                value = NAN
-        else:
-            comp = self._dependency
-            comp.push(data)
-            value = comp.result()
-        return value
-
-
-cdef class Latest(StatelessSingleValueAccumulator):
-
-    def __init__(self, dependency='x', current_value=NAN):
-        super(Latest, self).__init__(dependency)
-        self._window = 0
-        self._returnSize = 1
         self._isFull = True
         self._latest = current_value
+        self._dependency = [x]
 
     cpdef push(self, dict data):
-        self._latest = self._push(data)
+        try:
+            self._latest = data[self._dependency[0]]
+        except KeyError:
+            pass
 
     def __str__(self):
-        if self._isValueHolderContained:
-            return "{0}".format(str(self._dependency))
-        else:
-            return "''\\text{{{0}}}''".format(str(self._dependency))
+        return "''\\text{{{0}}}''".format(str(self._dependency[0]))
 
-    cpdef object result(self):
+    cpdef double result(self):
         return self._latest
 
 
@@ -541,47 +440,31 @@ cpdef build_holder(name):
 cdef class CompoundedValueHolder(Accumulator):
 
     def __init__(self, left, right):
-        super(CompoundedValueHolder, self).__init__([])
+        super(CompoundedValueHolder, self).__init__()
         self._left = build_holder(left)
         self._right = build_holder(right)
-        self._returnSize = self._right.valueSize
-        self._window = self._left.window + self._right.window - 1
+        self._window = self._left.window + self._right.window
         self._dependency = deepcopy(self._left.dependency)
 
-        if hasattr(right.dependency, '__iter__'):
-            pyFinAssert(left.valueSize == len(right.dependency), ValueError, "left value size {0} "
-                                                                          "should be equal to right dependency size {1}"
-                     .format(left.valueSize, len(right.dependency)))
-        else:
-            pyFinAssert(left.valueSize == 1, ValueError, "left value size {0} should be equal to right dependency size 1"
-                     .format(left.valueSize))
-
     cpdef push(self, dict data):
+        cdef double left_value
         self._left.push(data)
-        values = self._left.result()
-        if not hasattr(values, '__iter__'):
-            parameters = {self._right.dependency: values}
-        else:
-            parameters = {name: value for name, value in zip(self._right.dependency, values)}
-        self._right.push(parameters)
+        left_value = self._left.result()
+        self._right.push({self._right.dependency[0]: left_value})
         self._isFull = self._isFull or (self._left.isFull() and self._right.isFull())
 
-    cpdef object result(self):
+    cpdef double result(self):
         return self._right.result()
-
-    cpdef bint isFull(self):
-        return self._isFull
 
 
 cdef class IIF(Accumulator):
 
     def __init__(self, cond, left, right):
-        super(IIF, self).__init__([])
+        super(IIF, self).__init__()
         self._cond = build_holder(cond)
-        self._returnSize = self._cond.valueSize
         self._left = build_holder(left)
         self._right = build_holder(right)
-        self._dependency = list(set(self._cond.dependency).union(set(self._cond.dependency).union(set(self._cond.dependency))))
+        self._dependency = list(set(self._cond.dependency + self._left.dependency + self._right.dependency))
         self._window = max(self._cond.window, self._left.window, self._right.window)
         self._isFull = False
 
@@ -591,166 +474,133 @@ cdef class IIF(Accumulator):
         self._right.push(data)
         self._isFull = self._isFull or (self._cond.isFull() and self._left.isFull() and self._right.isFull())
 
-    cpdef object result(self):
+    cpdef double result(self):
         return self._left.result() if self._cond.result() else self._right.result()
 
 
 cdef class BasicFunction(Accumulator):
 
-    def __init__(self, dependency, orig_value=NAN):
-        super(BasicFunction, self).__init__(dependency)
-        if self._isValueHolderContained:
-            self._window = self._dependency.window
-        else:
-            self._window = 1
-        self._returnSize = 1
-        self._isFull = 1
+    def __init__(self, x, orig_value=NAN):
+        super(BasicFunction, self).__init__()
+        self._inner = build_holder(x)
+        self._window = self._inner.window
+        self._isFull = False
+        self._dependency = self._inner.dependency
         self._origValue = orig_value
 
     cpdef push(self, dict data):
-
-        cdef double value = self.extract(data)
-        self._origValue = value
+        self._inner.push(data)
+        self._origValue = self._inner.result()
+        self._isFull = self._isFull or self._inner.isFull()
 
 
 cdef class Exp(BasicFunction):
-    def __init__(self, dependency, orig_value=NAN):
-        super(Exp, self).__init__(dependency, orig_value)
+    def __init__(self, x, orig_value=NAN):
+        super(Exp, self).__init__(x, orig_value)
 
-    cpdef object result(self):
+    cpdef double result(self):
         return exp(self._origValue)
 
     def __str__(self):
-        if self._isValueHolderContained:
-            return "\\exp({0})".format(str(self._dependency))
-        else:
-            return "\\exp(''\\text{{{0}}}'')".format(str(self._dependency))
+        return "\\exp({0})".format(str(self._inner))
 
 
 cdef class Log(BasicFunction):
-    def __init__(self, dependency, orig_value=NAN):
-        super(Log, self).__init__(dependency, orig_value)
+    def __init__(self, x, orig_value=NAN):
+        super(Log, self).__init__(x, orig_value)
 
-    cpdef object result(self):
+    cpdef double result(self):
         return log(self._origValue)
 
     def __str__(self):
-        if self._isValueHolderContained:
-            return "\\ln({0})".format(str(self._dependency))
-        else:
-            return "\\ln(''\\text{{{0}}}'')".format(str(self._dependency))
+        return "\\ln({0})".format(str(self._inner))
 
 
 cdef class Sqrt(BasicFunction):
-    def __init__(self, dependency, orig_value=NAN):
-        super(Sqrt, self).__init__(dependency, orig_value)
+    def __init__(self, x, orig_value=NAN):
+        super(Sqrt, self).__init__(x, orig_value)
 
-    cpdef object result(self):
+    cpdef double result(self):
         return sqrt(self._origValue)
 
     def __str__(self):
-        if self._isValueHolderContained:
-            return "\\sqrt{{{0}}}".format(str(self._dependency))
-        else:
-            return "\\sqrt{{''\\text{{{0}}}''}}".format(str(self._dependency))
+        return "\\sqrt{{{0}}}".format(str(self._inner))
 
 
 # due to the fact that pow function is much slower than ** operator
 cdef class Pow(BasicFunction):
 
-    def __init__(self, dependency, n, orig_value=NAN):
-        super(Pow, self).__init__(dependency, orig_value)
+    def __init__(self, x, n, orig_value=NAN):
+        super(Pow, self).__init__(x, orig_value)
         self._n = n
 
-    cpdef object result(self):
+    cpdef double result(self):
         return self._origValue ** self._n
 
     def __str__(self):
-        if self._isValueHolderContained:
-            return "{0} ^ {{{1}}}".format(str(self._dependency), self._n)
-        else:
-            return "''\\text{{{0}}}'' ^ {{{1}}}".format(str(self._dependency), self._n)
+        return "{0} ^ {{{1}}}".format(str(self._inner), self._n)
 
 
 cdef class Abs(BasicFunction):
-    def __init__(self, dependency, orig_value=NAN):
-        super(Abs, self).__init__(dependency, orig_value)
+    def __init__(self, x, orig_value=NAN):
+        super(Abs, self).__init__(x, orig_value)
 
-    cpdef object result(self):
+    cpdef double result(self):
         return fabs(self._origValue)
 
     def __str__(self):
-        if self._isValueHolderContained:
-            return "\\left| {0} \\right|".format(str(self._dependency))
-        else:
-            return "\\left|  ''\\text{{{0}}}'' \\right|".format(str(self._dependency))
+        return "\\left| {0} \\right|".format(str(self._inner))
 
 
 cdef class Sign(BasicFunction):
-    def __init__(self, dependency, orig_value=NAN):
-        super(Sign, self).__init__(dependency, orig_value)
+    def __init__(self, x, orig_value=NAN):
+        super(Sign, self).__init__(x, orig_value)
 
-    cpdef object result(self):
+    cpdef double result(self):
         return sign(self._origValue)
 
     def __str__(self):
-        if self._isValueHolderContained:
-            return "\\mathrm{{sign}}({0})".format(str(self._dependency))
-        else:
-            return "\\mathrm{{sign}}(''\\text{{{0}}}'')".format(str(self._dependency))
+        return "\\mathrm{{sign}}({0})".format(str(self._inner))
 
 
 cdef class Acos(BasicFunction):
-    def __init__(self, dependency, orig_value=NAN):
-        super(Acos, self).__init__(dependency, orig_value)
+    def __init__(self, x, orig_value=NAN):
+        super(Acos, self).__init__(x, orig_value)
 
-    cpdef object result(self):
+    cpdef double result(self):
         return acos(self._origValue)
 
     def __str__(self):
-        if self._isValueHolderContained:
-            return "\\mathrm{{ACos}}({0})".format(str(self._dependency))
-        else:
-            return "\\mathrm{{ACos}}(''\\text{{{0}}}'')".format(str(self._dependency))
+        return "\\mathrm{{ACos}}({0})".format(str(self._inner))
 
 
 cdef class Acosh(BasicFunction):
-    def __init__(self, dependency, orig_value=NAN):
-        super(Acosh, self).__init__(dependency, orig_value)
+    def __init__(self, x, orig_value=NAN):
+        super(Acosh, self).__init__(x, orig_value)
 
-    cpdef object result(self):
+    cpdef double result(self):
         return acosh(self._origValue)
 
     def __str__(self):
-        if self._isValueHolderContained:
-            return "\\mathrm{{ACosh}}({0})".format(str(self._dependency))
-        else:
-            return "\\mathrm{{ACosh}}(''\\text{{{0}}}'')".format(str(self._dependency))
-
+        return "\\mathrm{{ACosh}}({0})".format(str(self._inner))
 
 cdef class Asin(BasicFunction):
-    def __init__(self, dependency, orig_value=NAN):
-        super(Asin, self).__init__(dependency, orig_value)
+    def __init__(self, x, orig_value=NAN):
+        super(Asin, self).__init__(x, orig_value)
 
-    cpdef object result(self):
+    cpdef double result(self):
         return asin(self._origValue)
 
     def __str__(self):
-        if self._isValueHolderContained:
-            return "\\mathrm{{ASin}}({0})".format(str(self._dependency))
-        else:
-            return "\\mathrm{{ASin}}(''\\text{{{0}}}'')".format(str(self._dependency))
+        return "\\mathrm{{ASin}}({0})".format(str(self._inner))
 
 
 cdef class Asinh(BasicFunction):
-    def __init__(self, dependency, orig_value=NAN):
-        super(Asinh, self).__init__(dependency, orig_value)
+    def __init__(self, x, orig_value=NAN):
+        super(Asinh, self).__init__(x, orig_value)
 
-    cpdef object result(self):
+    cpdef double result(self):
         return asinh(self._origValue)
 
     def __str__(self):
-        if self._isValueHolderContained:
-            return "\\mathrm{{ASinh}}({0})".format(str(self._dependency))
-        else:
-            return "\\mathrm{{ASinh}}(''\\text{{{0}}}'')".format(str(self._dependency))
+        return "\\mathrm{{ASinh}}({0})".format(str(self._inner))

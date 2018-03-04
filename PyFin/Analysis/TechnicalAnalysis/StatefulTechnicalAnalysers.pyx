@@ -29,7 +29,6 @@ from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingPositiveDifferen
 from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingNegativeDifferenceAverage
 from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingRSI
 from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingResidue
-from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingHistoricalWindow
 from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingLogReturn
 from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingCorrelation
 from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingRank
@@ -208,74 +207,3 @@ cdef class SecurityMovingRank(SecuritySingleValueHolder):
 
     def __init__(self, window, dependency='x'):
         super(SecurityMovingRank, self).__init__(window, MovingRank, dependency)
-
-
-cdef class SecurityMovingHistoricalWindow(SecuritySingleValueHolder):
-    def __init__(self, window, dependency='x'):
-        super(SecurityMovingHistoricalWindow, self).__init__(window, MovingHistoricalWindow, dependency)
-
-    def __getitem__(self, item):
-        if isinstance(item, str):
-            return super(SecurityMovingHistoricalWindow, self).__getitem__(item)
-        elif isinstance(item, int):
-            res = {}
-            for name in self._innerHolders:
-                try:
-                    res[name] = self._innerHolders[name].value[item]
-                except ArithmeticError:
-                    res[name] = NAN
-            return SeriesValues(res)
-        else:
-            raise ValueError("{0} is not recognized as valid int or string".format(item))
-
-    @property
-    @cython.boundscheck(False)
-    @cython.wraparound(False)
-    def value(self):
-
-        cdef list values
-        cdef Accumulator holder
-        cdef size_t n
-        cdef int i
-
-        if self.updated:
-            return SeriesValues(self.cached.values, self.cached.name_mapping)
-        else:
-            keys = self._innerHolders.keys()
-            n = len(keys)
-            values = [None] * n
-            for i, name in enumerate(keys):
-                try:
-                    holder = self._innerHolders[name]
-                    values[i] = holder.result()
-                except ArithmeticError:
-                    values[i] = NAN
-            self.cached = SeriesValues(np.array(values), index=dict(zip(keys, range(n))))
-            self.updated = 1
-            return self.cached
-
-    @cython.boundscheck(False)
-    @cython.wraparound(False)
-    cpdef SeriesValues value_by_names(self, list names):
-        cdef Accumulator holder
-        cdef list res
-        cdef int i
-        cdef size_t n
-
-        if self.updated:
-            return self.cached[names]
-        else:
-            n = len(names)
-            res = [None] * n
-            for i, name in enumerate(names):
-                holder = self._innerHolders[name]
-                res[i] = holder.result()
-            return SeriesValues(np.array(res), index=dict(zip(names, range(n))))
-
-    cpdef double value_by_name(self, name):
-        cdef Accumulator holder
-        if self.updated:
-            return self.cached[name]
-        else:
-            holder = self._innerHolders[name]
-            return holder.result()

@@ -46,13 +46,13 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
         self.sampleRf = np.random.randn(10000)
 
     def testAddedNanValue(self):
-        m = Max(dependency='x')
+        m = Max('x')
         m.push({'x': 10.0})
         m.push({'x': np.nan})
         self.assertAlmostEqual(10., m.value)
 
     def testAccumulatorBasic(self):
-        m = Max(dependency='x')
+        m = Max('x')
         m.push({'x': 10.0})
         self.assertAlmostEqual(m.result(), m.value)
 
@@ -159,9 +159,9 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
                                                              "calculated: {2:f}".format(i, expected, calculated))
 
     def testDivOperator(self):
-        mc5 = MovingCorrelation(5, ['open', 'close'])
+        mc5 = MovingCorrelation(5, 'open', 'close')
         minum = Min('open')
-        divRes = Min('open') / MovingCorrelation(5, ['open', 'close'])
+        divRes = Min('open') / MovingCorrelation(5, 'open', 'close')
 
         for i, (open, close) in enumerate(zip(self.sampleOpen, self.sampleClose)):
             data = {'close': close, 'open': open}
@@ -228,7 +228,7 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
     def testCompoundedOperator(self):
         ma5 = MovingAverage(5, 'x')
         maxer = Max('close')
-        max5ma = Max('close') >> MovingAverage(5)
+        max5ma = Max('close') >> MovingAverage(5, 'max')
         max5ma2 = MovingAverage(5, Max('close'))
 
         for i, close in enumerate(self.sampleClose):
@@ -677,7 +677,7 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
 
     def testAbsStr(self):
         s = Abs('roe')
-        self.assertEqual("\\left|  ''\\text{roe}'' \\right|", str(s))
+        self.assertEqual("\\left| ''\\text{roe}'' \\right|", str(s))
 
     def testSignStr(self):
         s = Sign('roe')

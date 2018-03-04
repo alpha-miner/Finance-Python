@@ -22,7 +22,6 @@ from PyFin.Analysis.TechnicalAnalysis import SecurityMovingStandardDeviation
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingCountedPositive
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingPositiveAverage
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingRSI
-from PyFin.Analysis.TechnicalAnalysis import SecurityMovingHistoricalWindow
 from PyFin.Analysis.TechnicalAnalysis import SecuritySignValueHolder
 from PyFin.Analysis.TechnicalAnalysis import SecurityXAverageValueHolder
 from PyFin.Analysis.TechnicalAnalysis import SecurityMACDValueHolder
@@ -160,10 +159,6 @@ def MNPOSITIVE(window, dependency='x'):
 
 def MAPOSITIVE(window, dependency='x'):
     return SecurityMovingPositiveAverage(window, dependency)
-
-
-def HIST(window, dependency='x'):
-    return SecurityMovingHistoricalWindow(window, dependency)
 
 
 def LAST(dependency='x'):

@@ -32,7 +32,6 @@ from PyFin.Analysis.TechnicalAnalysis import SecurityMovingLogReturn
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingResidue
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingRank
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingCorrelation
-from PyFin.Analysis.TechnicalAnalysis import SecurityMovingHistoricalWindow
 
 
 class TestStatefulTechnicalAnalysis(unittest.TestCase):

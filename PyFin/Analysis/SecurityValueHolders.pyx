@@ -86,7 +86,6 @@ cdef class SecurityValueHolder(object):
                     holder = copy.deepcopy(self._holderTemplate)
                     holder.push({dummy_name:  sec_values[name]})
                     self._innerHolders[name] = holder
-                    self._innerHolders[name] = holder
         else:
             for name in data:
                 try:

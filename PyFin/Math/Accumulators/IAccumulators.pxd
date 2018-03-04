@@ -21,7 +21,7 @@ cdef class Accumulator(IAccumulator):
     cpdef double result(self)
     cpdef transform(self, data, str name=*, bint to_sort=*)
 
-
+cdef bint isanumber(a)
 cpdef build_holder(name)
 
 

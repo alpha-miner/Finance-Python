@@ -12,6 +12,8 @@ from numpy import nansum
 from numpy import nanmean
 from numpy import nanstd
 from numpy import percentile
+from numpy import maximum
+from numpy import minimum
 from PyFin.Math.MathConstants cimport NAN
 
 
@@ -32,11 +34,8 @@ cdef class SeriesValues(object):
             index = dict(zip(keys, range(len(data))))
             data = np.array([data[k] for k in keys])
 
-        if data.dtype == np.object and len(data) > 0:
-            if isinstance(data[0], float) or isinstance(data[0], int):
-                self.values = data.astype(float)
-            else:
-                self.values = data
+        if data.dtype == np.object:
+            self.values = data.astype(float)
         else:
             self.values = data
 
@@ -251,3 +250,13 @@ cdef class SeriesValues(object):
         return self.to_dict().__str__()
 
 
+cpdef SeriesValues s_maximum(SeriesValues left, SeriesValues right):
+    cdef np.ndarray[double, ndim=1] x = left.values
+    cdef np.ndarray[double, ndim=1] y = right.values
+    return SeriesValues(maximum(x, y), left.name_mapping)
+
+
+cpdef SeriesValues s_minimum(SeriesValues left, SeriesValues right):
+    cdef np.ndarray[double, ndim=1] x = left.values
+    cdef np.ndarray[double, ndim=1] y = right.values
+    return SeriesValues(minimum(x, y), left.name_mapping)

@@ -51,10 +51,10 @@ cdef class Deque:
     def __richcmp__(Deque self, Deque other, int op):
         cdef bint flag = False
         if op == 2:
-            flag = self.window == other.window \
-                   and self.is_full == other.is_full \
-                   and self.start == other.start \
-                   and self.con == other.con
+           return self.window == other.window \
+                  and self.is_full == other.is_full \
+                  and self.start == other.start \
+                  and self.con == other.con
 
         elif op == 3:
             return not self.__richcmp__(other, 2)

@@ -19,7 +19,7 @@ def calculate_volatility(returns, multplier=50):
 
 
 def calculate_sharp(returns, multplier=50):
-    msharp = MovingSharp(len(returns))
+    msharp = MovingSharp(len(returns), x='ret', y='riskFree')
     for ret in returns:
         msharp.push({'ret': ret, 'riskFree': 0.})
     return msharp.value * math.sqrt(multplier)

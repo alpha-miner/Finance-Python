@@ -295,7 +295,7 @@ class TestStatelessTechnicalAnalysis(unittest.TestCase):
         os.unlink(f.name)
 
     def testSecurityMaximumValueHolder(self):
-        mm = SecurityMaximumValueHolder(('open', 'close'))
+        mm = SecurityMaximumValueHolder('open', 'close')
 
         for i in range(len(self.aapl['close'])):
             data = dict(aapl=dict(close=self.aapl['close'][i],
@@ -316,7 +316,7 @@ class TestStatelessTechnicalAnalysis(unittest.TestCase):
     def testSecurityMaximumValueHolderWithValueHolder(self):
         exp1 = SecurityLatestValueHolder('open')
         exp2 = SecurityLatestValueHolder('close')
-        mm = SecurityMaximumValueHolder(exp1 ^ exp2)
+        mm = SecurityMaximumValueHolder(exp1, exp2)
 
         for i in range(len(self.aapl['close'])):
             data = dict(aapl=dict(close=self.aapl['close'][i],
@@ -335,7 +335,7 @@ class TestStatelessTechnicalAnalysis(unittest.TestCase):
                                        .format(i, expected, calculated))
 
     def testSecurityMinimumValueHolder(self):
-        mm = SecurityMinimumValueHolder(('open', 'close'))
+        mm = SecurityMinimumValueHolder('open', 'close')
 
         for i in range(len(self.aapl['close'])):
             data = dict(aapl=dict(close=self.aapl['close'][i],
@@ -356,7 +356,7 @@ class TestStatelessTechnicalAnalysis(unittest.TestCase):
     def testSecurityMinimumValueHolderWithValueHolder(self):
         exp1 = SecurityLatestValueHolder('open')
         exp2 = SecurityLatestValueHolder('close')
-        mm = SecurityMinimumValueHolder(exp1 ^ exp2)
+        mm = SecurityMinimumValueHolder(exp1, exp2)
 
         for i in range(len(self.aapl['close'])):
             data = dict(aapl=dict(close=self.aapl['close'][i],

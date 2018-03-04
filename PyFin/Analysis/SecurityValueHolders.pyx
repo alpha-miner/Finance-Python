@@ -6,7 +6,6 @@ Created on 2015-8-7
 """
 
 import copy
-from collections import defaultdict
 import sys
 import operator
 import six
@@ -18,6 +17,7 @@ from PyFin.Analysis.SeriesValues cimport SeriesValues
 from PyFin.Utilities.Tools import to_dict
 from PyFin.Math.Accumulators.StatefulAccumulators cimport Shift
 from PyFin.Math.Accumulators.IAccumulators cimport Latest
+from PyFin.Math.Accumulators.IAccumulators cimport isanumber
 from PyFin.Math.MathConstants cimport NAN
 
 if sys.version_info > (3, 0, 0):
@@ -28,39 +28,21 @@ else:
 
 cdef class SecurityValueHolder(object):
 
-    def __init__(self, dependency='x'):
-        if isinstance(dependency, SecurityValueHolder):
-            self._dependency = dependency._dependency
-            self._dependency = dependency._dependency
-            self._compHolder = copy.deepcopy(dependency)
-            self._window = self._compHolder._window
-        else:
-            self._compHolder = None
-            if not isinstance(dependency, six.string_types):
-                self._dependency = [name for name in dependency]
-            else:
-                self._dependency = [dependency]
-            self._window = 0
-        self._returnSize = 1
+    def __init__(self):
+        self._window = 0
         self._holderTemplate = None
         self.updated = 0
         self.cached = None
         self._innerHolders = {}
+        self._compHolder = None
 
     @property
     def symbolList(self):
-        return set(self._innerHolders.keys())
+        return list(self._innerHolders.keys())
 
     @property
     def fields(self):
-        if isinstance(self._dependency, list):
-            return self._dependency
-        else:
-            return [self._dependency]
-
-    @property
-    def valueSize(self):
-        return self._returnSize
+        return self._dependency
 
     @property
     def window(self):
@@ -111,7 +93,7 @@ cdef class SecurityValueHolder(object):
         else:
             keys = sorted(self._innerHolders.keys())
             n = len(keys)
-            values = np.empty(n, dtype='object')
+            values = np.zeros(n)
             for i, name in enumerate(keys):
                 try:
                     holder = self._innerHolders[name]
@@ -134,7 +116,7 @@ cdef class SecurityValueHolder(object):
             return self.cached[names]
         else:
             n = len(names)
-            res = np.empty(n, dtype='object')
+            res = np.zeros(n)
             for i, name in enumerate(names):
                 holder = self._innerHolders[name]
                 res[i] = holder.result()
@@ -224,28 +206,6 @@ cdef class SecurityValueHolder(object):
     def __rxor__(self, left):
         return SecurityXorValuedHolder(left, self)
 
-    cpdef copy_attributes(self, dict attributes, bint is_deep=True):
-        self._dependency = copy.deepcopy(attributes['_dependency']) if is_deep else attributes['_dependency']
-        self._compHolder = copy.deepcopy(attributes['_compHolder']) if is_deep else attributes['_compHolder']
-        self._window = attributes['_window']
-        self._returnSize = attributes['_returnSize']
-        self._holderTemplate = copy.deepcopy(attributes['_holderTemplate']) if is_deep else attributes['_holderTemplate']
-        self.updated = attributes['updated']
-        self._innerHolders = copy.deepcopy(attributes['_innerHolders']) if is_deep else attributes['_innerHolders']
-        self.cached = copy.deepcopy(attributes['cached']) if is_deep else attributes['cached']
-
-    cpdef collect_attributes(self):
-        attributes = dict()
-        attributes['_dependency'] = self._dependency
-        attributes['_compHolder'] = self._compHolder
-        attributes['_window'] = self._window
-        attributes['_returnSize'] = self._returnSize
-        attributes['_holderTemplate'] = self._holderTemplate
-        attributes['updated'] = self.updated
-        attributes['_innerHolders'] = self._innerHolders
-        attributes['cached'] = self.cached
-        return attributes
-
     cpdef shift(self, int n):
         return SecurityShiftedValueHolder(self, n)
 
@@ -315,15 +275,11 @@ cdef class SecurityValueHolder(object):
 cdef class FilteredSecurityValueHolder(SecurityValueHolder):
 
     def __init__(self, computer, filtering):
-        super(FilteredSecurityValueHolder, self).__init__([])
+        super(FilteredSecurityValueHolder, self).__init__()
         self._filter = copy.deepcopy(filtering)
         self._computer = copy.deepcopy(computer)
         self._window = max(computer.window, filtering.window)
-        self._returnSize = computer.valueSize
-        self._dependency = _merge2set(
-            self._computer._dependency,
-            self._filter._dependency
-        )
+        self._dependency = list(set(self._computer.fields + self._filter.fields))
         self.updated = 0
         self.cached = None
 
@@ -388,8 +344,9 @@ cdef class FilteredSecurityValueHolder(SecurityValueHolder):
 cdef class IdentitySecurityValueHolder(SecurityValueHolder):
 
     def __init__(self, value):
-        super(IdentitySecurityValueHolder, self).__init__([])
+        super(IdentitySecurityValueHolder, self).__init__()
         self._value = value
+        self._dependency = []
 
     def __str__(self):
         return str(self._value)
@@ -418,7 +375,8 @@ cdef class IdentitySecurityValueHolder(SecurityValueHolder):
 cdef class SecurityConstArrayValueHolder(SecurityValueHolder):
 
     def __init__(self, values):
-        super(SecurityConstArrayValueHolder, self).__init__([])
+        super(SecurityConstArrayValueHolder, self).__init__()
+        self._dependency = []
 
         if isinstance(values, SeriesValues):
             self._values = values
@@ -455,12 +413,11 @@ cdef class SecurityConstArrayValueHolder(SecurityValueHolder):
 cdef class SecurityUnitoryValueHolder(SecurityValueHolder):
 
     def __init__(self, right, op):
-        super(SecurityUnitoryValueHolder, self).__init__([])
+        super(SecurityUnitoryValueHolder, self).__init__()
         self._right = copy.deepcopy(right)
 
         self._window = self._right.window
-        self._dependency = copy.deepcopy(self._right._dependency)
-        self._returnSize = self._right.valueSize
+        self._dependency = copy.deepcopy(self._right.fields)
         self._op = op
         self.updated = 0
         self.cached = None
@@ -518,52 +475,35 @@ cdef class SecurityInvertValueHolder(SecurityUnitoryValueHolder):
 
 
 cdef class SecurityLatestValueHolder(SecurityValueHolder):
-    def __init__(self, dependency='x'):
-        super(SecurityLatestValueHolder, self).__init__(dependency)
-        if self._compHolder:
-            self._holderTemplate = Latest(dependency=str(self._compHolder))
-            self._innerHolders = {
-                name: copy.deepcopy(self._holderTemplate) for name in self._compHolder.symbolList
-                }
-        else:
-            self._holderTemplate = Latest(dependency=self._dependency)
+    def __init__(self, x):
+        super(SecurityLatestValueHolder, self).__init__()
+        self._holderTemplate = Latest(x)
+        self._dependency = [x]
 
     def __str__(self):
-        if self._compHolder:
-            return "{0}".format(str(self._compHolder))
-        else:
-            return str(self._holderTemplate)
+        return str(self._holderTemplate)
 
-    def __deepcopy__(self, memo):
-        if self._compHolder:
-            copied = SecurityLatestValueHolder(self._compHolder)
-        else:
-            copied = SecurityLatestValueHolder(self._dependency)
 
-        copied.copy_attributes(self.collect_attributes(), is_deep=True)
-        return copied
+cpdef SecurityValueHolder build_holder(name):
+    if isinstance(name, SecurityValueHolder):
+        return copy.deepcopy(name)
+    elif isinstance(name, six.string_types):
+        return SecurityLatestValueHolder(name)
+    elif isanumber(name):
+        return IdentitySecurityValueHolder(float(name))
+    elif hasattr(name, '__iter__'):
+        return build_holder(name[0])
 
 
 cdef class SecurityCombinedValueHolder(SecurityValueHolder):
 
     def __init__(self, left, right, op):
-        if isinstance(left, SecurityValueHolder):
-            self._left = copy.deepcopy(left)
-            if isinstance(right, SecurityValueHolder):
-                self._right = copy.deepcopy(right)
-            else:
-                self._right = IdentitySecurityValueHolder(right)
-        elif isinstance(left, six.string_types):
-            self._left = SecurityLatestValueHolder(left)
-            self._right = copy.deepcopy(right)
-        else:
-            self._left = IdentitySecurityValueHolder(left)
-            self._right = copy.deepcopy(right)
+        super(SecurityCombinedValueHolder, self).__init__()
+        self._left = build_holder(left)
+        self._right = build_holder(right)
 
         self._window = max(self._left.window, self._right.window)
-        self._dependency = _merge2set(
-            self._left._dependency, self._right._dependency)
-        self._returnSize = self._left.valueSize
+        self._dependency = list(set(self._left.fields + self._right.fields))
         self._op = op
         self.updated = 0
         self.cached = None
@@ -577,7 +517,7 @@ cdef class SecurityCombinedValueHolder(SecurityValueHolder):
 
     @property
     def symbolList(self):
-        return self._left.symbolList.union(self._right.symbolList)
+        return list(set(self._left.symbolList + self._right.symbolList))
 
     cpdef push(self, dict data):
         self._left.push(data)
@@ -743,11 +683,11 @@ cdef class SecurityOrOperatorValueHolder(SecurityCombinedValueHolder):
 cdef class SecurityShiftedValueHolder(SecurityValueHolder):
 
     def __init__(self, right, n):
-        super(SecurityShiftedValueHolder, self).__init__(right)
+        super(SecurityShiftedValueHolder, self).__init__()
 
-        self._returnSize = self._compHolder.valueSize
+        self._compHolder = build_holder(right)
         self._window = self._compHolder.window + n
-        self._dependency = copy.deepcopy(self._compHolder._dependency)
+        self._dependency = copy.deepcopy(self._compHolder.fields)
         self._holderTemplate = Shift(Latest(str(self._compHolder)), n)
 
         self._innerHolders = {
@@ -755,44 +695,19 @@ cdef class SecurityShiftedValueHolder(SecurityValueHolder):
         }
 
     def __str__(self):
-        if self._compHolder:
-            return "\\mathrm{{Shift}}({0}, {1})".format(str(self._compHolder), self._holderTemplate.lag())
-        else:
-            return "\\mathrm{{Shift}}(''\\text{{{0}}}'', {1})".format(self._dependency, self._holderTemplate.lag())
+        return "\\mathrm{{Shift}}({0}, {1})".format(str(self._compHolder), self._holderTemplate.lag())
 
 
 cdef class SecurityIIFValueHolder(SecurityValueHolder):
 
     def __init__(self, flag, left, right):
-
-        if not isinstance(flag, SecurityValueHolder):
-            if isinstance(flag, six.string_types):
-                self._flag = SecurityLatestValueHolder(flag)
-            else:
-                self._flag = IdentitySecurityValueHolder(flag)
-        else:
-            self._flag = copy.deepcopy(flag)
-
-        if not isinstance(left, SecurityValueHolder):
-            if isinstance(left, six.string_types):
-                self._left = SecurityLatestValueHolder(left)
-            else:
-                self._left = IdentitySecurityValueHolder(left)
-        else:
-            self._left = copy.deepcopy(left)
-
-        if not isinstance(right, SecurityValueHolder):
-            if isinstance(left, six.string_types):
-                self._right = SecurityLatestValueHolder(right)
-            else:
-                self._right = IdentitySecurityValueHolder(right)
-        else:
-            self._right = copy.deepcopy(right)
+        super(SecurityIIFValueHolder, self).__init__()
+        self._flag = build_holder(flag)
+        self._left = build_holder(left)
+        self._right = build_holder(right)
 
         self._window = max(self._flag.window, self._left.window, self._right.window)
-        self._dependency = _merge2set(self._flag._dependency, _merge2set(
-            self._left._dependency, self._right._dependency))
-        self._returnSize = self._flag.valueSize
+        self._dependency = list(set(self._flag.fields + self._left.fields + self._right.fields))
         self.updated = 0
         self.cached = None
 
@@ -873,56 +788,3 @@ cdef class SecurityIIFValueHolder(SecurityValueHolder):
                                          left_value,
                                          right_value),
                                 flag_value.name_mapping)
-
-
-def dependencyCalculator(*args):
-    res = defaultdict(list)
-    tmp = {}
-    for value in args:
-        tmp = _merge2dict(tmp, value)
-
-    for name in tmp:
-        if isinstance(tmp[name], list):
-            for field in tmp[name]:
-                res[field].append(name)
-        else:
-            res[tmp[name]].append(name)
-    return res
-
-
-# detail implementation
-cdef dict _merge2dict(dict left, dict right):
-    res = {}
-    for name in left:
-        if name in right:
-            if isinstance(left[name], list):
-                if isinstance(right[name], list):
-                    res[name] = list(set(left[name] + right[name]))
-                else:
-                    res[name] = list(set(left[name] + [right[name]]))
-            else:
-                if isinstance(right[name], list):
-                    res[name] = list(set([left[name]] + right[name]))
-                else:
-                    res[name] = list(set([left[name]] + [right[name]]))
-        else:
-            res[name] = left[name]
-
-    for name in right:
-        if name not in left:
-            res[name] = right[name]
-    return res
-
-
-def _merge2set(left, right):
-    if isinstance(left, list):
-        if isinstance(right, list):
-            res = list(set(left + right))
-        else:
-            res = list(set(left + [right]))
-    else:
-        if isinstance(right, list):
-            res = list(set([left] + right))
-        else:
-            res = list(set([left] + [right]))
-    return res

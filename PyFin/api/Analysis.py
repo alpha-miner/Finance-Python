@@ -37,9 +37,6 @@ from PyFin.Analysis.TechnicalAnalysis import SecurityAcosValueHolder
 from PyFin.Analysis.TechnicalAnalysis import SecurityAcoshValueHolder
 from PyFin.Analysis.TechnicalAnalysis import SecurityAsinValueHolder
 from PyFin.Analysis.TechnicalAnalysis import SecurityAsinhValueHolder
-from PyFin.Analysis.TechnicalAnalysis import SecurityMovingResidue
-from PyFin.Analysis.TechnicalAnalysis import SecurityMovingCorrelation
-from PyFin.Analysis.TechnicalAnalysis import SecurityMovingRank
 from PyFin.Analysis.SecurityValueHolders import SecurityShiftedValueHolder
 from PyFin.Analysis.SecurityValueHolders import SecurityLatestValueHolder
 from PyFin.Analysis.SecurityValueHolders import SecurityIIFValueHolder
@@ -95,18 +92,6 @@ def MACD(short, long, dependency='x'):
 
 def RSI(window, dependency='x'):
     return SecurityMovingRSI(window, dependency)
-
-
-def RES(window, dependency=('y', 'x')):
-    return SecurityMovingResidue(window, dependency)
-
-
-def CORR(window, dependency=('x', 'y')):
-    return SecurityMovingCorrelation(window, dependency)
-
-
-def RANK(window, dependency='x'):
-    return SecurityMovingRank(window, dependency)
 
 
 def MA(window, dependency='x'):

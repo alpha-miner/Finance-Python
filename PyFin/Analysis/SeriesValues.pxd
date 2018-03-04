@@ -27,3 +27,5 @@ cdef class SeriesValues(object):
 
 
 cdef SeriesValues residue(SeriesValues left, SeriesValues right)
+cpdef SeriesValues s_maximum(SeriesValues left, SeriesValues right)
+cpdef SeriesValues s_minimum(SeriesValues left, SeriesValues right)

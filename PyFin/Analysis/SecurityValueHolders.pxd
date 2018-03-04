@@ -14,7 +14,6 @@ cdef class SecurityValueHolder(object):
     cdef public list _dependency
     cdef public SecurityValueHolder _compHolder
     cdef public int _window
-    cdef public int _returnSize
     cdef public Accumulator _holderTemplate
     cdef public int updated
     cdef public dict _innerHolders
@@ -25,8 +24,6 @@ cdef class SecurityValueHolder(object):
     cpdef double value_by_name(self, name)
     cpdef shift(self, int n)
     cpdef transform(self, data, str name=*, str category_field=*, bint dropna=*)
-    cpdef copy_attributes(self, dict attributes, bint is_deep=*)
-    cpdef collect_attributes(self)
 
 
 cdef class FilteredSecurityValueHolder(SecurityValueHolder):
@@ -76,6 +73,9 @@ cdef class SecurityInvertValueHolder(SecurityUnitoryValueHolder):
 
 cdef class SecurityLatestValueHolder(SecurityValueHolder):
     pass
+
+
+cpdef SecurityValueHolder build_holder(name)
 
 
 cdef class SecurityCombinedValueHolder(SecurityValueHolder):

@@ -14,7 +14,6 @@ import numpy as np
 import pandas as pd
 from PyFin.Enums import Factors
 from PyFin.Analysis.SeriesValues import SeriesValues
-from PyFin.Analysis.SecurityValueHolders import dependencyCalculator
 from PyFin.Analysis.SecurityValueHolders import FilteredSecurityValueHolder
 from PyFin.Analysis.SecurityValueHolders import SecurityLatestValueHolder
 from PyFin.Analysis.SecurityValueHolders import SecurityIIFValueHolder
@@ -49,8 +48,8 @@ class TestSecurityValueHolders(unittest.TestCase):
 
         shift = 2
 
-        benchmark = SecurityShiftedValueHolder(SecurityLatestValueHolder(dependency='close'), shift)
-        testValueHolder = SecurityLatestValueHolder(dependency='close')[shift]
+        benchmark = SecurityShiftedValueHolder(SecurityLatestValueHolder(x='close'), shift)
+        testValueHolder = SecurityLatestValueHolder(x='close')[shift]
 
         for i in range(len(self.datas['aapl']['close'])):
             data = {'aapl': {Factors.CLOSE: self.datas['aapl'][Factors.CLOSE][i],
@@ -70,7 +69,7 @@ class TestSecurityValueHolders(unittest.TestCase):
             np.testing.assert_array_almost_equal(calculated.values, expected.values)
 
     def testSecurityWhereValueHolder(self):
-        benchmark = SecurityLatestValueHolder(dependency='close')
+        benchmark = SecurityLatestValueHolder(x='close')
 
         testValueHolder = SecurityIIFValueHolder(benchmark > 0, benchmark, -benchmark)
         for i in range(len(self.datas['aapl']['close'])):
@@ -114,7 +113,7 @@ class TestSecurityValueHolders(unittest.TestCase):
         dictValue = {'aapl': 1.0, 'ibm': 2.0}
         constArray = SecurityConstArrayValueHolder(dictValue)
 
-        benchmark = SecurityLatestValueHolder(dependency='close')
+        benchmark = SecurityLatestValueHolder(x='close')
         multiplied = benchmark * constArray
 
         for i in range(len(self.datas['aapl']['close'])):
@@ -133,8 +132,8 @@ class TestSecurityValueHolders(unittest.TestCase):
                 self.assertAlmostEqual(testValue[name] * dictValue[name], expectedValue[name])
 
     def testSecurityAndOperatorValueHolder(self):
-        benchmark = SecurityLatestValueHolder(dependency='close') > 0
-        benchmark2 = SecurityLatestValueHolder(dependency='open') > 0
+        benchmark = SecurityLatestValueHolder(x='close') > 0
+        benchmark2 = SecurityLatestValueHolder(x='open') > 0
 
         testValueHolder = benchmark & benchmark2
 
@@ -156,8 +155,8 @@ class TestSecurityValueHolders(unittest.TestCase):
                     self.assertFalse(calculated[name])
 
     def testSecurityOrOperatorValueHolder(self):
-        benchmark = SecurityLatestValueHolder(dependency='close') > 0
-        benchmark2 = SecurityLatestValueHolder(dependency='open') > 0
+        benchmark = SecurityLatestValueHolder(x='close') > 0
+        benchmark2 = SecurityLatestValueHolder(x='open') > 0
 
         testValueHolder = benchmark | benchmark2
 
@@ -179,8 +178,8 @@ class TestSecurityValueHolders(unittest.TestCase):
                     self.assertFalse(calculated[name])
 
     def testSecurityXorOperatorValueHolder(self):
-        benchmark = SecurityLatestValueHolder(dependency='close') > 0
-        benchmark2 = SecurityLatestValueHolder(dependency='open') > 0
+        benchmark = SecurityLatestValueHolder(x='close') > 0
+        benchmark2 = SecurityLatestValueHolder(x='open') > 0
 
         testValueHolder = benchmark ^ benchmark2
 
@@ -200,7 +199,7 @@ class TestSecurityValueHolders(unittest.TestCase):
                 self.assertEqual(calculated[name][1], open_value > 0)
 
     def testSecurityWhereValueHolderWithSymbolName(self):
-        benchmark = SecurityLatestValueHolder(dependency='close')
+        benchmark = SecurityLatestValueHolder(x='close')
 
         testValueHolder = SecurityIIFValueHolder(benchmark > 0, 'open', -benchmark)
         for i in range(len(self.datas['aapl']['close'])):
@@ -239,8 +238,8 @@ class TestSecurityValueHolders(unittest.TestCase):
                     self.assertAlmostEqual(rawValue, calculated[name])
 
     def testSecurityWhereValueHolderWithMissingSymbol(self):
-        benchmark = SecurityLatestValueHolder(dependency='open')
-        benchmark2 = SecurityLatestValueHolder(dependency='close')
+        benchmark = SecurityLatestValueHolder(x='open')
+        benchmark2 = SecurityLatestValueHolder(x='close')
         testValueHolder = SecurityIIFValueHolder(benchmark < 0, 'open', -benchmark2)
 
         data = {'aapl': {'close': 2.0, 'open': 1.5},
@@ -256,7 +255,7 @@ class TestSecurityValueHolders(unittest.TestCase):
         self.assertTrue(np.isnan(calculated['ibm']))
 
     def testSecurityWhereValueHolderWithScalarValue(self):
-        benchmark = SecurityLatestValueHolder(dependency='open')
+        benchmark = SecurityLatestValueHolder(x='open')
         testValueHolder = SecurityIIFValueHolder(benchmark > 0, 1., -1.)
         for i in range(len(self.datas['aapl']['close'])):
             data = {'aapl': {Factors.CLOSE: self.datas['aapl'][Factors.CLOSE][i],
@@ -278,7 +277,7 @@ class TestSecurityValueHolders(unittest.TestCase):
                     self.assertAlmostEqual(-1., testValueHolder.value_by_name(name))
 
     def testFilteredSecurityValueHolder(self):
-        benchmark = SecurityLatestValueHolder(dependency='close') > 0
+        benchmark = SecurityLatestValueHolder(x='close') > 0
         filtered = FilteredSecurityValueHolder(benchmark, benchmark)
 
         for i in range(len(self.datas['aapl']['close'])):
@@ -301,7 +300,7 @@ class TestSecurityValueHolders(unittest.TestCase):
                 self.assertFalse(benchmark['ibm'])
 
     def testFilteredSecurityValueHolderWithGetItemMethod(self):
-        benchmark = SecurityLatestValueHolder(dependency='close') > 0
+        benchmark = SecurityLatestValueHolder(x='close') > 0
         filtered = benchmark[benchmark]
 
         for i in range(len(self.datas['aapl']['close'])):
@@ -325,7 +324,7 @@ class TestSecurityValueHolders(unittest.TestCase):
                 self.assertFalse(benchmark['ibm'])
 
     def testFilteredSecurityValueHolderTransform(self):
-        rawHolder = SecurityLatestValueHolder(dependency='close')
+        rawHolder = SecurityLatestValueHolder(x='close')
         fliterFlag = rawHolder >= 0
         filteredHolder = rawHolder[fliterFlag]
 
@@ -348,18 +347,15 @@ class TestSecurityValueHolders(unittest.TestCase):
                     self.assertTrue(name in filteredValues)
 
     def testSecurityValueHolderIsFull(self):
-        test = SecurityMovingMax(2, dependency='close')
+        test = SecurityMovingMax(2, x='close')
 
         data = {'aapl': {'close': 1.0},
                 'ibm': {'close': 2.0}}
         test.push(data)
         self.assertEqual(test.isFull, False)
 
-        data = {'aapl': {'close': 1.0}}
-        test.push(data)
-        self.assertEqual(test.isFull, False)
-
-        data = {'ibm': {'close': 13.0}}
+        data = {'aapl': {'close': 1.0},
+                'ibm': {'close': 13.0}}
         test.push(data)
         self.assertEqual(test.isFull, True)
 
@@ -482,7 +478,6 @@ class TestSecurityValueHolders(unittest.TestCase):
         testValueHolder.push({'aapl': {'close': 1.0}, 'ibm': {'close': 2.0}})
 
         self.assertEqual(set(testValueHolder.symbolList), set(symbolList))
-        self.assertEqual(testValueHolder.valueSize, 1)
         self.assertEqual(testValueHolder.window, window)
 
         # test binary operated value holder
@@ -491,31 +486,15 @@ class TestSecurityValueHolders(unittest.TestCase):
         test2 = SecurityMovingMax(window2, pNames2)
         binaryValueHolder = testValueHolder + test2
 
-        self.assertEqual(binaryValueHolder.valueSize, 1)
         self.assertEqual(binaryValueHolder.window, max(window, window2))
 
         # test compounded operated value holder
         test3 = SecurityMovingMax(window2, testValueHolder)
-        self.assertEqual(test3.valueSize, 1)
         self.assertEqual(test3.window, window + window2)
 
         # test compounded twice
         test4 = SecurityMovingMax(window2, test3)
-        self.assertEqual(test4.valueSize, 1)
         self.assertEqual(test4.window, window + 2 * window2)
-
-    def testDependencyCalculation(self):
-        h1 = {'aapl': 'close', 'ibm': 'close'}
-        h2 = {'goog': 'open'}
-        h3 = {'aapl': 'pe', 'ibm': 'pe', 'goog': 'pe'}
-        h4 = {'qqq': Factors.PE}
-
-        expected = {'close': ['aapl', 'ibm'],
-                    'pe': ['goog', 'aapl', 'ibm', 'qqq'],
-                    'open': ['goog']}
-        calculated = dict(dependencyCalculator(h1, h2, h3, h4))
-        for name in expected:
-            self.assertEqual(set(expected[name]), set(calculated[name]))
 
     def testItemizedValueHolder(self):
         window = 10
@@ -904,12 +883,12 @@ class TestSecurityValueHolders(unittest.TestCase):
             self.assertAlmostEqual(expected[name], calculated[name], 15)
 
     def testFilterSecurityValueHolderWorkWithStr(self):
-        filter = SecurityLatestValueHolder('code') == 'ibm'
+        filter = SecurityLatestValueHolder('code') == 2
         ma = FilteredSecurityValueHolder(SecurityMovingAverage(10, 'close'), filter)
 
-        data = {'aapl': {'code': 'aapl', 'close': 15.},
-                'ibm': {'code': 'ibm', 'close': 10.},
-                'goog': {'code': 'goog', 'close': 7.}}
+        data = {'aapl': {'code': 1, 'close': 15.},
+                'ibm': {'code': 2, 'close': 10.},
+                'goog': {'code': 3, 'close': 7.}}
 
         ma.push(data)
         expected = {'ibm': 10.0}

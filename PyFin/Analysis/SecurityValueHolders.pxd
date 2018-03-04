@@ -20,6 +20,7 @@ cdef class SecurityValueHolder(object):
     cdef public SeriesValues cached
 
     cpdef push(self, dict data)
+    cpdef value_all(self)
     cpdef SeriesValues value_by_names(self, list names)
     cpdef double value_by_name(self, name)
     cpdef shift(self, int n)
@@ -39,9 +40,11 @@ cdef class FilteredSecurityValueHolder(SecurityValueHolder):
 cdef class IdentitySecurityValueHolder(SecurityValueHolder):
 
     cdef public object _value
+    cdef set _symbols
 
     cpdef push(self, dict data)
     cpdef double value_by_name(self, name)
+    cpdef SeriesValues value_all(self)
     cpdef SeriesValues value_by_names(self, list names)
 
 
@@ -50,6 +53,7 @@ cdef class SecurityConstArrayValueHolder(SecurityValueHolder):
 
     cpdef push(self, dict data)
     cpdef double value_by_name(self, name)
+    cpdef SeriesValues value_all(self)
     cpdef SeriesValues value_by_names(self, list names)
 
 
@@ -59,6 +63,7 @@ cdef class SecurityUnitoryValueHolder(SecurityValueHolder):
     cdef public object _op
 
     cpdef double value_by_name(self, name)
+    cpdef SeriesValues value_all(self)
     cpdef SeriesValues value_by_names(self, list names)
     cpdef push(self, dict data)
 
@@ -72,7 +77,12 @@ cdef class SecurityInvertValueHolder(SecurityUnitoryValueHolder):
 
 
 cdef class SecurityLatestValueHolder(SecurityValueHolder):
-    pass
+    cdef dict _symbol_values
+
+    cpdef push(self, dict data)
+    cpdef SeriesValues value_all(self)
+    cpdef SeriesValues value_by_names(self, list names)
+    cpdef double value_by_name(self, name)
 
 
 cpdef SecurityValueHolder build_holder(name)
@@ -85,6 +95,7 @@ cdef class SecurityCombinedValueHolder(SecurityValueHolder):
     cdef public object _op
 
     cpdef double value_by_name(self, name)
+    cpdef SeriesValues value_all(self)
     cpdef SeriesValues value_by_names(self, list names)
     cpdef push(self, dict data)
 
@@ -152,5 +163,6 @@ cdef class SecurityIIFValueHolder(SecurityValueHolder):
     cdef public SecurityValueHolder _right
 
     cpdef double value_by_name(self, name)
+    cpdef SeriesValues value_all(self)
     cpdef SeriesValues value_by_names(self, list names)
     cpdef push(self, dict data)

@@ -36,11 +36,18 @@ from PyFin.Math.MathConstants cimport NAN
 cdef class SecuritySingleValueHolder(SecurityValueHolder):
     def __init__(self, window, holderType, x):
         super(SecuritySingleValueHolder, self).__init__()
-        self._compHolder = build_holder(x)
-        self._window = window + self._compHolder.window
-        self._dependency = self._compHolder.fields
-        self._holderTemplate = holderType(window=window, x=str(self._compHolder))
-        self._innerHolders = {name: copy.deepcopy(self._holderTemplate) for name in self._compHolder.symbolList}
+        self._compHolder = build_holder(x) if isinstance(x, SecurityValueHolder) else None
+        if self._compHolder:
+            self._dependency = self._compHolder.fields
+            self._window = window + self._compHolder.window
+            self._holderTemplate = holderType(window=window, x=str(self._compHolder))
+            self._innerHolders = {
+                name: copy.deepcopy(self._holderTemplate) for name in self._compHolder.symbolList
+                }
+        else:
+            self._dependency = [x]
+            self._window = window
+            self._holderTemplate = holderType(window=window, x=self._dependency)
 
 
 cdef class SecurityMovingAverage(SecuritySingleValueHolder):

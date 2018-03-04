@@ -13,6 +13,8 @@ import numpy as np
 cimport numpy as np
 import pandas as pd
 cimport cython
+from libc.math cimport isnan
+from PyFin.Math.MathConstants cimport NAN
 from PyFin.Analysis.SeriesValues cimport SeriesValues
 from PyFin.Utilities.Tools import to_dict
 from PyFin.Math.Accumulators.StatefulAccumulators cimport Shift
@@ -58,7 +60,7 @@ cdef class SecurityValueHolder(object):
         if self._compHolder:
             dummy_name = str(self._compHolder)
             self._compHolder.push(data)
-            sec_values = self._compHolder.value
+            sec_values = self._compHolder.value_all()
 
             for name in sec_values.index():
                 try:
@@ -79,11 +81,14 @@ cdef class SecurityValueHolder(object):
                     self._innerHolders[name] = holder
 
     @property
+    def value(self):
+        return self.value_all()
+
     @cython.boundscheck(False)
     @cython.wraparound(False)
-    def value(self):
+    cpdef value_all(self):
 
-        cdef np.ndarray values
+        cdef np.ndarray[double, ndim=1] values
         cdef Accumulator holder
         cdef size_t n
         cdef int i
@@ -108,7 +113,7 @@ cdef class SecurityValueHolder(object):
     @cython.wraparound(False)
     cpdef SeriesValues value_by_names(self, list names):
         cdef Accumulator holder
-        cdef np.ndarray res
+        cdef np.ndarray[double, ndim=1] res
         cdef int i
         cdef size_t n
 
@@ -150,7 +155,7 @@ cdef class SecurityValueHolder(object):
         elif isinstance(filter, int):
             return SecurityShiftedValueHolder(self, filter)
         else:
-            return self.value[filter]
+            return self.value_all()[filter]
 
     def __add__(self, right):
         return SecurityAddedValueHolder(self, right)
@@ -298,15 +303,14 @@ cdef class FilteredSecurityValueHolder(SecurityValueHolder):
     def holders(self):
         return self._computer.holders
 
-    @property
-    def value(self):
+    cpdef value_all(self):
         cdef SeriesValues filter_value
 
         if self.updated:
             return self.cached
         else:
-            filter_value = self._filter.value
-            self.cached = self._computer.value.mask(filter_value.values)
+            filter_value = self._filter.value_all()
+            self.cached = self._computer.value_all().mask(filter_value.values)
             self.updated = 1
             return self.cached
 
@@ -347,6 +351,7 @@ cdef class IdentitySecurityValueHolder(SecurityValueHolder):
         super(IdentitySecurityValueHolder, self).__init__()
         self._value = value
         self._dependency = []
+        self._symbols = set()
 
     def __str__(self):
         return str(self._value)
@@ -359,11 +364,10 @@ cdef class IdentitySecurityValueHolder(SecurityValueHolder):
         return True
 
     cpdef push(self, dict data):
-        pass
+        self._symbols = self._symbols.union(data.keys())
 
-    @property
-    def value(self):
-        return self._value
+    cpdef SeriesValues value_all(self):
+        return SeriesValues({n: self._value for n in self._symbols})
 
     cpdef double value_by_name(self, name):
         return self._value
@@ -384,10 +388,7 @@ cdef class SecurityConstArrayValueHolder(SecurityValueHolder):
             self._values = SeriesValues(values)
 
     def isFullByName(self, name):
-        if name in self._values:
-            return True
-        else:
-            return False
+        return True
 
     @property
     def isFull(self):
@@ -405,8 +406,7 @@ cdef class SecurityConstArrayValueHolder(SecurityValueHolder):
     cpdef SeriesValues value_by_names(self, list names):
         return self._values[names]
 
-    @property
-    def value(self):
+    cpdef SeriesValues value_all(self):
         return self._values
 
 
@@ -437,12 +437,11 @@ cdef class SecurityUnitoryValueHolder(SecurityValueHolder):
         self._right.push(data)
         self.updated = 0
 
-    @property
-    def value(self):
+    cpdef SeriesValues value_all(self):
         if self.updated:
             return self.cached
         else:
-            self.cached = self._op(self._right.value)
+            self.cached = self._op(self._right.value_all())
             self.updated = 1
             return self.cached
 
@@ -477,8 +476,80 @@ cdef class SecurityInvertValueHolder(SecurityUnitoryValueHolder):
 cdef class SecurityLatestValueHolder(SecurityValueHolder):
     def __init__(self, x):
         super(SecurityLatestValueHolder, self).__init__()
-        self._holderTemplate = Latest(x)
         self._dependency = [x]
+        self._symbol_values = {}
+        self._holderTemplate = Latest(x)
+
+    @property
+    def symbolList(self):
+        return list(self._symbol_values.keys())
+
+    cpdef push(self, dict data):
+        cdef double value
+        cdef dict data_pack
+        field = self._dependency[0]
+        self.updated = 0
+
+        for name in data:
+            data_pack = data[name]
+            if field in data_pack:
+                value = data_pack[field]
+                if not isnan(value):
+                    self._symbol_values[name] = value
+
+            if name not in self._symbol_values:
+                self._symbol_values[name] = NAN
+
+    @cython.boundscheck(False)
+    @cython.wraparound(False)
+    cpdef SeriesValues value_all(self):
+
+        cdef np.ndarray values
+        cdef size_t n
+        cdef int i
+
+        if self.updated:
+            return SeriesValues(self.cached.values, self.cached.name_mapping)
+        else:
+            keys = sorted(self._symbol_values.keys())
+            n = len(keys)
+            values = np.zeros(n)
+            for i, name in enumerate(keys):
+                values[i] = self._symbol_values[name]
+            self.cached = SeriesValues(values, index=keys)
+            self.updated = 1
+            return self.cached
+
+    @cython.boundscheck(False)
+    @cython.wraparound(False)
+    cpdef SeriesValues value_by_names(self, list names):
+        cdef Accumulator holder
+        cdef np.ndarray res
+        cdef int i
+        cdef size_t n
+
+        if self.updated:
+            return self.cached[names]
+        else:
+            n = len(names)
+            res = np.zeros(n)
+            for i, name in enumerate(names):
+                res[i] = self._symbol_values[name]
+            return SeriesValues(res, index=names)
+
+    cpdef double value_by_name(self, name):
+        cdef Accumulator holder
+        if self.updated:
+            return self.cached[name]
+        else:
+            return self._symbol_values[name]
+
+    def isFullByName(self, name):
+        return True
+
+    @property
+    def isFull(self):
+        return True
 
     def __str__(self):
         return str(self._holderTemplate)
@@ -491,8 +562,8 @@ cpdef SecurityValueHolder build_holder(name):
         return SecurityLatestValueHolder(name)
     elif isanumber(name):
         return IdentitySecurityValueHolder(float(name))
-    elif hasattr(name, '__iter__'):
-        return build_holder(name[0])
+    else:
+        raise ValueError("{0} is not recognized as valid holder or name".format(name))
 
 
 cdef class SecurityCombinedValueHolder(SecurityValueHolder):
@@ -524,12 +595,11 @@ cdef class SecurityCombinedValueHolder(SecurityValueHolder):
         self._right.push(data)
         self.updated = 0
 
-    @property
-    def value(self):
+    cpdef SeriesValues value_all(self):
         if self.updated:
             return self.cached
         else:
-            self.cached = self._op(self._left.value, self._right.value)
+            self.cached = self._op(self._left.value_all(), self._right.value_all())
             self.updated = 1
             return self.cached
 
@@ -728,25 +798,17 @@ cdef class SecurityIIFValueHolder(SecurityValueHolder):
         self._right.push(data)
         self.updated = 0
 
-    @property
-    def value(self):
+    cpdef SeriesValues value_all(self):
 
         cdef SeriesValues flag_value
 
         if self.updated:
             return self.cached
         else:
-            flag_value = self._flag.value
+            flag_value = self._flag.value_all()
 
-            if isinstance(self._left, IdentitySecurityValueHolder):
-                left_value = self._left.value
-            else:
-                left_value = self._left.value.values
-
-            if isinstance(self._right, IdentitySecurityValueHolder):
-                right_value = self._right.value
-            else:
-                right_value = self._right.value.values
+            left_value = self._left.value_all().values
+            right_value = self._right.value_all().values
 
             self.cached = SeriesValues(np.where(flag_value.values,
                                                 left_value,
@@ -774,15 +836,8 @@ cdef class SecurityIIFValueHolder(SecurityValueHolder):
 
             flag_value = self._flag.value_by_names(names)
 
-            if isinstance(self._left, IdentitySecurityValueHolder):
-                left_value = self._left.value_by_names(names)
-            else:
-                left_value = self._left.value_by_names(names).values
-
-            if isinstance(self._right, IdentitySecurityValueHolder):
-                right_value = self._right.value_by_names(names)
-            else:
-                right_value = self._right.value_by_names(names).values
+            left_value = self._left.value_by_names(names).values
+            right_value = self._right.value_by_names(names).values
 
             return SeriesValues(np.where(flag_value.values,
                                          left_value,

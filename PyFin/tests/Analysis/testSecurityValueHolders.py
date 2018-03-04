@@ -471,7 +471,7 @@ class TestSecurityValueHolders(unittest.TestCase):
 
     def testBasicFunctions(self):
         window = 10
-        pNames = ['close']
+        pNames = 'close'
         symbolList = ['aapl', 'ibm']
         testValueHolder = SecurityMovingAverage(window, pNames)
 
@@ -482,7 +482,7 @@ class TestSecurityValueHolders(unittest.TestCase):
 
         # test binary operated value holder
         window2 = 5
-        pNames2 = ['open']
+        pNames2 = 'open'
         test2 = SecurityMovingMax(window2, pNames2)
         binaryValueHolder = testValueHolder + test2
 
@@ -532,7 +532,7 @@ class TestSecurityValueHolders(unittest.TestCase):
 
     def testAddedSecurityValueHoldersWithScalar(self):
         window = 10
-        dependency = ['close']
+        dependency = 'close'
         mm = SecurityMovingSum(window, dependency)
         combined = 2.0 + mm
         for i in range(len(self.datas['aapl']['close'])):
@@ -550,7 +550,7 @@ class TestSecurityValueHolders(unittest.TestCase):
 
     def testAddedSecurityValueHolderWithName(self):
         window = 10
-        dependency = ['close']
+        dependency = 'close'
         mm = SecurityMovingSum(window, dependency)
         combined = 'open' + mm
 
@@ -569,7 +569,7 @@ class TestSecurityValueHolders(unittest.TestCase):
 
     def testRAddedSecurityValueHoldersWithScalar(self):
         window = 10
-        dependency = ['close']
+        dependency = 'close'
         ma = SecurityMovingAverage(window, dependency)
         combined = ma + 2.0
         for i in range(len(self.datas['aapl']['close'])):
@@ -610,7 +610,7 @@ class TestSecurityValueHolders(unittest.TestCase):
 
     def testSubbedSecurityValueHoldersWithScalar(self):
         window = 10
-        dependency = ['close']
+        dependency = 'close'
         mm = SecurityMovingSum(window, dependency)
         combined = 2.0 - mm
         for i in range(len(self.datas['aapl']['close'])):
@@ -628,7 +628,7 @@ class TestSecurityValueHolders(unittest.TestCase):
 
     def testRSubbedSecurityValueHoldersWithScalar(self):
         window = 10
-        dependency = ['close']
+        dependency = 'close'
         ma = SecurityMovingAverage(window, dependency)
         combined = ma - 2.0
         for i in range(len(self.datas['aapl']['close'])):
@@ -669,7 +669,7 @@ class TestSecurityValueHolders(unittest.TestCase):
 
     def testMultipliedSecurityValueHoldersWithScalar(self):
         window = 10
-        dependency = ['close']
+        dependency = 'close'
         mm = SecurityMovingSum(window, dependency)
         combined = 2.0 * mm
         for i in range(len(self.datas['aapl']['close'])):
@@ -687,7 +687,7 @@ class TestSecurityValueHolders(unittest.TestCase):
 
     def testRMultipliedSecurityValueHoldersWithScalar(self):
         window = 10
-        dependency = ['close']
+        dependency = 'close'
         ma = SecurityMovingAverage(window, dependency)
         combined = ma * 2.0
         for i in range(len(self.datas['aapl']['close'])):
@@ -728,7 +728,7 @@ class TestSecurityValueHolders(unittest.TestCase):
 
     def testDividedSecurityValueHoldersWithScalar(self):
         window = 10
-        dependency = ['close']
+        dependency = 'close'
         mm = SecurityMovingSum(window, dependency)
         combined = 2.0 / mm
         for i in range(len(self.datas['aapl']['close'])):
@@ -746,7 +746,7 @@ class TestSecurityValueHolders(unittest.TestCase):
 
     def testRDividedSecurityValueHoldersWithScalar(self):
         window = 10
-        dependency = ['close']
+        dependency = 'close'
         ma = SecurityMovingAverage(window, dependency)
         combined = ma / 2.0
         for i in range(len(self.datas['aapl']['close'])):

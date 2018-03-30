@@ -62,6 +62,9 @@ from PyFin.Math.Accumulators.StatefulAccumulators import MovingLogReturn
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingResidue
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingSharp
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingSortino
+from PyFin.Math.Accumulators.StatefulAccumulators import MovingDrawDown
+from PyFin.Math.Accumulators.StatefulAccumulators import MovingMaxDrawDown
+
 
 __all__ = ["Exp",
            "Log",
@@ -86,7 +89,6 @@ __all__ = ["Exp",
            "Min",
            "Minimum",
            "Sum",
-           "TruncatedValueHolder",
            "Average",
            "XAverage",
            "MACD",
@@ -116,7 +118,7 @@ __all__ = ["Exp",
            "MovingResidue",
            "MovingSharp",
            "MovingSortino",
+           "MovingDrawDown",
+           "MovingMaxDrawDown",
            "Product",
-           "CenterMoment",
-           "Skewness",
            "MovingProduct"]

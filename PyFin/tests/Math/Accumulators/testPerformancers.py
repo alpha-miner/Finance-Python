@@ -12,6 +12,7 @@ import numpy as np
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingSharp
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingSortino
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingDrawDown
+from PyFin.Math.Accumulators.StatefulAccumulators import MovingMaxDrawDown
 
 
 class TestPerformancers(unittest.TestCase):
@@ -83,7 +84,7 @@ class TestPerformancers(unittest.TestCase):
                                                                                                                      expectedDrawdown,
                                                                                                                      calculatedDrawdown))
 
-    def testMovingDrawdownDecreasing(self):
+    def testMovingDrawDownDecreasing(self):
         dirName = os.path.dirname(os.path.abspath(__file__))
         filePath = os.path.join(dirName, 'data/drawdown_decreasing.csv')
 
@@ -103,3 +104,23 @@ class TestPerformancers(unittest.TestCase):
                                                                                  "Drawdown calculated: {2:f}".format(i,
                                                                                                                      expectedDrawdown,
                                                                                                                      calculatedDrawdown))
+
+    def testMovingMaxDrawDownRandom(self):
+        dirName = os.path.dirname(os.path.abspath(__file__))
+        filePath = os.path.join(dirName, 'data/maxdrawdown_random.csv')
+
+        window = 20
+
+        with open(filePath, 'r') as fileHandler:
+            reader = csv.reader(fileHandler)
+            mv = MovingMaxDrawDown(window, x='ret')
+            for i, row in enumerate(reader):
+                if i == 0:
+                    continue
+                mv.push(dict(ret=float(row[1])))
+                expectedDrawdown = float(row[5])
+                calculatedDrawdown = mv.result()
+                self.assertAlmostEqual(calculatedDrawdown, expectedDrawdown, 7, "at index {0:d}\n"
+                                                                                "Max drawdown expected:   {1:f}\n"
+                                                                                "Max drawdown calculated: {2:f}".format(
+                    i, expectedDrawdown, calculatedDrawdown))

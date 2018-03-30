@@ -257,6 +257,16 @@ cdef class MovingDrawDown(StatefulValueHolder):
     cpdef double result(self)
 
 
+cdef class MovingMaxDrawDown(StatefulValueHolder):
+
+    cdef MovingDrawDown _drawdownCalculator
+    cdef MovingMin _minimer
+    cdef Accumulator _x
+
+    cpdef push(self, dict data)
+    cpdef double result(self)
+
+
 cdef class MovingResidue(StatefulValueHolder):
 
     cdef public double _cross

@@ -848,6 +848,31 @@ cdef class MovingDrawDown(StatefulValueHolder):
         return self._runningCum - self._currentMax
 
 
+cdef class MovingMaxDrawDown(StatefulValueHolder):
+
+    def __init__(self, window, x):
+        super(MovingMaxDrawDown, self).__init__(window)
+        self._drawdownCalculator = MovingDrawDown(window, 'x')
+        self._minimer = MovingMin(window, 'x')
+        self._x = build_holder(x)
+
+    cpdef push(self, dict data):
+        self._x.push(data)
+        cdef double ret = self._x.result()
+
+        if isnan(ret):
+            return NAN
+
+        self._drawdownCalculator.push(dict(x=ret))
+        cdef double draw_down = self._drawdownCalculator.result()
+        self._minimer.push(dict(x=draw_down))
+        self._deque.dump(draw_down)
+        self._isFull = self._isFull or self._deque.isFull()
+
+    cpdef double result(self):
+        return self._minimer.result()
+
+
 cdef class MovingResidue(StatefulValueHolder):
 
     def __init__(self, window, x, y):

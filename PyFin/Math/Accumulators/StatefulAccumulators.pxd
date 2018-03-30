@@ -246,6 +246,17 @@ cdef class MovingSortino(StatefulValueHolder):
     cpdef double result(self)
 
 
+cdef class MovingDrawDown(StatefulValueHolder):
+
+    cdef MovingMax _maxer
+    cdef double _runningCum
+    cdef double _currentMax
+    cdef Accumulator _x
+
+    cpdef push(self, dict data)
+    cpdef double result(self)
+
+
 cdef class MovingResidue(StatefulValueHolder):
 
     cdef public double _cross

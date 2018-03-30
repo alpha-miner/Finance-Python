@@ -822,6 +822,32 @@ cdef class MovingSortino(StatefulValueHolder):
             return NAN
 
 
+cdef class MovingDrawDown(StatefulValueHolder):
+
+    def __init__(self, window, x):
+        super(MovingDrawDown, self).__init__(window)
+        self._maxer = MovingMax(window + 1, x='x')
+        self._maxer.push(dict(x=0.0))
+        self._x = build_holder(x)
+        self._runningCum = 0.0
+        self._currentMax = NAN
+
+    cpdef push(self, dict data):
+        self._x.push(data)
+        cdef double ret = self._x.result()
+
+        if isnan(ret):
+            return NAN
+
+        self._runningCum += ret
+        self._maxer.push(dict(x=self._runningCum))
+        self._currentMax = self._maxer.result()
+        self._isFull = self._isFull or self._maxer.isFull()
+
+    cpdef double result(self):
+        return self._runningCum - self._currentMax
+
+
 cdef class MovingResidue(StatefulValueHolder):
 
     def __init__(self, window, x, y):

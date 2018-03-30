@@ -11,6 +11,7 @@ import os
 import numpy as np
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingSharp
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingSortino
+from PyFin.Math.Accumulators.StatefulAccumulators import MovingDrawDown
 
 
 class TestPerformancers(unittest.TestCase):
@@ -60,3 +61,45 @@ class TestPerformancers(unittest.TestCase):
                                                                     "Sortino expected:   {1:f}\n"
                                                                     "Sortino calculated: {2:f}".format(i, expected,
                                                                                                        calculated))
+
+    def testMovingDrawdownIncreasing(self):
+        dirName = os.path.dirname(os.path.abspath(__file__))
+        filePath = os.path.join(dirName, 'data/drawdown_increasing.csv')
+
+        window = 20
+
+        with open(filePath, 'r') as fileHandler:
+            reader = csv.reader(fileHandler)
+            mv = MovingDrawDown(window, x='ret')
+            for i, row in enumerate(reader):
+                if i == 0:
+                    continue
+                mv.push(dict(ret=float(row[1])))
+                expectedDrawdown = float(row[2])
+                calculatedDrawdown = mv.result()
+                self.assertAlmostEqual(calculatedDrawdown, expectedDrawdown, 10, "at index {0:d}\n"
+                                                                                 "Drawdown expected:   {1:f}\n"
+                                                                                 "Drawdown calculated: {2:f}".format(i,
+                                                                                                                     expectedDrawdown,
+                                                                                                                     calculatedDrawdown))
+
+    def testMovingDrawdownDecreasing(self):
+        dirName = os.path.dirname(os.path.abspath(__file__))
+        filePath = os.path.join(dirName, 'data/drawdown_decreasing.csv')
+
+        window = 20
+
+        with open(filePath, 'r') as fileHandler:
+            reader = csv.reader(fileHandler)
+            mv = MovingDrawDown(window, x='ret')
+            for i, row in enumerate(reader):
+                if i == 0:
+                    continue
+                mv.push(dict(ret=float(row[1])))
+                expectedDrawdown = float(row[2])
+                calculatedDrawdown = mv.result()
+                self.assertAlmostEqual(calculatedDrawdown, expectedDrawdown, 10, "at index {0:d}\n"
+                                                                                 "Drawdown expected:   {1:f}\n"
+                                                                                 "Drawdown calculated: {2:f}".format(i,
+                                                                                                                     expectedDrawdown,
+                                                                                                                     calculatedDrawdown))

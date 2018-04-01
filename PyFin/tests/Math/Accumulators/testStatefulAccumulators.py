@@ -75,7 +75,7 @@ class TestStatefulAccumulators(unittest.TestCase):
 
         with open(f.name, 'rb') as f2:
             pickled = pickle.load(f2)
-            self.assertTrue(math.isnan(pickled._latest))
+            self.assertTrue(math.isnan(pickled.result()))
 
         os.unlink(f.name)
 

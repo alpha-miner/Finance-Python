@@ -397,6 +397,11 @@ cdef class Identity(Accumulator):
 cdef class Latest(Accumulator):
 
     def __init__(self, x='x', current_value=NAN):
+        """
+        Latest should only be used as a vanilla named value holder
+        :param x:
+        :param current_value:
+        """
         super(Latest, self).__init__()
         self._window = 0
         self._isFull = True

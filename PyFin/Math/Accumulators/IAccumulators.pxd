@@ -27,7 +27,7 @@ cpdef build_holder(name)
 
 cdef class Negative(Accumulator):
 
-    cdef public Accumulator _inner
+    cdef Accumulator _inner
 
     cpdef push(self, dict data)
     cpdef double result(self)
@@ -35,8 +35,8 @@ cdef class Negative(Accumulator):
 
 cdef class CombinedValueHolder(Accumulator):
 
-    cdef public Accumulator _left
-    cdef public Accumulator _right
+    cdef Accumulator _left
+    cdef Accumulator _right
 
     cpdef push(self, dict data)
 
@@ -93,7 +93,7 @@ cdef class NeOperatorValueHolder(CombinedValueHolder):
 
 cdef class Identity(Accumulator):
 
-    cdef public double _value
+    cdef double _value
 
     cpdef push(self, dict data)
     cpdef double result(self)
@@ -101,7 +101,7 @@ cdef class Identity(Accumulator):
 
 cdef class Latest(Accumulator):
 
-    cdef public double _latest
+    cdef double _latest
 
     cpdef push(self, dict data)
     cpdef double result(self)
@@ -109,8 +109,8 @@ cdef class Latest(Accumulator):
 
 cdef class CompoundedValueHolder(Accumulator):
 
-    cdef public Accumulator _left
-    cdef public Accumulator _right
+    cdef Accumulator _left
+    cdef Accumulator _right
 
     cpdef push(self, dict data)
     cpdef double result(self)
@@ -118,9 +118,9 @@ cdef class CompoundedValueHolder(Accumulator):
 
 cdef class IIF(Accumulator):
 
-    cdef public Accumulator _cond
-    cdef public Accumulator _left
-    cdef public Accumulator _right
+    cdef Accumulator _cond
+    cdef Accumulator _left
+    cdef Accumulator _right
 
     cpdef push(self, dict data)
     cpdef double result(self)
@@ -128,7 +128,7 @@ cdef class IIF(Accumulator):
 
 cdef class BasicFunction(Accumulator):
 
-    cdef public double _origValue
+    cdef double _origValue
     cdef Accumulator _inner
 
     cpdef push(self, dict data)

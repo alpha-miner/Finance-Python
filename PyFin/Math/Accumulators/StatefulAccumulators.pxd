@@ -246,7 +246,7 @@ cdef class MovingSortino(StatefulValueHolder):
     cpdef double result(self)
 
 
-cdef class MovingDrawDown(StatefulValueHolder):
+cdef class MovingDrawdown(StatefulValueHolder):
 
     cdef MovingMax _maxer
     cdef double _runningCum
@@ -257,9 +257,9 @@ cdef class MovingDrawDown(StatefulValueHolder):
     cpdef double result(self)
 
 
-cdef class MovingMaxDrawDown(StatefulValueHolder):
+cdef class MovingMaxDrawdown(StatefulValueHolder):
 
-    cdef MovingDrawDown _drawdownCalculator
+    cdef MovingDrawdown _drawdownCalculator
     cdef MovingMin _minimer
     cdef Accumulator _x
 

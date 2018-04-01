@@ -11,8 +11,8 @@ import os
 import numpy as np
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingSharp
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingSortino
-from PyFin.Math.Accumulators.StatefulAccumulators import MovingDrawDown
-from PyFin.Math.Accumulators.StatefulAccumulators import MovingMaxDrawDown
+from PyFin.Math.Accumulators.StatefulAccumulators import MovingDrawdown
+from PyFin.Math.Accumulators.StatefulAccumulators import MovingMaxDrawdown
 
 
 class TestPerformancers(unittest.TestCase):
@@ -71,7 +71,7 @@ class TestPerformancers(unittest.TestCase):
 
         with open(filePath, 'r') as fileHandler:
             reader = csv.reader(fileHandler)
-            mv = MovingDrawDown(window, x='ret')
+            mv = MovingDrawdown(window, x='ret')
             for i, row in enumerate(reader):
                 if i == 0:
                     continue
@@ -84,7 +84,7 @@ class TestPerformancers(unittest.TestCase):
                                                                                                                      expectedDrawdown,
                                                                                                                      calculatedDrawdown))
 
-    def testMovingDrawDownDecreasing(self):
+    def testMovingDrawdownDecreasing(self):
         dirName = os.path.dirname(os.path.abspath(__file__))
         filePath = os.path.join(dirName, 'data/drawdown_decreasing.csv')
 
@@ -92,7 +92,7 @@ class TestPerformancers(unittest.TestCase):
 
         with open(filePath, 'r') as fileHandler:
             reader = csv.reader(fileHandler)
-            mv = MovingDrawDown(window, x='ret')
+            mv = MovingDrawdown(window, x='ret')
             for i, row in enumerate(reader):
                 if i == 0:
                     continue
@@ -105,7 +105,7 @@ class TestPerformancers(unittest.TestCase):
                                                                                                                      expectedDrawdown,
                                                                                                                      calculatedDrawdown))
 
-    def testMovingMaxDrawDownRandom(self):
+    def testMovingMaxDrawdownRandom(self):
         dirName = os.path.dirname(os.path.abspath(__file__))
         filePath = os.path.join(dirName, 'data/maxdrawdown_random.csv')
 
@@ -113,7 +113,7 @@ class TestPerformancers(unittest.TestCase):
 
         with open(filePath, 'r') as fileHandler:
             reader = csv.reader(fileHandler)
-            mv = MovingMaxDrawDown(window, x='ret')
+            mv = MovingMaxDrawdown(window, x='ret')
             for i, row in enumerate(reader):
                 if i == 0:
                     continue

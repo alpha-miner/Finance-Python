@@ -62,8 +62,8 @@ from PyFin.Math.Accumulators.StatefulAccumulators import MovingLogReturn
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingResidue
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingSharp
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingSortino
-from PyFin.Math.Accumulators.StatefulAccumulators import MovingDrawDown
-from PyFin.Math.Accumulators.StatefulAccumulators import MovingMaxDrawDown
+from PyFin.Math.Accumulators.StatefulAccumulators import MovingDrawdown
+from PyFin.Math.Accumulators.StatefulAccumulators import MovingMaxDrawdown
 
 
 __all__ = ["Exp",
@@ -118,7 +118,7 @@ __all__ = ["Exp",
            "MovingResidue",
            "MovingSharp",
            "MovingSortino",
-           "MovingDrawDown",
-           "MovingMaxDrawDown",
+           "MovingDrawdown",
+           "MovingMaxDrawdown",
            "Product",
            "MovingProduct"]

@@ -822,10 +822,10 @@ cdef class MovingSortino(StatefulValueHolder):
             return NAN
 
 
-cdef class MovingDrawDown(StatefulValueHolder):
+cdef class MovingDrawdown(StatefulValueHolder):
 
     def __init__(self, window, x):
-        super(MovingDrawDown, self).__init__(window)
+        super(MovingDrawdown, self).__init__(window)
         self._maxer = MovingMax(window + 1, x='x')
         self._maxer.push(dict(x=0.0))
         self._x = build_holder(x)
@@ -848,11 +848,11 @@ cdef class MovingDrawDown(StatefulValueHolder):
         return self._runningCum - self._currentMax
 
 
-cdef class MovingMaxDrawDown(StatefulValueHolder):
+cdef class MovingMaxDrawdown(StatefulValueHolder):
 
     def __init__(self, window, x):
-        super(MovingMaxDrawDown, self).__init__(window)
-        self._drawdownCalculator = MovingDrawDown(window, 'x')
+        super(MovingMaxDrawdown, self).__init__(window)
+        self._drawdownCalculator = MovingDrawdown(window, 'x')
         self._minimer = MovingMin(window, 'x')
         self._x = build_holder(x)
 

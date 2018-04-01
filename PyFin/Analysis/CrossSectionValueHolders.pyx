@@ -13,7 +13,7 @@ cimport cython
 from PyFin.Analysis.SeriesValues cimport SeriesValues
 from PyFin.Analysis.SecurityValueHolders cimport SecurityValueHolder
 from PyFin.Analysis.SecurityValueHolders cimport SecurityLatestValueHolder
-from PyFin.Analysis.SecurityValueHolders import _merge2set
+from PyFin.Analysis.SecurityValueHolders import build_holder
 from PyFin.Math.MathConstants cimport NAN
 
 
@@ -22,15 +22,10 @@ cdef class CrossSectionValueHolder(SecurityValueHolder):
     cdef public SecurityValueHolder _inner
 
     def __init__(self, innerValue):
-        if isinstance(innerValue, SecurityValueHolder):
-            self._inner = copy.deepcopy(innerValue)
-        elif isinstance(innerValue, six.string_types):
-            self._inner = SecurityLatestValueHolder(innerValue)
-        else:
-            raise ValueError("Currently only value holder input is allowed for cross sectional value holder.")
+        super(CrossSectionValueHolder, self).__init__()
+        self._inner = build_holder(innerValue)
         self._window = self._inner.window
-        self._returnSize = self._inner.valueSize
-        self._dependency = copy.deepcopy(self._inner._dependency)
+        self._dependency = copy.deepcopy(self._inner.fields)
         self.updated = 0
         self.cached = None
 
@@ -61,7 +56,7 @@ cdef class CSRankedSecurityValueHolder(CrossSectionValueHolder):
             self.updated = 1
             return self.cached
 
-    cpdef value_by_name(self, name):
+    cpdef double value_by_name(self, name):
 
         cdef SeriesValues raw_values
 
@@ -73,7 +68,7 @@ cdef class CSRankedSecurityValueHolder(CrossSectionValueHolder):
             self.updated = 1
             return self.cached[name]
 
-    cpdef value_by_names(self, list names):
+    cpdef SeriesValues value_by_names(self, list names):
         cdef SeriesValues raw_values
         raw_values = self._inner.value_by_names(names)
         raw_values = raw_values.rank()
@@ -103,7 +98,7 @@ cdef class CSAverageSecurityValueHolder(CrossSectionValueHolder):
             self.updated = 1
             return self.cached
 
-    cpdef value_by_name(self, name):
+    cpdef double value_by_name(self, name):
 
         cdef SeriesValues raw_values
         cdef np.ndarray[double, ndim=1] mean_value
@@ -118,7 +113,7 @@ cdef class CSAverageSecurityValueHolder(CrossSectionValueHolder):
             self.updated = 1
             return self.cached[name]
 
-    cpdef value_by_names(self, list names):
+    cpdef SeriesValues value_by_names(self, list names):
 
         cdef SeriesValues raw_values
         cdef np.ndarray[double, ndim=1] mean_value
@@ -157,7 +152,7 @@ cdef class CSPercentileSecurityValueHolder(CrossSectionValueHolder):
             self.updated = 1
             return self.cached
 
-    cpdef value_by_name(self, name):
+    cpdef double value_by_name(self, name):
 
         cdef SeriesValues raw_values
         cdef np.ndarray[double, ndim=1] per_value
@@ -172,7 +167,7 @@ cdef class CSPercentileSecurityValueHolder(CrossSectionValueHolder):
             self.updated = 1
             return self.cached[name]
 
-    cpdef value_by_names(self, list names):
+    cpdef SeriesValues value_by_names(self, list names):
 
         cdef SeriesValues raw_values
         cdef np.ndarray[double, ndim=1] per_value
@@ -204,7 +199,7 @@ cdef class CSAverageAdjustedSecurityValueHolder(CrossSectionValueHolder):
             self.updated = 1
             return self.cached
 
-    cpdef value_by_name(self, name):
+    cpdef double value_by_name(self, name):
 
         cdef SeriesValues raw_values
 
@@ -216,7 +211,7 @@ cdef class CSAverageAdjustedSecurityValueHolder(CrossSectionValueHolder):
             self.updated = 1
             return self.cached[name]
 
-    cpdef value_by_names(self, list names):
+    cpdef SeriesValues value_by_names(self, list names):
         raw_values = self._inner.value_by_names(names)
         raw_values = raw_values - raw_values.mean()
         return raw_values[names]
@@ -243,7 +238,7 @@ cdef class CSQuantileSecurityValueHolder(CrossSectionValueHolder):
             return self.cached
 
     @cython.cdivision(True)
-    cpdef value_by_name(self, name):
+    cpdef double value_by_name(self, name):
 
         cdef SeriesValues raw_values
 
@@ -256,7 +251,7 @@ cdef class CSQuantileSecurityValueHolder(CrossSectionValueHolder):
             return self.cached[name]
 
     @cython.cdivision(True)
-    cpdef value_by_names(self, list names):
+    cpdef SeriesValues value_by_names(self, list names):
 
         cdef SeriesValues raw_values
 
@@ -286,7 +281,7 @@ cdef class CSZScoreSecurityValueHolder(CrossSectionValueHolder):
             return self.cached
 
     @cython.cdivision(True)
-    cpdef value_by_name(self, name):
+    cpdef double value_by_name(self, name):
 
         cdef SeriesValues raw_values
 
@@ -299,7 +294,7 @@ cdef class CSZScoreSecurityValueHolder(CrossSectionValueHolder):
             return self.cached[name]
 
     @cython.cdivision(True)
-    cpdef value_by_names(self, list names):
+    cpdef SeriesValues value_by_names(self, list names):
 
         cdef SeriesValues raw_values
 
@@ -317,23 +312,12 @@ cdef class CSResidueSecurityValueHolder(SecurityValueHolder):
     cdef public SecurityValueHolder _right
 
     def __init__(self, left, right):
-        if isinstance(left, SecurityValueHolder):
-            self._left = copy.deepcopy(left)
-        elif isinstance(left, six.string_types):
-            self._left = SecurityLatestValueHolder(left)
-        else:
-            raise ValueError("Currently only value holder input is allowed for binary cross sectional value holder.")
+        super(CSResidueSecurityValueHolder, self).__init__()
+        self._left = build_holder(left)
+        self._right = build_holder(right)
 
-        if isinstance(right, SecurityValueHolder):
-            self._right = copy.deepcopy(right)
-        elif isinstance(right, six.string_types):
-            self._right = SecurityLatestValueHolder(right)
-        else:
-            raise ValueError("Currently only value holder input is allowed for binary cross sectional value holder.")
-
-        self._window = max(self._left.window, self._right._window)
-        self._returnSize = self._left.valueSize
-        self._dependency = _merge2set(self._left._dependency, self._right._dependency)
+        self._window = max(self._left.window, self._right.window)
+        self._dependency = list(set(self._left.fields + self._right.fields))
         self.updated = 0
         self.cached = None
 
@@ -361,7 +345,7 @@ cdef class CSResidueSecurityValueHolder(SecurityValueHolder):
             self.updated = 1
             return self.cached
 
-    cpdef value_by_name(self, name):
+    cpdef double value_by_name(self, name):
 
         cdef SeriesValues left_raw_values
         cdef SeriesValues right_raw_values
@@ -375,7 +359,7 @@ cdef class CSResidueSecurityValueHolder(SecurityValueHolder):
             self.updated = 1
             return self.cached[name]
 
-    cpdef value_by_names(self, list names):
+    cpdef SeriesValues value_by_names(self, list names):
         cdef SeriesValues left_raw_values
         cdef SeriesValues right_raw_values
         left_raw_values = self._left.value_by_names(names)

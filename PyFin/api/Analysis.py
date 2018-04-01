@@ -22,7 +22,6 @@ from PyFin.Analysis.TechnicalAnalysis import SecurityMovingStandardDeviation
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingCountedPositive
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingPositiveAverage
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingRSI
-from PyFin.Analysis.TechnicalAnalysis import SecurityMovingHistoricalWindow
 from PyFin.Analysis.TechnicalAnalysis import SecuritySignValueHolder
 from PyFin.Analysis.TechnicalAnalysis import SecurityXAverageValueHolder
 from PyFin.Analysis.TechnicalAnalysis import SecurityMACDValueHolder
@@ -38,9 +37,6 @@ from PyFin.Analysis.TechnicalAnalysis import SecurityAcosValueHolder
 from PyFin.Analysis.TechnicalAnalysis import SecurityAcoshValueHolder
 from PyFin.Analysis.TechnicalAnalysis import SecurityAsinValueHolder
 from PyFin.Analysis.TechnicalAnalysis import SecurityAsinhValueHolder
-from PyFin.Analysis.TechnicalAnalysis import SecurityMovingResidue
-from PyFin.Analysis.TechnicalAnalysis import SecurityMovingCorrelation
-from PyFin.Analysis.TechnicalAnalysis import SecurityMovingRank
 from PyFin.Analysis.SecurityValueHolders import SecurityShiftedValueHolder
 from PyFin.Analysis.SecurityValueHolders import SecurityLatestValueHolder
 from PyFin.Analysis.SecurityValueHolders import SecurityIIFValueHolder
@@ -98,18 +94,6 @@ def RSI(window, dependency='x'):
     return SecurityMovingRSI(window, dependency)
 
 
-def RES(window, dependency=('y', 'x')):
-    return SecurityMovingResidue(window, dependency)
-
-
-def CORR(window, dependency=('x', 'y')):
-    return SecurityMovingCorrelation(window, dependency)
-
-
-def RANK(window, dependency='x'):
-    return SecurityMovingRank(window, dependency)
-
-
 def MA(window, dependency='x'):
     return SecurityMovingAverage(window, dependency)
 
@@ -160,10 +144,6 @@ def MNPOSITIVE(window, dependency='x'):
 
 def MAPOSITIVE(window, dependency='x'):
     return SecurityMovingPositiveAverage(window, dependency)
-
-
-def HIST(window, dependency='x'):
-    return SecurityMovingHistoricalWindow(window, dependency)
 
 
 def LAST(dependency='x'):

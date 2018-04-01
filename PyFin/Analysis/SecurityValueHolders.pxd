@@ -14,19 +14,17 @@ cdef class SecurityValueHolder(object):
     cdef public list _dependency
     cdef public SecurityValueHolder _compHolder
     cdef public int _window
-    cdef public int _returnSize
     cdef public Accumulator _holderTemplate
     cdef public int updated
     cdef public dict _innerHolders
     cdef public SeriesValues cached
 
     cpdef push(self, dict data)
-    cpdef value_by_names(self, list names)
-    cpdef value_by_name(self, name)
+    cpdef value_all(self)
+    cpdef SeriesValues value_by_names(self, list names)
+    cpdef double value_by_name(self, name)
     cpdef shift(self, int n)
     cpdef transform(self, data, str name=*, str category_field=*, bint dropna=*)
-    cpdef copy_attributes(self, dict attributes, bint is_deep=*)
-    cpdef collect_attributes(self)
 
 
 cdef class FilteredSecurityValueHolder(SecurityValueHolder):
@@ -34,26 +32,29 @@ cdef class FilteredSecurityValueHolder(SecurityValueHolder):
     cdef public SecurityValueHolder _filter
     cdef public SecurityValueHolder _computer
 
-    cpdef value_by_name(self, name)
-    cpdef value_by_names(self, list names)
+    cpdef double value_by_name(self, name)
+    cpdef SeriesValues value_by_names(self, list names)
     cpdef push(self, dict data)
 
 
 cdef class IdentitySecurityValueHolder(SecurityValueHolder):
 
     cdef public object _value
+    cdef set _symbols
 
     cpdef push(self, dict data)
-    cpdef value_by_name(self, name)
-    cpdef value_by_names(self, list names)
+    cpdef double value_by_name(self, name)
+    cpdef SeriesValues value_all(self)
+    cpdef SeriesValues value_by_names(self, list names)
 
 
 cdef class SecurityConstArrayValueHolder(SecurityValueHolder):
     cdef SeriesValues _values
 
     cpdef push(self, dict data)
-    cpdef value_by_name(self, name)
-    cpdef value_by_names(self, list names)
+    cpdef double value_by_name(self, name)
+    cpdef SeriesValues value_all(self)
+    cpdef SeriesValues value_by_names(self, list names)
 
 
 cdef class SecurityUnitoryValueHolder(SecurityValueHolder):
@@ -61,8 +62,9 @@ cdef class SecurityUnitoryValueHolder(SecurityValueHolder):
     cdef public SecurityValueHolder _right
     cdef public object _op
 
-    cpdef value_by_name(self, name)
-    cpdef value_by_names(self, list names)
+    cpdef double value_by_name(self, name)
+    cpdef SeriesValues value_all(self)
+    cpdef SeriesValues value_by_names(self, list names)
     cpdef push(self, dict data)
 
 
@@ -75,7 +77,15 @@ cdef class SecurityInvertValueHolder(SecurityUnitoryValueHolder):
 
 
 cdef class SecurityLatestValueHolder(SecurityValueHolder):
-    pass
+    cdef dict _symbol_values
+
+    cpdef push(self, dict data)
+    cpdef SeriesValues value_all(self)
+    cpdef SeriesValues value_by_names(self, list names)
+    cpdef double value_by_name(self, name)
+
+
+cpdef SecurityValueHolder build_holder(name)
 
 
 cdef class SecurityCombinedValueHolder(SecurityValueHolder):
@@ -84,13 +94,14 @@ cdef class SecurityCombinedValueHolder(SecurityValueHolder):
     cdef public SecurityValueHolder _right
     cdef public object _op
 
-    cpdef value_by_name(self, name)
-    cpdef value_by_names(self, list names)
+    cpdef double value_by_name(self, name)
+    cpdef SeriesValues value_all(self)
+    cpdef SeriesValues value_by_names(self, list names)
     cpdef push(self, dict data)
 
 cdef class SecurityXorValueHolder(SecurityCombinedValueHolder):
 
-    cpdef value_by_name(self, name)
+    cpdef double value_by_name(self, name)
 
 
 cdef class SecurityAddedValueHolder(SecurityCombinedValueHolder):
@@ -151,6 +162,7 @@ cdef class SecurityIIFValueHolder(SecurityValueHolder):
     cdef public SecurityValueHolder _left
     cdef public SecurityValueHolder _right
 
-    cpdef value_by_name(self, name)
-    cpdef value_by_names(self, list names)
+    cpdef double value_by_name(self, name)
+    cpdef SeriesValues value_all(self)
+    cpdef SeriesValues value_by_names(self, list names)
     cpdef push(self, dict data)

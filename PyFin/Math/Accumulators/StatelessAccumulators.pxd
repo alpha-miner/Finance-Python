@@ -7,215 +7,146 @@ Created on 2017-2-10
 
 cimport numpy as np
 from PyFin.Math.Accumulators.IAccumulators cimport Accumulator
-from PyFin.Math.Accumulators.IAccumulators cimport StatelessSingleValueAccumulator
 
 
-cdef class Diff(StatelessSingleValueAccumulator):
+cdef class Diff(Accumulator):
 
     cdef public double _curr
     cdef public double _previous
+    cdef Accumulator _inner
 
     cpdef push(self, dict data)
-    cpdef object result(self)
+    cpdef double result(self)
 
 
-cdef class SimpleReturn(StatelessSingleValueAccumulator):
+cdef class SimpleReturn(Accumulator):
 
     cdef public double _diff
     cdef public double _curr
     cdef public double _previous
+    cdef Accumulator _inner
 
     cpdef push(self, dict data)
-    cpdef object result(self)
+    cpdef double result(self)
 
 
-cdef class LogReturn(StatelessSingleValueAccumulator):
+cdef class LogReturn(Accumulator):
 
     cdef public double _diff
     cdef public double _curr
     cdef public double _previous
+    cdef Accumulator _inner
 
     cpdef push(self, dict data)
-    cpdef object result(self)
+    cpdef double result(self)
 
 
-cdef class PositivePart(StatelessSingleValueAccumulator):
+cdef class PositivePart(Accumulator):
 
     cdef public double _pos
+    cdef Accumulator _inner
 
     cpdef push(self, dict data)
-    cpdef object result(self)
+    cpdef double result(self)
 
 
-cdef class NegativePart(StatelessSingleValueAccumulator):
+cdef class NegativePart(Accumulator):
 
     cdef public double _neg
+    cdef Accumulator _inner
 
     cpdef push(self, dict data)
-    cpdef object result(self)
+    cpdef double result(self)
 
 
-cdef class Max(StatelessSingleValueAccumulator):
+cdef class Max(Accumulator):
 
     cdef public double _currentMax
     cdef public int _first
+    cdef Accumulator _inner
 
     cpdef push(self, dict data)
-    cpdef object result(self)
+    cpdef double result(self)
 
 
-cdef class Maximum(StatelessSingleValueAccumulator):
+cdef class Maximum(Accumulator):
 
     cdef public double _currentMax
+    cdef Accumulator _x
+    cdef Accumulator _y
 
     cpdef push(self, dict data)
-    cpdef object result(self)
+    cpdef double result(self)
 
 
-cdef class Min(StatelessSingleValueAccumulator):
+cdef class Min(Accumulator):
 
     cdef public double _currentMin
     cdef public int _first
+    cdef Accumulator _inner
 
     cpdef push(self, dict data)
-    cpdef object result(self)
+    cpdef double result(self)
 
 
-cdef class Minimum(StatelessSingleValueAccumulator):
+cdef class Minimum(Accumulator):
 
     cdef public double _currentMin
     cdef public int _first
+    cdef Accumulator _x
+    cdef Accumulator _y
 
     cpdef push(self, dict data)
-    cpdef object result(self)
+    cpdef double result(self)
 
 
-cdef class Sum(StatelessSingleValueAccumulator):
+cdef class Sum(Accumulator):
 
     cdef public double _currentSum
     cdef public int _first
+    cdef Accumulator _inner
 
     cpdef push(self, dict data)
-    cpdef object result(self)
+    cpdef double result(self)
 
 
-cdef class Average(StatelessSingleValueAccumulator):
+cdef class Average(Accumulator):
 
     cdef public double _currentSum
     cdef public int _currentCount
+    cdef Accumulator _inner
 
     cpdef push(self, dict data)
-    cpdef object result(self)
+    cpdef double result(self)
 
 
-cdef class XAverage(StatelessSingleValueAccumulator):
+cdef class XAverage(Accumulator):
 
     cdef public double _average
     cdef public double _exp
     cdef public int _count
+    cdef Accumulator _inner
 
     cpdef push(self, dict data)
-    cpdef object result(self)
+    cpdef double result(self)
 
 
-cdef class Variance(StatelessSingleValueAccumulator):
+cdef class Variance(Accumulator):
 
     cdef public double _currentSum
     cdef public double _currentSumSquare
     cdef public int _currentCount
     cdef public bint _isPop
+    cdef Accumulator _inner
 
     cpdef push(self, dict data)
-    cpdef object result(self)
+    cpdef double result(self)
 
 
-cdef class Product(StatelessSingleValueAccumulator):
+cdef class Product(Accumulator):
 
     cdef public double _product
+    cdef Accumulator _inner
 
     cpdef push(self, dict data)
-    cpdef object result(self)
-
-
-cdef class CenterMoment(StatelessSingleValueAccumulator):
-
-    cdef public list _this_list
-    cdef public double _order
-    cdef public double _moment
-
-    cpdef push(self, dict data)
-    cpdef object result(self)
-
-
-cdef class Skewness(StatelessSingleValueAccumulator):
-
-    cdef public Accumulator _skewness
-
-    cpdef push(self, dict data)
-    cpdef object result(self)
-
-
-cdef class Kurtosis(StatelessSingleValueAccumulator):
-
-    cdef public Accumulator _kurtosis
-
-    cpdef push(self, dict data)
-    cpdef object result(self)
-
-
-cdef class Rank(StatelessSingleValueAccumulator):
-
-    cdef public list _thisList
-    cdef public list _sortedList
-    cdef public list _rank
-
-    cpdef push(self, dict data)
-    cpdef object result(self)
-
-
-cdef class LevelList(StatelessSingleValueAccumulator):
-
-    cdef public list _levelList
-    cdef public list _thisList
-
-    cpdef push(self, dict data)
-    cpdef object result(self)
-
-
-cdef class LevelValue(StatelessSingleValueAccumulator):
-
-    cdef public list _thisList
-    cdef public double _levelValue
-
-    cpdef push(self, dict data)
-    cpdef object result(self)
-
-
-cdef class AutoCorrelation(StatelessSingleValueAccumulator):
-
-    cdef public int _lags
-    cdef public list _thisList
-    cdef public list _VecForward
-    cdef public list _VecBackward
-    cdef public np.ndarray _AutoCorrMatrix
-
-    cpdef push(self, dict data)
-    cpdef object result(self)
-
-
-cdef class StatelessMultiValueAccumulator(Accumulator):
-
-    cdef _push(self, dict data)
-
-
-cdef class Correlation(StatelessMultiValueAccumulator):
-
-    cdef public double _runningSumLeft
-    cdef public double _runningSumRight
-    cdef public double _runningSumSquareLeft
-    cdef public double _runningSumSquareRight
-    cdef public double _runningSumCrossSquare
-    cdef public int _currentCount
-
-    cpdef push(self, dict data)
-    cpdef object result(self)
+    cpdef double result(self)

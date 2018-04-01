@@ -36,7 +36,6 @@ from PyFin.api.Analysis import MVARIANCE
 from PyFin.api.Analysis import MSTD
 from PyFin.api.Analysis import MNPOSITIVE
 from PyFin.api.Analysis import MAPOSITIVE
-from PyFin.api.Analysis import HIST
 from PyFin.api.Analysis import LAST
 from PyFin.api.Analysis import HIGH
 from PyFin.api.Analysis import LOW
@@ -56,9 +55,6 @@ from PyFin.api.Analysis import ASIN
 from PyFin.api.Analysis import ASINH
 from PyFin.api.Analysis import SHIFT
 from PyFin.api.Analysis import IIF
-from PyFin.api.Analysis import RES
-from PyFin.api.Analysis import CORR
-from PyFin.api.Analysis import RANK
 
 from PyFin.api.Analysis import CSRank
 from PyFin.api.Analysis import CSMean
@@ -101,7 +97,6 @@ __all__ = ["datesList",
            "MSTD",
            "MNPOSITIVE",
            "MAPOSITIVE",
-           "HIST",
            "LAST",
            "HIGH",
            "LOW",
@@ -119,9 +114,6 @@ __all__ = ["datesList",
            "ACOSH",
            "ASIN",
            "ASINH",
-           "RES",
-           "CORR",
-           "RANK",
            "SHIFT",
            "IIF",
            "CSRank",

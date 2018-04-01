@@ -30,7 +30,7 @@ class TestCrossSectionValueHolder(unittest.TestCase):
                       'ibm': {'close': sample2[:, 0], 'open': sample2[:, 1]}}
 
     def testCSRankedSecurityValueHolderWithSymbolName(self):
-        benchmark = SecurityLatestValueHolder(dependency='close')
+        benchmark = SecurityLatestValueHolder(x='close')
         rankHolder = CSRankedSecurityValueHolder('close')
 
         for i in range(len(self.datas['aapl']['close'])):
@@ -44,7 +44,7 @@ class TestCrossSectionValueHolder(unittest.TestCase):
             np.testing.assert_array_almost_equal(benchmarkValues.rank().values, rankHolder.value.values)
 
     def testCSRankedSecurityValueHolder(self):
-        benchmark = SecurityLatestValueHolder(dependency='close')
+        benchmark = SecurityLatestValueHolder(x='close')
         rankHolder = CSRankedSecurityValueHolder(benchmark)
 
         for i in range(len(self.datas['aapl']['close'])):
@@ -58,7 +58,7 @@ class TestCrossSectionValueHolder(unittest.TestCase):
             np.testing.assert_array_almost_equal(benchmarkValues.rank().values, rankHolder.value.values)
 
     def testCSAverageSecurityValueHolder(self):
-        benchmark = SecurityLatestValueHolder(dependency='close')
+        benchmark = SecurityLatestValueHolder(x='close')
         meanHolder = CSAverageSecurityValueHolder(benchmark)
 
         for i in range(len(self.datas['aapl']['close'])):
@@ -73,7 +73,7 @@ class TestCrossSectionValueHolder(unittest.TestCase):
 
     def testCSPercentileSecurityValueHolder(self):
         percent = 50
-        benchmark = SecurityLatestValueHolder(dependency='close')
+        benchmark = SecurityLatestValueHolder(x='close')
         perHolder = CSPercentileSecurityValueHolder(percent, benchmark)
 
         for i in range(len(self.datas['aapl']['close'])):
@@ -87,7 +87,7 @@ class TestCrossSectionValueHolder(unittest.TestCase):
             np.testing.assert_array_almost_equal(np.percentile(benchmarkValues.values, 50), perHolder.value.values)
 
     def testCSAverageAdjustedSecurityValueHolder(self):
-        benchmark = SecurityLatestValueHolder(dependency='close')
+        benchmark = SecurityLatestValueHolder(x='close')
         meanAdjustedHolder = CSAverageAdjustedSecurityValueHolder(benchmark)
 
         for i in range(len(self.datas['aapl']['close'])):
@@ -142,8 +142,8 @@ class TestCrossSectionValueHolder(unittest.TestCase):
         np.testing.assert_array_almost_equal(expected, calculated.values)
 
     def testCSZResidueSecurityValueHolder(self):
-        y = SecurityLatestValueHolder(dependency='close')
-        x = SecurityLatestValueHolder(dependency='open')
+        y = SecurityLatestValueHolder(x='close')
+        x = SecurityLatestValueHolder(x='open')
 
         res = CSResidueSecurityValueHolder(y, x)
 

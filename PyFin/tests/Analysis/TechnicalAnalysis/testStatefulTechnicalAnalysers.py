@@ -29,10 +29,6 @@ from PyFin.Analysis.TechnicalAnalysis import SecurityMovingPositiveDifferenceAve
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingNegativeDifferenceAverage
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingRSI
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingLogReturn
-from PyFin.Analysis.TechnicalAnalysis import SecurityMovingResidue
-from PyFin.Analysis.TechnicalAnalysis import SecurityMovingRank
-from PyFin.Analysis.TechnicalAnalysis import SecurityMovingCorrelation
-from PyFin.Analysis.TechnicalAnalysis import SecurityMovingHistoricalWindow
 
 
 class TestStatefulTechnicalAnalysis(unittest.TestCase):
@@ -125,9 +121,6 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
                                                                  'expected:   {1:.12f}\n'
                                                                  'calculated: {2:.12f}'.format(i, expected, calculated))
 
-        with self.assertRaises(ValueError):
-            _ = SecurityMovingAverage(window, ['close', 'open'])
-
     def testSecurityMovingAverageWithErrorValues(self):
         window = 5
         to_average = SecurityLatestValueHolder('open') / SecurityLatestValueHolder('close')
@@ -158,10 +151,10 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
                                                                  'calculated: {2:.12f}'.format(i, expected, calculated))
 
     def testSecurityMovingAverageDeepcopy(self):
-        self.template_test_deepcopy(SecurityMovingAverage, window=10, dependency=['x'])
+        self.template_test_deepcopy(SecurityMovingAverage, window=10, x=['x'])
 
     def testSecurityMovingAveragePickle(self):
-        self.template_test_pickle(SecurityMovingAverage, window=10, dependency=['x'])
+        self.template_test_pickle(SecurityMovingAverage, window=10, x=['x'])
 
     def testSecurityMovingVariance(self):
         window = 10
@@ -190,14 +183,12 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
                 self.assertAlmostEqual(expected, calculated, 12, 'at index {0}\n'
                                                                  'expected:   {1:.12f}\n'
                                                                  'calculated: {2:.12f}'.format(i, expected, calculated))
-        with self.assertRaises(ValueError):
-            _ = SecurityMovingVariance(window, ['close', 'open'])
 
     def testSecurityMovingVarianceDeepcopy(self):
-        self.template_test_deepcopy(SecurityMovingVariance, window=10, dependency=['x'])
+        self.template_test_deepcopy(SecurityMovingVariance, window=10, x=['x'])
 
     def testSecurityMovingVariancePickle(self):
-        self.template_test_pickle(SecurityMovingVariance, window=10, dependency=['x'])
+        self.template_test_pickle(SecurityMovingVariance, window=10, x=['x'])
 
     def testSecurityMovingStandardDeviation(self):
         window = 10
@@ -228,18 +219,16 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
                                                                  'expected:   {1:.12f}\n'
                                                                  'calculated: {2:.12f}'.format(i, expected,
                                                                                                calculated))
-        with self.assertRaises(ValueError):
-            _ = SecurityMovingStandardDeviation(window, ['close', 'open'])
 
     def testSecurityMovingStandardDeviationDeepcopy(self):
-        self.template_test_deepcopy(SecurityMovingStandardDeviation, window=10, dependency=['x'])
+        self.template_test_deepcopy(SecurityMovingStandardDeviation, window=10, x=['x'])
 
     def testSecurityMovingStandardDeviationPickle(self):
-        self.template_test_pickle(SecurityMovingStandardDeviation, window=10, dependency=['x'])
+        self.template_test_pickle(SecurityMovingStandardDeviation, window=10, x=['x'])
 
     def testSecurityMovingMax(self):
         window = 10
-        ma1 = SecurityMovingMax(window, ['close'])
+        ma1 = SecurityMovingMax(window, 'close')
 
         for i in range(len(self.aapl['close'])):
             data = dict(aapl=dict(close=self.aapl['close'][i],
@@ -260,18 +249,15 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
                                                                  'expected:   {1:.12f}\n'
                                                                  'calculated: {2:.12f}'.format(i, expected, calculated))
 
-        with self.assertRaises(ValueError):
-            _ = SecurityMovingMax(window, ['close', 'open'])
-
     def testSecurityMovingMaxDeepcopy(self):
-        self.template_test_deepcopy(SecurityMovingMax, window=10, dependency=['x'])
+        self.template_test_deepcopy(SecurityMovingMax, window=10, x=['x'])
 
     def testSecurityMovingMaxPickle(self):
-        self.template_test_pickle(SecurityMovingMax, window=10, dependency=['x'])
+        self.template_test_pickle(SecurityMovingMax, window=10, x=['x'])
 
     def testSecurityMovingMinimum(self):
         window = 10
-        ma1 = SecurityMovingMin(window, ['close'])
+        ma1 = SecurityMovingMin(window, 'close')
 
         for i in range(len(self.aapl['close'])):
             data = dict(aapl=dict(close=self.aapl['close'][i],
@@ -292,14 +278,11 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
                                                                  'expected:   {1:.12f}\n'
                                                                  'calculated: {2:.12f}'.format(i, expected, calculated))
 
-        with self.assertRaises(ValueError):
-            _ = SecurityMovingMin(window, ['close', 'open'])
-
     def testSecurityMovingMinimumDeepcopy(self):
-        self.template_test_deepcopy(SecurityMovingMin, window=10, dependency=['x'])
+        self.template_test_deepcopy(SecurityMovingMin, window=10, x='x')
 
     def testSecurityMovingMinimumPickle(self):
-        self.template_test_pickle(SecurityMovingMin, window=10, dependency=['x'])
+        self.template_test_pickle(SecurityMovingMin, window=10, x='x')
 
     def testSecurityMovingQuantile(self):
         window = 10
@@ -330,10 +313,10 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
                                                                  'calculated: {2:.12f}'.format(i, expected, calculated))
 
     def testSecurityMovingQuantileDeepcopy(self):
-        self.template_test_deepcopy(SecurityMovingQuantile, window=10, dependency=['x'])
+        self.template_test_deepcopy(SecurityMovingQuantile, window=10, x=['x'])
 
     def testSecurityMovingQuantilePickle(self):
-        self.template_test_pickle(SecurityMovingQuantile, window=10, dependency=['x'])
+        self.template_test_pickle(SecurityMovingQuantile, window=10, x=['x'])
 
     def testSecurityMovingAllTrue(self):
         window = 3
@@ -367,10 +350,10 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
                                                        'calculated: {2}'.format(i, expected, calculated))
 
     def testSecurityMovingAllTrueDeepcopy(self):
-        self.template_test_deepcopy(SecurityMovingAllTrue, window=10, dependency=SecurityLatestValueHolder('x') > 0.)
+        self.template_test_deepcopy(SecurityMovingAllTrue, window=10, x=SecurityLatestValueHolder('x') > 0.)
 
     def testSecurityMovingAllTruePickle(self):
-        self.template_test_pickle(SecurityMovingAllTrue, window=10, dependency=SecurityLatestValueHolder('x') > 0.)
+        self.template_test_pickle(SecurityMovingAllTrue, window=10, x=SecurityLatestValueHolder('x') > 0.)
 
     def testSecurityMovingAnyTrue(self):
         window = 3
@@ -404,10 +387,10 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
                                                        'calculated: {2}'.format(i, expected, calculated))
 
     def testSecurityMovingAnyTrueDeepcopy(self):
-        self.template_test_deepcopy(SecurityMovingAnyTrue, window=10, dependency=SecurityLatestValueHolder('x') > 0.)
+        self.template_test_deepcopy(SecurityMovingAnyTrue, window=10, x=SecurityLatestValueHolder('x') > 0.)
 
     def testSecurityMovingAnyTruePickle(self):
-        self.template_test_pickle(SecurityMovingAnyTrue, window=10, dependency=SecurityLatestValueHolder('x') > 0.)
+        self.template_test_pickle(SecurityMovingAnyTrue, window=10, x=SecurityLatestValueHolder('x') > 0.)
 
     def testSecurityMovingSum(self):
         window = 10
@@ -433,10 +416,10 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
                                                                  'calculated: {2:.12f}'.format(i, expected, calculated))
 
     def testSecurityMovingSumDeepcopy(self):
-        self.template_test_deepcopy(SecurityMovingSum, window=10, dependency='x')
+        self.template_test_deepcopy(SecurityMovingSum, window=10, x='x')
 
     def testSecurityMovingSumPickle(self):
-        self.template_test_pickle(SecurityMovingSum, window=10, dependency='x')
+        self.template_test_pickle(SecurityMovingSum, window=10, x='x')
 
     def testSecurityMovingCountedPositive(self):
         window = 10
@@ -461,14 +444,11 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
                                                                  'expected:   {1:.12f}\n'
                                                                  'calculated: {2:.12f}'.format(i, expected, calculated))
 
-        with self.assertRaises(ValueError):
-            _ = SecurityMovingCountedPositive(window, ['close', 'open'])
-
     def testSecurityMovingCountedPositiveDeepcopy(self):
-        self.template_test_deepcopy(SecurityMovingCountedPositive, window=10, dependency='x')
+        self.template_test_deepcopy(SecurityMovingCountedPositive, window=10, x='x')
 
     def testSecurityMovingCountedPositivePickle(self):
-        self.template_test_pickle(SecurityMovingCountedPositive, window=10, dependency='x')
+        self.template_test_pickle(SecurityMovingCountedPositive, window=10, x='x')
 
     def testSecurityMovingPositiveAverage(self):
         window = 10
@@ -497,14 +477,11 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
                                                                  'expected:   {1:.12f}\n'
                                                                  'calculated: {2:.12f}'.format(i, expected, calculated))
 
-        with self.assertRaises(ValueError):
-            _ = SecurityMovingPositiveAverage(window, ['close', 'open'])
-
     def testSecurityMovingPositiveAverageDeepcopy(self):
-        self.template_test_deepcopy(SecurityMovingPositiveAverage, window=10, dependency='x')
+        self.template_test_deepcopy(SecurityMovingPositiveAverage, window=10, x='x')
 
     def testSecurityMovingPositiveAveragePickle(self):
-        self.template_test_pickle(SecurityMovingPositiveAverage, window=10, dependency='x')
+        self.template_test_pickle(SecurityMovingPositiveAverage, window=10, x='x')
 
     def testSecurityMovingRSI(self):
         window = 10
@@ -533,10 +510,10 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
                                                                                                    calculated))
 
     def testSecurityMovingRSIDeepcopy(self):
-        self.template_test_deepcopy(SecurityMovingRSI, window=10, dependency='x')
+        self.template_test_deepcopy(SecurityMovingRSI, window=10, x='x')
 
     def testSecurityMovingRSIPickle(self):
-        self.template_test_pickle(SecurityMovingRSI, window=10, dependency='x')
+        self.template_test_pickle(SecurityMovingRSI, window=10, x='x')
 
     def testSecurityMovingLogReturn(self):
         window = 10
@@ -568,9 +545,6 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
                                                                      'expected:   {1:.12f}\n'
                                                                      'calculated: {2:.12f}'.format(i, expected,
                                                                                                    calculated))
-
-        with self.assertRaises(ValueError):
-            _ = SecurityMovingLogReturn(window, ['close', 'open'])
 
     def testSecurityMovingLogReturnDeepcopy(self):
         ma = SecurityMovingLogReturn(10, ['x'])
@@ -622,103 +596,6 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
                 for name in ma.value.index():
                     self.assertAlmostEqual(ma.value[name], pickled.value[name])
 
-    def testSecurityMovingHistoricalWindow(self):
-        window = 5
-        mh = SecurityMovingHistoricalWindow(window, 'close')
-
-        benchmark = {'aapl': deque(maxlen=window),
-                     'ibm': deque(maxlen=window)}
-        for i in range(len(self.aapl['close'])):
-            data = {'aapl': {'close': self.aapl['close'][i]},
-                    'ibm': {'close': self.ibm['close'][i]}}
-
-            mh.push(data)
-            for name in benchmark:
-                benchmark[name].append(data[name]['close'])
-
-            if i >= 1:
-                # check by get item methon
-                container = mh.value
-                for k in range(min(i + 1, window)):
-                    calculated = mh[k]
-                    for name in calculated.index():
-                        self.assertAlmostEqual(calculated[name], benchmark[name][-1 - k],
-                                               "at index {0} positon {1} and symbol {2}\n"
-                                               "expected:   {3}\n"
-                                               "calculated: {4}".format(i, k, name,
-                                                                        benchmark[name][-1],
-                                                                        calculated[name]))
-                # check by value method
-                for k in range(min(i + 1, window)):
-                    for name in calculated.index():
-                        self.assertAlmostEqual(container[name][k], benchmark[name][-1 - k],
-                                               "at index {0} positon {1} and symbol {2}\n"
-                                               "expected:   {3}\n"
-                                               "calculated: {4}".format(i, k, name,
-                                                                        benchmark[name][-1],
-                                                                        container[name][k]))
-
-    def testSecurityMovingHistoricalWindowDeepcopy(self):
-        window = 10
-        ma = SecurityMovingHistoricalWindow(window, ['x'])
-
-        data = dict(aapl=dict(x=1.),
-                    ibm=dict(x=2.))
-        data2 = dict(aapl=dict(x=2.),
-                     ibm=dict(x=3.))
-
-        ma.push(data)
-        ma.push(data2)
-
-        copied = copy.deepcopy(ma)
-
-        for name in ma.value.index():
-            np.testing.assert_array_almost_equal(ma.value[name], copied.value[name])
-
-        for v in np.random.rand(20):
-            data['aapl']['x'] = v
-            data['ibm']['x'] = v + 1.
-            ma.push(data)
-
-        copied = copy.deepcopy(ma)
-        for name in ma.value.index():
-            np.testing.assert_array_almost_equal(ma.value[name], copied.value[name])
-
-    def testSecurityMovingHistoricalWindowPickle(self):
-        window = 10
-        ma = SecurityMovingHistoricalWindow(window, ['x'])
-
-        data = dict(aapl=dict(x=1.),
-                    ibm=dict(x=2.))
-        data2 = dict(aapl=dict(x=2.),
-                     ibm=dict(x=3.))
-
-        ma.push(data)
-        ma.push(data2)
-
-        with tempfile.NamedTemporaryFile('w+b', delete=False) as f:
-            pickle.dump(ma, f)
-
-        with open(f.name, 'rb') as f2:
-            pickled = pickle.load(f2)
-            for name in ma.value.index():
-                np.testing.assert_array_almost_equal(ma.value[name], pickled.value[name])
-        os.unlink(f.name)
-
-        for v in np.random.rand(20):
-            data['aapl']['x'] = v
-            data['ibm']['x'] = v + 1.
-            ma.push(data)
-
-        with tempfile.NamedTemporaryFile('w+b', delete=False) as f:
-            pickle.dump(ma, f)
-
-        with open(f.name, 'rb') as f2:
-            pickled = pickle.load(f2)
-            for name in ma.value.index():
-                np.testing.assert_array_almost_equal(ma.value[name], pickled.value[name])
-        os.unlink(f.name)
-
     def testValueHolderCompounding(self):
         window = 10
         ma1 = SecurityMovingAverage(window, 'close')
@@ -739,218 +616,3 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
             if i >= 1:
                 self.assertAlmostEqual(max(container), compounded1.value['aapl'], 12)
                 self.assertAlmostEqual(np.mean((container)), compounded2.value['aapl'], 12)
-
-    def testSecurityMovingResidue(self):
-        window = 100
-        mr = SecurityMovingResidue(window, ('y', 'x'))
-        for i in range(len(self.aapl['close'])):
-            data = {'aapl': {'y': self.aapl['close'][i], 'x': self.aapl['open'][i]},
-                    'ibm': {'y': self.ibm['close'][i], 'x': self.ibm['open'][i]}}
-            mr.push(data)
-
-            if i >= window - 1:
-                for name in mr.value.index():
-                    series_x = getattr(self, name)['open'][i - window + 1:i + 1]
-                    series_y = getattr(self, name)['close'][i - window + 1:i + 1]
-                    expected_res = series_y[-1] - np.dot(series_x, series_y) / np.dot(series_x, series_x) * series_x[-1]
-                    self.assertAlmostEqual(mr.value[name], expected_res, msg= \
-                        "at index {0} and symbol {1}\n"
-                        "expected:   {2}\n"
-                        "calculated: {3}".format(i, name, expected_res, mr.value[name]))
-
-    def testSecurityMovingResidueDeepcopy(self):
-        ma = SecurityMovingResidue(10, ['y', 'x'])
-
-        data = dict(aapl=dict(x=1., y=2),
-                    ibm=dict(x=2., y=3))
-        data2 = dict(aapl=dict(x=2., y=3),
-                     ibm=dict(x=3., y=4))
-
-        ma.push(data)
-        ma.push(data2)
-
-        copied = copy.deepcopy(ma)
-
-        for i, v in enumerate(np.random.rand(20)):
-            data['aapl']['x'] = v
-            data['aapl']['y'] = v + 1
-            data['ibm']['x'] = v + 1.
-            data['ibm']['y'] = v + 2.
-            ma.push(data)
-            copied.push(data)
-            if i >= 10:
-                for name in ma.value.index():
-                    self.assertAlmostEqual(ma.value[name], copied.value[name])
-
-    def testSecurityMovingResiduePickle(self):
-        ma = SecurityMovingResidue(10, ['y', 'x'])
-
-        data = dict(aapl=dict(x=1., y=2),
-                    ibm=dict(x=2., y=3))
-        data2 = dict(aapl=dict(x=2., y=3),
-                     ibm=dict(x=3., y=4))
-
-        ma.push(data)
-        ma.push(data2)
-
-        with tempfile.NamedTemporaryFile('w+b', delete=False) as f:
-            pickle.dump(ma, f)
-
-        with open(f.name, 'rb') as f2:
-            pickled = pickle.load(f2)
-        os.unlink(f.name)
-
-        for i, v in enumerate(np.random.rand(20)):
-            data['aapl']['x'] = v
-            data['aapl']['y'] = v + 1
-            data['ibm']['x'] = v + 1.
-            data['ibm']['y'] = v + 2.
-            ma.push(data)
-            pickled.push(data)
-
-            if i >= 10:
-                for name in ma.value.index():
-                    self.assertAlmostEqual(ma.value[name], pickled.value[name])
-
-    def testSecurityMovingCorrelation(self):
-        window = 100
-        mr = SecurityMovingCorrelation(window, ('y', 'x'))
-        for i in range(len(self.aapl['close'])):
-            data = {'aapl': {'y': self.aapl['close'][i], 'x': self.aapl['open'][i]},
-                    'ibm': {'y': self.ibm['close'][i], 'x': self.ibm['open'][i]}}
-            mr.push(data)
-
-            if i >= window - 1:
-                for name in mr.value.index():
-                    series_x = getattr(self, name)['open'][i - window + 1:i + 1]
-                    series_y = getattr(self, name)['close'][i - window + 1:i + 1]
-                    expected_res = np.corrcoef(series_x, series_y)[0, 1]
-                    self.assertAlmostEqual(mr.value[name], expected_res, msg= \
-                        "at index {0} and symbol {1}\n"
-                        "expected:   {2}\n"
-                        "calculated: {3}".format(i, name, expected_res, mr.value[name]))
-
-    def testSecurityMovingCorrelationDeepcopy(self):
-        ma = SecurityMovingCorrelation(10, ['y', 'x'])
-
-        data = dict(aapl=dict(x=1., y=2),
-                    ibm=dict(x=2., y=3))
-        data2 = dict(aapl=dict(x=2., y=3),
-                     ibm=dict(x=3., y=4))
-
-        ma.push(data)
-        ma.push(data2)
-
-        copied = copy.deepcopy(ma)
-
-        for i, v in enumerate(np.random.rand(20)):
-            data['aapl']['x'] = v
-            data['aapl']['y'] = v + 1
-            data['ibm']['x'] = v + 1.
-            data['ibm']['y'] = v + 2.
-            ma.push(data)
-            copied.push(data)
-            if i >= 10:
-                for name in ma.value.index():
-                    self.assertAlmostEqual(ma.value[name], copied.value[name])
-
-    def testSecurityMovingCorrelationPickle(self):
-        ma = SecurityMovingCorrelation(10, ['y', 'x'])
-
-        data = dict(aapl=dict(x=1., y=2),
-                    ibm=dict(x=2., y=3))
-        data2 = dict(aapl=dict(x=2., y=3),
-                     ibm=dict(x=3., y=4))
-
-        ma.push(data)
-        ma.push(data2)
-
-        with tempfile.NamedTemporaryFile('w+b', delete=False) as f:
-            pickle.dump(ma, f)
-
-        with open(f.name, 'rb') as f2:
-            pickled = pickle.load(f2)
-        os.unlink(f.name)
-
-        for i, v in enumerate(np.random.rand(20)):
-            data['aapl']['x'] = v
-            data['aapl']['y'] = v + 1
-            data['ibm']['x'] = v + 1.
-            data['ibm']['y'] = v + 2.
-            ma.push(data)
-            pickled.push(data)
-
-            if i >= 10:
-                for name in ma.value.index():
-                    self.assertAlmostEqual(ma.value[name], pickled.value[name])
-
-    def testSecurityMovingRank(self):
-        window = 100
-        mr = SecurityMovingRank(window, 'x')
-        for i in range(len(self.aapl['close'])):
-            data = {'aapl': {'y': self.aapl['close'][i], 'x': self.aapl['open'][i]},
-                    'ibm': {'y': self.ibm['close'][i], 'x': self.ibm['open'][i]}}
-            mr.push(data)
-
-            if i >= window - 1:
-                for name in mr.value.index():
-                    series_x = getattr(self, name)['open'][i - window + 1:i + 1]
-                    expected_res = np.argsort(series_x.argsort())[-1]
-                    self.assertAlmostEqual(mr.value[name], expected_res, msg= \
-                        "at index {0} and symbol {1}\n"
-                        "expected:   {2}\n"
-                        "calculated: {3}".format(i, name, expected_res, mr.value[name]))
-
-    def testSecurityMovingRankDeepcopy(self):
-        ma = SecurityMovingRank(10, 'x')
-
-        data = dict(aapl=dict(x=1., y=2),
-                    ibm=dict(x=2., y=3))
-        data2 = dict(aapl=dict(x=2., y=3),
-                     ibm=dict(x=3., y=4))
-
-        ma.push(data)
-        ma.push(data2)
-
-        copied = copy.deepcopy(ma)
-
-        for i, v in enumerate(np.random.rand(20)):
-            data['aapl']['x'] = v
-            data['aapl']['y'] = v + 0.1
-            data['ibm']['x'] = v + 0.1
-            data['ibm']['y'] = v + 0.2
-            ma.push(data)
-            copied.push(data)
-            if i >= 10:
-                for name in ma.value.index():
-                    self.assertAlmostEqual(ma.value[name], copied.value[name])
-
-    def testSecurityMovingRankPickle(self):
-        ma = SecurityMovingRank(10, 'x')
-
-        data = dict(aapl=dict(x=1., y=2),
-                    ibm=dict(x=2., y=3))
-        data2 = dict(aapl=dict(x=2., y=3),
-                     ibm=dict(x=3., y=4))
-
-        ma.push(data)
-        ma.push(data2)
-
-        with tempfile.NamedTemporaryFile('w+b', delete=False) as f:
-            pickle.dump(ma, f)
-
-        with open(f.name, 'rb') as f2:
-            pickled = pickle.load(f2)
-        os.unlink(f.name)
-
-        for i, v in enumerate(np.random.rand(20)):
-            data['aapl']['x'] = v
-            data['aapl']['y'] = v + 0.1
-            data['ibm']['x'] = v + 0.1
-            data['ibm']['y'] = v + 0.2
-            ma.push(data)
-            pickled.push(data)
-
-            if i >= 10:
-                for name in ma.value.index():
-                    self.assertAlmostEqual(ma.value[name], pickled.value[name])

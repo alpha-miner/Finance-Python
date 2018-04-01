@@ -40,7 +40,7 @@ class TestStatelessTechnicalAnalysis(unittest.TestCase):
         self.dataSet = {'aapl': self.aapl, 'ibm': self.ibm}
 
     def testSecuritySignValueHolder(self):
-        sign = SecuritySignValueHolder(['close'])
+        sign = SecuritySignValueHolder('close')
 
         expected = {}
         for i in range(len(self.aapl['close'])):
@@ -61,7 +61,7 @@ class TestStatelessTechnicalAnalysis(unittest.TestCase):
 
     def testSecurityXAverageValueHolder(self):
         window = 10
-        xav = SecurityXAverageValueHolder(window, ['close'])
+        xav = SecurityXAverageValueHolder(window, 'close')
         exp_weight = 2.0 / (1.0 + window)
 
         expected = {}
@@ -85,7 +85,7 @@ class TestStatelessTechnicalAnalysis(unittest.TestCase):
                                        .format(i, expected[name], calculated))
 
     def testSecurityExpValueHolder(self):
-        exp = SecurityExpValueHolder(['close'])
+        exp = SecurityExpValueHolder('close')
 
         expected = {}
         for i in range(len(self.aapl['close'])):
@@ -105,7 +105,7 @@ class TestStatelessTechnicalAnalysis(unittest.TestCase):
                                        .format(i, expected[name], calculated))
 
     def testSecurityLogValueHolder(self):
-        logExp = SecurityLogValueHolder(SecurityExpValueHolder(['close']))
+        logExp = SecurityLogValueHolder(SecurityExpValueHolder('close'))
 
         expected = {}
         for i in range(len(self.aapl['close'])):
@@ -167,7 +167,7 @@ class TestStatelessTechnicalAnalysis(unittest.TestCase):
                                        .format(i, expected[name], calculated))
 
     def testSecurityAbsValueHolder(self):
-        absHolder = SecurityAbsValueHolder(['close'])
+        absHolder = SecurityAbsValueHolder('close')
 
         expected = {}
         for i in range(len(self.aapl['close'])):
@@ -190,8 +190,8 @@ class TestStatelessTechnicalAnalysis(unittest.TestCase):
         short = 5
         long = 10
         macd = SecurityMACDValueHolder(short, long, 'close')
-        short_average = SecurityXAverageValueHolder(short, ['close'])
-        long_average = SecurityXAverageValueHolder(long, ['close'])
+        short_average = SecurityXAverageValueHolder(short, 'close')
+        long_average = SecurityXAverageValueHolder(long, 'close')
 
         for i in range(len(self.aapl['close'])):
             data = dict(aapl=dict(close=self.aapl['close'][i],
@@ -234,7 +234,7 @@ class TestStatelessTechnicalAnalysis(unittest.TestCase):
             previous_data = data
 
     def testSecurityDiffValueHolderDeepcopy(self):
-        ma = SecurityDiffValueHolder(['x'])
+        ma = SecurityDiffValueHolder('x')
 
         data = dict(aapl=dict(x=1.),
                     ibm=dict(x=2.))
@@ -259,7 +259,7 @@ class TestStatelessTechnicalAnalysis(unittest.TestCase):
             self.assertAlmostEqual(ma.value[name], copied.value[name])
 
     def testSecurityDiffValueHolderPickle(self):
-        ma = SecurityDiffValueHolder(['x'])
+        ma = SecurityDiffValueHolder('x')
 
         data = dict(aapl=dict(x=1.),
                     ibm=dict(x=2.))
@@ -295,7 +295,7 @@ class TestStatelessTechnicalAnalysis(unittest.TestCase):
         os.unlink(f.name)
 
     def testSecurityMaximumValueHolder(self):
-        mm = SecurityMaximumValueHolder(('open', 'close'))
+        mm = SecurityMaximumValueHolder('open', 'close')
 
         for i in range(len(self.aapl['close'])):
             data = dict(aapl=dict(close=self.aapl['close'][i],
@@ -316,7 +316,7 @@ class TestStatelessTechnicalAnalysis(unittest.TestCase):
     def testSecurityMaximumValueHolderWithValueHolder(self):
         exp1 = SecurityLatestValueHolder('open')
         exp2 = SecurityLatestValueHolder('close')
-        mm = SecurityMaximumValueHolder(exp1 ^ exp2)
+        mm = SecurityMaximumValueHolder(exp1, exp2)
 
         for i in range(len(self.aapl['close'])):
             data = dict(aapl=dict(close=self.aapl['close'][i],
@@ -335,7 +335,7 @@ class TestStatelessTechnicalAnalysis(unittest.TestCase):
                                        .format(i, expected, calculated))
 
     def testSecurityMinimumValueHolder(self):
-        mm = SecurityMinimumValueHolder(('open', 'close'))
+        mm = SecurityMinimumValueHolder('open', 'close')
 
         for i in range(len(self.aapl['close'])):
             data = dict(aapl=dict(close=self.aapl['close'][i],
@@ -356,7 +356,7 @@ class TestStatelessTechnicalAnalysis(unittest.TestCase):
     def testSecurityMinimumValueHolderWithValueHolder(self):
         exp1 = SecurityLatestValueHolder('open')
         exp2 = SecurityLatestValueHolder('close')
-        mm = SecurityMinimumValueHolder(exp1 ^ exp2)
+        mm = SecurityMinimumValueHolder(exp1, exp2)
 
         for i in range(len(self.aapl['close'])):
             data = dict(aapl=dict(close=self.aapl['close'][i],

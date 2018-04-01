@@ -5,6 +5,7 @@ Created on 2015-7-25
 @author: cheng.li
 """
 
+import copy
 import math
 import numpy as np
 cimport numpy as np
@@ -14,67 +15,67 @@ from libc.math cimport isnan
 from libc.math cimport log
 from libc.math cimport fmax
 from libc.math cimport fmin
+from libc.math cimport sqrt
+from PyFin.Math.Accumulators.IAccumulators import build_holder
 from PyFin.Math.Accumulators.IAccumulators cimport Accumulator
 from PyFin.Math.Accumulators.IAccumulators cimport Pow
-from PyFin.Math.Accumulators.IAccumulators cimport StatelessSingleValueAccumulator
+from PyFin.Math.Accumulators.IAccumulators cimport Latest
 from PyFin.Math.MathConstants cimport NAN
 import bisect
 
 
-cdef _checkParameterList(dependency):
-    if not isinstance(dependency, Accumulator) and len(dependency) > 1 and not isinstance(dependency, six.string_types):
-        raise ValueError("This value holder (e.g. Max or Minimum) can't hold more than 2 parameter names ({0})"
-                         " provided".format(dependency))
+cdef class Diff(Accumulator):
 
-
-cdef class Diff(StatelessSingleValueAccumulator):
-
-    def __init__(self, dependency='x'):
-        super(Diff, self).__init__(dependency)
-        _checkParameterList(dependency)
-        self._returnSize = 1
+    def __init__(self, x):
+        super(Diff, self).__init__()
         self._curr = NAN
         self._previous = NAN
+        self._isFull = False
+        self._inner = build_holder(x)
+        self._window = self._inner.window
+        self._dependency = self._inner.dependency
 
     cpdef push(self, dict data):
-        cdef double value = self._push(data)
+        cdef double value
+        self._inner.push(data)
+        value = self._inner.result()
         if isnan(value):
             return NAN
-        self._isFull = True
+        self._isFull = self._isFull or self._inner.isFull()
         self._previous = self._curr
         self._curr = value
 
-    cpdef object result(self):
+    cpdef double result(self):
         return self._curr - self._previous
 
     def __str__(self):
-        if self._isValueHolderContained:
-            return "\\mathrm{{Diff}}({0})".format(str(self._dependency))
-        else:
-            return "\\mathrm{{Diff}}(''\\text{{{0}}}'')".format(str(self._dependency))
+        return "\\mathrm{{Diff}}({0})".format(str(self._inner))
 
 
-cdef class SimpleReturn(StatelessSingleValueAccumulator):
+cdef class SimpleReturn(Accumulator):
 
-    def __init__(self, dependency='x'):
-        super(SimpleReturn, self).__init__(dependency)
-        _checkParameterList(dependency)
-        self._returnSize = 1
+    def __init__(self, x):
+        super(SimpleReturn, self).__init__()
         self._diff = NAN
         self._curr = NAN
         self._previous = NAN
+        self._isFull = False
+        self._inner = build_holder(x)
+        self._window = self._inner.window
+        self._dependency = self._inner.dependency
 
     cpdef push(self, dict data):
-        cdef double value = self._push(data)
+        cdef double value
+        self._inner.push(data)
+        value = self._inner.result()
         if isnan(value):
             return NAN
-        self._isFull = True
+        self._isFull = self._isFull or self._inner.isFull()
         self._previous = self._curr
         self._curr = value
 
     @cython.cdivision(True)
-    cpdef object result(self):
-
+    cpdef double result(self):
         cdef double denorm = self._previous
         if denorm:
             return self._curr / denorm - 1.
@@ -82,26 +83,30 @@ cdef class SimpleReturn(StatelessSingleValueAccumulator):
             return NAN
 
 
-cdef class LogReturn(StatelessSingleValueAccumulator):
+cdef class LogReturn(Accumulator):
 
-    def __init__(self, dependency='x'):
-        super(LogReturn, self).__init__(dependency)
-        _checkParameterList(dependency)
-        self._returnSize = 1
+    def __init__(self, x):
+        super(LogReturn, self).__init__()
         self._diff = NAN
         self._curr = NAN
         self._previous = NAN
+        self._isFull = False
+        self._inner = build_holder(x)
+        self._window = self._inner.window
+        self._dependency = self._inner.dependency
 
     cpdef push(self, dict data):
-        cdef double value = self._push(data)
+        cdef double value
+        self._inner.push(data)
+        value = self._inner.result()
         if isnan(value):
             return NAN
-        self._isFull = True
+        self._isFull = self._isFull or self._inner.isFull()
         self._previous = self._curr
         self._curr = value
 
     @cython.cdivision(True)
-    cpdef object result(self):
+    cpdef double result(self):
         cdef double denorm = self._previous
         if denorm:
             return log(self._curr / denorm)
@@ -109,206 +114,241 @@ cdef class LogReturn(StatelessSingleValueAccumulator):
             return NAN
 
 
-cdef class PositivePart(StatelessSingleValueAccumulator):
+cdef class PositivePart(Accumulator):
 
-    def __init__(self, dependency='x'):
-        super(PositivePart, self).__init__(dependency)
-        _checkParameterList(dependency)
-        self._returnSize = 1
+    def __init__(self, x):
+        super(PositivePart, self).__init__()
         self._pos = NAN
-        self._isFull = True
+        self._isFull = False
+        self._inner = build_holder(x)
+        self._window = self._inner.window
+        self._dependency = self._inner.dependency
 
     cpdef push(self, dict data):
-        cdef double value = self._push(data)
+        cdef double value
+        self._inner.push(data)
+        value = self._inner.result()
         if isnan(value):
             self._pos = NAN
         else:
             self._pos = fmax(value, 0.)
+        self._isFull = self._isFull or self._inner.isFull()
 
-    cpdef object result(self):
+    cpdef double result(self):
         return self._pos
 
 
-cdef class NegativePart(StatelessSingleValueAccumulator):
+cdef class NegativePart(Accumulator):
 
-    def __init__(self, dependency='x'):
-        super(NegativePart, self).__init__(dependency)
-        _checkParameterList(dependency)
-        self._returnSize = 1
+    def __init__(self, x):
+        super(NegativePart, self).__init__()
         self._neg = NAN
         self._isFull = False
+        self._inner = build_holder(x)
+        self._window = self._inner.window
+        self._dependency = self._inner.dependency
 
     cpdef push(self, dict data):
-        cdef double value = self._push(data)
+        cdef double value
+        self._inner.push(data)
+        value = self._inner.result()
         if isnan(value):
             self._neg = NAN
         else:
             self._neg = fmin(value, 0.)
-            self._isFull = True
+        self._isFull = self._isFull or self._inner.isFull()
 
-    cpdef object result(self):
+    cpdef double result(self):
         return self._neg
 
 
-cdef class Max(StatelessSingleValueAccumulator):
+cdef class Max(Accumulator):
 
-    def __init__(self, dependency='x'):
-        super(Max, self).__init__(dependency)
-        _checkParameterList(dependency)
+    def __init__(self, x):
+        super(Max, self).__init__()
         self._currentMax = -np.inf
-        self._returnSize = 1
         self._isFull = False
+        self._inner = build_holder(x)
+        self._window = self._inner.window
+        self._dependency = self._inner.dependency
 
     cpdef push(self, dict data):
-        cdef double value = self._push(data)
+        cdef double value
+        self._inner.push(data)
+        value = self._inner.result()
         if isnan(value):
             return NAN
 
         self._currentMax = fmax(value, self._currentMax)
-        self._isFull = True
+        self._isFull = self._isFull or self._inner.isFull()
 
-    cpdef object result(self):
+    cpdef double result(self):
         return self._currentMax
 
-cdef class Maximum(StatelessSingleValueAccumulator):
+cdef class Maximum(Accumulator):
 
-    def __init__(self, dependency=('x', 'y')):
-        super(Maximum, self).__init__(dependency)
+    def __init__(self, x, y):
+        super(Maximum, self).__init__()
         self._currentMax = NAN
-        self._returnSize = 1
         self._isFull = False
+        self._x = build_holder(x)
+        self._y = build_holder(y)
+        self._dependency = list(set(self._x.dependency + self._y.dependency))
 
     cpdef push(self, dict data):
-        cdef object value = self.extract(data)
-        self._currentMax = fmax(value[0], value[1])
+        self._x.push(data)
+        cdef double left = self._x.result()
+        self._y.push(data)
+        cdef double right = self._y.result()
+        self._currentMax = fmax(left, right)
+        self._isFull = self._isFull or (self._y.isFull() and self._y.isFull())
 
-    cpdef object result(self):
+    cpdef double result(self):
         return self._currentMax
 
 
-cdef class Min(StatelessSingleValueAccumulator):
+cdef class Min(Accumulator):
 
-    def __init__(self, dependency='x'):
-        super(Min, self).__init__(dependency)
-        _checkParameterList(dependency)
+    def __init__(self, x):
+        super(Min, self).__init__()
         self._currentMin = np.inf
-        self._returnSize = 1
         self._isFull = False
+        self._inner = build_holder(x)
+        self._window = self._inner.window
+        self._dependency = self._inner.dependency
 
     cpdef push(self, dict data):
-        cdef double value = self._push(data)
+        self._inner.push(data)
+        cdef double value = self._inner.result()
         if isnan(value):
             return NAN
 
         self._currentMin = fmin(value, self._currentMin)
-        self._isFull = True
+        self._isFull = self._isFull or self._inner.isFull()
 
-    cpdef object result(self):
+    cpdef double result(self):
         return self._currentMin
 
 
-cdef class Minimum(StatelessSingleValueAccumulator):
+cdef class Minimum(Accumulator):
 
-    def __init__(self, dependency=('x', 'y')):
-        super(Minimum, self).__init__(dependency)
+    def __init__(self, x, y):
+        super(Minimum, self).__init__()
         self._currentMin = NAN
-        self._returnSize = 1
         self._isFull = False
+        self._x = build_holder(x)
+        self._y = build_holder(y)
+        self._dependency = list(set(self._x.dependency + self._y.dependency))
 
     cpdef push(self, dict data):
-        cdef object value = self.extract(data)
-        self._currentMin = fmin(value[0], value[1])
+        self._x.push(data)
+        cdef double left = self._x.result()
+        self._y.push(data)
+        cdef double right = self._y.result()
+        self._currentMin = fmin(left, right)
+        self._isFull = self._isFull or (self._y.isFull() and self._y.isFull())
 
-    cpdef object result(self):
+    cpdef double result(self):
         return self._currentMin
 
 
-cdef class Sum(StatelessSingleValueAccumulator):
+cdef class Sum(Accumulator):
 
-    def __init__(self, dependency='x'):
-        super(Sum, self).__init__(dependency)
-        _checkParameterList(dependency)
+    def __init__(self, x):
+        super(Sum, self).__init__()
         self._currentSum = 0.
-        self._returnSize = 1
         self._isFull = False
+        self._inner = build_holder(x)
+        self._window = self._inner.window
+        self._dependency = self._inner.dependency
 
     cpdef push(self, dict data):
-        cdef double value = self._push(data)
+        self._inner.push(data)
+        cdef double value = self._inner.result()
         if isnan(value):
             return NAN
 
-        self._isFull = True
         self._currentSum += value
+        self._isFull = self._isFull or self._inner.isFull()
 
-    cpdef object result(self):
+    cpdef double result(self):
         return self._currentSum
 
 
-cdef class Average(StatelessSingleValueAccumulator):
+cdef class Average(Accumulator):
 
-    def __init__(self, dependency='x'):
-        super(Average, self).__init__(dependency)
-        _checkParameterList(dependency)
+    def __init__(self, x):
+        super(Average, self).__init__()
         self._currentSum = 0.
         self._currentCount = 0
-        self._returnSize = 1
         self._isFull = False
+        self._inner = build_holder(x)
+        self._window = self._inner.window
+        self._dependency = self._inner.dependency
 
     cpdef push(self, dict data):
-        cdef double value = self._push(data)
+        self._inner.push(data)
+        cdef double value = self._inner.result()
         if isnan(value):
             return NAN
 
-        self._isFull = True
         self._currentCount += 1
         self._currentSum += value
+        self._isFull = self._isFull or self._inner.isFull()
 
     @cython.cdivision(True)
-    cpdef object result(self):
+    cpdef double result(self):
         if self._currentCount:
             return self._currentSum / self._currentCount
         else:
             return NAN
 
 
-cdef class XAverage(StatelessSingleValueAccumulator):
+cdef class XAverage(Accumulator):
 
-    def __init__(self, window, dependency='x'):
-        super(XAverage, self).__init__(dependency)
+    def __init__(self, window, x):
+        super(XAverage, self).__init__()
         self._average = 0.0
         self._exp = 2.0 / (window + 1.)
         self._count = 0
+        self._isFull = False
+        self._inner = build_holder(x)
+        self._window = self._inner.window
+        self._dependency = self._inner.dependency
 
     cpdef push(self, dict data):
-        cdef double value = self._push(data)
+        self._inner.push(data)
+        cdef double value = self._inner.result()
         if isnan(value):
             return NAN
-
-        self._isFull = True
 
         if self._count == 0:
             self._average = value
             self._count += 1
         else:
             self._average += self._exp * (value - self._average)
+        self._isFull = self._isFull or self._inner.isFull()
 
-    cpdef object result(self):
+    cpdef double result(self):
         return self._average
 
 
-cdef class Variance(StatelessSingleValueAccumulator):
+cdef class Variance(Accumulator):
 
-    def __init__(self, dependency='x', bint isPopulation=0):
-        super(Variance, self).__init__(dependency)
-        _checkParameterList(dependency)
+    def __init__(self, x, bint isPopulation=0):
+        super(Variance, self).__init__()
         self._currentSum = 0.0
         self._currentSumSquare = 0.0
         self._currentCount = 0
         self._isPop = isPopulation
-        self._returnSize = 1
+        self._isFull = False
+        self._inner = build_holder(x)
+        self._window = self._inner.window
+        self._dependency = self._inner.dependency
 
     cpdef push(self, dict data):
-        cdef double value = self._push(data)
+        self._inner.push(data)
+        cdef double value = self._inner.result()
         if isnan(value):
             return NAN
 
@@ -317,12 +357,12 @@ cdef class Variance(StatelessSingleValueAccumulator):
         self._currentSum += value
         self._currentSumSquare += value * value
         self._currentCount += 1
+        self._isFull = self._isFull or self._inner.isFull()
 
     @cython.cdivision(True)
-    cpdef object result(self):
+    cpdef double result(self):
 
         cdef double tmp = self._currentSumSquare - self._currentSum * self._currentSum / self._currentCount
-
         cdef double pop_num = self._currentCount if self._isPop else self._currentCount - 1
 
         if pop_num:
@@ -331,238 +371,24 @@ cdef class Variance(StatelessSingleValueAccumulator):
             return NAN
 
 
-cdef class Product(StatelessSingleValueAccumulator):
+cdef class Product(Accumulator):
 
-    def __init__(self, dependency='x'):
-        super(Product, self).__init__(dependency)
+    def __init__(self, x):
+        super(Product, self).__init__()
         self._product = 1.0
+        self._isFull = False
+        self._inner = build_holder(x)
+        self._window = self._inner.window
+        self._dependency = self._inner.dependency
 
     cpdef push(self, dict data):
-        cdef double value = self._push(data)
+        self._inner.push(data)
+        cdef double value = self._inner.result()
         if isnan(value):
             return NAN
 
-        self._isFull = True
         self._product *= value
+        self._isFull = self._isFull or self._inner.isFull()
 
-    cpdef object result(self):
+    cpdef double result(self):
         return self._product
-
-
-cdef class CenterMoment(StatelessSingleValueAccumulator):
-
-    def __init__(self, order, dependency='x'):
-        super(CenterMoment, self).__init__(dependency)
-        self._this_list = []
-        self._order = order
-        self._moment = NAN
-
-    cpdef push(self, dict data):
-        cdef double value = self._push(data)
-        if isnan(value):
-            return NAN
-
-        self._isFull = True
-
-        self._this_list.append(value)
-        self._moment = np.mean(np.power(np.abs(np.array(self._this_list) - np.mean(self._this_list)), self._order))
-
-    cpdef object result(self):
-        return self._moment
-
-
-cdef class Skewness(StatelessSingleValueAccumulator):
-
-    def __init__(self, dependency='x'):
-        super(Skewness, self).__init__(dependency)
-        cdef Pow std3 = Pow(Variance(dependency, isPopulation=1), 1.5)
-        cdef CenterMoment moment3 = CenterMoment(3, dependency)
-        self._skewness = moment3 / std3
-
-    cpdef push(self, dict data):
-        self._skewness.push(data)
-
-    cpdef object result(self):
-        try:
-            return self._skewness.result()
-        except ZeroDivisionError:
-            return NAN
-
-
-cdef class Kurtosis(StatelessSingleValueAccumulator):
-
-    def __init__(self, dependency='x'):
-        super(Kurtosis, self).__init__(dependency)
-        cdef Pow std4 = Pow(Variance(dependency, isPopulation=1), 2)
-        cdef CenterMoment moment4 = CenterMoment(4, dependency)
-        self._kurtosis = moment4 / std4
-
-    cpdef push(self, dict data):
-        self._kurtosis.push(data)
-
-    cpdef object result(self):
-        try:
-            return self._kurtosis.result()
-        except ZeroDivisionError:
-            return NAN
-
-
-cdef class Rank(StatelessSingleValueAccumulator):
-
-    def __init__(self, dependency='x'):
-        super(Rank, self).__init__(dependency)
-        self._thisList = []
-        self._sortedList = []
-        self._rank = []
-
-    cpdef push(self, dict data):
-        cdef double value = self._push(data)
-        if isnan(value):
-            return NAN
-
-        self._isFull = True
-
-        self._thisList.append(value)
-        self._sortedList = sorted(self._thisList)
-
-    cpdef object result(self):
-        self._rank = [bisect.bisect_left(self._sortedList, x) for x in self._thisList]
-        return self._rank
-
-
-cdef class LevelList(StatelessSingleValueAccumulator):
-
-    def __init__(self, dependency='x', ):
-        super(LevelList, self).__init__(dependency)
-        self._levelList = []
-        self._thisList = []
-
-    cpdef push(self, dict data):
-        cdef double value = self._push(data)
-        if isnan(value):
-            return NAN
-
-        self._isFull = True
-
-        self._thisList.append(value)
-        if len(self._thisList) == 1:
-            self._levelList.append(1.0)
-        else:
-            self._levelList.append(self._thisList[-1] / self._thisList[0])
-
-    cpdef object result(self):
-        return self._levelList
-
-
-cdef class LevelValue(StatelessSingleValueAccumulator):
-
-    def __init__(self, dependency='x'):
-        super(LevelValue, self).__init__(dependency)
-        self._thisList = []
-        self._levelValue = NAN
-
-    cpdef push(self, dict data):
-        value = self._push(data)
-        if isnan(value):
-            return NAN
-
-        self._isFull = True
-
-        self._thisList.append(value)
-        if len(self._thisList) == 1:
-            self._levelValue = 1.0
-        else:
-            self._levelValue = self._thisList[-1] / self._thisList[0]
-
-    cpdef object result(self):
-        return self._levelValue
-
-
-cdef class AutoCorrelation(StatelessSingleValueAccumulator):
-
-    def __init__(self, lags, dependency='x'):
-        super(AutoCorrelation, self).__init__(dependency)
-        self._lags = lags
-        self._thisList = []
-        self._VecForward = []
-        self._VecBackward = []
-        self._AutoCorrMatrix = None
-
-    cpdef push(self, dict data):
-        cdef double value = self._push(data)
-        if isnan(value):
-            return NAN
-
-        self._isFull = True
-        self._thisList.append(value)
-
-    cpdef object result(self):
-        if len(self._thisList) <= self._lags:
-            raise ValueError ("time-series length should be more than lags however\n"
-                              "time-series length is: {0} while lags is: {1}".format(len(self._thisList), self._lags))
-        else:
-            try:
-                self._VecForward = self._thisList[0:len(self._thisList) - self._lags]
-                self._VecBackward = self._thisList[-len(self._thisList) + self._lags - 1:-1]
-                self._AutoCorrMatrix = np.cov(self._VecBackward, self._VecForward) / \
-                                (np.std(self._VecBackward) * np.std(self._VecForward))
-            except ZeroDivisionError:
-                return NAN
-            return self._AutoCorrMatrix[0, 1]
-
-
-cdef class StatelessMultiValueAccumulator(Accumulator):
-
-    def __init__(self, dependency):
-        super(StatelessMultiValueAccumulator, self).__init__(dependency)
-        self._returnSize = 1
-        self._window = 1
-
-    cdef _push(self, dict data):
-        if not self._isValueHolderContained:
-            try:
-                value = [data[name] for name in self._dependency]
-            except KeyError:
-                value = [NAN] * len(self._dependency)
-        else:
-            self._dependency.push(data)
-            value = self._dependency.result()
-        return value
-
-
-cdef class Correlation(StatelessMultiValueAccumulator):
-
-    def __init__(self, dependency=('x', 'y')):
-        super(Correlation, self).__init__(dependency)
-        self._runningSumLeft = 0.0
-        self._runningSumRight = 0.0
-        self._runningSumSquareLeft = 0.0
-        self._runningSumSquareRight = 0.0
-        self._runningSumCrossSquare = 0.0
-        self._currentCount = 0
-        self._returnSize = 1
-
-    cpdef push(self, dict data):
-        value = self._push(data)
-        if isnan(value[0]) or isnan(value[1]):
-            return NAN
-
-        self._isFull = True
-
-        self._runningSumLeft = self._runningSumLeft + value[0]
-        self._runningSumRight = self._runningSumRight + value[1]
-        self._runningSumSquareLeft = self._runningSumSquareLeft + value[0] * value[0]
-        self._runningSumSquareRight = self._runningSumSquareRight + value[1] * value[1]
-        self._runningSumCrossSquare = self._runningSumCrossSquare + value[0] * value[1]
-        self._currentCount += 1
-
-    cpdef object result(self):
-        n = self._currentCount
-        nominator = n * self._runningSumCrossSquare - self._runningSumLeft * self._runningSumRight
-        denominator = (n * self._runningSumSquareLeft - self._runningSumLeft * self._runningSumLeft) \
-                      * (n * self._runningSumSquareRight - self._runningSumRight * self._runningSumRight)
-        denominator = math.sqrt(denominator)
-        if denominator != 0:
-            return nominator / denominator
-        else:
-            return NAN

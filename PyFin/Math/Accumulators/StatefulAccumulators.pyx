@@ -84,6 +84,7 @@ cdef class SortedValueHolder(SingleValuedValueHolder):
     def __init__(self, window, x):
         super(SortedValueHolder, self).__init__(window, x)
         self._sortedArray = []
+        self._cur_pos = NAN
 
     cpdef push(self, dict data):
         cdef double popout
@@ -97,10 +98,12 @@ cdef class SortedValueHolder(SingleValuedValueHolder):
             popout = self._deque.dump(value)
             delPos = bisect.bisect_left(self._sortedArray, popout)
             del self._sortedArray[delPos]
-            bisect.insort_left(self._sortedArray, value)
+            self._cur_pos = bisect.bisect_left(self._sortedArray, value)
+            self._sortedArray.insert(int(self._cur_pos), value)
         else:
             self._deque.dump(value)
-            bisect.insort_left(self._sortedArray, value)
+            self._cur_pos = bisect.bisect_left(self._sortedArray, value)
+            self._sortedArray.insert(int(self._cur_pos), value)
         self._isFull = self._isFull or self._deque.isFull()
 
 
@@ -132,6 +135,17 @@ cdef class MovingMin(SortedValueHolder):
         return "\\mathrm{{MMin}}({0}, {1})".format(self._window, str(self._x))
 
 
+cdef class MovingRank(SortedValueHolder):
+    def __init__(self, window, x):
+        super(MovingRank, self).__init__(window, x)
+
+    cpdef double result(self):
+        return self._cur_pos
+
+    def __str__(self):
+        return "\\mathrm{{MRank}}({0}, {1})".format(self._window, str(self._x))
+
+
 cdef class MovingQuantile(SortedValueHolder):
     def __init__(self, window, x):
         super(MovingQuantile, self).__init__(window, x)
@@ -140,7 +154,7 @@ cdef class MovingQuantile(SortedValueHolder):
     cpdef double result(self):
         cdef size_t n = len(self._sortedArray)
         if n > 1:
-            return self._sortedArray.index(self._deque[n-1]) / (n - 1.)
+            return self._cur_pos / (n - 1)
         else:
             return NAN
 
@@ -704,15 +718,6 @@ cdef class MACD(Accumulator):
         return self._short_average.result() - self._long_average.result()
 
 
-cdef class MovingRank(SortedValueHolder):
-    def __init__(self, window, x):
-        super(MovingRank, self).__init__(window, x)
-        self._runningRank = NAN
-
-    cpdef double result(self):
-        self._runningRank = bisect.bisect_left(self._sortedArray, self._deque[self._deque.size() - 1])
-        return self._runningRank
-
 '''
 performancer
 '''
@@ -921,3 +926,4 @@ cdef class MovingResidue(StatefulValueHolder):
 
     def __str__(self):
         return "\\mathrm{{Res}}({0}, {1}, {2})".format(self._window, str(self._x), str(self._y))
+

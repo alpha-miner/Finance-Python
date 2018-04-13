@@ -19,6 +19,7 @@ from PyFin.Math.Accumulators import Shift
 from PyFin.Math.Accumulators import Exp
 from PyFin.Math.Accumulators import MovingMax
 from PyFin.Math.Accumulators import MovingMin
+from PyFin.Math.Accumulators import MovingRank
 from PyFin.Math.Accumulators import MovingQuantile
 from PyFin.Math.Accumulators import MovingAllTrue
 from PyFin.Math.Accumulators import MovingAnyTrue
@@ -612,6 +613,27 @@ class TestStatefulAccumulators(unittest.TestCase):
             pickled = pickle.load(f2)
             self.assertAlmostEqual(test.value, pickled.value)
         os.unlink(f.name)
+
+    def testMovingRank(self):
+        window = 10
+
+        mq = MovingRank(window, 'z')
+        total = np.random.randn(2500)
+        con = deque(maxlen=window)
+        for i, value in enumerate(total):
+            value = float(value)
+            con.append(value)
+            mq.push(dict(z=value))
+
+            if i >= 1:
+                calculated = mq.result()
+                sorted_con = sorted(con)
+                expected = sorted_con.index(value)
+                self.assertAlmostEqual(calculated, expected, 15, "at index {0:d}\n"
+                                                                 "Rank expected:   {1:f}\n"
+                                                                 "Rank calculated: {2:f}".format(i,
+                                                                                                 expected,
+                                                                                                 calculated))
 
     def testMovingQuantile(self):
         window = 10

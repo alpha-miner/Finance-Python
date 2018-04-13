@@ -16,6 +16,7 @@ from PyFin.Analysis.SecurityValueHolders cimport build_holder
 from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingAverage
 from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingMax
 from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingMin
+from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingRank
 from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingQuantile
 from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingAllTrue
 from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingAnyTrue
@@ -79,6 +80,17 @@ cdef class SecurityMovingMin(SecuritySingleValueHolder):
     def __str__(self):
         if self._compHolder:
             return "\\mathrm{{MMin}}({0}, {1})".format(self._window - self._compHolder.window, str(self._compHolder))
+        else:
+            return str(self._holderTemplate)
+
+
+cdef class SecurityMovingRank(SecuritySingleValueHolder):
+    def __init__(self, window, x):
+        super(SecurityMovingRank, self).__init__(window, MovingRank, x)
+
+    def __str__(self):
+        if self._compHolder:
+            return "\\mathrm{{MRank}}({0}, {1})".format(self._window - self._compHolder.window, str(self._compHolder))
         else:
             return str(self._holderTemplate)
 

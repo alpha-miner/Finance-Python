@@ -19,6 +19,7 @@ from PyFin.Analysis.TechnicalAnalysis import SecurityMovingVariance
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingStandardDeviation
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingMax
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingMin
+from PyFin.Analysis.TechnicalAnalysis import SecurityMovingRank
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingQuantile
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingAllTrue
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingAnyTrue
@@ -283,6 +284,34 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
 
     def testSecurityMovingMinimumPickle(self):
         self.template_test_pickle(SecurityMovingMin, window=10, x='x')
+
+    def testSecurityMovingRank(self):
+        window = 10
+        mq = SecurityMovingRank(window, ['close'])
+
+        for i in range(len(self.aapl['close'])):
+            data = dict(aapl=dict(close=self.aapl['close'][i],
+                                  open=self.aapl['open'][i]),
+                        ibm=dict(close=self.ibm['close'][i],
+                                 open=self.ibm['open'][i]))
+            mq.push(data)
+            if i < window:
+                start = 0
+            else:
+                start = i + 1 - window
+
+            if i < 1:
+                continue
+
+            value = mq.value
+            for name in value.index():
+                con = self.dataSet[name]['close'][start:(i + 1)]
+                sorted_con = sorted(con)
+                expected = sorted_con.index(self.dataSet[name]['close'][i])
+                calculated = value[name]
+                self.assertAlmostEqual(expected, calculated, 12, 'at index {0}\n'
+                                                                 'expected:   {1:.12f}\n'
+                                                                 'calculated: {2:.12f}'.format(i, expected, calculated))
 
     def testSecurityMovingQuantile(self):
         window = 10

@@ -35,7 +35,8 @@ cdef class SingleValuedValueHolder(StatefulValueHolder):
 
 cdef class SortedValueHolder(SingleValuedValueHolder):
 
-    cdef public list _sortedArray
+    cdef list _sortedArray
+    cdef double _cur_pos
     cpdef push(self, dict data)
 
 cdef class MovingMax(SortedValueHolder):
@@ -44,6 +45,11 @@ cdef class MovingMax(SortedValueHolder):
 
 
 cdef class MovingMin(SortedValueHolder):
+
+    cpdef double result(self)
+
+
+cdef class MovingRank(SortedValueHolder):
 
     cpdef double result(self)
 
@@ -204,13 +210,6 @@ cdef class MACD(Accumulator):
     cdef public Accumulator _long_average
 
     cpdef push(self, dict data)
-    cpdef double result(self)
-
-
-cdef class MovingRank(SortedValueHolder):
-
-    cdef public double _runningRank
-
     cpdef double result(self)
 
 

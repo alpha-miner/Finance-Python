@@ -11,6 +11,7 @@ import pickle
 import tempfile
 import os
 import numpy as np
+import pandas as pd
 from PyFin.Analysis.SeriesValues import SeriesValues
 
 
@@ -34,12 +35,26 @@ class TestSecurityValues(unittest.TestCase):
         data = SeriesValues(data, index)
         test = data.rank()
 
-        expected = SeriesValues(np.array([2, 1, np.nan, np.nan, 3, 4]), dict(zip(index, range(len(index)))))
+        expected = SeriesValues(np.array([1, 0, np.nan, np.nan, 2, 3]), dict(zip(index, range(len(index)))))
         for name in test.index():
             if np.isnan(test[name]):
                 self.assertTrue(np.isnan(expected[name]))
             else:
                 self.assertEqual(test[name], expected[name])
+
+    def testSecurityValuesRankWithGroup(self):
+        data = np.random.randn(3000)
+        groups = np.random.randint(0, 30, 3000)
+        index = list(range(3000))
+
+        data = SeriesValues(data, index)
+        groups = SeriesValues(groups, index)
+
+        test = data.rank(groups)
+
+        pd_series = pd.Series(data.values)
+        expected = pd_series.groupby(groups.values).rank()
+        np.testing.assert_array_almost_equal(test.values, expected.values - 1.)
 
     def testSecurityValuesUnit(self):
         data = np.array([3, -2, np.nan, np.nan, 4, 5])

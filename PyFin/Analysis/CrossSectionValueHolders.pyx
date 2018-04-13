@@ -19,13 +19,19 @@ from PyFin.Math.MathConstants cimport NAN
 
 cdef class CrossSectionValueHolder(SecurityValueHolder):
 
-    cdef public SecurityValueHolder _inner
+    cdef SecurityValueHolder _inner
+    cdef SecurityValueHolder _group
 
-    def __init__(self, innerValue):
+    def __init__(self, innerValue, groupValue=None):
         super(CrossSectionValueHolder, self).__init__()
         self._inner = build_holder(innerValue)
-        self._window = self._inner.window
-        self._dependency = copy.deepcopy(self._inner.fields)
+        self._group = build_holder(groupValue) if groupValue else None
+        if self._group:
+            self._window = max(self._inner.window, self._group.window)
+            self._dependency = list(set(self._inner.fields + self._group.fields))
+        else:
+            self._window = self._inner.window
+            self._dependency = copy.deepcopy(self._inner.fields)
         self.updated = 0
         self.cached = None
 
@@ -35,13 +41,20 @@ cdef class CrossSectionValueHolder(SecurityValueHolder):
 
     cpdef push(self, dict data):
         self._inner.push(data)
+        if self._group:
+            self._group.push(data)
         self.updated = 0
 
 
 cdef class CSRankedSecurityValueHolder(CrossSectionValueHolder):
 
-    def __init__(self, innerValue):
-        super(CSRankedSecurityValueHolder, self).__init__(innerValue)
+    def __init__(self, innerValue, groupValue=None):
+        super(CSRankedSecurityValueHolder, self).__init__(innerValue, groupValue)
+
+    cdef _cal_impl(self):
+        raw_values = self._inner.value
+        self.cached = raw_values.rank()
+        self.updated = 1
 
     @property
     def value(self):
@@ -51,9 +64,7 @@ cdef class CSRankedSecurityValueHolder(CrossSectionValueHolder):
         if self.updated:
             return self.cached
         else:
-            raw_values = self._inner.value
-            self.cached = raw_values.rank()
-            self.updated = 1
+            self._cal_impl()
             return self.cached
 
     cpdef double value_by_name(self, name):
@@ -63,9 +74,7 @@ cdef class CSRankedSecurityValueHolder(CrossSectionValueHolder):
         if self.updated:
             return self.cached[name]
         else:
-            raw_values = self._inner.value
-            self.cached = raw_values.rank()
-            self.updated = 1
+            self._cal_impl()
             return self.cached[name]
 
     cpdef SeriesValues value_by_names(self, list names):
@@ -233,7 +242,7 @@ cdef class CSQuantileSecurityValueHolder(CrossSectionValueHolder):
             return self.cached
         else:
             raw_values = self._inner.value
-            self.cached = (raw_values.rank() - 1.) / (len(raw_values) - 1.)
+            self.cached = raw_values.rank() / (len(raw_values) - 1.)
             self.updated = 1
             return self.cached
 
@@ -246,7 +255,7 @@ cdef class CSQuantileSecurityValueHolder(CrossSectionValueHolder):
             return self.cached[name]
         else:
             raw_values = self._inner.value
-            self.cached = (raw_values.rank() - 1.) / (len(raw_values) - 1.)
+            self.cached = raw_values.rank() / (len(raw_values) - 1.)
             self.updated = 1
             return self.cached[name]
 

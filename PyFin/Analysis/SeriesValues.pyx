@@ -17,6 +17,13 @@ from numpy import minimum
 from PyFin.Math.MathConstants cimport NAN
 
 
+cdef groupby(groups):
+    cdef np.ndarray[long long, ndim=1] order = groups.argsort()
+    t = groups[order]
+    cdef np.ndarray[long long, ndim=1] index_diff = np.where(np.diff(t))[0]
+    return np.concatenate([index_diff, [len(groups)]]), order
+
+
 @cython.cdivision(True)
 cdef SeriesValues residue(SeriesValues left, SeriesValues right):
     cdef np.ndarray[double, ndim=1] y = left.values
@@ -206,10 +213,27 @@ cdef class SeriesValues(object):
 
     @cython.boundscheck(False)
     @cython.wraparound(False)
-    cpdef SeriesValues rank(self):
-        cdef np.ndarray[double, ndim=1] data = self.values.argsort().argsort().astype(float)
-        data[np.isnan(self.values)] = NAN
-        return SeriesValues(data + 1., self.name_mapping)
+    cpdef SeriesValues rank(self, SeriesValues groups=None):
+        cdef np.ndarray[double, ndim=1] data
+        cdef np.ndarray[long long, ndim=1] order
+        cdef np.ndarray[long long, ndim=1] index_diff
+        cdef long long diff_loc
+        cdef long long start = 0
+        cdef np.ndarray[long long, ndim=1] curr_idx
+
+        if groups:
+            data = self.values.copy()
+            index_diff, order = groupby(groups.values)
+            start = 0
+            for diff_loc in index_diff:
+                curr_idx = order[start:diff_loc + 1]
+                data[curr_idx] = self.values[curr_idx].argsort().argsort().astype(float)
+                start = diff_loc + 1
+            data[np.isnan(self.values)] = NAN
+        else:
+            data = self.values.argsort().argsort().astype(float)
+            data[np.isnan(self.values)] = NAN
+        return SeriesValues(data, self.name_mapping)
 
     cpdef SeriesValues zscore(self):
         cdef np.ndarray[double, ndim=1] data = self.values

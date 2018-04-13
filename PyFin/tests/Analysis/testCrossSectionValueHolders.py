@@ -117,7 +117,7 @@ class TestCrossSectionValueHolder(unittest.TestCase):
 
         data = np.linspace(1., 0., 10)
 
-        expected = pd.Series(data=data, index=[x for x in range(1, 11)])
+        expected = pd.Series(data=data, index=[x for x in range(0, 10)])
 
         np.testing.assert_array_almost_equal(expected.values, calculated.values)
 

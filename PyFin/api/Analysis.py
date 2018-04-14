@@ -51,8 +51,8 @@ from PyFin.Analysis.CrossSectionValueHolders import CSQuantileSecurityValueHolde
 from PyFin.Analysis.CrossSectionValueHolders import CSResidueSecurityValueHolder
 
 
-def CSRank(dependency):
-    return CSRankedSecurityValueHolder(dependency)
+def CSRank(dependency, groups=None):
+    return CSRankedSecurityValueHolder(dependency, groups)
 
 
 def CSMean(dependency):

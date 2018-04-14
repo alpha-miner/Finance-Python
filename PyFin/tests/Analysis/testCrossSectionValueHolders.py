@@ -23,11 +23,13 @@ class TestCrossSectionValueHolder(unittest.TestCase):
 
     def setUp(self):
         np.random.seed(0)
-        sample1 = np.random.randn(1000, 2)
-        sample2 = np.random.randn(1000, 2)
+        sample1 = np.random.randn(1000, 4)
+        sample2 = np.random.randn(1000, 4)
 
         self.datas = {'aapl': {'close': sample1[:, 0], 'open': sample1[:, 1]},
-                      'ibm': {'close': sample2[:, 0], 'open': sample2[:, 1]}}
+                      'ibm': {'close': sample2[:, 0], 'open': sample2[:, 1]},
+                      'goog': {'close': sample1[:, 2], 'open': sample1[:, 3]},
+                      'baba': {'close': sample2[:, 2], 'open': sample2[:, 3]}}
 
     def testCSRankedSecurityValueHolderWithSymbolName(self):
         benchmark = SecurityLatestValueHolder(x='close')
@@ -56,6 +58,31 @@ class TestCrossSectionValueHolder(unittest.TestCase):
             rankHolder.push(data)
             benchmarkValues = benchmark.value
             np.testing.assert_array_almost_equal(benchmarkValues.rank().values, rankHolder.value.values)
+
+    def testCSRankedSecurityValueHolderWithGroups(self):
+        benchmark = SecurityLatestValueHolder(x='close')
+        groups = SecurityLatestValueHolder(x='ind')
+        rankHolder = CSRankedSecurityValueHolder(benchmark, groups)
+
+        for i in range(len(self.datas['aapl']['close'])):
+            data = {'aapl': {Factors.CLOSE: self.datas['aapl'][Factors.CLOSE][i],
+                             Factors.OPEN: self.datas['aapl'][Factors.OPEN][i],
+                             'ind': 1.},
+                    'ibm': {Factors.CLOSE: self.datas['ibm'][Factors.CLOSE][i],
+                            Factors.OPEN: self.datas['ibm'][Factors.OPEN][i],
+                            'ind': 1.},
+                    'goog': {Factors.CLOSE: self.datas['goog'][Factors.CLOSE][i],
+                             Factors.OPEN: self.datas['goog'][Factors.OPEN][i],
+                             'ind': 2.},
+                    'baba': {Factors.CLOSE: self.datas['baba'][Factors.CLOSE][i],
+                             Factors.OPEN: self.datas['baba'][Factors.OPEN][i],
+                             'ind': 2.}}
+            benchmark.push(data)
+            rankHolder.push(data)
+            benchmarkValues = benchmark.value
+            groups = {'aapl': 1., 'ibm': 1., 'goog': 2., 'baba': 2.}
+            expected_rank = pd.Series(benchmarkValues.to_dict()).groupby(groups).rank().values - 1.
+            np.testing.assert_array_almost_equal(expected_rank, rankHolder.value.values)
 
     def testCSAverageSecurityValueHolder(self):
         benchmark = SecurityLatestValueHolder(x='close')

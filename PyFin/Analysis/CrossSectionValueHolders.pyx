@@ -52,15 +52,16 @@ cdef class CSRankedSecurityValueHolder(CrossSectionValueHolder):
         super(CSRankedSecurityValueHolder, self).__init__(innerValue, groupValue)
 
     cdef _cal_impl(self):
-        raw_values = self._inner.value
-        self.cached = raw_values.rank()
+        cdef SeriesValues raw_values = self._inner.value
+
+        if self._group:
+            self.cached = raw_values.rank(self._group.value)
+        else:
+            self.cached = raw_values.rank()
         self.updated = 1
 
     @property
     def value(self):
-
-        cdef SeriesValues raw_values
-
         if self.updated:
             return self.cached
         else:
@@ -68,9 +69,6 @@ cdef class CSRankedSecurityValueHolder(CrossSectionValueHolder):
             return self.cached
 
     cpdef double value_by_name(self, name):
-
-        cdef SeriesValues raw_values
-
         if self.updated:
             return self.cached[name]
         else:
@@ -78,13 +76,18 @@ cdef class CSRankedSecurityValueHolder(CrossSectionValueHolder):
             return self.cached[name]
 
     cpdef SeriesValues value_by_names(self, list names):
-        cdef SeriesValues raw_values
-        raw_values = self._inner.value_by_names(names)
-        raw_values = raw_values.rank()
+        cdef SeriesValues raw_values = self._inner.value_by_names(names)
+        if self._group:
+            raw_values = raw_values.rank(self._group.value_by_names(names))
+        else:
+            raw_values = raw_values.rank()
         return raw_values
 
     def __str__(self):
-        return "\mathrm{{CSRank}}({0})".format(str(self._inner))
+        if self._group:
+            return "\mathrm{{CSRank}}({0}. {1})".format(str(self._inner), str(self._group))
+        else:
+            return "\mathrm{{CSRank}}({0})".format(str(self._inner))
 
 
 cdef class CSAverageSecurityValueHolder(CrossSectionValueHolder):

@@ -22,10 +22,10 @@ cdef class CrossSectionValueHolder(SecurityValueHolder):
     cdef SecurityValueHolder _inner
     cdef SecurityValueHolder _group
 
-    def __init__(self, innerValue, groupValue=None):
+    def __init__(self, innerValue, groups=None):
         super(CrossSectionValueHolder, self).__init__()
         self._inner = build_holder(innerValue)
-        self._group = build_holder(groupValue) if groupValue else None
+        self._group = build_holder(groups) if groups else None
         if self._group:
             self._window = max(self._inner.window, self._group.window)
             self._dependency = list(set(self._inner.fields + self._group.fields))
@@ -48,8 +48,8 @@ cdef class CrossSectionValueHolder(SecurityValueHolder):
 
 cdef class CSRankedSecurityValueHolder(CrossSectionValueHolder):
 
-    def __init__(self, innerValue, groupValue=None):
-        super(CSRankedSecurityValueHolder, self).__init__(innerValue, groupValue)
+    def __init__(self, innerValue, groups=None):
+        super(CSRankedSecurityValueHolder, self).__init__(innerValue, groups)
 
     cdef _cal_impl(self):
         cdef SeriesValues raw_values = self._inner.value
@@ -85,59 +85,52 @@ cdef class CSRankedSecurityValueHolder(CrossSectionValueHolder):
 
     def __str__(self):
         if self._group:
-            return "\mathrm{{CSRank}}({0}. {1})".format(str(self._inner), str(self._group))
+            return "\mathrm{{CSRank}}({0}, groups={1})".format(str(self._inner), str(self._group))
         else:
             return "\mathrm{{CSRank}}({0})".format(str(self._inner))
 
 
 cdef class CSAverageSecurityValueHolder(CrossSectionValueHolder):
-    def __init__(self, innerValue):
-        super(CSAverageSecurityValueHolder, self).__init__(innerValue)
+    def __init__(self, innerValue, groups=None):
+        super(CSAverageSecurityValueHolder, self).__init__(innerValue, groups)
+
+    cdef _cal_impl(self):
+        cdef SeriesValues raw_values = self._inner.value
+
+        if self._group:
+            self.cached = raw_values.mean(self._group.value)
+        else:
+            self.cached = raw_values.mean()
+        self.updated = 1
 
     @property
     def value(self):
-
-        cdef SeriesValues raw_values
-        cdef np.ndarray[double, ndim=1] mean_value
-
         if self.updated:
             return self.cached
         else:
-            raw_values = self._inner.value
-            mean_value = np.array([raw_values.mean()] * len(raw_values))
-            mean_value[np.isnan(raw_values.values)] = NAN
-            self.cached = SeriesValues(mean_value, raw_values.name_mapping)
-            self.updated = 1
+            self._cal_impl()
             return self.cached
 
     cpdef double value_by_name(self, name):
-
-        cdef SeriesValues raw_values
-        cdef np.ndarray[double, ndim=1] mean_value
-
         if self.updated:
             return self.cached[name]
         else:
-            raw_values = self._inner.value
-            mean_value = np.array([raw_values.mean()] * len(raw_values))
-            mean_value[np.isnan(raw_values.values)] = NAN
-            self.cached = SeriesValues(mean_value, raw_values.name_mapping)
-            self.updated = 1
+            self._cal_impl()
             return self.cached[name]
 
     cpdef SeriesValues value_by_names(self, list names):
-
-        cdef SeriesValues raw_values
-        cdef np.ndarray[double, ndim=1] mean_value
-
-        raw_values = self._inner.value_by_names(names)
-        mean_value = np.array([raw_values.mean()] * len(raw_values))
-        mean_value[np.isnan(raw_values.values)] = NAN
-        raw_values = SeriesValues(mean_value, raw_values.name_mapping)
-        return raw_values[names]
+        cdef SeriesValues raw_values = self._inner.value_by_names(names)
+        if self._group:
+            raw_values = raw_values.mean(self._group.value_by_names(names))
+        else:
+            raw_values = raw_values.mean()
+        return raw_values
 
     def __str__(self):
-        return "\mathrm{{CSMean}}({0})".format(str(self._inner))
+        if self._group:
+            return "\mathrm{{CSMean}}({0}, groups={1})".format(str(self._inner), str(self._group))
+        else:
+            return "\mathrm{{CSMean}}({0})".format(str(self._inner))
 
 
 cdef class CSPercentileSecurityValueHolder(CrossSectionValueHolder):

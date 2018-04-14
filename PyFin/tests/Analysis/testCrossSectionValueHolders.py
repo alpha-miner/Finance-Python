@@ -96,7 +96,38 @@ class TestCrossSectionValueHolder(unittest.TestCase):
             benchmark.push(data)
             meanHolder.push(data)
             benchmarkValues = benchmark.value
-            np.testing.assert_array_almost_equal(benchmarkValues.mean(), meanHolder.value.values)
+            np.testing.assert_array_almost_equal(benchmarkValues.values.mean(), meanHolder.value.values)
+
+    def testCSAverageSecurityValueHolderWithGroup(self):
+        benchmark = SecurityLatestValueHolder(x='close')
+        groups = SecurityLatestValueHolder(x='ind')
+        meanHolder = CSAverageSecurityValueHolder(benchmark, groups)
+
+        for i in range(len(self.datas['aapl']['close'])):
+            data = {'aapl': {Factors.CLOSE: self.datas['aapl'][Factors.CLOSE][i],
+                             Factors.OPEN: self.datas['aapl'][Factors.OPEN][i],
+                             'ind': 1.},
+                    'ibm': {Factors.CLOSE: self.datas['ibm'][Factors.CLOSE][i],
+                            Factors.OPEN: self.datas['ibm'][Factors.OPEN][i],
+                            'ind': 1.},
+                    'goog': {Factors.CLOSE: self.datas['goog'][Factors.CLOSE][i],
+                             Factors.OPEN: self.datas['goog'][Factors.OPEN][i],
+                             'ind': 2.},
+                    'baba': {Factors.CLOSE: self.datas['baba'][Factors.CLOSE][i],
+                             Factors.OPEN: self.datas['baba'][Factors.OPEN][i],
+                             'ind': 2.}}
+            benchmark.push(data)
+            meanHolder.push(data)
+            benchmarkValues = benchmark.value
+            groups = {'aapl': 1., 'ibm': 1., 'goog': 2., 'baba': 2.}
+            expected_mean = pd.Series(benchmarkValues.to_dict()).groupby(groups).mean()
+            calculated_mean = meanHolder.value
+
+            for name in calculated_mean.index():
+                if name in ['aapl', 'ibm']:
+                    self.assertAlmostEqual(calculated_mean[name], expected_mean[1])
+                else:
+                    self.assertAlmostEqual(calculated_mean[name], expected_mean[2])
 
     def testCSPercentileSecurityValueHolder(self):
         percent = 50
@@ -125,7 +156,7 @@ class TestCrossSectionValueHolder(unittest.TestCase):
             benchmark.push(data)
             meanAdjustedHolder.push(data)
             benchmarkValues = benchmark.value
-            np.testing.assert_array_almost_equal(benchmarkValues.values - benchmarkValues.mean(), meanAdjustedHolder.value.values)
+            np.testing.assert_array_almost_equal((benchmarkValues - benchmarkValues.mean()).values, meanAdjustedHolder.value.values)
 
     def testCSQuantileSecurityValueHolder(self):
         keys = list(range(1, 11))

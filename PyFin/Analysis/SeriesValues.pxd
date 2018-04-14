@@ -19,7 +19,7 @@ cdef class SeriesValues(object):
     cpdef SeriesValues zscore(self)
     cpdef SeriesValues unit(self)
 
-    cpdef double mean(self)
+    cpdef SeriesValues mean(self, SeriesValues groups=*)
     cpdef double percentile(self, double per)
     cpdef double dot(self, SeriesValues right)
     cpdef SeriesValues res(self, SeriesValues right)

@@ -55,8 +55,8 @@ def CSRank(dependency, groups=None):
     return CSRankedSecurityValueHolder(dependency, groups)
 
 
-def CSMean(dependency):
-    return CSAverageSecurityValueHolder(dependency)
+def CSMean(dependency, groups=None):
+    return CSAverageSecurityValueHolder(dependency, groups)
 
 
 def CSMeanAdjusted(dependency):

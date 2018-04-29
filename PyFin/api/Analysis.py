@@ -58,16 +58,16 @@ def CSMean(dependency, groups=None):
     return CSAverageSecurityValueHolder(dependency, groups)
 
 
-def CSMeanAdjusted(dependency):
-    return CSAverageAdjustedSecurityValueHolder(dependency)
+def CSMeanAdjusted(dependency, groups=None):
+    return CSAverageAdjustedSecurityValueHolder(dependency, groups)
 
 
 def CSQuantiles(dependency, groups=None):
     return CSPercentileSecurityValueHolder(dependency, groups)
 
 
-def CSZScore(dependency):
-    return CSZScoreSecurityValueHolder(dependency)
+def CSZScore(dependency, groups=None):
+    return CSZScoreSecurityValueHolder(dependency, groups)
 
 
 def CSRes(left, right):

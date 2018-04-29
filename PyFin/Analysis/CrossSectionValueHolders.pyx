@@ -227,46 +227,46 @@ cdef class CSAverageAdjustedSecurityValueHolder(CrossSectionValueHolder):
 
 
 cdef class CSZScoreSecurityValueHolder(CrossSectionValueHolder):
-    def __init__(self, innerValue):
-        super(CSZScoreSecurityValueHolder, self).__init__(innerValue)
+    def __init__(self, innerValue, groups=None):
+        super(CSZScoreSecurityValueHolder, self).__init__(innerValue, groups)
+
+    cdef _cal_impl(self):
+        cdef SeriesValues raw_values = self._inner.value
+
+        if self._group:
+            self.cached = raw_values.zscore(self._group.value)
+        else:
+            self.cached = raw_values.zscore()
+        self.updated = 1
 
     @property
     def value(self):
-
-        cdef SeriesValues raw_values
-
         if self.updated:
             return self.cached
         else:
-            raw_values = self._inner.value
-            self.cached = raw_values.zscore()
-            self.updated = 1
+            self._cal_impl()
             return self.cached
 
-    @cython.cdivision(True)
     cpdef double value_by_name(self, name):
-
-        cdef SeriesValues raw_values
-
         if self.updated:
             return self.cached[name]
         else:
-            raw_values = self._inner.value
-            self.cached = raw_values.zscore()
-            self.updated = 1
+            self._cal_impl()
             return self.cached[name]
 
-    @cython.cdivision(True)
     cpdef SeriesValues value_by_names(self, list names):
-
-        cdef SeriesValues raw_values
-
-        raw_values = self._inner.value_by_names(names)
-        raw_values = raw_values.zscore()
-        return raw_values[names]
+        cdef SeriesValues raw_values = self._inner.value_by_names(names)
+        if self._group:
+            raw_values = raw_values.zscore(self._group.value_by_names(names))
+        else:
+            raw_values = raw_values.zscore()
+        return raw_values
 
     def __str__(self):
-        return "\mathrm{{CSZScore}}({0})".format(str(self._inner))
+        if self._group:
+            return "\mathrm{{CSZscore}}({0}, groups={1})".format(str(self._inner), str(self._group))
+        else:
+            return "\mathrm{{CSZscore}}({0})".format(str(self._inner))
 
 
 cdef class CSResidueSecurityValueHolder(SecurityValueHolder):

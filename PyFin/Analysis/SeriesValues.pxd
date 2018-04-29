@@ -16,7 +16,7 @@ cdef class SeriesValues(object):
     cpdef SeriesValues mask(self, flags)
     cpdef list index(self)
     cpdef SeriesValues rank(self, SeriesValues groups=*)
-    cpdef SeriesValues zscore(self)
+    cpdef SeriesValues zscore(self, SeriesValues groups=*)
     cpdef SeriesValues unit(self)
 
     cpdef SeriesValues mean(self, SeriesValues groups=*)

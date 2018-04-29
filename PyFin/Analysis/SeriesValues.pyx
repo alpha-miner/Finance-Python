@@ -234,9 +234,30 @@ cdef class SeriesValues(object):
             data[np.isnan(self.values)] = NAN
         return SeriesValues(data, self.name_mapping)
 
-    cpdef SeriesValues zscore(self):
-        cdef np.ndarray[double, ndim=1] data = self.values
-        return SeriesValues((data - nanmean(data)) / nanstd(data), self.name_mapping)
+    cpdef SeriesValues zscore(self, SeriesValues groups=None):
+        cdef np.ndarray[double, ndim=1] data
+        cdef np.ndarray[long long, ndim=1] order
+        cdef np.ndarray[long long, ndim=1] index_diff
+        cdef long long diff_loc
+        cdef long long start = 0
+        cdef np.ndarray[long long, ndim=1] curr_idx
+        cdef np.ndarray[double, ndim=1] values = self.values
+        cdef np.ndarray[double, ndim=1] curr_values
+
+        if groups:
+            data = values.copy()
+            index_diff, order = groupby(groups.values)
+            start = 0
+            for diff_loc in index_diff:
+                curr_idx = order[start:diff_loc + 1]
+                curr_values = self.values[curr_idx]
+                data[curr_idx] = (curr_values - nanmean(curr_values)) / nanstd(curr_values)
+                start = diff_loc + 1
+            data[np.isnan(values)] = NAN
+        else:
+            data = (values - nanmean(values)) / nanstd(values)
+            data[np.isnan(values)] = NAN
+        return SeriesValues(data, self.name_mapping)
 
     cpdef SeriesValues unit(self):
         cdef np.ndarray[double, ndim=1] data = self.values

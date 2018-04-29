@@ -14,7 +14,6 @@ cimport numpy as np
 import pandas as pd
 cimport cython
 from libc.math cimport isnan
-from PyFin.Math.MathConstants cimport NAN
 from PyFin.Analysis.SeriesValues cimport SeriesValues
 from PyFin.Utilities.Tools import to_dict
 from PyFin.Math.Accumulators.StatefulAccumulators cimport Shift

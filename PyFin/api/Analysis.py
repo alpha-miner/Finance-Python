@@ -50,156 +50,156 @@ from PyFin.Analysis.CrossSectionValueHolders import CSPercentileSecurityValueHol
 from PyFin.Analysis.CrossSectionValueHolders import CSResidueSecurityValueHolder
 
 
-def CSRank(dependency, groups=None):
-    return CSRankedSecurityValueHolder(dependency, groups)
+def CSRank(x, groups=None):
+    return CSRankedSecurityValueHolder(x, groups)
 
 
-def CSMean(dependency, groups=None):
-    return CSAverageSecurityValueHolder(dependency, groups)
+def CSMean(x, groups=None):
+    return CSAverageSecurityValueHolder(x, groups)
 
 
-def CSMeanAdjusted(dependency, groups=None):
-    return CSAverageAdjustedSecurityValueHolder(dependency, groups)
+def CSMeanAdjusted(x, groups=None):
+    return CSAverageAdjustedSecurityValueHolder(x, groups)
 
 
-def CSQuantiles(dependency, groups=None):
-    return CSPercentileSecurityValueHolder(dependency, groups)
+def CSQuantiles(x, groups=None):
+    return CSPercentileSecurityValueHolder(x, groups)
 
 
-def CSZScore(dependency, groups=None):
-    return CSZScoreSecurityValueHolder(dependency, groups)
+def CSZScore(x, groups=None):
+    return CSZScoreSecurityValueHolder(x, groups)
 
 
 def CSRes(left, right):
     return CSResidueSecurityValueHolder(left, right)
 
 
-def SIGN(dependency='x'):
-    return SecuritySignValueHolder(dependency)
+def SIGN(x='x'):
+    return SecuritySignValueHolder(x)
 
 
-def EMA(window, dependency='x'):
-    return SecurityXAverageValueHolder(window, dependency)
+def EMA(window, x='x'):
+    return SecurityXAverageValueHolder(window, x)
 
 
-def MACD(short, long, dependency='x'):
-    return SecurityMACDValueHolder(short, long, dependency)
+def MACD(short, long, x='x'):
+    return SecurityMACDValueHolder(short, long, x)
 
 
-def RSI(window, dependency='x'):
-    return SecurityMovingRSI(window, dependency)
+def RSI(window, x='x'):
+    return SecurityMovingRSI(window, x)
 
 
-def MA(window, dependency='x'):
-    return SecurityMovingAverage(window, dependency)
+def MA(window, x='x'):
+    return SecurityMovingAverage(window, x)
 
 
-def MMAX(window, dependency='x'):
-    return SecurityMovingMax(window, dependency)
+def MMAX(window, x='x'):
+    return SecurityMovingMax(window, x)
 
 
-def MMIN(window, dependency='x'):
-    return SecurityMovingMin(window, dependency)
+def MMIN(window, x='x'):
+    return SecurityMovingMin(window, x)
 
 
-def MRANK(window, dependency='x'):
-    return SecurityMovingRank(window, dependency)
+def MRANK(window, x='x'):
+    return SecurityMovingRank(window, x)
 
 
-def MAXIMUM(dependency=('x', 'y')):
-    return SecurityMaximumValueHolder(dependency)
+def MAXIMUM(x='x', y='y'):
+    return SecurityMaximumValueHolder(x, y)
 
 
-def MINIMUM(dependency=('x', 'y')):
-    return SecurityMinimumValueHolder(dependency)
+def MINIMUM(x='x', y='y'):
+    return SecurityMinimumValueHolder(x, y)
 
 
-def MQUANTILE(window, dependency='x'):
-    return SecurityMovingQuantile(window, dependency)
+def MQUANTILE(window, x='x'):
+    return SecurityMovingQuantile(window, x)
 
 
-def MALLTRUE(window, dependency='x'):
-    return SecurityMovingAllTrue(window, dependency)
+def MALLTRUE(window, x='x'):
+    return SecurityMovingAllTrue(window, x)
 
 
-def MANYTRUE(window, dependency='x'):
-    return SecurityMovingAnyTrue(window, dependency)
+def MANYTRUE(window, x='x'):
+    return SecurityMovingAnyTrue(window, x)
 
 
-def MSUM(window, dependency='x'):
-    return SecurityMovingSum(window, dependency)
+def MSUM(window, x='x'):
+    return SecurityMovingSum(window, x)
 
 
-def MVARIANCE(window, dependency='x'):
-    return SecurityMovingVariance(window, dependency)
+def MVARIANCE(window, x='x'):
+    return SecurityMovingVariance(window, x)
 
 
-def MSTD(window, dependency='x'):
-    return SecurityMovingStandardDeviation(window, dependency)
+def MSTD(window, x='x'):
+    return SecurityMovingStandardDeviation(window, x)
 
 
-def MNPOSITIVE(window, dependency='x'):
-    return SecurityMovingCountedPositive(window, dependency)
+def MNPOSITIVE(window, x='x'):
+    return SecurityMovingCountedPositive(window, x)
 
 
-def MAPOSITIVE(window, dependency='x'):
-    return SecurityMovingPositiveAverage(window, dependency)
+def MAPOSITIVE(window, x='x'):
+    return SecurityMovingPositiveAverage(window, x)
 
 
-def LAST(dependency='x'):
-    return SecurityLatestValueHolder(dependency)
+def LAST(x='x'):
+    return SecurityLatestValueHolder(x)
 
 
-def SQRT(dependency='x'):
-    return SecuritySqrtValueHolder(dependency)
+def SQRT(x='x'):
+    return SecuritySqrtValueHolder(x)
 
 
-def DIFF(dependency='x'):
-    return SecurityDiffValueHolder(dependency)
+def DIFF(x='x'):
+    return SecurityDiffValueHolder(x)
 
 
-def RETURNSimple(dependency='x'):
-    return SecuritySimpleReturnValueHolder(dependency)
+def RETURNSimple(x='x'):
+    return SecuritySimpleReturnValueHolder(x)
 
 
-def RETURNLog(dependency='x'):
-    return SecurityLogReturnValueHolder(dependency)
+def RETURNLog(x='x'):
+    return SecurityLogReturnValueHolder(x)
 
 
-def EXP(dependency):
-    return SecurityExpValueHolder(dependency)
+def EXP(x):
+    return SecurityExpValueHolder(x)
 
 
-def LOG(dependency):
-    return SecurityLogValueHolder(dependency)
+def LOG(x):
+    return SecurityLogValueHolder(x)
 
 
-def POW(dependency, n):
-    return SecurityPowValueHolder(dependency, n)
+def POW(x, n):
+    return SecurityPowValueHolder(x, n)
 
 
-def ABS(dependency):
-    return SecurityAbsValueHolder(dependency)
+def ABS(x):
+    return SecurityAbsValueHolder(x)
 
 
-def ACOS(dependency):
-    return SecurityAcosValueHolder(dependency)
+def ACOS(x):
+    return SecurityAcosValueHolder(x)
 
 
-def ACOSH(dependency):
-    return SecurityAcoshValueHolder(dependency)
+def ACOSH(x):
+    return SecurityAcoshValueHolder(x)
 
 
-def ASIN(dependency):
-    return SecurityAsinValueHolder(dependency)
+def ASIN(x):
+    return SecurityAsinValueHolder(x)
 
 
-def ASINH(dependency):
-    return SecurityAsinhValueHolder(dependency)
+def ASINH(x):
+    return SecurityAsinhValueHolder(x)
 
 
-def SHIFT(dependency, n):
-    return SecurityShiftedValueHolder(dependency, n)
+def SHIFT(x, n):
+    return SecurityShiftedValueHolder(x, n)
 
 
 def IIF(flag, left, right):

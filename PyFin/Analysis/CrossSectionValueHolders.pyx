@@ -12,7 +12,6 @@ cimport numpy as np
 cimport cython
 from PyFin.Analysis.SeriesValues cimport SeriesValues
 from PyFin.Analysis.SecurityValueHolders cimport SecurityValueHolder
-from PyFin.Analysis.SecurityValueHolders cimport SecurityLatestValueHolder
 from PyFin.Analysis.SecurityValueHolders import build_holder
 from PyFin.Math.MathConstants cimport NAN
 
@@ -135,56 +134,46 @@ cdef class CSAverageSecurityValueHolder(CrossSectionValueHolder):
 
 cdef class CSPercentileSecurityValueHolder(CrossSectionValueHolder):
 
-    cdef double percentile
+    def __init__(self, innerValue, groups=None):
+        super(CSPercentileSecurityValueHolder, self).__init__(innerValue, groups)
 
-    def __init__(self, percentile, innerValue):
-        super(CSPercentileSecurityValueHolder, self).__init__(innerValue)
-        self.percentile = percentile
+    cdef _cal_impl(self):
+        cdef SeriesValues raw_values = self._inner.value
+
+        if self._group:
+            self.cached = raw_values.percentile(self._group.value)
+        else:
+            self.cached = raw_values.percentile()
+        self.updated = 1
 
     @property
     def value(self):
-
-        cdef SeriesValues raw_values
-        cdef np.ndarray[double, ndim=1] per_value
-
         if self.updated:
             return self.cached
         else:
-            raw_values = self._inner.value
-            per_value = np.array([raw_values.percentile(self.percentile)] * len(raw_values))
-            per_value[np.isnan(raw_values.values)] = NAN
-            self.cached = SeriesValues(per_value, raw_values.name_mapping)
-            self.updated = 1
+            self._cal_impl()
             return self.cached
 
     cpdef double value_by_name(self, name):
-
-        cdef SeriesValues raw_values
-        cdef np.ndarray[double, ndim=1] per_value
-
         if self.updated:
             return self.cached[name]
         else:
-            raw_values = self._inner.value
-            per_value = np.array([raw_values.percentile(self.percentile)] * len(raw_values))
-            per_value[np.isnan(raw_values.values)] = NAN
-            self.cached = SeriesValues(per_value, raw_values.name_mapping)
-            self.updated = 1
+            self._cal_impl()
             return self.cached[name]
 
     cpdef SeriesValues value_by_names(self, list names):
-
-        cdef SeriesValues raw_values
-        cdef np.ndarray[double, ndim=1] per_value
-
-        raw_values = self._inner.value_by_names(names)
-        per_value = np.array([raw_values.percentile(self.percentile)] * len(raw_values))
-        per_value[np.isnan(raw_values.values)] = NAN
-        raw_values = SeriesValues(per_value, raw_values.name_mapping)
-        return raw_values[names]
+        cdef SeriesValues raw_values = self._inner.value_by_names(names)
+        if self._group:
+            raw_values = raw_values.percentile(self._group.value_by_names(names))
+        else:
+            raw_values = raw_values.percentile()
+        return raw_values
 
     def __str__(self):
-        return "\mathrm{{CSPercentile}}({0})".format(str(self._inner))
+        if self._group:
+            return "\mathrm{{CSPercentile}}({0}, groups={1})".format(str(self._inner), str(self._group))
+        else:
+            return "\mathrm{{CSPercentile}}({0})".format(str(self._inner))
 
 
 cdef class CSAverageAdjustedSecurityValueHolder(CrossSectionValueHolder):

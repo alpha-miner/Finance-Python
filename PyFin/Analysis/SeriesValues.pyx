@@ -11,7 +11,6 @@ cimport numpy as np
 from numpy import nansum
 from numpy import nanmean
 from numpy import nanstd
-from numpy import percentile
 from numpy import maximum
 from numpy import minimum
 from PyFin.Math.MathConstants cimport NAN
@@ -266,8 +265,35 @@ cdef class SeriesValues(object):
             data[np.isnan(values)] = NAN
         return SeriesValues(data, self.name_mapping)
 
-    cpdef double percentile(self, double per):
-        return percentile(self.values, per)
+    @cython.boundscheck(False)
+    @cython.wraparound(False)
+    @cython.cdivision(True)
+    cpdef SeriesValues percentile(self, SeriesValues groups=None):
+        cdef np.ndarray[double, ndim=1] data
+        cdef np.ndarray[long long, ndim=1] order
+        cdef np.ndarray[long long, ndim=1] index_diff
+        cdef long long diff_loc
+        cdef long long start = 0
+        cdef np.ndarray[long long, ndim=1] curr_idx
+        cdef np.ndarray[double, ndim=1] curr_values
+        cdef int size
+
+        if groups:
+            data = self.values.copy()
+            index_diff, order = groupby(groups.values)
+            start = 0
+            for diff_loc in index_diff:
+                curr_idx = order[start:diff_loc + 1]
+                curr_values = self.values[curr_idx]
+                size = len(curr_values) - 1 if len(curr_values) > 1 else 1
+                data[curr_idx] = curr_values.argsort().argsort().astype(float) / size
+                start = diff_loc + 1
+            data[np.isnan(self.values)] = NAN
+        else:
+            size = len(self.values) - 1 if len(self.values) > 1 else 1
+            data = self.values.argsort().argsort().astype(float) / size
+            data[np.isnan(self.values)] = NAN
+        return SeriesValues(data, self.name_mapping)
 
     cpdef double dot(self, SeriesValues right):
         return np.dot(self.values, right.values)

@@ -20,7 +20,7 @@ cdef class SeriesValues(object):
     cpdef SeriesValues unit(self)
 
     cpdef SeriesValues mean(self, SeriesValues groups=*)
-    cpdef double percentile(self, double per)
+    cpdef SeriesValues percentile(self, SeriesValues groups=*)
     cpdef double dot(self, SeriesValues right)
     cpdef SeriesValues res(self, SeriesValues right)
     cpdef dict to_dict(self)

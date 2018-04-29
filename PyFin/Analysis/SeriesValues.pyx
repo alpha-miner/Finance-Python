@@ -234,6 +234,9 @@ cdef class SeriesValues(object):
             data[np.isnan(self.values)] = NAN
         return SeriesValues(data, self.name_mapping)
 
+    @cython.boundscheck(False)
+    @cython.wraparound(False)
+    @cython.cdivision(True)
     cpdef SeriesValues zscore(self, SeriesValues groups=None):
         cdef np.ndarray[double, ndim=1] data
         cdef np.ndarray[long long, ndim=1] order
@@ -250,7 +253,7 @@ cdef class SeriesValues(object):
             start = 0
             for diff_loc in index_diff:
                 curr_idx = order[start:diff_loc + 1]
-                curr_values = self.values[curr_idx]
+                curr_values = data[curr_idx]
                 data[curr_idx] = (curr_values - nanmean(curr_values)) / nanstd(curr_values)
                 start = diff_loc + 1
             data[np.isnan(values)] = NAN
@@ -305,14 +308,14 @@ cdef class SeriesValues(object):
             start = 0
             for diff_loc in index_diff:
                 curr_idx = order[start:diff_loc + 1]
-                curr_values = self.values[curr_idx]
+                curr_values = data[curr_idx]
                 size = len(curr_values) - 1 if len(curr_values) > 1 else 1
-                data[curr_idx] = curr_values.argsort().argsort().astype(float) / size
+                data[curr_idx] = curr_values.argsort().argsort().astype(float) / float(size)
                 start = diff_loc + 1
             data[np.isnan(self.values)] = NAN
         else:
             size = len(self.values) - 1 if len(self.values) > 1 else 1
-            data = self.values.argsort().argsort().astype(float) / size
+            data = self.values.argsort().argsort().astype(float) / float(size)
             data[np.isnan(self.values)] = NAN
         return SeriesValues(data, self.name_mapping)
 

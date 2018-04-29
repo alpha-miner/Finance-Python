@@ -61,7 +61,6 @@ from PyFin.api.Analysis import CSRank
 from PyFin.api.Analysis import CSMean
 from PyFin.api.Analysis import CSMeanAdjusted
 from PyFin.api.Analysis import CSQuantiles
-from PyFin.api.Analysis import CSPercentile
 from PyFin.api.Analysis import CSZScore
 from PyFin.api.Analysis import CSRes
 
@@ -123,6 +122,5 @@ __all__ = ["datesList",
            "CSMeanAdjusted",
            "CSQuantiles",
            "CSZScore",
-           "CSPercentile",
            "CSRes",
            "pyFinAssert"]

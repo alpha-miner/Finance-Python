@@ -47,7 +47,6 @@ from PyFin.Analysis.CrossSectionValueHolders import CSAverageSecurityValueHolder
 from PyFin.Analysis.CrossSectionValueHolders import CSAverageAdjustedSecurityValueHolder
 from PyFin.Analysis.CrossSectionValueHolders import CSZScoreSecurityValueHolder
 from PyFin.Analysis.CrossSectionValueHolders import CSPercentileSecurityValueHolder
-from PyFin.Analysis.CrossSectionValueHolders import CSQuantileSecurityValueHolder
 from PyFin.Analysis.CrossSectionValueHolders import CSResidueSecurityValueHolder
 
 
@@ -63,12 +62,8 @@ def CSMeanAdjusted(dependency):
     return CSAverageAdjustedSecurityValueHolder(dependency)
 
 
-def CSQuantiles(dependency):
-    return CSQuantileSecurityValueHolder(dependency)
-
-
-def CSPercentile(percent, dependency):
-    return CSPercentileSecurityValueHolder(percent, dependency)
+def CSQuantiles(dependency, groups=None):
+    return CSPercentileSecurityValueHolder(dependency, groups)
 
 
 def CSZScore(dependency):

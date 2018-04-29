@@ -12,7 +12,6 @@ from PyFin.Analysis.SecurityValueHolders import SecurityConstArrayValueHolder
 from PyFin.Analysis.CrossSectionValueHolders import CSRankedSecurityValueHolder
 from PyFin.Analysis.CrossSectionValueHolders import CSAverageSecurityValueHolder
 from PyFin.Analysis.CrossSectionValueHolders import CSAverageAdjustedSecurityValueHolder
-from PyFin.Analysis.CrossSectionValueHolders import CSQuantileSecurityValueHolder
 from PyFin.Analysis.CrossSectionValueHolders import CSZScoreSecurityValueHolder
 from PyFin.Analysis.CrossSectionValueHolders import CSPercentileSecurityValueHolder
 from PyFin.Analysis.CrossSectionValueHolders import CSResidueSecurityValueHolder
@@ -27,7 +26,6 @@ __all__ = ['DataProvider',
            'CSRankedSecurityValueHolder',
            'CSAverageSecurityValueHolder',
            'CSAverageAdjustedSecurityValueHolder',
-           'CSQuantileSecurityValueHolder',
            'CSZScoreSecurityValueHolder',
            'CSPercentileSecurityValueHolder',
            'CSResidueSecurityValueHolder',

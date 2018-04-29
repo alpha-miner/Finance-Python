@@ -214,49 +214,6 @@ cdef class CSAverageAdjustedSecurityValueHolder(CrossSectionValueHolder):
         return "\mathrm{{CSMeanAdjusted}}({0})".format(str(self._inner))
 
 
-cdef class CSQuantileSecurityValueHolder(CrossSectionValueHolder):
-    def __init__(self, innerValue):
-        super(CSQuantileSecurityValueHolder, self).__init__(innerValue)
-
-    @property
-    def value(self):
-
-        cdef SeriesValues raw_values
-
-        if self.updated:
-            return self.cached
-        else:
-            raw_values = self._inner.value
-            self.cached = raw_values.rank() / (len(raw_values) - 1.)
-            self.updated = 1
-            return self.cached
-
-    @cython.cdivision(True)
-    cpdef double value_by_name(self, name):
-
-        cdef SeriesValues raw_values
-
-        if self.updated:
-            return self.cached[name]
-        else:
-            raw_values = self._inner.value
-            self.cached = raw_values.rank() / (len(raw_values) - 1.)
-            self.updated = 1
-            return self.cached[name]
-
-    @cython.cdivision(True)
-    cpdef SeriesValues value_by_names(self, list names):
-
-        cdef SeriesValues raw_values
-
-        raw_values = self._inner.value_by_names(names)
-        raw_values = (raw_values.rank() - 1.) / (len(raw_values) - 1.)
-        return raw_values[names]
-
-    def __str__(self):
-        return "\mathrm{{CSQuantiles}}({0})".format(str(self._inner))
-
-
 cdef class CSZScoreSecurityValueHolder(CrossSectionValueHolder):
     def __init__(self, innerValue):
         super(CSZScoreSecurityValueHolder, self).__init__(innerValue)

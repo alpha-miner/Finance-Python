@@ -21,7 +21,7 @@ In [1]: price_average = (LAST('open') + LAST('high') + LAST('low') + LAST('close
 
 ```python
 In [2]: data = dict(aapl=dict(open=2., high=4., low=1., close=3.),
-   ...:             ibm=dict(open=6., high=7., low=4., close=7.))
+......:             ibm=dict(open=6., high=7., low=4., close=7.))
 ```
 
 推送数据:

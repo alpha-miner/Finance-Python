@@ -33,9 +33,7 @@ In [3]: value_holder.push({'s1': {'x': 2}})
 
 ```python
 In [4]: value_holder.value
-Out[4]:
-s1    2.0
-dtype: float64
+Out[4]: SeriesValues({'s1': 2.0})
 ```
 
 这个结果表示，符号``s1``关于依赖``'x'``的``MA``运算结果为：``2.0``。
@@ -50,9 +48,7 @@ In [6]: value_holder.push({'s1': {'x': 3}})
 
 ```python
 In [6]: value_holder.value
-Out[6]:
-s1 2.5
-dtype: float64
+Out[6]: SeriesValues({'s1': 2.5})
 ```
 
 我们仍然可以继续：
@@ -65,8 +61,6 @@ In [7]: value_holder.push({'s1': {'x': 4}})
 
 ```python
 In [8]: value_holder.value
-Out[8]:
-s1 3.5
-dtype: float64
+Out[8]: SeriesValues({'s1': 3.5})
 ```
 

@@ -21,7 +21,7 @@ Out[2]: '0.5.4'
 In [3]: from PyFin import api
 ```
 
-下面的代码获取2016年12月的所有工作日：
+下面的代码获取上海证券交易所2016年12月的所有工作日：
 
 ```python
 In [5]: api.bizDatesList('china.sse', '2016-12-01', '2016-12-31')

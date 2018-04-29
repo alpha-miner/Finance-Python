@@ -22,6 +22,8 @@
 * `ASINH`
 * `SHIFT`
 * `IIF`
+* `MAXIMUM`
+* `MINIMUM`
 
 ## Windowed value holders
 
@@ -46,3 +48,4 @@
 * `CSMeanAdjusted`
 * `CSQuantile`
 * `CSZScore`
+* `CSRes`

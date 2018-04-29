@@ -188,6 +188,32 @@ class TestCrossSectionValueHolder(unittest.TestCase):
             benchmarkValues = benchmark.value
             np.testing.assert_array_almost_equal((benchmarkValues - benchmarkValues.mean()).values, meanAdjustedHolder.value.values)
 
+    def testCSAverageAdjustedSecurityValueHolderWithGroups(self):
+        benchmark = SecurityLatestValueHolder(x='close')
+        groups = SecurityLatestValueHolder(x='ind')
+        meanAdjustedHolder = CSAverageAdjustedSecurityValueHolder(benchmark, groups)
+
+        for i in range(len(self.datas['aapl']['close'])):
+            data = {'aapl': {Factors.CLOSE: self.datas['aapl'][Factors.CLOSE][i],
+                             Factors.OPEN: self.datas['aapl'][Factors.OPEN][i],
+                             'ind': 1.},
+                    'ibm': {Factors.CLOSE: self.datas['ibm'][Factors.CLOSE][i],
+                            Factors.OPEN: self.datas['ibm'][Factors.OPEN][i],
+                            'ind': 1.},
+                    'goog': {Factors.CLOSE: self.datas['goog'][Factors.CLOSE][i],
+                             Factors.OPEN: self.datas['goog'][Factors.OPEN][i],
+                             'ind': 2.},
+                    'baba': {Factors.CLOSE: self.datas['baba'][Factors.CLOSE][i],
+                             Factors.OPEN: self.datas['baba'][Factors.OPEN][i],
+                             'ind': 2.}}
+            benchmark.push(data)
+            meanAdjustedHolder.push(data)
+            benchmarkValues = benchmark.value
+            groups = {'aapl': 1., 'ibm': 1., 'goog': 2., 'baba': 2.}
+            expected_rank = pd.Series(benchmarkValues.to_dict()).groupby(groups) \
+                .transform(lambda x: x - x.mean())
+            np.testing.assert_array_almost_equal(expected_rank, meanAdjustedHolder.value.values)
+
     def testCSZscoreSecurityValueHolder(self):
         keys = list(range(1, 11))
         values = list(range(10, 0, -1))

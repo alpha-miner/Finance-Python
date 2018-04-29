@@ -177,8 +177,8 @@ cdef class CSPercentileSecurityValueHolder(CrossSectionValueHolder):
 
 
 cdef class CSAverageAdjustedSecurityValueHolder(CrossSectionValueHolder):
-    def __init__(self, innerValue):
-        super(CSAverageAdjustedSecurityValueHolder, self).__init__(innerValue)
+    def __init__(self, innerValue, groups=None):
+        super(CSAverageAdjustedSecurityValueHolder, self).__init__(innerValue, groups)
 
     @property
     def value(self):
@@ -189,7 +189,10 @@ cdef class CSAverageAdjustedSecurityValueHolder(CrossSectionValueHolder):
             return self.cached
         else:
             raw_values = self._inner.value
-            self.cached = raw_values - raw_values.mean()
+            if self._group:
+                self.cached = raw_values - raw_values.mean(self._group.value)
+            else:
+                self.cached = raw_values - raw_values.mean()
             self.updated = 1
             return self.cached
 
@@ -201,17 +204,26 @@ cdef class CSAverageAdjustedSecurityValueHolder(CrossSectionValueHolder):
             return self.cached[name]
         else:
             raw_values = self._inner.value
-            self.cached = raw_values - raw_values.mean()
+            if self._group:
+                self.cached = raw_values - raw_values.mean(self._group.value)
+            else:
+                self.cached = raw_values - raw_values.mean()
             self.updated = 1
             return self.cached[name]
 
     cpdef SeriesValues value_by_names(self, list names):
         raw_values = self._inner.value_by_names(names)
-        raw_values = raw_values - raw_values.mean()
+        if self._group:
+            self.cached = raw_values - raw_values.mean(self._group.value)
+        else:
+            self.cached = raw_values - raw_values.mean()
         return raw_values[names]
 
     def __str__(self):
-        return "\mathrm{{CSMeanAdjusted}}({0})".format(str(self._inner))
+        if self._group:
+            return "\mathrm{{CSMeanAdjusted}}({0}, groups={1})".format(str(self._inner), str(self._group))
+        else:
+            return "\mathrm{{CSMeanAdjusted}}({0})".format(str(self._inner))
 
 
 cdef class CSZScoreSecurityValueHolder(CrossSectionValueHolder):

@@ -13,6 +13,7 @@ from numpy import nanmean
 from numpy import nanstd
 from numpy import maximum
 from numpy import minimum
+from scipy.stats import rankdata
 from PyFin.Math.MathConstants cimport NAN
 
 
@@ -226,11 +227,11 @@ cdef class SeriesValues(object):
             start = 0
             for diff_loc in index_diff:
                 curr_idx = order[start:diff_loc + 1]
-                data[curr_idx] = self.values[curr_idx].argsort().argsort().astype(float)
+                data[curr_idx] = rankdata(self.values[curr_idx]).astype(float) - 1.
                 start = diff_loc + 1
             data[np.isnan(self.values)] = NAN
         else:
-            data = self.values.argsort().argsort().astype(float)
+            data = rankdata(self.values).astype(float) - 1.
             data[np.isnan(self.values)] = NAN
         return SeriesValues(data, self.name_mapping)
 
@@ -310,12 +311,12 @@ cdef class SeriesValues(object):
                 curr_idx = order[start:diff_loc + 1]
                 curr_values = data[curr_idx]
                 size = len(curr_values) - 1 if len(curr_values) > 1 else 1
-                data[curr_idx] = curr_values.argsort().argsort().astype(float) / float(size)
+                data[curr_idx] = (rankdata(curr_values).astype(float) - 1.) / float(size)
                 start = diff_loc + 1
             data[np.isnan(self.values)] = NAN
         else:
             size = len(self.values) - 1 if len(self.values) > 1 else 1
-            data = self.values.argsort().argsort().astype(float) / float(size)
+            data = (rankdata(self.values).astype(float) - 1.) / float(size)
             data[np.isnan(self.values)] = NAN
         return SeriesValues(data, self.name_mapping)
 

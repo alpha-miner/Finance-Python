@@ -493,8 +493,7 @@ cdef class SecurityLatestValueHolder(SecurityValueHolder):
             data_pack = data[name]
             if field in data_pack:
                 value = data_pack[field]
-                if not isnan(value):
-                    self._symbol_values[name] = value
+                self._symbol_values[name] = value
 
             if name not in self._symbol_values:
                 self._symbol_values[name] = NAN

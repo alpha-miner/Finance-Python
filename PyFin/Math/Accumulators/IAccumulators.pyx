@@ -102,7 +102,7 @@ cdef class Accumulator(IAccumulator):
             name = 'transformed'
 
         data = data.select_dtypes([np.number])
-        matrix_values = data.as_matrix().astype(float)
+        matrix_values = data.values.astype(float)
         columns = data.columns.tolist()
         column_length = len(columns)
 

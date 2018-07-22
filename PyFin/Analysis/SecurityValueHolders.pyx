@@ -247,7 +247,7 @@ cdef class SecurityValueHolder(object):
 
         total_category = data[category_field].values
         data = data.select_dtypes([np.number])
-        matrix_values = data.as_matrix().astype(float)
+        matrix_values = data.values.astype(float)
         columns = data.columns.tolist()
         split_category, split_values = to_dict(total_index, total_category.tolist(), matrix_values, columns)
 

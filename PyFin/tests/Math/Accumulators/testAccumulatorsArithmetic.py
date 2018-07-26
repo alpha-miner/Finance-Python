@@ -11,10 +11,9 @@ import tempfile
 import pickle
 import os
 import math
-from collections import deque
 import numpy as np
 import pandas as pd
-from scipy.stats import linregress
+from scipy.stats import norm
 from PyFin.Math.Accumulators.IAccumulators import Identity
 from PyFin.Math.Accumulators.IAccumulators import Exp
 from PyFin.Math.Accumulators.IAccumulators import Log
@@ -26,6 +25,7 @@ from PyFin.Math.Accumulators.IAccumulators import Acos
 from PyFin.Math.Accumulators.IAccumulators import Acosh
 from PyFin.Math.Accumulators.IAccumulators import Asin
 from PyFin.Math.Accumulators.IAccumulators import Asinh
+from PyFin.Math.Accumulators.IAccumulators import NormInv
 from PyFin.Math.Accumulators.IAccumulators import IIF
 from PyFin.Math.Accumulators.IAccumulators import Latest
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingAverage
@@ -457,6 +457,37 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
             holder.push(data)
 
             expected = math.asinh(ma5.result())
+            calculated = holder.result()
+            self.assertAlmostEqual(calculated, expected, 12, "at index {0:d}\n"
+                                                             "expected:   {1:f}\n"
+                                                             "calculated: {2:f}".format(i, expected, calculated))
+
+    def testNormInvFunction(self):
+        ma5 = MovingAverage(5, 'close')
+        holder = NormInv(ma5)
+
+        sampleClose = norm.cdf(self.sampleClose)
+
+        for i, close in enumerate(sampleClose):
+            data = {'close': close}
+            ma5.push(data)
+            holder.push(data)
+
+            expected = norm.ppf(ma5.result())
+            calculated = holder.result()
+            self.assertAlmostEqual(calculated, expected, 6, "at index {0:d}\n"
+                                                            "expected:   {1:f}\n"
+                                                            "calculated: {2:f}".format(i, expected, calculated))
+
+        holder = NormInv(ma5, fullAcc=True)
+        sampleClose = norm.cdf(self.sampleClose)
+
+        for i, close in enumerate(sampleClose):
+            data = {'close': close}
+            ma5.push(data)
+            holder.push(data)
+
+            expected = norm.ppf(ma5.result())
             calculated = holder.result()
             self.assertAlmostEqual(calculated, expected, 12, "at index {0:d}\n"
                                                              "expected:   {1:f}\n"

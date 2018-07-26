@@ -5,6 +5,8 @@ Created on 2017-2-8
 @author: cheng.li
 """
 
+from PyFin.Math.Distributions.NormalDistribution cimport InverseCumulativeNormal as InvNormImpl
+
 
 cdef class IAccumulator(object):
     pass
@@ -182,5 +184,12 @@ cdef class Asin(BasicFunction):
 
 
 cdef class Asinh(BasicFunction):
+
+    cpdef double result(self)
+
+
+cdef class NormInv(BasicFunction):
+
+    cdef InvNormImpl _inv
 
     cpdef double result(self)

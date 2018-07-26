@@ -23,6 +23,8 @@ import pandas as pd
 from PyFin.Utilities.Asserts cimport pyFinAssert
 from PyFin.Math.MathConstants cimport NAN
 from PyFin.Math.udfs cimport sign
+from PyFin.Math.Distributions.NormalDistribution cimport InverseCumulativeNormal as InvNormImpl
+
 
 
 cdef class IAccumulator(object):
@@ -609,3 +611,15 @@ cdef class Asinh(BasicFunction):
 
     def __str__(self):
         return "\\mathrm{{ASinh}}({0})".format(str(self._inner))
+
+
+cdef class NormInv(BasicFunction):
+    def __init__(self, x, orig_value=NAN, fullAcc=False):
+        super(NormInv, self).__init__(x, orig_value)
+        self._inv = InvNormImpl(0., 1., fullAcc)
+
+    cpdef double result(self):
+        return self._inv.inv(self._origValue)
+
+    def __str__(self):
+        return "\\mathrm{{NormInv}}({0})".format(str(self._inner))

@@ -163,10 +163,6 @@ cdef double _tail_value(double x):
 
 cdef class InverseCumulativeNormal(object):
 
-    cdef double _average
-    cdef double _sigma
-    cdef int _fullAcc
-
     def __init__(self, average=0.0, sigma=1.0, fullAccuracy=False):
         self._average = average
         self._sigma = sigma
@@ -202,8 +198,11 @@ cdef class InverseCumulativeNormal(object):
             z -= r / (1 + 0.5 * z * r)
         return z
 
-    def __call__(self, x):
+    cdef double inv(self, double x):
         return self._average + self._sigma * self._standard_value(x)
+
+    def __call__(self, x):
+        return self.inv(x)
 
     def __deepcopy__(self, memo):
         return InverseCumulativeNormal(self._average, self._sigma, self._fullAcc)

@@ -17,6 +17,7 @@ from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import Securit
 from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import SecurityAcoshValueHolder
 from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import SecurityAsinValueHolder
 from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import SecurityAsinhValueHolder
+from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import SecurityNormInvValueHolder
 from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import SecurityDiffValueHolder
 from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import SecuritySimpleReturnValueHolder
 from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import SecurityLogReturnValueHolder
@@ -53,6 +54,7 @@ __all__ = ['SecuritySignValueHolder',
            'SecurityAcoshValueHolder',
            'SecurityAsinValueHolder',
            'SecurityAsinhValueHolder',
+           'SecurityNormInvValueHolder',
            'SecurityDiffValueHolder',
            'SecuritySimpleReturnValueHolder',
            'SecurityLogReturnValueHolder',

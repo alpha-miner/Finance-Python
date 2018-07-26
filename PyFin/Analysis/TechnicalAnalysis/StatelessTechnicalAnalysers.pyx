@@ -21,6 +21,7 @@ from PyFin.Math.Accumulators.IAccumulators cimport Acos
 from PyFin.Math.Accumulators.IAccumulators cimport Acosh
 from PyFin.Math.Accumulators.IAccumulators cimport Asin
 from PyFin.Math.Accumulators.IAccumulators cimport Asinh
+from PyFin.Math.Accumulators.IAccumulators cimport NormInv
 from PyFin.Math.Accumulators.StatelessAccumulators cimport Diff
 from PyFin.Math.Accumulators.StatelessAccumulators cimport SimpleReturn
 from PyFin.Math.Accumulators.StatelessAccumulators cimport LogReturn
@@ -114,6 +115,10 @@ cdef class SecurityAsinhValueHolder(SecurityStatelessSingleValueHolder):
         super(SecurityAsinhValueHolder, self).__init__(holderType=Asinh,
                                                        x=x)
 
+cdef class SecurityNormInvValueHolder(SecurityStatelessSingleValueHolder):
+    def __init__(self, x):
+        super(SecurityNormInvValueHolder, self).__init__(holderType=NormInv,
+                                                         x=x)
 
 cdef class SecurityDiffValueHolder(SecurityStatelessSingleValueHolder):
     def __init__(self, x):

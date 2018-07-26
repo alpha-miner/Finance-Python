@@ -24,6 +24,7 @@ from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import Securit
 from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import SecurityMACDValueHolder
 from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import SecurityMaximumValueHolder
 from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import SecurityMinimumValueHolder
+from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import SecurityNormInvValueHolder
 
 
 class TestStatelessTechnicalAnalysis(unittest.TestCase):
@@ -373,3 +374,6 @@ class TestStatelessTechnicalAnalysis(unittest.TestCase):
                                                                  'expected:   {1:.12f}\n'
                                                                  'calculat: {2:.12f}'
                                        .format(i, expected, calculated))
+
+    def testSecurityNormInvValueHolder(self):
+        

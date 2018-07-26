@@ -732,11 +732,11 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
 
     def testNormInvStr(self):
         s = NormInv('roe')
-        self.assertEqual("\mathrm{NormInv}(''\\text{roe}'')", str(s))
+        self.assertEqual("\mathrm{NormInv}(''\\text{roe}'', fullAcc=0)", str(s))
 
     def testNegStr(self):
         s = -Asinh('roe')
-        self.assertEqual("-\mathrm{ASinh}(''\\text{roe}'')", str(s))
+        self.assertEqual("-\mathrm{ASinh}(''\\text{roe}'',)", str(s))
 
     def testAddedStr(self):
         s = Latest('x') + Latest('y')

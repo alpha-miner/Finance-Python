@@ -622,4 +622,4 @@ cdef class NormInv(BasicFunction):
         return self._inv.inv(self._origValue)
 
     def __str__(self):
-        return "\\mathrm{{NormInv}}({0})".format(str(self._inner))
+        return "\\mathrm{{NormInv}}({0}, fullAcc={1})".format(str(self._inner), self._inv.isFullAcc)

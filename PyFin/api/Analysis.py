@@ -38,6 +38,7 @@ from PyFin.Analysis.TechnicalAnalysis import SecurityAcosValueHolder
 from PyFin.Analysis.TechnicalAnalysis import SecurityAcoshValueHolder
 from PyFin.Analysis.TechnicalAnalysis import SecurityAsinValueHolder
 from PyFin.Analysis.TechnicalAnalysis import SecurityAsinhValueHolder
+from PyFin.Analysis.TechnicalAnalysis import SecurityNormInvValueHolder
 from PyFin.Analysis.SecurityValueHolders import SecurityShiftedValueHolder
 from PyFin.Analysis.SecurityValueHolders import SecurityLatestValueHolder
 from PyFin.Analysis.SecurityValueHolders import SecurityIIFValueHolder
@@ -196,6 +197,10 @@ def ASIN(x):
 
 def ASINH(x):
     return SecurityAsinhValueHolder(x)
+
+
+def NORMINV(x):
+    return SecurityNormInvValueHolder(x)
 
 
 def SHIFT(x, n):

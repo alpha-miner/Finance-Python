@@ -12,6 +12,7 @@ import copy
 import pickle
 import tempfile
 import os
+from scipy.stats import norm
 from PyFin.Analysis.SecurityValueHolders import SecurityLatestValueHolder
 from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import SecurityDiffValueHolder
 from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import SecuritySignValueHolder
@@ -376,4 +377,27 @@ class TestStatelessTechnicalAnalysis(unittest.TestCase):
                                        .format(i, expected, calculated))
 
     def testSecurityNormInvValueHolder(self):
-        
+        mm1 = SecurityNormInvValueHolder('open')
+        mm2 = SecurityNormInvValueHolder('open', fullAcc=True)
+
+        for i in range(len(self.aapl['close'])):
+            data = dict(aapl=dict(open=norm.cdf(self.aapl['open'][i])),
+                        ibm=dict(open=norm.cdf(self.ibm['open'][i])))
+            mm1.push(data)
+            mm2.push(data)
+
+            value1 = mm1.value
+            value2 = mm2.value
+            for name in value1.index():
+                expected = norm.ppf(data[name]['open'])
+                calculated = value1[name]
+                self.assertAlmostEqual(expected, calculated, 6, 'at index {0}\n'
+                                                                'expected:   {1:.12f}\n'
+                                                                'calculat: {2:.12f}'
+                                       .format(i, expected, calculated))
+
+                calculated = value2[name]
+                self.assertAlmostEqual(expected, calculated, 12, 'at index {0}\n'
+                                                                 'expected:   {1:.12f}\n'
+                                                                 'calculat: {2:.12f}'
+                                       .format(i, expected, calculated))

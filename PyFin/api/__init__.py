@@ -54,6 +54,7 @@ from PyFin.api.Analysis import ACOS
 from PyFin.api.Analysis import ACOSH
 from PyFin.api.Analysis import ASIN
 from PyFin.api.Analysis import ASINH
+from PyFin.api.Analysis import NORMINV
 from PyFin.api.Analysis import SHIFT
 from PyFin.api.Analysis import IIF
 
@@ -115,6 +116,7 @@ __all__ = ["datesList",
            "ACOSH",
            "ASIN",
            "ASINH",
+           "NORMINV",
            "SHIFT",
            "IIF",
            "CSRank",

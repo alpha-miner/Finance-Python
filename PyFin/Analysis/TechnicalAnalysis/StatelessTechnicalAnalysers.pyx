@@ -116,9 +116,10 @@ cdef class SecurityAsinhValueHolder(SecurityStatelessSingleValueHolder):
                                                        x=x)
 
 cdef class SecurityNormInvValueHolder(SecurityStatelessSingleValueHolder):
-    def __init__(self, x):
+    def __init__(self, x, fullAcc=False):
         super(SecurityNormInvValueHolder, self).__init__(holderType=NormInv,
-                                                         x=x)
+                                                         x=x,
+                                                         fullAcc=fullAcc)
 
 cdef class SecurityDiffValueHolder(SecurityStatelessSingleValueHolder):
     def __init__(self, x):

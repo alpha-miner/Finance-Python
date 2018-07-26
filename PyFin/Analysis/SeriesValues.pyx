@@ -301,7 +301,7 @@ cdef class SeriesValues(object):
         cdef long long start = 0
         cdef np.ndarray[long long, ndim=1] curr_idx
         cdef np.ndarray[double, ndim=1] curr_values
-        cdef int size
+        cdef float size
 
         if groups:
             data = self.values.copy()
@@ -310,13 +310,13 @@ cdef class SeriesValues(object):
             for diff_loc in index_diff:
                 curr_idx = order[start:diff_loc + 1]
                 curr_values = data[curr_idx]
-                size = len(curr_values) - 1 if len(curr_values) > 1 else 1
-                data[curr_idx] = (rankdata(curr_values).astype(float) - 1.) / float(size)
+                size = len(curr_values) + 1.
+                data[curr_idx] = rankdata(curr_values).astype(float) / size
                 start = diff_loc + 1
             data[np.isnan(self.values)] = NAN
         else:
-            size = len(self.values) - 1 if len(self.values) > 1 else 1
-            data = (rankdata(self.values).astype(float) - 1.) / float(size)
+            size = len(self.values) + 1.
+            data = rankdata(self.values).astype(float) / size
             data[np.isnan(self.values)] = NAN
         return SeriesValues(data, self.name_mapping)
 

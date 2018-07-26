@@ -736,7 +736,7 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
 
     def testNegStr(self):
         s = -Asinh('roe')
-        self.assertEqual("-\mathrm{ASinh}(''\\text{roe}'',)", str(s))
+        self.assertEqual("-\mathrm{ASinh}(''\\text{roe}'')", str(s))
 
     def testAddedStr(self):
         s = Latest('x') + Latest('y')

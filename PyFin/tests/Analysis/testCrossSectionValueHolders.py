@@ -170,7 +170,7 @@ class TestCrossSectionValueHolder(unittest.TestCase):
             benchmarkValues = benchmark.value
             groups = {'aapl': 1., 'ibm': 1., 'goog': 2., 'baba': 2.}
             expected_rank = pd.Series(benchmarkValues.to_dict()).groupby(groups) \
-                .transform(lambda x: (x.rank().values - 1.) / (len(x) - 1))
+                .transform(lambda x: x.rank().values / (len(x) + 1))
             np.testing.assert_array_almost_equal(expected_rank, perHolder.value.values)
 
     def testCSAverageAdjustedSecurityValueHolder(self):

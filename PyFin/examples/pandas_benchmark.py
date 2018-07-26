@@ -12,8 +12,8 @@ import pandas as pd
 from PyFin.api import *
 from PyFin.Math.Accumulators import MovingAverage
 
-n = 3000
-m = 3000
+n = 300
+m = 300
 
 index = pd.date_range(dt.datetime(1990, 1, 1), dt.datetime(1990, 1, 1) + dt.timedelta(days=m-1))
 index = np.repeat(index, n)
@@ -62,7 +62,7 @@ print("\nFinance-Python (cs rank): {0}s".format(dt.datetime.now() - start))
 
 start = dt.datetime.now()
 df2 = df.reset_index()
-res2 = df2.groupby(['index', 'ind']).apply(lambda x: x['x'].rank() - 1)
+res2 = df2.groupby(['index', 'ind']).apply(lambda x: x['x'].rank())
 print("Pandas (cs rank): {0}s".format(dt.datetime.now() - start))
 
 res2 = pd.DataFrame({'index': res2.index.get_level_values(2), 'exp_rank': res2.values})
@@ -80,7 +80,7 @@ print("\nFinance-Python (cs percentile): {0}s".format(dt.datetime.now() - start)
 
 start = dt.datetime.now()
 df2 = df.reset_index()
-res2 = df2.groupby(['index', 'ind']).apply(lambda x: (x['x'].rank() - 1.) / (len(x) - 1))
+res2 = df2.groupby(['index', 'ind']).apply(lambda x: x['x'].rank() / (len(x) + 1))
 print("Pandas (cs percentile): {0}s".format(dt.datetime.now() - start))
 
 res2 = pd.DataFrame({'index': res2.index.get_level_values(2), 'exp_rank': res2.values})

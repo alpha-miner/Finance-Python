@@ -80,7 +80,7 @@ class TestCrossSectionValueHolder(unittest.TestCase):
             rankHolder.push(data)
             benchmarkValues = benchmark.value
             groups = {'aapl': 1., 'ibm': 1., 'goog': 2., 'baba': 2.}
-            expected_rank = pd.Series(benchmarkValues.to_dict()).groupby(groups).rank().values - 1.
+            expected_rank = pd.Series(benchmarkValues.to_dict()).groupby(groups).rank().values
             np.testing.assert_array_almost_equal(expected_rank, rankHolder.value.values)
 
     def testCSAverageSecurityValueHolder(self):
@@ -145,7 +145,7 @@ class TestCrossSectionValueHolder(unittest.TestCase):
             benchmark.push(data)
             perHolder.push(data)
             benchmarkValues = benchmark.value
-            np.testing.assert_array_almost_equal(benchmarkValues.rank().values / (len(data) - 1), perHolder.value.values)
+            np.testing.assert_array_almost_equal(benchmarkValues.rank().values / (len(data) + 1.), perHolder.value.values)
 
     def testCSPercentileSecurityValueHolderWithGroups(self):
         benchmark = SecurityLatestValueHolder(x='close')

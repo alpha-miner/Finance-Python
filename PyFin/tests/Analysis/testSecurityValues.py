@@ -35,7 +35,7 @@ class TestSecurityValues(unittest.TestCase):
         data = SeriesValues(data, index)
         test = data.rank()
 
-        expected = SeriesValues(np.array([1, 0, np.nan, np.nan, 2, 3]), dict(zip(index, range(len(index)))))
+        expected = SeriesValues(np.array([2, 1, np.nan, np.nan, 3, 4]), dict(zip(index, range(len(index)))))
         for name in test.index():
             if np.isnan(test[name]):
                 self.assertTrue(np.isnan(expected[name]))
@@ -54,7 +54,7 @@ class TestSecurityValues(unittest.TestCase):
 
         pd_series = pd.Series(data.values)
         expected = pd_series.groupby(groups.values).rank()
-        np.testing.assert_array_almost_equal(test.values, expected.values - 1.)
+        np.testing.assert_array_almost_equal(test.values, expected.values)
 
     def testSecurityValuesUnit(self):
         data = np.array([3, -2, np.nan, np.nan, 4, 5])

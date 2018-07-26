@@ -227,11 +227,11 @@ cdef class SeriesValues(object):
             start = 0
             for diff_loc in index_diff:
                 curr_idx = order[start:diff_loc + 1]
-                data[curr_idx] = rankdata(self.values[curr_idx]).astype(float) - 1.
+                data[curr_idx] = rankdata(self.values[curr_idx]).astype(float)
                 start = diff_loc + 1
             data[np.isnan(self.values)] = NAN
         else:
-            data = rankdata(self.values).astype(float) - 1.
+            data = rankdata(self.values).astype(float)
             data[np.isnan(self.values)] = NAN
         return SeriesValues(data, self.name_mapping)
 

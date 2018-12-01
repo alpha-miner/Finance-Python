@@ -45,6 +45,194 @@ cdef class CrossSectionValueHolder(SecurityValueHolder):
         self.updated = 0
 
 
+cdef class CSTopNSecurityValueHolder(CrossSectionValueHolder):
+
+    cdef int _n;
+
+    def __init__(self, innerValue, n, groups=None):
+        super(CSTopNSecurityValueHolder, self).__init__(innerValue, groups)
+        self._n = n
+
+    cdef _cal_impl(self):
+        cdef SeriesValues raw_values = self._inner.value
+
+        if self._group:
+            self.cached = raw_values.top_n(self._n, self._group.value)
+        else:
+            self.cached = raw_values.top_n(self._n)
+        self.updated = 1
+
+    @property
+    def value(self):
+        if self.updated:
+            return self.cached
+        else:
+            self._cal_impl()
+            return self.cached
+
+    cpdef double value_by_name(self, name):
+        if self.updated:
+            return self.cached[name]
+        else:
+            self._cal_impl()
+            return self.cached[name]
+
+    cpdef SeriesValues value_by_names(self, list names):
+        cdef SeriesValues raw_values = self._inner.value_by_names(names)
+        if self._group:
+            raw_values = raw_values.top_n(self._n, self._group.value_by_names(names))
+        else:
+            raw_values = raw_values.top_n(self._n)
+        return raw_values
+
+    def __str__(self):
+        if self._group:
+            return "\mathrm{{CSTopN}}({0}, {1}, groups={2})".format(str(self._inner), self._n, str(self._group))
+        else:
+            return "\mathrm{{CSTopN}}({0}, {1})".format(str(self._inner), self._n)
+
+
+cdef class CSTopNPercentileSecurityValueHolder(CrossSectionValueHolder):
+
+    cdef double _n;
+
+    def __init__(self, innerValue, n, groups=None):
+        super(CSTopNPercentileSecurityValueHolder, self).__init__(innerValue, groups)
+        self._n = n
+
+    cdef _cal_impl(self):
+        cdef SeriesValues raw_values = self._inner.value
+
+        if self._group:
+            self.cached = raw_values.top_n_percentile(self._n, self._group.value)
+        else:
+            self.cached = raw_values.top_n_percentile(self._n)
+        self.updated = 1
+
+    @property
+    def value(self):
+        if self.updated:
+            return self.cached
+        else:
+            self._cal_impl()
+            return self.cached
+
+    cpdef double value_by_name(self, name):
+        if self.updated:
+            return self.cached[name]
+        else:
+            self._cal_impl()
+            return self.cached[name]
+
+    cpdef SeriesValues value_by_names(self, list names):
+        cdef SeriesValues raw_values = self._inner.value_by_names(names)
+        if self._group:
+            raw_values = raw_values.top_n_percentile(self._n, self._group.value_by_names(names))
+        else:
+            raw_values = raw_values.top_n_percentile(self._n)
+        return raw_values
+
+    def __str__(self):
+        if self._group:
+            return "\mathrm{{CSTopNPercentile}}({0}, {1}, groups={2})".format(str(self._inner), self._n, str(self._group))
+        else:
+            return "\mathrm{{CSTopNPercentile}}({0}, {1})".format(str(self._inner), self._n)
+
+
+cdef class CSBottomNSecurityValueHolder(CrossSectionValueHolder):
+
+    cdef int _n;
+
+    def __init__(self, innerValue, n, groups=None):
+        super(CSBottomNSecurityValueHolder, self).__init__(innerValue, groups)
+        self._n = n
+
+    cdef _cal_impl(self):
+        cdef SeriesValues raw_values = self._inner.value
+
+        if self._group:
+            self.cached = raw_values.bottom_n(self._n, self._group.value)
+        else:
+            self.cached = raw_values.bottom_n(self._n)
+        self.updated = 1
+
+    @property
+    def value(self):
+        if self.updated:
+            return self.cached
+        else:
+            self._cal_impl()
+            return self.cached
+
+    cpdef double value_by_name(self, name):
+        if self.updated:
+            return self.cached[name]
+        else:
+            self._cal_impl()
+            return self.cached[name]
+
+    cpdef SeriesValues value_by_names(self, list names):
+        cdef SeriesValues raw_values = self._inner.value_by_names(names)
+        if self._group:
+            raw_values = raw_values.bottom_n(self._n, self._group.value_by_names(names))
+        else:
+            raw_values = raw_values.bottom_n(self._n)
+        return raw_values
+
+    def __str__(self):
+        if self._group:
+            return "\mathrm{{CSBottomN}}({0}, {1}, groups={2})".format(str(self._inner), self._n, str(self._group))
+        else:
+            return "\mathrm{{CSBottomN}}({0}, {1})".format(str(self._inner), self._n)
+
+
+cdef class CSBottomNPercentileSecurityValueHolder(CrossSectionValueHolder):
+
+    cdef double _n;
+
+    def __init__(self, innerValue, n, groups=None):
+        super(CSBottomNPercentileSecurityValueHolder, self).__init__(innerValue, groups)
+        self._n = n
+
+    cdef _cal_impl(self):
+        cdef SeriesValues raw_values = self._inner.value
+
+        if self._group:
+            self.cached = raw_values.bottom_n_percentile(self._n, self._group.value)
+        else:
+            self.cached = raw_values.bottom_n_percentile(self._n)
+        self.updated = 1
+
+    @property
+    def value(self):
+        if self.updated:
+            return self.cached
+        else:
+            self._cal_impl()
+            return self.cached
+
+    cpdef double value_by_name(self, name):
+        if self.updated:
+            return self.cached[name]
+        else:
+            self._cal_impl()
+            return self.cached[name]
+
+    cpdef SeriesValues value_by_names(self, list names):
+        cdef SeriesValues raw_values = self._inner.value_by_names(names)
+        if self._group:
+            raw_values = raw_values.bottom_n_percentile(self._n, self._group.value_by_names(names))
+        else:
+            raw_values = raw_values.bottom_n_percentile(self._n)
+        return raw_values
+
+    def __str__(self):
+        if self._group:
+            return "\mathrm{{CSBottomNPercentile}}({0}, {1}, groups={2})".format(str(self._inner), self._n, str(self._group))
+        else:
+            return "\mathrm{{CSBottomNPercentile}}({0}, {1})".format(str(self._inner), self._n)
+
+
 cdef class CSRankedSecurityValueHolder(CrossSectionValueHolder):
 
     def __init__(self, innerValue, groups=None):

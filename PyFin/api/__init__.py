@@ -59,6 +59,10 @@ from PyFin.api.Analysis import SHIFT
 from PyFin.api.Analysis import IIF
 
 from PyFin.api.Analysis import CSRank
+from PyFin.api.Analysis import CSTopN
+from PyFin.api.Analysis import CSBottomN
+from PyFin.api.Analysis import CSTopNQuantile
+from PyFin.api.Analysis import CSBottomNQuantile
 from PyFin.api.Analysis import CSMean
 from PyFin.api.Analysis import CSMeanAdjusted
 from PyFin.api.Analysis import CSQuantiles
@@ -120,6 +124,10 @@ __all__ = ["datesList",
            "SHIFT",
            "IIF",
            "CSRank",
+           "CSTopN",
+           "CSBottomN",
+           "CSTopNQuantile",
+           "CSBottomNQuantile",
            "CSMean",
            "CSMeanAdjusted",
            "CSQuantiles",

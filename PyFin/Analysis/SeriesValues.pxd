@@ -16,6 +16,10 @@ cdef class SeriesValues(object):
     cpdef SeriesValues mask(self, flags)
     cpdef list index(self)
     cpdef SeriesValues rank(self, SeriesValues groups=*)
+    cpdef SeriesValues top_n(self, int n, SeriesValues groups=*)
+    cpdef SeriesValues bottom_n(self, int n, SeriesValues groups=*)
+    cpdef SeriesValues top_n_percentile(self, double n, SeriesValues groups=*)
+    cpdef SeriesValues bottom_n_percentile(self, double n, SeriesValues groups=*)
     cpdef SeriesValues zscore(self, SeriesValues groups=*)
     cpdef SeriesValues unit(self)
 

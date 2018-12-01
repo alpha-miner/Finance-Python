@@ -235,6 +235,22 @@ cdef class SeriesValues(object):
             data[np.isnan(self.values)] = NAN
         return SeriesValues(data, self.name_mapping)
 
+    cpdef SeriesValues top_n(self, int n, SeriesValues groups=None):
+        cdef SeriesValues reversed_rank = (-self).rank(groups)
+        return reversed_rank <= n
+
+    cpdef SeriesValues bottom_n(self, int n, SeriesValues groups=None):
+        cdef SeriesValues rank = self.rank(groups)
+        return rank <= n
+
+    cpdef SeriesValues top_n_percentile(self, double n, SeriesValues groups=None):
+        cdef SeriesValues reversed_percentile = (-self).percentile(groups)
+        return reversed_percentile <= n
+
+    cpdef SeriesValues bottom_n_percentile(self, double n, SeriesValues groups=None):
+        cdef SeriesValues percentile = self.percentile(groups)
+        return percentile <= n
+
     @cython.boundscheck(False)
     @cython.wraparound(False)
     @cython.cdivision(True)
@@ -310,12 +326,12 @@ cdef class SeriesValues(object):
             for diff_loc in index_diff:
                 curr_idx = order[start:diff_loc + 1]
                 curr_values = data[curr_idx]
-                size = len(curr_values) + 1.
+                size = len(curr_values)
                 data[curr_idx] = rankdata(curr_values).astype(float) / size
                 start = diff_loc + 1
             data[np.isnan(self.values)] = NAN
         else:
-            size = len(self.values) + 1.
+            size = len(self.values)
             data = rankdata(self.values).astype(float) / size
             data[np.isnan(self.values)] = NAN
         return SeriesValues(data, self.name_mapping)

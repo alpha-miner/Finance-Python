@@ -11,6 +11,10 @@ import pandas as pd
 from PyFin.Enums import Factors
 from PyFin.Analysis.SecurityValueHolders import SecurityLatestValueHolder
 from PyFin.Analysis.CrossSectionValueHolders import CSRankedSecurityValueHolder
+from PyFin.Analysis.CrossSectionValueHolders import CSTopNSecurityValueHolder
+from PyFin.Analysis.CrossSectionValueHolders import CSBottomNSecurityValueHolder
+from PyFin.Analysis.CrossSectionValueHolders import CSTopNPercentileSecurityValueHolder
+from PyFin.Analysis.CrossSectionValueHolders import CSBottomNPercentileSecurityValueHolder
 from PyFin.Analysis.CrossSectionValueHolders import CSAverageSecurityValueHolder
 from PyFin.Analysis.CrossSectionValueHolders import CSAverageAdjustedSecurityValueHolder
 from PyFin.Analysis.CrossSectionValueHolders import CSZScoreSecurityValueHolder
@@ -57,6 +61,44 @@ class TestCrossSectionValueHolder(unittest.TestCase):
             rankHolder.push(data)
             benchmarkValues = benchmark.value
             np.testing.assert_array_almost_equal(benchmarkValues.rank().values, rankHolder.value.values)
+
+    def testCSTopNSecurityValueHolder(self):
+        benchmark = SecurityLatestValueHolder(x='close')
+        n = 2
+        topnHolder = CSTopNSecurityValueHolder(benchmark, n)
+
+        for i in range(len(self.datas['aapl']['close'])):
+            data = {'aapl': {Factors.CLOSE: self.datas['aapl'][Factors.CLOSE][i],
+                             Factors.OPEN: self.datas['aapl'][Factors.OPEN][i]},
+                    'ibm': {Factors.CLOSE: self.datas['ibm'][Factors.CLOSE][i],
+                            Factors.OPEN: self.datas['ibm'][Factors.OPEN][i]},
+                    'goog': {Factors.CLOSE: self.datas['goog'][Factors.CLOSE][i],
+                            Factors.OPEN: self.datas['goog'][Factors.OPEN][i]},
+                    'baba': {Factors.CLOSE: self.datas['baba'][Factors.CLOSE][i],
+                             Factors.OPEN: self.datas['baba'][Factors.OPEN][i]}}
+            benchmark.push(data)
+            topnHolder.push(data)
+            benchmarkValues = benchmark.value
+            np.testing.assert_array_almost_equal((-benchmarkValues).rank().values <= n, topnHolder.value.values)
+
+    def testCSBottomNSecurityValueHolder(self):
+        benchmark = SecurityLatestValueHolder(x='close')
+        n = 2
+        topnHolder = CSBottomNSecurityValueHolder(benchmark, n)
+
+        for i in range(len(self.datas['aapl']['close'])):
+            data = {'aapl': {Factors.CLOSE: self.datas['aapl'][Factors.CLOSE][i],
+                             Factors.OPEN: self.datas['aapl'][Factors.OPEN][i]},
+                    'ibm': {Factors.CLOSE: self.datas['ibm'][Factors.CLOSE][i],
+                            Factors.OPEN: self.datas['ibm'][Factors.OPEN][i]},
+                    'goog': {Factors.CLOSE: self.datas['goog'][Factors.CLOSE][i],
+                            Factors.OPEN: self.datas['goog'][Factors.OPEN][i]},
+                    'baba': {Factors.CLOSE: self.datas['baba'][Factors.CLOSE][i],
+                             Factors.OPEN: self.datas['baba'][Factors.OPEN][i]}}
+            benchmark.push(data)
+            topnHolder.push(data)
+            benchmarkValues = benchmark.value
+            np.testing.assert_array_almost_equal(benchmarkValues.rank().values <= n, topnHolder.value.values)
 
     def testCSRankedSecurityValueHolderWithGroups(self):
         benchmark = SecurityLatestValueHolder(x='close')
@@ -145,7 +187,49 @@ class TestCrossSectionValueHolder(unittest.TestCase):
             benchmark.push(data)
             perHolder.push(data)
             benchmarkValues = benchmark.value
-            np.testing.assert_array_almost_equal(benchmarkValues.rank().values / (len(data) + 1.), perHolder.value.values)
+            np.testing.assert_array_almost_equal(benchmarkValues.rank().values / len(data), perHolder.value.values)
+
+    def testCSTopNPercentileSecurityValueHolder(self):
+        benchmark = SecurityLatestValueHolder(x='close')
+        n = 0.3
+        perHolder = CSTopNPercentileSecurityValueHolder(benchmark, n)
+
+        for i in range(len(self.datas['aapl']['close'])):
+            data = {'aapl': {Factors.CLOSE: self.datas['aapl'][Factors.CLOSE][i],
+                             Factors.OPEN: self.datas['aapl'][Factors.OPEN][i]},
+                    'ibm': {Factors.CLOSE: self.datas['ibm'][Factors.CLOSE][i],
+                            Factors.OPEN: self.datas['ibm'][Factors.OPEN][i]},
+                    'goog': {Factors.CLOSE: self.datas['goog'][Factors.CLOSE][i],
+                             Factors.OPEN: self.datas['goog'][Factors.OPEN][i]},
+                    'baba': {Factors.CLOSE: self.datas['baba'][Factors.CLOSE][i],
+                            Factors.OPEN: self.datas['baba'][Factors.OPEN][i]}
+                    }
+            benchmark.push(data)
+            perHolder.push(data)
+            benchmarkValues = benchmark.value
+            np.testing.assert_array_almost_equal(((-benchmarkValues).rank().values / len(data)) <= n,
+                                                 perHolder.value.values)
+
+    def testCSBottomNPercentileSecurityValueHolder(self):
+        benchmark = SecurityLatestValueHolder(x='close')
+        n = 0.3
+        perHolder = CSBottomNPercentileSecurityValueHolder(benchmark, n)
+
+        for i in range(len(self.datas['aapl']['close'])):
+            data = {'aapl': {Factors.CLOSE: self.datas['aapl'][Factors.CLOSE][i],
+                             Factors.OPEN: self.datas['aapl'][Factors.OPEN][i]},
+                    'ibm': {Factors.CLOSE: self.datas['ibm'][Factors.CLOSE][i],
+                            Factors.OPEN: self.datas['ibm'][Factors.OPEN][i]},
+                    'goog': {Factors.CLOSE: self.datas['goog'][Factors.CLOSE][i],
+                             Factors.OPEN: self.datas['goog'][Factors.OPEN][i]},
+                    'baba': {Factors.CLOSE: self.datas['baba'][Factors.CLOSE][i],
+                            Factors.OPEN: self.datas['baba'][Factors.OPEN][i]}
+                    }
+            benchmark.push(data)
+            perHolder.push(data)
+            benchmarkValues = benchmark.value
+            np.testing.assert_array_almost_equal((benchmarkValues.rank().values / len(data)) <= n,
+                                                 perHolder.value.values)
 
     def testCSPercentileSecurityValueHolderWithGroups(self):
         benchmark = SecurityLatestValueHolder(x='close')
@@ -170,7 +254,7 @@ class TestCrossSectionValueHolder(unittest.TestCase):
             benchmarkValues = benchmark.value
             groups = {'aapl': 1., 'ibm': 1., 'goog': 2., 'baba': 2.}
             expected_rank = pd.Series(benchmarkValues.to_dict()).groupby(groups) \
-                .transform(lambda x: x.rank().values / (len(x) + 1))
+                .transform(lambda x: x.rank().values / len(x))
             np.testing.assert_array_almost_equal(expected_rank, perHolder.value.values)
 
     def testCSAverageAdjustedSecurityValueHolder(self):

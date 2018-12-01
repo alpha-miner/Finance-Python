@@ -44,6 +44,10 @@ from PyFin.Analysis.SecurityValueHolders import SecurityLatestValueHolder
 from PyFin.Analysis.SecurityValueHolders import SecurityIIFValueHolder
 
 from PyFin.Analysis.CrossSectionValueHolders import CSRankedSecurityValueHolder
+from PyFin.Analysis.CrossSectionValueHolders import CSTopNSecurityValueHolder
+from PyFin.Analysis.CrossSectionValueHolders import CSBottomNSecurityValueHolder
+from PyFin.Analysis.CrossSectionValueHolders import CSTopNPercentileSecurityValueHolder
+from PyFin.Analysis.CrossSectionValueHolders import CSBottomNPercentileSecurityValueHolder
 from PyFin.Analysis.CrossSectionValueHolders import CSAverageSecurityValueHolder
 from PyFin.Analysis.CrossSectionValueHolders import CSAverageAdjustedSecurityValueHolder
 from PyFin.Analysis.CrossSectionValueHolders import CSZScoreSecurityValueHolder
@@ -53,6 +57,22 @@ from PyFin.Analysis.CrossSectionValueHolders import CSResidueSecurityValueHolder
 
 def CSRank(x, groups=None):
     return CSRankedSecurityValueHolder(x, groups)
+
+
+def CSTopN(x, n, groups=None):
+    return CSTopNSecurityValueHolder(x, n, groups)
+
+
+def CSTopNQuantile(x, n, groups=None):
+    return CSTopNPercentileSecurityValueHolder(x, n, groups)
+
+
+def CSBottomN(x, n, groups=None):
+    return CSBottomNSecurityValueHolder(x, n, groups)
+
+
+def CSBottomNQuantile(x, n, groups=None):
+    return CSBottomNPercentileSecurityValueHolder(x, n, groups)
 
 
 def CSMean(x, groups=None):

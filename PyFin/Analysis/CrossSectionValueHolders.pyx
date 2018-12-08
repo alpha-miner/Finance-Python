@@ -18,8 +18,8 @@ from PyFin.Math.MathConstants cimport NAN
 
 cdef class CrossSectionValueHolder(SecurityValueHolder):
 
-    cdef SecurityValueHolder _inner
-    cdef SecurityValueHolder _group
+    cdef public SecurityValueHolder _inner
+    cdef public SecurityValueHolder _group
 
     def __init__(self, innerValue, groups=None):
         super(CrossSectionValueHolder, self).__init__()

@@ -231,7 +231,7 @@ def IIF(flag, left, right):
     return SecurityIIFValueHolder(flag, left, right)
 
 
-HIGH = functools.partial(LAST, 'highesrPrice')
+HIGH = functools.partial(LAST, 'highestPrice')
 LOW = functools.partial(LAST, 'lowestPrice')
 OPEN = functools.partial(LAST, 'openPrice')
 CLOSE = functools.partial(LAST, 'closePrice')

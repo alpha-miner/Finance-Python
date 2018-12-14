@@ -433,7 +433,22 @@ cdef set sse_holDays = {Date(2005, 1, 3),
                         Date(2018, 10, 2),
                         Date(2018, 10, 3),
                         Date(2018, 10, 4),
-                        Date(2018, 10, 5)}
+                        Date(2018, 10, 5),
+                        Date(2019, 1, 1),
+                        Date(2019, 2, 4),
+                        Date(2019, 2, 5),
+                        Date(2019, 2, 6),
+                        Date(2019, 2, 7),
+                        Date(2019, 2, 8),
+                        Date(2019, 4, 5),
+                        Date(2019, 5, 1),
+                        Date(2019, 6, 7),
+                        Date(2019, 9, 13),
+                        Date(2019, 9, 30),
+                        Date(2019, 10, 1),
+                        Date(2019, 10, 2),
+                        Date(2019, 10, 3),
+                        Date(2019, 10, 4)}
 
 cdef class ChinaSseImpl(CalendarImpl):
     def __init__(self):
@@ -557,6 +572,12 @@ cdef set ib_working_weekends = {
     Date.westernStyle(28, Months.April, 2018),
     Date.westernStyle(29, Months.September, 2018),
     Date.westernStyle(30, Months.September, 2018),
+    Date.westernStyle(29, Months.December, 2018),
+    # 2019
+    Date.westernStyle(2, Months.February, 2019),
+    Date.westernStyle(3, Months.February, 2019),
+    Date.westernStyle(29, Months.September, 2019),
+    Date.westernStyle(12, Months.October, 2019),
 }
 
 cdef ChinaSseImpl _sseImpl = ChinaSseImpl()

@@ -104,14 +104,22 @@ class TestCalendar(unittest.TestCase):
                        Date(2018, 4, 29), Date(2018, 4, 30), Date(2018, 5, 1),
                        Date(2018, 6, 16), Date(2018, 6, 17), Date(2018, 6, 18),
                        Date(2018, 9, 22), Date(2018, 9, 23), Date(2018, 9, 24),
-                       Date(2018, 10, 1), Date(2018, 10, 2), Date(2018, 10, 3), Date(2018, 10, 4), Date(2018, 10, 5), Date(2018, 10, 6), Date(2018, 10 ,7)]
+                       Date(2018, 10, 1), Date(2018, 10, 2), Date(2018, 10, 3), Date(2018, 10, 4), Date(2018, 10, 5), Date(2018, 10, 6), Date(2018, 10, 7),
+        # China Shanghai Securities Exchange holiday list in the year 2019
+                       Date(2019, 1, 1),
+                       Date(2019, 2, 4), Date(2019, 2, 5), Date(2019, 2, 6), Date(2019, 2, 7), Date(2019, 2, 8),
+                       Date(2019, 4, 5),
+                       Date(2019, 5, 1),
+                       Date(2019, 6, 7),
+                       Date(2019, 9, 13),
+                       Date(2019, 9, 30), Date(2019, 10, 1), Date(2019, 10, 2), Date(2019, 10, 3), Date(2019, 10, 4)]
 
         cal = Calendar('China.SSE')
 
         for day in expectedHol:
             self.assertEqual(cal.isHoliday(day), True, "{0} is expected to be a holiday in {1}".format(day, cal))
             self.assertEqual(cal.isBizDay(day), False,
-                             "{0} is expected not to be a working day in {1} ".format(day, cal))
+                             "{0} is not expected to be a working day in {1} ".format(day, cal))
 
     def testChinaIB(self):
 
@@ -146,7 +154,12 @@ class TestCalendar(unittest.TestCase):
                                   Date(2018, 4, 8),
                                   Date(2018, 4, 28),
                                   Date(2018, 9, 29),
-                                  Date(2018, 9, 30)]
+                                  Date(2018, 9, 30),
+        # China Inter Bank working weekend list in the year 2018
+                                  Date(2019, 2, 2),
+                                  Date(2019, 2, 3),
+                                  Date(2019, 9, 29),
+                                  Date(2019, 10, 12)]
 
         cal = Calendar('China.IB')
 

@@ -105,6 +105,7 @@ class TestCalendar(unittest.TestCase):
                        Date(2018, 6, 16), Date(2018, 6, 17), Date(2018, 6, 18),
                        Date(2018, 9, 22), Date(2018, 9, 23), Date(2018, 9, 24),
                        Date(2018, 10, 1), Date(2018, 10, 2), Date(2018, 10, 3), Date(2018, 10, 4), Date(2018, 10, 5), Date(2018, 10, 6), Date(2018, 10, 7),
+                       Date(2018, 12, 31),
         # China Shanghai Securities Exchange holiday list in the year 2019
                        Date(2019, 1, 1),
                        Date(2019, 2, 4), Date(2019, 2, 5), Date(2019, 2, 6), Date(2019, 2, 7), Date(2019, 2, 8),

@@ -39,6 +39,7 @@ from PyFin.Math.Accumulators.StatelessAccumulators import Product
 
 from PyFin.Math.Accumulators.StatefulAccumulators import Shift
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingAverage
+from PyFin.Math.Accumulators.StatefulAccumulators import MovingDecay
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingPositiveAverage
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingNegativeAverage
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingPositiveDifferenceAverage
@@ -100,6 +101,7 @@ __all__ = ["Exp",
            "IIF",
            "Identity",
            "MovingAverage",
+           "MovingDecay",
            "MovingPositiveAverage",
            "MovingNegativeAverage",
            "MovingPositiveDifferenceAverage",

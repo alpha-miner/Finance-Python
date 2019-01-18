@@ -24,6 +24,7 @@ from PyFin.Math.Accumulators.StatelessAccumulators cimport XAverage
 from PyFin.Math.Accumulators.IAccumulators cimport Pow
 from PyFin.Utilities.Asserts cimport pyFinAssert
 from PyFin.Utilities.Asserts cimport isClose
+from PyFin.Math.udfs cimport consecutive_int_sum
 from PyFin.Math.Accumulators.impl cimport Deque
 from PyFin.Math.MathConstants cimport NAN
 
@@ -273,6 +274,44 @@ cdef class MovingAverage(SingleValuedValueHolder):
         cdef size_t size = self.size()
         if size:
             return self._runningSum / size
+        else:
+            return NAN
+
+    def __str__(self):
+        return "\\mathrm{{MA}}({0}, {1})".format(self._window, str(self._x))
+
+
+cdef class MovingDecay(SingleValuedValueHolder):
+
+    def __init__(self, window, x):
+        super(MovingDecay, self).__init__(window, x)
+        self._runningSum = 0.0
+        self._runningWeightedSum = 0.0
+        self._newestValue = 0.
+
+    cpdef push(self, dict data):
+        cdef double popout
+        cdef double k = self._window
+
+        self._x.push(data)
+        cdef double value = self._x.result()
+
+        if isnan(value):
+            return NAN
+
+        popout = self._deque.dump(value, 0.)
+        self._runningWeightedSum = self._runningWeightedSum - self._runningSum + k * value
+        self._runningSum += value - popout
+        self._newestValue = value
+        self._isFull = self._isFull or self._deque.isFull()
+
+    @cython.cdivision(True)
+    cpdef double result(self):
+        cdef double k = self._window
+        cdef size_t s = self.size()
+        cdef double c = consecutive_int_sum(k - s + 1, k)
+        if s:
+            return self._runningWeightedSum / c
         else:
             return NAN
 

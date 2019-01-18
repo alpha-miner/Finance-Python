@@ -24,6 +24,7 @@ from PyFin.Math.Accumulators import MovingQuantile
 from PyFin.Math.Accumulators import MovingAllTrue
 from PyFin.Math.Accumulators import MovingAnyTrue
 from PyFin.Math.Accumulators import MovingAverage
+from PyFin.Math.Accumulators import MovingDecay
 from PyFin.Math.Accumulators import MovingPositiveAverage
 from PyFin.Math.Accumulators import MovingNegativeAverage
 from PyFin.Math.Accumulators import MovingPositiveDifferenceAverage
@@ -156,6 +157,37 @@ class TestStatefulAccumulators(unittest.TestCase):
 
             if i >= window - 1:
                 expected = runningSum / window
+                calculated = mv.result()
+                self.assertAlmostEqual(calculated, expected, 15, "at index {0:d}\n"
+                                                                 "Average expected:   {1:f}\n"
+                                                                 "Average calculated: {2:f}".format(i, expected,
+                                                                                                    calculated))
+
+    def testMovingDecay(self):
+        window = 80
+        total = 2500
+
+        mv = MovingDecay(window, 'z')
+
+        def calculate_decay(con, k):
+            s = k - len(con) + 1
+            c = (k + s) * (k - s + 1) / 2.
+            sum_value = 0.
+            for w in range(s, k+1):
+                i = w - s
+                sum_value += w * con[i]
+            return sum_value / c
+
+        con = []
+        for i in range(total):
+            value = float(i)
+            con.append(value)
+            mv.push(dict(z=value))
+            if i >= window:
+                con = con[1:]
+
+            if i >= 1:
+                expected = calculate_decay(con, window)
                 calculated = mv.result()
                 self.assertAlmostEqual(calculated, expected, 15, "at index {0:d}\n"
                                                                  "Average expected:   {1:f}\n"

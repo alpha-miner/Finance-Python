@@ -91,6 +91,15 @@ cdef class MovingAverage(SingleValuedValueHolder):
     cpdef double result(self)
 
 
+cdef class MovingDecay(SingleValuedValueHolder):
+    cdef public double _runningSum
+    cdef double _runningWeightedSum
+    cdef double _newestValue
+
+    cpdef push(self, dict data)
+    cpdef double result(self)
+
+
 cdef class MovingPositiveAverage(SingleValuedValueHolder):
 
     cdef public double _runningPositiveSum

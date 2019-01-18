@@ -15,4 +15,4 @@ cdef inline double sign(double x) nogil:
 
 
 cdef inline double consecutive_int_sum(double s, double e) nogil:
-    return (e + s) * (e - s + 1) / 2.
+    return (e + s) * (e - s + 1.) / 2.

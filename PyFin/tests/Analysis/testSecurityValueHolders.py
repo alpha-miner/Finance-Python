@@ -18,6 +18,7 @@ from PyFin.Analysis.SecurityValueHolders import FilteredSecurityValueHolder
 from PyFin.Analysis.SecurityValueHolders import SecurityLatestValueHolder
 from PyFin.Analysis.SecurityValueHolders import SecurityIIFValueHolder
 from PyFin.Analysis.SecurityValueHolders import SecurityShiftedValueHolder
+from PyFin.Analysis.SecurityValueHolders import SecurityDeltaValueHolder
 from PyFin.Analysis.SecurityValueHolders import SecurityConstArrayValueHolder
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingAverage
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingMax
@@ -787,8 +788,8 @@ class TestSecurityValueHolders(unittest.TestCase):
 
         shifted1.push(data2)
         expected = SeriesValues({'aapl': 1.0,
-                                   'ibm': 2.0,
-                                   'goog': 3.0})
+                                 'ibm': 2.0,
+                                 'goog': 3.0})
         calculated = shifted1.value
         for name in expected.index():
             self.assertAlmostEqual(expected[name], calculated[name])
@@ -799,9 +800,52 @@ class TestSecurityValueHolders(unittest.TestCase):
 
         shifted1.push(data3)
         expected = SeriesValues({'aapl': 1.5,
-                                   'ibm': 2.5,
-                                   'goog': 3.5})
+                                 'ibm': 2.5,
+                                 'goog': 3.5})
         calculated = shifted1.value
+        for name in expected.index():
+            self.assertAlmostEqual(expected[name], calculated[name])
+
+    def testDeltaSecurityValueHolder(self):
+        mm = SecurityMovingAverage(2, 'close')
+        delta1 = SecurityDeltaValueHolder(mm, 2)
+
+        data1 = {'aapl': {'close': 1.0},
+                 'ibm': {'close': 2.0},
+                 'goog': {'close': 3.0}}
+        delta1.push(data1)
+        calculated = delta1.value
+        for name in calculated.index():
+            self.assertTrue(np.isnan(calculated[name]))
+
+        data2 = {'aapl': {'close': 2.0},
+                 'ibm': {'close': 3.0},
+                 'goog': {'close': 4.0}}
+
+        delta1.push(data2)
+
+        data3 = {'aapl': {'close': 3.0},
+                 'ibm': {'close': 4.0},
+                 'goog': {'close': 5.0}}
+
+        delta1.push(data3)
+
+        expected = SeriesValues({'aapl': 1.5,
+                                 'ibm': 1.5,
+                                 'goog': 1.5})
+        calculated = delta1.value
+        for name in expected.index():
+            self.assertAlmostEqual(expected[name], calculated[name])
+
+        data4 = ({'aapl': {'close': 4.0},
+                  'ibm': {'close': 5.0},
+                  'goog': {'close': 6.0}})
+
+        delta1.push(data4)
+        expected = SeriesValues({'aapl': 2.0,
+                                 'ibm': 2.0,
+                                 'goog': 2.0})
+        calculated = delta1.value
         for name in expected.index():
             self.assertAlmostEqual(expected[name], calculated[name])
 

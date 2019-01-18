@@ -41,6 +41,7 @@ from PyFin.Analysis.TechnicalAnalysis import SecurityAsinValueHolder
 from PyFin.Analysis.TechnicalAnalysis import SecurityAsinhValueHolder
 from PyFin.Analysis.TechnicalAnalysis import SecurityNormInvValueHolder
 from PyFin.Analysis.SecurityValueHolders import SecurityShiftedValueHolder
+from PyFin.Analysis.SecurityValueHolders import SecurityDeltaValueHolder
 from PyFin.Analysis.SecurityValueHolders import SecurityLatestValueHolder
 from PyFin.Analysis.SecurityValueHolders import SecurityIIFValueHolder
 
@@ -230,6 +231,10 @@ def NORMINV(x):
 
 def SHIFT(x, n):
     return SecurityShiftedValueHolder(x, n)
+
+
+def DELTA(X, n):
+    return SecurityDeltaValueHolder(x, n)
 
 
 def IIF(flag, left, right):

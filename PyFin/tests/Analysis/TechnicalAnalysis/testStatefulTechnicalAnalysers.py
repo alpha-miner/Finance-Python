@@ -15,6 +15,7 @@ import os
 from collections import deque
 from PyFin.Analysis.SecurityValueHolders import SecurityLatestValueHolder
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingAverage
+from PyFin.Analysis.TechnicalAnalysis import SecurityMovingDecay
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingVariance
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingStandardDeviation
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingMax
@@ -117,6 +118,38 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
             value = ma1.value
             for name in value.index():
                 expected = np.mean(self.dataSet[name]['close'][start:(i + 1)])
+                calculated = value[name]
+                self.assertAlmostEqual(expected, calculated, 12, 'at index {0}\n'
+                                                                 'expected:   {1:.12f}\n'
+                                                                 'calculated: {2:.12f}'.format(i, expected, calculated))
+
+    def testSecurityMovingDecay(self):
+        window = 10
+        ma1 = SecurityMovingDecay(window, ['close'])
+
+        def calculate_decay(con, k):
+            s = k - len(con) + 1
+            c = (k + s) * (k - s + 1) / 2.
+            sum_value = 0.
+            for w in range(s, k+1):
+                i = w - s
+                sum_value += w * con[i]
+            return sum_value / c
+
+        for i in range(len(self.aapl['close'])):
+            data = dict(aapl=dict(close=self.aapl['close'][i],
+                                  open=self.aapl['open'][i]),
+                        ibm=dict(close=self.ibm['close'][i],
+                                 open=self.ibm['open'][i]))
+            ma1.push(data)
+            if i < window:
+                start = 0
+            else:
+                start = i + 1 - window
+
+            value = ma1.value
+            for name in value.index():
+                expected = calculate_decay(self.dataSet[name]['close'][start:(i + 1)], window)
                 calculated = value[name]
                 self.assertAlmostEqual(expected, calculated, 12, 'at index {0}\n'
                                                                  'expected:   {1:.12f}\n'

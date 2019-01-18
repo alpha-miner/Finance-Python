@@ -14,6 +14,7 @@ from PyFin.Analysis.SeriesValues cimport SeriesValues
 from PyFin.Analysis.SecurityValueHolders cimport SecurityValueHolder
 from PyFin.Analysis.SecurityValueHolders cimport build_holder
 from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingAverage
+from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingDecay
 from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingMax
 from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingMin
 from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingRank
@@ -58,6 +59,17 @@ cdef class SecurityMovingAverage(SecuritySingleValueHolder):
     def __str__(self):
         if self._compHolder:
             return "\\mathrm{{MA}}({0}, {1})".format(self._window - self._compHolder.window, str(self._compHolder))
+        else:
+            return str(self._holderTemplate)
+
+
+cdef class SecurityMovingDecay(SecuritySingleValueHolder):
+    def __init__(self, window, x):
+        super(SecurityMovingDecay, self).__init__(window, MovingDecay, x)
+
+    def __str__(self):
+        if self._compHolder:
+            return "\\mathrm{{MADecay}}({0}, {1})".format(self._window - self._compHolder.window, str(self._compHolder))
         else:
             return str(self._holderTemplate)
 

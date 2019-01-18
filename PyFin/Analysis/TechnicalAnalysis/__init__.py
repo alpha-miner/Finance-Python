@@ -25,6 +25,7 @@ from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import Securit
 from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import SecurityMinimumValueHolder
 
 from PyFin.Analysis.TechnicalAnalysis.StatefulTechnicalAnalysers import SecurityMovingAverage
+from PyFin.Analysis.TechnicalAnalysis.StatefulTechnicalAnalysers import SecurityMovingDecay
 from PyFin.Analysis.TechnicalAnalysis.StatefulTechnicalAnalysers import SecurityMovingMax
 from PyFin.Analysis.TechnicalAnalysis.StatefulTechnicalAnalysers import SecurityMovingMin
 from PyFin.Analysis.TechnicalAnalysis.StatefulTechnicalAnalysers import SecurityMovingRank
@@ -62,6 +63,7 @@ __all__ = ['SecuritySignValueHolder',
            'SecurityMaximumValueHolder',
            'SecurityMinimumValueHolder',
            'SecurityMovingAverage',
+           'SecurityMovingDecay',
            'SecurityMovingMax',
            'SecurityMovingMin',
            'SecurityMovingRank',

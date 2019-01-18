@@ -316,7 +316,7 @@ cdef class MovingDecay(SingleValuedValueHolder):
             return NAN
 
     def __str__(self):
-        return "\\mathrm{{MA}}({0}, {1})".format(self._window, str(self._x))
+        return "\\mathrm{{MADecay}}({0}, {1})".format(self._window, str(self._x))
 
 
 cdef class MovingPositiveAverage(SingleValuedValueHolder):

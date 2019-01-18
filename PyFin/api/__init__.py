@@ -24,6 +24,7 @@ from PyFin.api.Analysis import EMA
 from PyFin.api.Analysis import MACD
 from PyFin.api.Analysis import RSI
 from PyFin.api.Analysis import MA
+from PyFin.api.Analysis import MADecay
 from PyFin.api.Analysis import MMAX
 from PyFin.api.Analysis import MMIN
 from PyFin.api.Analysis import MRANK
@@ -90,6 +91,7 @@ __all__ = ["datesList",
            "MACD",
            "RSI",
            "MA",
+           "MADecay",
            "MMAX",
            "MMIN",
            "MRANK",

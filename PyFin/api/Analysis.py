@@ -9,6 +9,7 @@ Created on 2015-9-23
 import functools
 
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingAverage
+from PyFin.Analysis.TechnicalAnalysis import SecurityMovingDecay
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingMax
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingMin
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingRank
@@ -113,6 +114,10 @@ def RSI(window, x='x'):
 
 def MA(window, x='x'):
     return SecurityMovingAverage(window, x)
+
+
+def MADecay(window, x='x'):
+    return SecurityMovingDecay(window, x)
 
 
 def MMAX(window, x='x'):

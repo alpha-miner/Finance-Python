@@ -14,8 +14,10 @@ cdef class Deque:
     cdef public size_t count
 
     cdef double dump(self, double value, double default=*)
+    cpdef void dumps(self, values)
     cdef inline size_t size(self)
     cdef inline bint isFull(self)
+    cpdef double sum(self)
     cdef void set_data(self, bytes data)
 
 

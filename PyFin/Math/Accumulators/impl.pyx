@@ -45,11 +45,24 @@ cdef class Deque:
             self.is_full = self.count == self.window
             return default
 
+    cpdef void dumps(self, values):
+        for v in values:
+            self.dump(v)
+
     cdef inline size_t size(self):
         return self.count
 
     cdef inline bint isFull(self):
         return self.is_full
+
+    @cython.wraparound(False)
+    @cython.boundscheck(False)
+    cpdef double sum(self):
+        cdef double x = self.con[0]
+        cdef int i
+        for i in range(1, self.count):
+            x += self.con[i]
+        return x
 
     @cython.cdivision(True)
     @cython.boundscheck(False)

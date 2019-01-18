@@ -33,3 +33,8 @@ class TestAccumulatorImpl(unittest.TestCase):
             self.assertEqual(benchmark_deque, pickled_deque)
 
         os.unlink(f.name)
+
+    def testDequeSum(self):
+        deque = Deque(5)
+        deque.dumps([1., 2., 3., 4., 5., 6.])
+        self.assertEqual(deque.sum(), 20.)

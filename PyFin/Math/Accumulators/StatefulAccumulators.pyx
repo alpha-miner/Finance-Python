@@ -72,6 +72,36 @@ cdef class Shift(StatefulValueHolder):
         return '\mathrm{{Shift}}({0}, {1})'.format(str(self._x), self._window - self._x.window)
 
 
+cdef class Delta(StatefulValueHolder):
+
+    def __init__(self, x, N=1):
+        super(Delta, self).__init__(N)
+        pyFinAssert(N >= 1, ValueError, "Delta window value should not be less than 1")
+        self._x = build_holder(x)
+        self._window = self._x.window + N
+        self._dependency = deepcopy(self._x.dependency)
+        self._popout = NAN
+        self._current = NAN
+
+    cpdef push(self, dict data):
+        self._x.push(data)
+        self._current = self._x.result()
+        self._popout = self._deque.dump(self._current)
+        self._isFull = self._isFull or self._deque.isFull()
+
+    cpdef double result(self):
+        if self._isFull:
+            return self._current - self._popout
+        else:
+            return NAN
+
+    cpdef int lag(self):
+        return self._window - self._x.window
+
+    def __str__(self):
+        return '\mathrm{{Delta}}({0}, {1})'.format(str(self._x), self._window - self._x.window)
+
+
 cdef class SingleValuedValueHolder(StatefulValueHolder):
     def __init__(self, window, x):
         super(SingleValuedValueHolder, self).__init__(window)

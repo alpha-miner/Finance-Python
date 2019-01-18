@@ -28,6 +28,17 @@ cdef class Shift(StatefulValueHolder):
     cpdef double result(self)
 
 
+cdef class Delta(StatefulValueHolder):
+
+    cdef public double _popout
+    cdef double _current
+    cdef public Accumulator _x
+
+    cpdef int lag(self)
+    cpdef push(self, dict data)
+    cpdef double result(self)
+
+
 cdef class SingleValuedValueHolder(StatefulValueHolder):
 
     cdef public Accumulator _x

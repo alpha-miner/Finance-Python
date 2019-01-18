@@ -16,6 +16,7 @@ import numpy as np
 from collections import deque
 from PyFin.Math.Accumulators import Latest
 from PyFin.Math.Accumulators import Shift
+from PyFin.Math.Accumulators import Delta
 from PyFin.Math.Accumulators import Exp
 from PyFin.Math.Accumulators import MovingMax
 from PyFin.Math.Accumulators import MovingMin
@@ -111,6 +112,29 @@ class TestStatefulAccumulators(unittest.TestCase):
         previous = ma.result()
         test.push(dict(close=10.0))
         self.assertAlmostEqual(previous, test.result())
+
+    def testDeltaValueHolder(self):
+        ma = MovingAverage(10, 'close')
+
+        with self.assertRaises(ValueError):
+            _ = Delta(ma, N=0)
+
+        test = Delta(ma, N=2)
+
+        test.push(dict(close=2.0))
+        ma.push(dict(close=2.0))
+        p_previous = ma.result()
+        test.push(dict(close=5.0))
+        ma.push(dict(close=5.0))
+        previous = ma.result()
+        test.push(dict(close=7.0))
+        ma.push(dict(close=7.0))
+
+        self.assertAlmostEqual(ma.result() - p_previous, test.result())
+
+        ma.push(dict(close=10.0))
+        test.push(dict(close=10.0))
+        self.assertAlmostEqual(ma.result() - previous, test.result())
 
     def testShiftValueHolderDeepcopy(self):
         ma = Latest('close')

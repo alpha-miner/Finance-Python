@@ -38,6 +38,7 @@ from PyFin.Math.Accumulators.StatelessAccumulators import Variance
 from PyFin.Math.Accumulators.StatelessAccumulators import Product
 
 from PyFin.Math.Accumulators.StatefulAccumulators import Shift
+from PyFin.Math.Accumulators.StatefulAccumulators import Delta
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingAverage
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingDecay
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingPositiveAverage
@@ -98,6 +99,7 @@ __all__ = ["Exp",
            "MACD",
            "Variance",
            "Shift",
+           "Delta",
            "IIF",
            "Identity",
            "MovingAverage",

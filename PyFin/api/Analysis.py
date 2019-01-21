@@ -241,6 +241,17 @@ def IIF(flag, left, right):
     return SecurityIIFValueHolder(flag, left, right)
 
 
+def INDUSTRY(name, level=1):
+    name = name.lower()
+    if name == 'sw':
+        if level in (1, 2, 3):
+            return LAST(name + str(level))
+        else:
+            raise ValueError('{0} is not recognized level for {1}'.format(level, name))
+    else:
+        raise ValueError('currently only `sw` industry is supported. {1} is not a recognized industry type')
+
+
 HIGH = functools.partial(LAST, 'highestPrice')
 LOW = functools.partial(LAST, 'lowestPrice')
 OPEN = functools.partial(LAST, 'openPrice')

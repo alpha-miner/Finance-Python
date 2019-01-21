@@ -58,6 +58,7 @@ from PyFin.api.Analysis import ASINH
 from PyFin.api.Analysis import NORMINV
 from PyFin.api.Analysis import SHIFT
 from PyFin.api.Analysis import IIF
+from PyFin.api.Analysis import INDUSTRY
 
 from PyFin.api.Analysis import CSRank
 from PyFin.api.Analysis import CSTopN
@@ -125,6 +126,7 @@ __all__ = ["datesList",
            "NORMINV",
            "SHIFT",
            "IIF",
+           "INDUSTRY",
            "CSRank",
            "CSTopN",
            "CSBottomN",

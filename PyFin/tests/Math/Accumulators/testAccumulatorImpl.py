@@ -51,7 +51,7 @@ class TestAccumulatorImpl(unittest.TestCase):
             deque2.dumps([v])
 
             max_val = max(deque1)
-            expected_idx = deque1.index(max_val)
+            expected_idx = np.where(np.array(deque1) == max_val)[0][0]
             caclulated_idx = deque2.idx(max_val)
             self.assertEqual(expected_idx, caclulated_idx)
 

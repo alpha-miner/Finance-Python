@@ -16,7 +16,9 @@ from PyFin.Analysis.SecurityValueHolders cimport build_holder
 from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingAverage
 from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingDecay
 from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingMax
+from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingArgMax
 from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingMin
+from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingArgMin
 from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingRank
 from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingQuantile
 from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingAllTrue
@@ -85,6 +87,17 @@ cdef class SecurityMovingMax(SecuritySingleValueHolder):
             return str(self._holderTemplate)
 
 
+cdef class SecurityMovingArgMax(SecuritySingleValueHolder):
+    def __init__(self, window, x):
+        super(SecurityMovingArgMax, self).__init__(window, MovingArgMax, x)
+
+    def __str__(self):
+        if self._compHolder:
+            return "\\mathrm{{MArgMax}}({0}, {1})".format(self._window - self._compHolder.window, str(self._compHolder))
+        else:
+            return str(self._holderTemplate)
+
+
 cdef class SecurityMovingMin(SecuritySingleValueHolder):
     def __init__(self, window, x):
         super(SecurityMovingMin, self).__init__(window, MovingMin, x)
@@ -92,6 +105,17 @@ cdef class SecurityMovingMin(SecuritySingleValueHolder):
     def __str__(self):
         if self._compHolder:
             return "\\mathrm{{MMin}}({0}, {1})".format(self._window - self._compHolder.window, str(self._compHolder))
+        else:
+            return str(self._holderTemplate)
+
+
+cdef class SecurityMovingArgMin(SecuritySingleValueHolder):
+    def __init__(self, window, x):
+        super(SecurityMovingArgMin, self).__init__(window, MovingArgMin, x)
+
+    def __str__(self):
+        if self._compHolder:
+            return "\\mathrm{{MArgMin}}({0}, {1})".format(self._window - self._compHolder.window, str(self._compHolder))
         else:
             return str(self._holderTemplate)
 

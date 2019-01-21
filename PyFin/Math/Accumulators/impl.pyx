@@ -52,6 +52,22 @@ cdef class Deque:
     cdef inline size_t size(self):
         return self.count
 
+    @cython.cdivision(True)
+    @cython.boundscheck(False)
+    @cython.wraparound(False)
+    cpdef size_t idx(self, double value):
+        cdef size_t i
+        for i in range(self.count):
+            if value == self.con[i]:
+                break
+        else:
+            i = -1
+        if i < 0:
+            return -1
+        else:
+            i = (i - self.start + self.window) % self.window
+        return i
+
     cdef inline bint isFull(self):
         return self.is_full
 

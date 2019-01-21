@@ -152,6 +152,25 @@ cdef class MovingMax(SortedValueHolder):
         return "\\mathrm{{MMax}}({0}, {1})".format(self._window, str(self._x))
 
 
+cdef class MovingArgMax(SortedValueHolder):
+
+    def __init__(self, window, x):
+        super(MovingArgMax, self).__init__(window, x)
+
+    cpdef double result(self):
+        cdef double currMax
+        cdef double idx
+        if self._sortedArray:
+            currMax = self._sortedArray[-1]
+            idx = self._deque.idx(currMax)
+            return self.size() - idx - 1
+        else:
+            return NAN
+
+    def __str__(self):
+        return "\\mathrm{{MArgMax}}({0}, {1})".format(self._window, str(self._x))
+
+
 cdef class MovingMin(SortedValueHolder):
     def __init__(self, window, x):
         super(MovingMin, self).__init__(window, x)
@@ -164,6 +183,25 @@ cdef class MovingMin(SortedValueHolder):
 
     def __str__(self):
         return "\\mathrm{{MMin}}({0}, {1})".format(self._window, str(self._x))
+
+
+cdef class MovingArgMin(SortedValueHolder):
+
+    def __init__(self, window, x):
+        super(MovingArgMin, self).__init__(window, x)
+
+    cpdef double result(self):
+        cdef double currMax
+        cdef double idx
+        if self._sortedArray:
+            currMin = self._sortedArray[0]
+            idx = self._deque.idx(currMin)
+            return self.size() - idx - 1
+        else:
+            return NAN
+
+    def __str__(self):
+        return "\\mathrm{{MArgMin}}({0}, {1})".format(self._window, str(self._x))
 
 
 cdef class MovingRank(SortedValueHolder):

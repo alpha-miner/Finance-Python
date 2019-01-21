@@ -55,7 +55,17 @@ cdef class MovingMax(SortedValueHolder):
     cpdef double result(self)
 
 
+cdef class MovingArgMax(SortedValueHolder):
+
+    cpdef double result(self)
+
+
 cdef class MovingMin(SortedValueHolder):
+
+    cpdef double result(self)
+
+
+cdef class MovingArgMin(SortedValueHolder):
 
     cpdef double result(self)
 

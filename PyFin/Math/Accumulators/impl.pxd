@@ -17,6 +17,7 @@ cdef class Deque:
     cpdef void dumps(self, values)
     cdef inline size_t size(self)
     cdef inline bint isFull(self)
+    cpdef size_t idx(self, double value)
     cpdef double sum(self)
     cdef void set_data(self, bytes data)
 

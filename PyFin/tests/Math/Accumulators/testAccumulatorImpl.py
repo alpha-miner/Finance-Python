@@ -10,6 +10,8 @@ import copy
 import tempfile
 import pickle
 import os
+from collections import deque
+import numpy as np
 from PyFin.Math.Accumulators.impl import Deque
 
 
@@ -38,3 +40,20 @@ class TestAccumulatorImpl(unittest.TestCase):
         deque = Deque(5)
         deque.dumps([1., 2., 3., 4., 5., 6.])
         self.assertEqual(deque.sum(), 20.)
+
+    def testDequeIdx(self):
+        deque1 = deque(maxlen=10)
+        deque2 = Deque(10)
+
+        values = np.random.randn(1000)
+        for v in values:
+            deque1.append(v)
+            deque2.dumps([v])
+
+            max_val = max(deque1)
+            expected_idx = deque1.index(max_val)
+            caclulated_idx = deque2.idx(max_val)
+            self.assertEqual(expected_idx, caclulated_idx)
+
+
+

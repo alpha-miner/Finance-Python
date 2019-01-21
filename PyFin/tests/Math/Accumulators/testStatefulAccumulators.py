@@ -19,7 +19,9 @@ from PyFin.Math.Accumulators import Shift
 from PyFin.Math.Accumulators import Delta
 from PyFin.Math.Accumulators import Exp
 from PyFin.Math.Accumulators import MovingMax
+from PyFin.Math.Accumulators import MovingArgMax
 from PyFin.Math.Accumulators import MovingMin
+from PyFin.Math.Accumulators import MovingArgMin
 from PyFin.Math.Accumulators import MovingRank
 from PyFin.Math.Accumulators import MovingQuantile
 from PyFin.Math.Accumulators import MovingAllTrue
@@ -197,7 +199,7 @@ class TestStatefulAccumulators(unittest.TestCase):
             s = k - len(con) + 1
             c = (k + s) * (k - s + 1) / 2.
             sum_value = 0.
-            for w in range(s, k+1):
+            for w in range(s, k + 1):
                 i = w - s
                 sum_value += w * con[i]
             return sum_value / c
@@ -601,6 +603,42 @@ class TestStatefulAccumulators(unittest.TestCase):
             self.assertAlmostEqual(calculated, expected, 15, "at index {0:d}\n"
                                                              "Max expected:   {1:f}\n"
                                                              "Max calculated: {2:f}".format(i, expected, calculated))
+
+    def testMovingArgMax(self):
+        window = 120
+
+        mv = MovingArgMax(window, 'z')
+        total = np.random.randn(2500)
+        con = deque(maxlen=window)
+        for i, value in enumerate(total):
+            value = float(value)
+            con.append(value)
+            mv.push(dict(z=value))
+            runningMax = max(con)
+
+            expected = len(con) - con.index(runningMax) - 1.
+            calculated = mv.result()
+            self.assertAlmostEqual(calculated, expected, 15, "at index {0:d}\n"
+                                                             "Max expected at:   {1:f}\n"
+                                                             "Max calculated at: {2:f}".format(i, expected, calculated))
+
+    def testMovingArgMin(self):
+        window = 120
+
+        mv = MovingArgMin(window, 'z')
+        total = np.random.randn(2500)
+        con = deque(maxlen=window)
+        for i, value in enumerate(total):
+            value = float(value)
+            con.append(value)
+            mv.push(dict(z=value))
+            runningMin = min(con)
+
+            expected = len(con) - con.index(runningMin) - 1.
+            calculated = mv.result()
+            self.assertAlmostEqual(calculated, expected, 15, "at index {0:d}\n"
+                                                             "Min expected at:   {1:f}\n"
+                                                             "Min calculated at: {2:f}".format(i, expected, calculated))
 
     def testMovingMaxDeepcopy(self):
         test = MovingMax(3, 'close')

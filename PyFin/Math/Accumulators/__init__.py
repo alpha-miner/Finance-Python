@@ -54,7 +54,9 @@ from PyFin.Math.Accumulators.StatefulAccumulators import MovingStandardDeviation
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingNegativeVariance
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingCorrelation
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingMax
+from PyFin.Math.Accumulators.StatefulAccumulators import MovingArgMax
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingMin
+from PyFin.Math.Accumulators.StatefulAccumulators import MovingArgMin
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingRank
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingQuantile
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingAllTrue
@@ -115,7 +117,9 @@ __all__ = ["Exp",
            "MovingNegativeVariance",
            "MovingCorrelation",
            "MovingMax",
+           "MovingArgMax",
            "MovingMin",
+           "MovingArgMin",
            "MovingRank",
            "MovingQuantile",
            "MovingAllTrue",

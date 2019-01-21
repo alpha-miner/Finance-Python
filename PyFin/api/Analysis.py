@@ -233,7 +233,7 @@ def SHIFT(x, n):
     return SecurityShiftedValueHolder(x, n)
 
 
-def DELTA(X, n):
+def DELTA(x, n):
     return SecurityDeltaValueHolder(x, n)
 
 

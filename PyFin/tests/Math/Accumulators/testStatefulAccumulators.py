@@ -616,7 +616,7 @@ class TestStatefulAccumulators(unittest.TestCase):
             mv.push(dict(z=value))
             runningMax = max(con)
 
-            expected = len(con) - con.index(runningMax) - 1.
+            expected = len(con) - np.where(np.array(con) == runningMax)[0][0] - 1.
             calculated = mv.result()
             self.assertAlmostEqual(calculated, expected, 15, "at index {0:d}\n"
                                                              "Max expected at:   {1:f}\n"
@@ -634,7 +634,7 @@ class TestStatefulAccumulators(unittest.TestCase):
             mv.push(dict(z=value))
             runningMin = min(con)
 
-            expected = len(con) - con.index(runningMin) - 1.
+            expected = len(con) - np.where(np.array(con) == runningMin)[0][0] - 1.
             calculated = mv.result()
             self.assertAlmostEqual(calculated, expected, 15, "at index {0:d}\n"
                                                              "Min expected at:   {1:f}\n"

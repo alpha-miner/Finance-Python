@@ -26,6 +26,9 @@ from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import Securit
 from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import SecurityMaximumValueHolder
 from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import SecurityMinimumValueHolder
 from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import SecurityNormInvValueHolder
+from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import SecurityCeilValueHolder
+from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import SecurityFloorValueHolder
+from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import SecurityRoundValueHolder
 
 
 class TestStatelessTechnicalAnalysis(unittest.TestCase):
@@ -401,3 +404,55 @@ class TestStatelessTechnicalAnalysis(unittest.TestCase):
                                                                  'expected:   {1:.12f}\n'
                                                                  'calculat: {2:.12f}'
                                        .format(i, expected, calculated))
+
+    def testSecurityCeilValueHolder(self):
+        mm1 = SecurityCeilValueHolder('open')
+
+        for i in range(len(self.aapl['close'])):
+            data = dict(aapl=dict(open=norm.cdf(self.aapl['open'][i])),
+                        ibm=dict(open=norm.cdf(self.ibm['open'][i])))
+            mm1.push(data)
+
+            value1 = mm1.value
+            for name in value1.index():
+                expected = math.ceil(data[name]['open'])
+                calculated = value1[name]
+                self.assertAlmostEqual(expected, calculated, 6, 'at index {0}\n'
+                                                                'expected:   {1:.12f}\n'
+                                                                'calculat: {2:.12f}'
+                                       .format(i, expected, calculated))
+
+    def testSecurityFloorValueHolder(self):
+        mm1 = SecurityFloorValueHolder('open')
+
+        for i in range(len(self.aapl['close'])):
+            data = dict(aapl=dict(open=norm.cdf(self.aapl['open'][i])),
+                        ibm=dict(open=norm.cdf(self.ibm['open'][i])))
+            mm1.push(data)
+
+            value1 = mm1.value
+            for name in value1.index():
+                expected = math.floor(data[name]['open'])
+                calculated = value1[name]
+                self.assertAlmostEqual(expected, calculated, 6, 'at index {0}\n'
+                                                                'expected:   {1:.12f}\n'
+                                                                'calculat: {2:.12f}'
+                                       .format(i, expected, calculated))
+
+    def testSecurityRoundValueHolder(self):
+        mm1 = SecurityRoundValueHolder('open')
+
+        for i in range(len(self.aapl['close'])):
+            data = dict(aapl=dict(open=norm.cdf(self.aapl['open'][i])),
+                        ibm=dict(open=norm.cdf(self.ibm['open'][i])))
+            mm1.push(data)
+
+            value1 = mm1.value
+            for name in value1.index():
+                expected = round(data[name]['open'])
+                calculated = value1[name]
+                self.assertAlmostEqual(expected, calculated, 6, 'at index {0}\n'
+                                                                'expected:   {1:.12f}\n'
+                                                                'calculat: {2:.12f}'
+                                       .format(i, expected, calculated))
+

@@ -22,6 +22,9 @@ from PyFin.Math.Accumulators.IAccumulators cimport Acosh
 from PyFin.Math.Accumulators.IAccumulators cimport Asin
 from PyFin.Math.Accumulators.IAccumulators cimport Asinh
 from PyFin.Math.Accumulators.IAccumulators cimport NormInv
+from PyFin.Math.Accumulators.IAccumulators cimport Ceil
+from PyFin.Math.Accumulators.IAccumulators cimport Floor
+from PyFin.Math.Accumulators.IAccumulators cimport Round
 from PyFin.Math.Accumulators.StatelessAccumulators cimport Diff
 from PyFin.Math.Accumulators.StatelessAccumulators cimport SimpleReturn
 from PyFin.Math.Accumulators.StatelessAccumulators cimport LogReturn
@@ -34,7 +37,7 @@ cdef class SecurityStatelessSingleValueHolder(SecurityValueHolder):
         super(SecurityStatelessSingleValueHolder, self).__init__()
         self._compHolder = build_holder(x)
         self._holderTemplate = holderType(x=str(self._compHolder), **kwargs)
-        self._innerHolders = { name: copy.deepcopy(self._holderTemplate) for name in self._compHolder.symbolList}
+        self._innerHolders = {name: copy.deepcopy(self._holderTemplate) for name in self._compHolder.symbolList}
         self._dependency = self._compHolder.fields
 
     def __str__(self):
@@ -110,16 +113,37 @@ cdef class SecurityAsinValueHolder(SecurityStatelessSingleValueHolder):
         super(SecurityAsinValueHolder, self).__init__(holderType=Asin,
                                                       x=x)
 
+
 cdef class SecurityAsinhValueHolder(SecurityStatelessSingleValueHolder):
     def __init__(self, x):
         super(SecurityAsinhValueHolder, self).__init__(holderType=Asinh,
                                                        x=x)
+
 
 cdef class SecurityNormInvValueHolder(SecurityStatelessSingleValueHolder):
     def __init__(self, x, fullAcc=False):
         super(SecurityNormInvValueHolder, self).__init__(holderType=NormInv,
                                                          x=x,
                                                          fullAcc=fullAcc)
+
+
+cdef class SecurityCeilValueHolder(SecurityStatelessSingleValueHolder):
+    def __init__(self, x):
+        super(SecurityCeilValueHolder, self).__init__(holderType=Ceil,
+                                                      x=x)
+
+
+cdef class SecurityFloorValueHolder(SecurityStatelessSingleValueHolder):
+    def __init__(self, x):
+        super(SecurityFloorValueHolder, self).__init__(holderType=Floor,
+                                                       x=x)
+
+
+cdef class SecurityRoundValueHolder(SecurityStatelessSingleValueHolder):
+    def __init__(self, x):
+        super(SecurityRoundValueHolder, self).__init__(holderType=Round,
+                                                       x=x)
+
 
 cdef class SecurityDiffValueHolder(SecurityStatelessSingleValueHolder):
     def __init__(self, x):
@@ -140,7 +164,6 @@ cdef class SecurityLogReturnValueHolder(SecurityStatelessSingleValueHolder):
 
 
 cdef class SecurityMaximumValueHolder(SecurityCombinedValueHolder):
-
     def __init__(self, x, y):
         super(SecurityMaximumValueHolder, self).__init__(x, y, s_maximum)
 

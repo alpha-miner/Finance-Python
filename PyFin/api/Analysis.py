@@ -11,7 +11,9 @@ import functools
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingAverage
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingDecay
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingMax
+from PyFin.Analysis.TechnicalAnalysis import SecurityMovingArgMax
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingMin
+from PyFin.Analysis.TechnicalAnalysis import SecurityMovingArgMin
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingRank
 from PyFin.Analysis.TechnicalAnalysis import SecurityMaximumValueHolder
 from PyFin.Analysis.TechnicalAnalysis import SecurityMinimumValueHolder
@@ -125,8 +127,16 @@ def MMAX(window, x='x'):
     return SecurityMovingMax(window, x)
 
 
+def MARGMAX(window, x='x'):
+    return SecurityMovingArgMax(window, x)
+
+
 def MMIN(window, x='x'):
     return SecurityMovingMin(window, x)
+
+
+def MARGMIN(window, x='x'):
+    return SecurityMovingArgMin(window, x)
 
 
 def MRANK(window, x='x'):

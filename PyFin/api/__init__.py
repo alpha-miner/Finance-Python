@@ -26,7 +26,9 @@ from PyFin.api.Analysis import RSI
 from PyFin.api.Analysis import MA
 from PyFin.api.Analysis import MADecay
 from PyFin.api.Analysis import MMAX
+from PyFin.api.Analysis import MARGMAX
 from PyFin.api.Analysis import MMIN
+from PyFin.api.Analysis import MARGMIN
 from PyFin.api.Analysis import MRANK
 from PyFin.api.Analysis import MAXIMUM
 from PyFin.api.Analysis import MINIMUM
@@ -94,7 +96,9 @@ __all__ = ["datesList",
            "MA",
            "MADecay",
            "MMAX",
+           "MARGMAX",
            "MMIN",
+           "MARGMIN",
            "MRANK",
            "MAXIMUM",
            "MINIMUM",

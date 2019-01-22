@@ -58,6 +58,9 @@ from PyFin.api.Analysis import ACOSH
 from PyFin.api.Analysis import ASIN
 from PyFin.api.Analysis import ASINH
 from PyFin.api.Analysis import NORMINV
+from PyFin.api.Analysis import CEIL
+from PyFin.api.Analysis import FLOOR
+from PyFin.api.Analysis import ROUND
 from PyFin.api.Analysis import SHIFT
 from PyFin.api.Analysis import IIF
 from PyFin.api.Analysis import INDUSTRY
@@ -128,6 +131,9 @@ __all__ = ["datesList",
            "ASIN",
            "ASINH",
            "NORMINV",
+           "CEIL",
+           "FLOOR",
+           "ROUND",
            "SHIFT",
            "IIF",
            "INDUSTRY",

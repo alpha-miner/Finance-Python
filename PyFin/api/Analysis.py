@@ -42,6 +42,9 @@ from PyFin.Analysis.TechnicalAnalysis import SecurityAcoshValueHolder
 from PyFin.Analysis.TechnicalAnalysis import SecurityAsinValueHolder
 from PyFin.Analysis.TechnicalAnalysis import SecurityAsinhValueHolder
 from PyFin.Analysis.TechnicalAnalysis import SecurityNormInvValueHolder
+from PyFin.Analysis.TechnicalAnalysis import SecurityCeilValueHolder
+from PyFin.Analysis.TechnicalAnalysis import SecurityFloorValueHolder
+from PyFin.Analysis.TechnicalAnalysis import SecurityRoundValueHolder
 from PyFin.Analysis.SecurityValueHolders import SecurityShiftedValueHolder
 from PyFin.Analysis.SecurityValueHolders import SecurityDeltaValueHolder
 from PyFin.Analysis.SecurityValueHolders import SecurityLatestValueHolder
@@ -237,6 +240,18 @@ def ASINH(x):
 
 def NORMINV(x):
     return SecurityNormInvValueHolder(x)
+
+
+def CEIL(x):
+    return SecurityCeilValueHolder(x)
+
+
+def FLOOR(x):
+    return SecurityFloorValueHolder(x)
+
+
+def ROUND(x):
+    return SecurityRoundValueHolder(x)
 
 
 def SHIFT(x, n):

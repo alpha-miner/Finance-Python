@@ -19,7 +19,9 @@ from PyFin.Analysis.TechnicalAnalysis import SecurityMovingDecay
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingVariance
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingStandardDeviation
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingMax
+from PyFin.Analysis.TechnicalAnalysis import SecurityMovingArgMax
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingMin
+from PyFin.Analysis.TechnicalAnalysis import SecurityMovingArgMin
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingRank
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingQuantile
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingAllTrue
@@ -283,13 +285,36 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
                                                                  'expected:   {1:.12f}\n'
                                                                  'calculated: {2:.12f}'.format(i, expected, calculated))
 
+    def testSecurityMovingArgMax(self):
+        window = 10
+        ma1 = SecurityMovingArgMax(window, 'close')
+
+        for i in range(len(self.aapl['close'])):
+            data = dict(aapl=dict(close=self.aapl['close'][i],
+                                  open=self.aapl['open'][i]),
+                        ibm=dict(close=self.ibm['close'][i],
+                                 open=self.ibm['open'][i]))
+            ma1.push(data)
+            if i < window:
+                start = 0
+            else:
+                start = i + 1 - window
+
+            value = ma1.value
+            for name in value.index():
+                expected = i - start - np.argmax(self.dataSet[name]['close'][start:(i + 1)])
+                calculated = value[name]
+                self.assertAlmostEqual(expected, calculated, 12, 'at index {0}\n'
+                                                                 'expected:   {1:.12f}\n'
+                                                                 'calculated: {2:.12f}'.format(i, expected, calculated))
+
     def testSecurityMovingMaxDeepcopy(self):
         self.template_test_deepcopy(SecurityMovingMax, window=10, x=['x'])
 
     def testSecurityMovingMaxPickle(self):
         self.template_test_pickle(SecurityMovingMax, window=10, x=['x'])
 
-    def testSecurityMovingMinimum(self):
+    def testSecurityMovingMin(self):
         window = 10
         ma1 = SecurityMovingMin(window, 'close')
 
@@ -307,6 +332,29 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
             value = ma1.value
             for name in value.index():
                 expected = np.min(self.dataSet[name]['close'][start:(i + 1)])
+                calculated = value[name]
+                self.assertAlmostEqual(expected, calculated, 12, 'at index {0}\n'
+                                                                 'expected:   {1:.12f}\n'
+                                                                 'calculated: {2:.12f}'.format(i, expected, calculated))
+
+    def testSecurityMovingArgMin(self):
+        window = 10
+        ma1 = SecurityMovingArgMin(window, 'close')
+
+        for i in range(len(self.aapl['close'])):
+            data = dict(aapl=dict(close=self.aapl['close'][i],
+                                  open=self.aapl['open'][i]),
+                        ibm=dict(close=self.ibm['close'][i],
+                                 open=self.ibm['open'][i]))
+            ma1.push(data)
+            if i < window:
+                start = 0
+            else:
+                start = i + 1 - window
+
+            value = ma1.value
+            for name in value.index():
+                expected = i - start - np.argmin(self.dataSet[name]['close'][start:(i + 1)])
                 calculated = value[name]
                 self.assertAlmostEqual(expected, calculated, 12, 'at index {0}\n'
                                                                  'expected:   {1:.12f}\n'

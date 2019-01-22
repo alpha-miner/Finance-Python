@@ -17,6 +17,9 @@ from PyFin.Math.Accumulators.IAccumulators import Asin
 from PyFin.Math.Accumulators.IAccumulators import Asinh
 from PyFin.Math.Accumulators.IAccumulators import NormInv
 from PyFin.Math.Accumulators.IAccumulators import Latest
+from PyFin.Math.Accumulators.IAccumulators import Ceil
+from PyFin.Math.Accumulators.IAccumulators import Floor
+from PyFin.Math.Accumulators.IAccumulators import Round
 from PyFin.Math.Accumulators.IAccumulators import Identity
 from PyFin.Math.Accumulators.IAccumulators import IIF
 from PyFin.Math.Accumulators.IAccumulators import Sign

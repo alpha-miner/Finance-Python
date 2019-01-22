@@ -16,6 +16,9 @@ from libc.math cimport acos
 from libc.math cimport acosh
 from libc.math cimport asin
 from libc.math cimport asinh
+from libc.math cimport ceil
+from libc.math cimport floor
+from libc.math cimport round
 cimport cython
 import numpy as np
 cimport numpy as np
@@ -442,6 +445,63 @@ cpdef build_holder(name):
         return Identity(float(name))
     elif hasattr(name, '__iter__'):
         return build_holder(name[0])
+
+
+cdef class Ceil(Accumulator):
+
+    def __init__(self, x='x'):
+        super(Ceil, self).__init__()
+        self._x = build_holder(x)
+        self._window = self._x.window
+        self._dependency = deepcopy(self._x.dependency)
+
+    cpdef push(self, dict data):
+        cdef double x_value
+        self._x.push(data)
+
+    def __str__(self):
+        return "\\ceil({0})".format(str(self._x))
+
+    cpdef double result(self):
+        return ceil(self._x.value)
+
+
+cdef class Floor(Accumulator):
+
+    def __init__(self, x='x'):
+        super(Floor, self).__init__()
+        self._x = build_holder(x)
+        self._window = self._x.window
+        self._dependency = deepcopy(self._x.dependency)
+
+    cpdef push(self, dict data):
+        cdef double x_value
+        self._x.push(data)
+
+    def __str__(self):
+        return "\\floor({0})".format(str(self._x))
+
+    cpdef double result(self):
+        return floor(self._x.value)
+
+
+cdef class Round(Accumulator):
+
+    def __init__(self, x='x'):
+        super(Round, self).__init__()
+        self._x = build_holder(x)
+        self._window = self._x.window
+        self._dependency = deepcopy(self._x.dependency)
+
+    cpdef push(self, dict data):
+        cdef double x_value
+        self._x.push(data)
+
+    def __str__(self):
+        return "\\round({0})".format(str(self._x))
+
+    cpdef double result(self):
+        return round(self._x.value)
 
 
 cdef class CompoundedValueHolder(Accumulator):

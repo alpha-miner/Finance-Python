@@ -109,6 +109,30 @@ cdef class Latest(Accumulator):
     cpdef double result(self)
 
 
+cdef class Ceil(Accumulator):
+
+    cdef Accumulator _x
+
+    cpdef push(self, dict data)
+    cpdef double result(self)
+
+
+cdef class Floor(Accumulator):
+
+    cdef Accumulator _x
+
+    cpdef push(self, dict data)
+    cpdef double result(self)
+
+
+cdef class Round(Accumulator):
+
+    cdef Accumulator _x
+
+    cpdef push(self, dict data)
+    cpdef double result(self)
+
+
 cdef class CompoundedValueHolder(Accumulator):
 
     cdef Accumulator _left

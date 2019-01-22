@@ -455,4 +455,3 @@ class TestStatelessTechnicalAnalysis(unittest.TestCase):
                                                                 'expected:   {1:.12f}\n'
                                                                 'calculat: {2:.12f}'
                                        .format(i, expected, calculated))
-

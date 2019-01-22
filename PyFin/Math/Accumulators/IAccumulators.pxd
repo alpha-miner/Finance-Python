@@ -109,30 +109,6 @@ cdef class Latest(Accumulator):
     cpdef double result(self)
 
 
-cdef class Ceil(Accumulator):
-
-    cdef Accumulator _x
-
-    cpdef push(self, dict data)
-    cpdef double result(self)
-
-
-cdef class Floor(Accumulator):
-
-    cdef Accumulator _x
-
-    cpdef push(self, dict data)
-    cpdef double result(self)
-
-
-cdef class Round(Accumulator):
-
-    cdef Accumulator _x
-
-    cpdef push(self, dict data)
-    cpdef double result(self)
-
-
 cdef class CompoundedValueHolder(Accumulator):
 
     cdef Accumulator _left
@@ -215,5 +191,20 @@ cdef class Asinh(BasicFunction):
 cdef class NormInv(BasicFunction):
 
     cdef InvNormImpl _inv
+
+    cpdef double result(self)
+
+
+cdef class Ceil(BasicFunction):
+
+    cpdef double result(self)
+
+
+cdef class Floor(BasicFunction):
+
+    cpdef double result(self)
+
+
+cdef class Round(BasicFunction):
 
     cpdef double result(self)

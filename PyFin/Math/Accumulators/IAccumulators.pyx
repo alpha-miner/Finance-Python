@@ -447,63 +447,6 @@ cpdef build_holder(name):
         return build_holder(name[0])
 
 
-cdef class Ceil(Accumulator):
-
-    def __init__(self, x='x'):
-        super(Ceil, self).__init__()
-        self._x = build_holder(x)
-        self._window = self._x.window
-        self._dependency = deepcopy(self._x.dependency)
-
-    cpdef push(self, dict data):
-        cdef double x_value
-        self._x.push(data)
-
-    def __str__(self):
-        return "\\ceil({0})".format(str(self._x))
-
-    cpdef double result(self):
-        return ceil(self._x.value)
-
-
-cdef class Floor(Accumulator):
-
-    def __init__(self, x='x'):
-        super(Floor, self).__init__()
-        self._x = build_holder(x)
-        self._window = self._x.window
-        self._dependency = deepcopy(self._x.dependency)
-
-    cpdef push(self, dict data):
-        cdef double x_value
-        self._x.push(data)
-
-    def __str__(self):
-        return "\\floor({0})".format(str(self._x))
-
-    cpdef double result(self):
-        return floor(self._x.value)
-
-
-cdef class Round(Accumulator):
-
-    def __init__(self, x='x'):
-        super(Round, self).__init__()
-        self._x = build_holder(x)
-        self._window = self._x.window
-        self._dependency = deepcopy(self._x.dependency)
-
-    cpdef push(self, dict data):
-        cdef double x_value
-        self._x.push(data)
-
-    def __str__(self):
-        return "\\round({0})".format(str(self._x))
-
-    cpdef double result(self):
-        return round(self._x.value)
-
-
 cdef class CompoundedValueHolder(Accumulator):
 
     def __init__(self, left, right):
@@ -683,3 +626,36 @@ cdef class NormInv(BasicFunction):
 
     def __str__(self):
         return "\\mathrm{{NormInv}}({0}, fullAcc={1})".format(str(self._inner), self._inv.isFullAcc)
+
+
+cdef class Ceil(BasicFunction):
+    def __init__(self, x, orig_value=NAN):
+        super(Ceil, self).__init__(x, orig_value)
+
+    cpdef double result(self):
+        return ceil(self._origValue)
+
+    def __str__(self):
+        return "\\mathrm{{Ceil}}({0})".format(str(self._inner))
+
+
+cdef class Floor(BasicFunction):
+    def __init__(self, x, orig_value=NAN):
+        super(Floor, self).__init__(x, orig_value)
+
+    cpdef double result(self):
+        return floor(self._origValue)
+
+    def __str__(self):
+        return "\\mathrm{{Floor}}({0})".format(str(self._inner))
+
+
+cdef class Round(BasicFunction):
+    def __init__(self, x, orig_value=NAN):
+        super(Round, self).__init__(x, orig_value)
+
+    cpdef double result(self):
+        return round(self._origValue)
+
+    def __str__(self):
+        return "\\mathrm{{Round}}({0})".format(str(self._inner))

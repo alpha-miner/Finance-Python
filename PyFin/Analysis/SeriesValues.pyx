@@ -6,6 +6,7 @@ Created on 2017-2-7
 """
 
 cimport cython
+import pandas as pd
 import numpy as np
 cimport numpy as np
 from numpy import nansum
@@ -353,6 +354,10 @@ cdef class SeriesValues(object):
     cpdef dict to_dict(self):
         keys = self.name_mapping.keys()
         return {k: self.values[self.name_mapping[k]] for k in keys}
+
+    def to_pd_series(self):
+        cdef dict dict_values = self.to_dict()
+        return pd.Series(dict_values)
 
     def __repr__(self):
         return 'SeriesValues({0})'.format(self.__str__())

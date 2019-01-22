@@ -28,6 +28,9 @@ from PyFin.Math.Accumulators.IAccumulators import Asinh
 from PyFin.Math.Accumulators.IAccumulators import NormInv
 from PyFin.Math.Accumulators.IAccumulators import IIF
 from PyFin.Math.Accumulators.IAccumulators import Latest
+from PyFin.Math.Accumulators.IAccumulators import Ceil
+from PyFin.Math.Accumulators.IAccumulators import Floor
+from PyFin.Math.Accumulators.IAccumulators import Round
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingAverage
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingVariance
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingMax
@@ -449,9 +452,7 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
         ma5 = MovingAverage(5, 'close')
         holder = Asinh(ma5)
 
-        sampleClose = np.sinh(self.sampleClose)
-
-        for i, close in enumerate(sampleClose):
+        for i, close in enumerate(self.sampleClose):
             data = {'close': close}
             ma5.push(data)
             holder.push(data)
@@ -488,6 +489,51 @@ class TestAccumulatorsArithmetic(unittest.TestCase):
             holder.push(data)
 
             expected = norm.ppf(ma5.result())
+            calculated = holder.result()
+            self.assertAlmostEqual(calculated, expected, 12, "at index {0:d}\n"
+                                                             "expected:   {1:f}\n"
+                                                             "calculated: {2:f}".format(i, expected, calculated))
+
+    def testCeilFunction(self):
+        ma5 = MovingAverage(5, 'close')
+        holder = Ceil(ma5)
+
+        for i, close in enumerate(self.sampleClose):
+            data = {'close': close}
+            ma5.push(data)
+            holder.push(data)
+
+            expected = math.ceil(ma5.result())
+            calculated = holder.result()
+            self.assertAlmostEqual(calculated, expected, 12, "at index {0:d}\n"
+                                                             "expected:   {1:f}\n"
+                                                             "calculated: {2:f}".format(i, expected, calculated))
+
+    def testFloorFunction(self):
+        ma5 = MovingAverage(5, 'close')
+        holder = Floor(ma5)
+
+        for i, close in enumerate(self.sampleClose):
+            data = {'close': close}
+            ma5.push(data)
+            holder.push(data)
+
+            expected = math.floor(ma5.result())
+            calculated = holder.result()
+            self.assertAlmostEqual(calculated, expected, 12, "at index {0:d}\n"
+                                                             "expected:   {1:f}\n"
+                                                             "calculated: {2:f}".format(i, expected, calculated))
+
+    def testRoundFunction(self):
+        ma5 = MovingAverage(5, 'close')
+        holder = Round(ma5)
+
+        for i, close in enumerate(self.sampleClose):
+            data = {'close': close}
+            ma5.push(data)
+            holder.push(data)
+
+            expected = round(ma5.result())
             calculated = holder.result()
             self.assertAlmostEqual(calculated, expected, 12, "at index {0:d}\n"
                                                              "expected:   {1:f}\n"

@@ -399,6 +399,32 @@ cdef class Identity(Accumulator):
         return str(self._value)
 
 
+cdef class Current(Accumulator):
+
+    def __init__(self, x='x'):
+        """
+        Current should only be used as a vanilla named value holder
+        :param x:
+        """
+        super(Current, self).__init__()
+        self._window = 0
+        self._isFull = True
+        self._dependency = [x]
+        self._current = NAN
+
+    cpdef push(self, dict data):
+        try:
+            self._current = data[self._dependency[0]]
+        except KeyError:
+            self._current = NAN
+
+    def __str__(self):
+        return "''\\text{{{0}}}''".format(str(self._dependency[0]))
+
+    cpdef double result(self):
+        return self._current
+
+
 cdef class Latest(Accumulator):
 
     def __init__(self, x='x', current_value=NAN):
@@ -440,7 +466,7 @@ cpdef build_holder(name):
     if isinstance(name, Accumulator):
         return deepcopy(name)
     elif isinstance(name, six.string_types):
-        return Latest(name)
+        return Current(name)
     elif isanumber(name):
         return Identity(float(name))
     elif hasattr(name, '__iter__'):

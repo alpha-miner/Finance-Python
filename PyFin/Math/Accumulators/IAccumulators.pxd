@@ -101,6 +101,14 @@ cdef class Identity(Accumulator):
     cpdef double result(self)
 
 
+cdef class Current(Accumulator):
+
+    cdef double _current
+
+    cpdef push(self, dict data)
+    cpdef double result(self)
+
+
 cdef class Latest(Accumulator):
 
     cdef double _latest

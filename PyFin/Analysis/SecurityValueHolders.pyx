@@ -18,6 +18,7 @@ from PyFin.Analysis.SeriesValues cimport SeriesValues
 from PyFin.Utilities.Tools import to_dict
 from PyFin.Math.Accumulators.StatefulAccumulators cimport Shift
 from PyFin.Math.Accumulators.StatefulAccumulators cimport Delta
+from PyFin.Math.Accumulators.IAccumulators cimport Current
 from PyFin.Math.Accumulators.IAccumulators cimport Latest
 from PyFin.Math.Accumulators.IAccumulators cimport isanumber
 from PyFin.Math.MathConstants cimport NAN
@@ -757,7 +758,7 @@ cdef class SecurityShiftedValueHolder(SecurityValueHolder):
         self._compHolder = build_holder(right)
         self._window = self._compHolder.window + n
         self._dependency = copy.deepcopy(self._compHolder.fields)
-        self._holderTemplate = Shift(Latest(str(self._compHolder)), n)
+        self._holderTemplate = Shift(Current(str(self._compHolder)), n)
 
         self._innerHolders = {
             name: copy.deepcopy(self._holderTemplate) for name in self._compHolder.symbolList
@@ -775,7 +776,7 @@ cdef class SecurityDeltaValueHolder(SecurityValueHolder):
         self._compHolder = build_holder(right)
         self._window = self._compHolder.window + n
         self._dependency = copy.deepcopy(self._compHolder.fields)
-        self._holderTemplate = Delta(Latest(str(self._compHolder)), n)
+        self._holderTemplate = Delta(Current(str(self._compHolder)), n)
 
         self._innerHolders = {
             name: copy.deepcopy(self._holderTemplate) for name in self._compHolder.symbolList

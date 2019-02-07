@@ -19,6 +19,7 @@ from libc.math cimport asinh
 from libc.math cimport ceil
 from libc.math cimport floor
 from libc.math cimport round
+from libc.math cimport isnan
 cimport cython
 import numpy as np
 cimport numpy as np
@@ -440,10 +441,14 @@ cdef class Latest(Accumulator):
         self._dependency = [x]
 
     cpdef push(self, dict data):
+        cdef double res
         try:
-            self._latest = data[self._dependency[0]]
+            res = data[self._dependency[0]]
         except KeyError:
             pass
+        else:
+            if not isnan(res):
+                self._latest = res
 
     def __str__(self):
         return "''\\text{{{0}}}''".format(str(self._dependency[0]))

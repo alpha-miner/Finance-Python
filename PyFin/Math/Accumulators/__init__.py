@@ -16,6 +16,7 @@ from PyFin.Math.Accumulators.IAccumulators import Acosh
 from PyFin.Math.Accumulators.IAccumulators import Asin
 from PyFin.Math.Accumulators.IAccumulators import Asinh
 from PyFin.Math.Accumulators.IAccumulators import NormInv
+from PyFin.Math.Accumulators.IAccumulators import Current
 from PyFin.Math.Accumulators.IAccumulators import Latest
 from PyFin.Math.Accumulators.IAccumulators import Ceil
 from PyFin.Math.Accumulators.IAccumulators import Floor
@@ -87,6 +88,7 @@ __all__ = ["Exp",
            "Asin",
            "Asinh",
            "NormInv",
+           "Current",
            "Latest",
            "Sign",
            "Diff",

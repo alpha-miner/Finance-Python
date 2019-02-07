@@ -14,6 +14,7 @@ import tempfile
 import math
 import numpy as np
 from collections import deque
+from PyFin.Math.Accumulators import Current
 from PyFin.Math.Accumulators import Latest
 from PyFin.Math.Accumulators import Shift
 from PyFin.Math.Accumulators import Delta
@@ -52,12 +53,20 @@ class TestStatefulAccumulators(unittest.TestCase):
         self.sample = np.random.randn(10000)
 
     def testLatestValueHolderWithOtherValueHolder(self):
-        test1 = Exp(Latest('x'))
+        test1 = Exp(Current('x'))
         test1.push({'x': 2.0})
         self.assertAlmostEqual(test1.value, math.exp(2.0))
 
         test1.push({'x': np.nan})
         self.assertTrue(math.isnan(test1.value))
+
+    def testLatestValueHolderWithOtherValueHolder(self):
+        test1 = Exp(Latest('x'))
+        test1.push({'x': 2.0})
+        self.assertAlmostEqual(test1.value, math.exp(2.0))
+
+        test1.push({'x': np.nan})
+        self.assertAlmostEqual(test1.value, math.exp(2.0))
 
     def testLatestValueHolderDeepCopy(self):
 

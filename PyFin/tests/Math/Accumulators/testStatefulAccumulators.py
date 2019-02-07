@@ -52,7 +52,7 @@ class TestStatefulAccumulators(unittest.TestCase):
         np.random.seed(0)
         self.sample = np.random.randn(10000)
 
-    def testLatestValueHolderWithOtherValueHolder(self):
+    def testCurrentValueHolderWithOtherValueHolder(self):
         test1 = Exp(Current('x'))
         test1.push({'x': 2.0})
         self.assertAlmostEqual(test1.value, math.exp(2.0))

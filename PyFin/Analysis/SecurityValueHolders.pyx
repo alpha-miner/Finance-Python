@@ -474,12 +474,12 @@ cdef class SecurityInvertValueHolder(SecurityUnitoryValueHolder):
             right, operator.invert)
 
 
-cdef class SecurityLatestValueHolder(SecurityValueHolder):
+cdef class SecurityCurrentValueHolder(SecurityValueHolder):
     def __init__(self, x):
-        super(SecurityLatestValueHolder, self).__init__()
+        super(SecurityCurrentValueHolder, self).__init__()
         self._dependency = [x]
         self._symbol_values = {}
-        self._holderTemplate = Latest(x)
+        self._holderTemplate = Current(x)
 
     @property
     def symbolList(self):
@@ -555,11 +555,93 @@ cdef class SecurityLatestValueHolder(SecurityValueHolder):
         return str(self._holderTemplate)
 
 
+cdef class SecurityLatestValueHolder(SecurityValueHolder):
+    def __init__(self, x):
+        super(SecurityLatestValueHolder, self).__init__()
+        self._dependency = [x]
+        self._symbol_values = {}
+        self._holderTemplate = Latest(x)
+
+    @property
+    def symbolList(self):
+        return list(self._symbol_values.keys())
+
+    cpdef push(self, dict data):
+        cdef double value
+        cdef dict data_pack
+        field = self._dependency[0]
+        self.updated = 0
+
+        for name in data:
+            data_pack = data[name]
+            if field in data_pack:
+                value = data_pack[field]
+                if not isnan(value):
+                    self._symbol_values[name] = value
+
+            if name not in self._symbol_values:
+                self._symbol_values[name] = NAN
+
+    @cython.boundscheck(False)
+    @cython.wraparound(False)
+    cpdef SeriesValues value_all(self):
+
+        cdef np.ndarray values
+        cdef size_t n
+        cdef int i
+
+        if self.updated:
+            return SeriesValues(self.cached.values, self.cached.name_mapping)
+        else:
+            keys = sorted(self._symbol_values.keys())
+            n = len(keys)
+            values = np.zeros(n)
+            for i, name in enumerate(keys):
+                values[i] = self._symbol_values[name]
+            self.cached = SeriesValues(values, index=keys)
+            self.updated = 1
+            return self.cached
+
+    @cython.boundscheck(False)
+    @cython.wraparound(False)
+    cpdef SeriesValues value_by_names(self, list names):
+        cdef Accumulator holder
+        cdef np.ndarray res
+        cdef int i
+        cdef size_t n
+
+        if self.updated:
+            return self.cached[names]
+        else:
+            n = len(names)
+            res = np.zeros(n)
+            for i, name in enumerate(names):
+                res[i] = self._symbol_values[name]
+            return SeriesValues(res, index=names)
+
+    cpdef double value_by_name(self, name):
+        cdef Accumulator holder
+        if self.updated:
+            return self.cached[name]
+        else:
+            return self._symbol_values[name]
+
+    def isFullByName(self, name):
+        return True
+
+    @property
+    def isFull(self):
+        return True
+
+    def __str__(self):
+        return str(self._holderTemplate)
+
+
 cpdef SecurityValueHolder build_holder(name):
     if isinstance(name, SecurityValueHolder):
         return copy.deepcopy(name)
     elif isinstance(name, six.string_types):
-        return SecurityLatestValueHolder(name)
+        return SecurityCurrentValueHolder(name)
     elif isanumber(name):
         return IdentitySecurityValueHolder(float(name))
     else:

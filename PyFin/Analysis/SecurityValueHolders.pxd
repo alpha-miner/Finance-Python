@@ -76,6 +76,15 @@ cdef class SecurityInvertValueHolder(SecurityUnitoryValueHolder):
     pass
 
 
+cdef class SecurityCurrentValueHolder(SecurityValueHolder):
+    cdef dict _symbol_values
+
+    cpdef push(self, dict data)
+    cpdef SeriesValues value_all(self)
+    cpdef SeriesValues value_by_names(self, list names)
+    cpdef double value_by_name(self, name)
+
+
 cdef class SecurityLatestValueHolder(SecurityValueHolder):
     cdef dict _symbol_values
 

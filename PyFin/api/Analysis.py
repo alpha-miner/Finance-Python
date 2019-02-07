@@ -47,6 +47,7 @@ from PyFin.Analysis.TechnicalAnalysis import SecurityFloorValueHolder
 from PyFin.Analysis.TechnicalAnalysis import SecurityRoundValueHolder
 from PyFin.Analysis.SecurityValueHolders import SecurityShiftedValueHolder
 from PyFin.Analysis.SecurityValueHolders import SecurityDeltaValueHolder
+from PyFin.Analysis.SecurityValueHolders import SecurityCurrentValueHolder
 from PyFin.Analysis.SecurityValueHolders import SecurityLatestValueHolder
 from PyFin.Analysis.SecurityValueHolders import SecurityIIFValueHolder
 
@@ -184,6 +185,10 @@ def MNPOSITIVE(window, x='x'):
 
 def MAPOSITIVE(window, x='x'):
     return SecurityMovingPositiveAverage(window, x)
+
+
+def CURRENT(x='x'):
+    return SecurityCurrentValueHolder(x)
 
 
 def LAST(x='x'):

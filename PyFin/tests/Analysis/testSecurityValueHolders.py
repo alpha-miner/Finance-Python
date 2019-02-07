@@ -15,6 +15,7 @@ import pandas as pd
 from PyFin.Enums import Factors
 from PyFin.Analysis.SeriesValues import SeriesValues
 from PyFin.Analysis.SecurityValueHolders import FilteredSecurityValueHolder
+from PyFin.Analysis.SecurityValueHolders import SecurityCurrentValueHolder
 from PyFin.Analysis.SecurityValueHolders import SecurityLatestValueHolder
 from PyFin.Analysis.SecurityValueHolders import SecurityIIFValueHolder
 from PyFin.Analysis.SecurityValueHolders import SecurityShiftedValueHolder
@@ -1066,6 +1067,50 @@ class TestSecurityValueHolders(unittest.TestCase):
 
         np.testing.assert_array_almost_equal(calculated['new_factor'].values[1:],
                                              expected['close'].values[1:])
+
+    def testSecurityCurrentValueHolder(self):
+        current = SecurityCurrentValueHolder('x')
+
+        data1 = dict(aapl=dict(x=1),
+                     ibm=dict(x=2))
+
+        current.push(data1)
+        calculated = current.value
+        for name in data1.keys():
+            self.assertAlmostEqual(data1[name]['x'], calculated[name])
+
+        data2 = dict(aapl=dict(x=3),
+                     ibm=dict(x=np.nan))
+        current.push(data2)
+        calculated = current.value
+        for name in data1.keys():
+            expected = data2[name]['x']
+            if not np.isnan(expected):
+                self.assertAlmostEqual(expected, calculated[name])
+            else:
+                self.assertTrue(np.isnan(calculated[name]))
+
+    def testSecurityLatestValueHolder(self):
+        latest = SecurityLatestValueHolder('x')
+
+        data1 = dict(aapl=dict(x=1),
+                     ibm=dict(x=2))
+
+        latest.push(data1)
+        calculated = latest.value
+        for name in data1.keys():
+            self.assertAlmostEqual(data1[name]['x'], calculated[name])
+
+        data2 = dict(aapl=dict(x=3),
+                     ibm=dict(x=np.nan))
+        latest.push(data2)
+        calculated = latest.value
+        for name in data1.keys():
+            expected = data2[name]['x']
+            if not np.isnan(expected):
+                self.assertAlmostEqual(expected, calculated[name])
+            else:
+                self.assertAlmostEqual(data1[name]['x'], calculated[name])
 
     def testSecurityLatestValueHolderDeepcopy(self):
         latest = SecurityLatestValueHolder('x')

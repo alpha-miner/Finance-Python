@@ -18,6 +18,7 @@ from PyFin.Analysis.CrossSectionValueHolders import CSAverageAdjustedSecurityVal
 from PyFin.Analysis.CrossSectionValueHolders import CSZScoreSecurityValueHolder
 from PyFin.Analysis.CrossSectionValueHolders import CSPercentileSecurityValueHolder
 from PyFin.Analysis.CrossSectionValueHolders import CSResidueSecurityValueHolder
+from PyFin.Analysis.SecurityValueHolders import SecurityCurrentValueHolder
 from PyFin.Analysis.SecurityValueHolders import SecurityLatestValueHolder
 from PyFin.Analysis import TechnicalAnalysis
 from PyFin.Analysis.transformer import transform
@@ -35,6 +36,7 @@ __all__ = ['DataProvider',
            'CSZScoreSecurityValueHolder',
            'CSPercentileSecurityValueHolder',
            'CSResidueSecurityValueHolder',
+           'SecurityCurrentValueHolder',
            'SecurityLatestValueHolder',
            'TechnicalAnalysis',
            'transform']

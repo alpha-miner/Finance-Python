@@ -40,6 +40,7 @@ from PyFin.api.Analysis import MVARIANCE
 from PyFin.api.Analysis import MSTD
 from PyFin.api.Analysis import MNPOSITIVE
 from PyFin.api.Analysis import MAPOSITIVE
+from PyFin.api.Analysis import CURRENT
 from PyFin.api.Analysis import LAST
 from PyFin.api.Analysis import HIGH
 from PyFin.api.Analysis import LOW
@@ -113,6 +114,7 @@ __all__ = ["datesList",
            "MSTD",
            "MNPOSITIVE",
            "MAPOSITIVE",
+           "CURRENT",
            "LAST",
            "HIGH",
            "LOW",

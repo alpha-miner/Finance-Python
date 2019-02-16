@@ -260,13 +260,13 @@ cdef class SecurityValueHolder(object):
             for j, dict_data in enumerate(split_values):
                 self.push(dict_data)
                 end_count = start_count + len(dict_data)
-                narr_view = self.value_by_names(split_category[j]).values
+                narr_view = self.value_by_names(split_category[j]).values.astype(float)
                 output_values[start_count:end_count]  = narr_view
                 start_count = end_count
         else:
             for j, dict_data in enumerate(split_values):
                 self.push(dict_data)
-                output_values[j] = self.value_by_name(split_category[j][0])
+                output_values[j] = float(self.value_by_name(split_category[j][0]))
 
         df = pd.DataFrame(np.array(output_values), index=data.index, columns=[name])
         if not dummy_category:

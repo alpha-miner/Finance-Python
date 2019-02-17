@@ -23,4 +23,4 @@ __all__ = ['__version__',
            'Analysis',
            'Utilities']
 
-__version__ = "0.6.7"
+__version__ = "0.7.0"

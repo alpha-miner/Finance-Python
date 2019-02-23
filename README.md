@@ -8,14 +8,14 @@
 <tr>
   <td>Build Status</td>
   <td>
-    <a href="https://travis-ci.org/wegamekinglc/Finance-Python">
-    <img src="https://travis-ci.org/wegamekinglc/Finance-Python.svg?branch=master" alt="travis build status" />
+    <a href="https://travis-ci.org/alpha-miner/Finance-Python">
+    <img src="https://travis-ci.org/alpha-miner/Finance-Python.svg?branch=master" alt="travis build status" />
     </a>
   </td>
 </tr>
 <tr>
   <td>Coverage</td>
-  <td><img src="https://coveralls.io/repos/wegamekinglc/Finance-Python/badge.svg?branch=master&service=github" alt="coverage" /></td>
+  <td><img src="https://coveralls.io/repos/alpha-miner/Finance-Python/badge.svg?branch=master&service=github" alt="coverage" /></td>
 </tr>
 </table>
 

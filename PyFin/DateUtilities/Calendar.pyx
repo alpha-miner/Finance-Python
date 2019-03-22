@@ -443,6 +443,8 @@ cdef set sse_holDays = {Date(2005, 1, 3),
                         Date(2019, 2, 8),
                         Date(2019, 4, 5),
                         Date(2019, 5, 1),
+                        Date(2019, 5, 2),
+                        Date(2019, 5, 3),
                         Date(2019, 6, 7),
                         Date(2019, 9, 13),
                         Date(2019, 9, 30),
@@ -577,6 +579,8 @@ cdef set ib_working_weekends = {
     # 2019
     Date.westernStyle(2, Months.February, 2019),
     Date.westernStyle(3, Months.February, 2019),
+    Date.westernStyle(28, Months.April, 2019),
+    Date.westernStyle(5, Months.May, 2019),
     Date.westernStyle(29, Months.September, 2019),
     Date.westernStyle(12, Months.October, 2019),
 }

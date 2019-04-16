@@ -59,6 +59,7 @@ from PyFin.Analysis.CrossSectionValueHolders import CSBottomNPercentileSecurityV
 from PyFin.Analysis.CrossSectionValueHolders import CSAverageSecurityValueHolder
 from PyFin.Analysis.CrossSectionValueHolders import CSAverageAdjustedSecurityValueHolder
 from PyFin.Analysis.CrossSectionValueHolders import CSZScoreSecurityValueHolder
+from PyFin.Analysis.CrossSectionValueHolders import CSFillNASecurityValueHolder
 from PyFin.Analysis.CrossSectionValueHolders import CSPercentileSecurityValueHolder
 from PyFin.Analysis.CrossSectionValueHolders import CSResidueSecurityValueHolder
 
@@ -97,6 +98,10 @@ def CSQuantiles(x, groups=None):
 
 def CSZScore(x, groups=None):
     return CSZScoreSecurityValueHolder(x, groups)
+
+
+def CSFillNA(x, groups=None):
+    return CSFillNASecurityValueHolder(x, groups)
 
 
 def CSRes(left, right):

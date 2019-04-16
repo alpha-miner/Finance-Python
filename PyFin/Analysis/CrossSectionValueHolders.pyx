@@ -457,6 +457,49 @@ cdef class CSZScoreSecurityValueHolder(CrossSectionValueHolder):
             return "\mathrm{{CSZscore}}({0})".format(str(self._inner))
 
 
+cdef class CSFillNASecurityValueHolder(CrossSectionValueHolder):
+    def __init__(self, innerValue, groups=None):
+        super(CSFillNASecurityValueHolder, self).__init__(innerValue, groups)
+
+    cdef _cal_impl(self):
+        cdef SeriesValues raw_values = self._inner.value
+
+        if self._group:
+            self.cached = raw_values.fillna(self._group.value)
+        else:
+            self.cached = raw_values.fillna()
+        self.updated = 1
+
+    @property
+    def value(self):
+        if self.updated:
+            return self.cached
+        else:
+            self._cal_impl()
+            return self.cached
+
+    cpdef double value_by_name(self, name):
+        if self.updated:
+            return self.cached[name]
+        else:
+            self._cal_impl()
+            return self.cached[name]
+
+    cpdef SeriesValues value_by_names(self, list names):
+        cdef SeriesValues raw_values = self._inner.value_by_names(names)
+        if self._group:
+            raw_values = raw_values.fillna(self._group.value_by_names(names))
+        else:
+            raw_values = raw_values.fillna()
+        return raw_values
+
+    def __str__(self):
+        if self._group:
+            return "\mathrm{{CSFillNA}}({0}, groups={1})".format(str(self._inner), str(self._group))
+        else:
+            return "\mathrm{{CSFillNA}}({0})".format(str(self._inner))
+
+
 cdef class CSResidueSecurityValueHolder(SecurityValueHolder):
 
     cdef public SecurityValueHolder _left

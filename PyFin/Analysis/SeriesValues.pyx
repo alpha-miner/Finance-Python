@@ -14,6 +14,7 @@ from numpy import nanmean
 from numpy import nanstd
 from numpy import maximum
 from numpy import minimum
+from numpy import isnan
 from scipy.stats import rankdata
 from PyFin.Math.MathConstants cimport NAN
 
@@ -230,10 +231,10 @@ cdef class SeriesValues(object):
                 curr_idx = order[start:diff_loc + 1]
                 data[curr_idx] = rankdata(self.values[curr_idx]).astype(float)
                 start = diff_loc + 1
-            data[np.isnan(self.values)] = NAN
+            data[isnan(self.values)] = NAN
         else:
             data = rankdata(self.values).astype(float)
-            data[np.isnan(self.values)] = NAN
+            data[isnan(self.values)] = NAN
         return SeriesValues(data, self.name_mapping)
 
     cpdef SeriesValues top_n(self, int n, SeriesValues groups=None):
@@ -274,10 +275,35 @@ cdef class SeriesValues(object):
                 curr_values = data[curr_idx]
                 data[curr_idx] = (curr_values - nanmean(curr_values)) / nanstd(curr_values)
                 start = diff_loc + 1
-            data[np.isnan(values)] = NAN
+            data[isnan(values)] = NAN
         else:
             data = (values - nanmean(values)) / nanstd(values)
-            data[np.isnan(values)] = NAN
+            data[isnan(values)] = NAN
+        return SeriesValues(data, self.name_mapping)
+
+    cpdef SeriesValues fillna(self, SeriesValues groups=None):
+        cdef np.ndarray[double, ndim=1] data
+        cdef np.ndarray[long long, ndim=1] order
+        cdef np.ndarray[long long, ndim=1] index_diff
+        cdef long long diff_loc
+        cdef long long start = 0
+        cdef np.ndarray[long long, ndim=1] curr_idx
+        cdef np.ndarray[double, ndim=1] values = self.values
+        cdef np.ndarray[double, ndim=1] curr_values
+
+        if groups:
+            data = values.copy()
+            index_diff, order = groupby(groups.values)
+            start = 0
+            for diff_loc in index_diff:
+                curr_idx = order[start:diff_loc + 1]
+                curr_values = data[curr_idx]
+                curr_values[isnan(curr_values)] = nanmean(curr_values)
+                data[curr_idx] = curr_values
+                start = diff_loc + 1
+        else:
+            data = values.copy()
+            data[isnan(data)] = nanmean(data)
         return SeriesValues(data, self.name_mapping)
 
     cpdef SeriesValues unit(self):

@@ -395,6 +395,34 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
                                                                  'expected:   {1:.12f}\n'
                                                                  'calculated: {2:.12f}'.format(i, expected, calculated))
 
+    def testSecurityMovingCorrelation(self):
+        window = 120
+        mc = SecurityMovingCorrelation(window, ['close'], ['open'])
+
+        for i in range(len(self.aapl['close'])):
+            data = dict(aapl=dict(close=self.aapl['close'][i],
+                                  open=self.aapl['open'][i]),
+                        ibm=dict(close=self.ibm['close'][i],
+                                 open=self.ibm['open'][i]))
+            mc.push(data)
+            if i < window:
+                start = 0
+            else:
+                start = i + 1 - window
+
+            if i < 1:
+                continue
+
+            value = mc.value
+            for name in value.index():
+                xs = self.dataSet[name]['close'][start:(i + 1)]
+                ys = self.dataSet[name]['open'][start:(i + 1)]
+                expected = np.corrcoef(xs, ys)[0, 1]
+                calculated = value[name]
+                self.assertAlmostEqual(expected, calculated, 12, 'at index {0}\n'
+                                                                 'expected:   {1:.12f}\n'
+                                                                 'calculated: {2:.12f}'.format(i, expected, calculated))
+
     def testSecurityMovingQuantile(self):
         window = 10
         mq = SecurityMovingQuantile(window, ['close'])

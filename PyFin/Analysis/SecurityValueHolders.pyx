@@ -313,10 +313,10 @@ cdef class SecurityBinaryValueHolder(SecurityValueHolder):
         for name in sec_values1.index():
             try:
                 holder = self._innerHolders[name]
-                holder.push({dummy_name1: sec_values1[name], dummy_name2: sec_values2})
+                holder.push({dummy_name1: sec_values1[name], dummy_name2: sec_values2[name]})
             except KeyError:
                 holder = copy.deepcopy(self._holderTemplate)
-                holder.push({dummy_name1: sec_values1[name], dummy_name2: sec_values2})
+                holder.push({dummy_name1: sec_values1[name], dummy_name2: sec_values2[name]})
                 self._innerHolders[name] = holder
 
     def __str__(self):

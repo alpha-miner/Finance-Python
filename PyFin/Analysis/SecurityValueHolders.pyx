@@ -282,6 +282,47 @@ cdef class SecuritySingleValueHolder(SecurityValueHolder):
         return str(self._holderTemplate)
 
 
+cdef class SecurityBinaryValueHolder(SecurityValueHolder):
+    def __init__(self, window, holderType, x, y):
+        super(SecurityBinaryValueHolder, self).__init__()
+        self._compHolder1 = build_holder(x)
+        self._compHolder2 = build_holder(y)
+        self._dependency = list(set(self._compHolder1.fields + self._compHolder2.fields))
+        self._window = window + max(self._compHolder1.window, self._compHolder1.window)
+        self._holderTemplate = holderType(window=window, x=str(self._compHolder1), y=str(self._compHolder2))
+        self._innerHolders = {
+            name: copy.deepcopy(self._holderTemplate) for name in self._compHolder1.symbolList
+            }
+
+    cpdef push(self, dict data):
+
+        cdef SeriesValues sec_values1
+        cdef SeriesValues sec_values2
+        cdef Accumulator holder
+        cdef str dummy_name1
+        cdef str dummy_name2
+        self.updated = 0
+
+        dummy_name1 = str(self._compHolder1)
+        dummy_name2 = str(self._compHolder2)
+        self._compHolder1.push(data)
+        self._compHolder2.push(data)
+        sec_values1 = self._compHolder1.value_all()
+        sec_values2 = self._compHolder2.value_all()
+
+        for name in sec_values1.index():
+            try:
+                holder = self._innerHolders[name]
+                holder.push({dummy_name1: sec_values1[name], dummy_name2: sec_values2})
+            except KeyError:
+                holder = copy.deepcopy(self._holderTemplate)
+                holder.push({dummy_name1: sec_values1[name], dummy_name2: sec_values2})
+                self._innerHolders[name] = holder
+
+    def __str__(self):
+        return str(self._holderTemplate)
+
+
 cdef class SecurityStatelessSingleValueHolder(SecurityValueHolder):
 
     def __init__(self, holderType, x, **kwargs):

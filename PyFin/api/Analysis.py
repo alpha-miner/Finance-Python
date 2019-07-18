@@ -26,6 +26,7 @@ from PyFin.Analysis.TechnicalAnalysis import SecurityMovingStandardDeviation
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingCountedPositive
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingPositiveAverage
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingRSI
+from PyFin.Analysis.TechnicalAnalysis import SecurityMovingCorrelation
 from PyFin.Analysis.TechnicalAnalysis import SecuritySignValueHolder
 from PyFin.Analysis.TechnicalAnalysis import SecurityXAverageValueHolder
 from PyFin.Analysis.TechnicalAnalysis import SecurityMACDValueHolder
@@ -120,8 +121,12 @@ def MACD(short, long, x='x'):
     return SecurityMACDValueHolder(short, long, x)
 
 
-def MRSI(window, x='x'):
+def RSI(window, x='x'):
     return SecurityMovingRSI(window, x)
+
+
+def MCORR(window, x='x', y='y'):
+    return SecurityMovingCorrelation(window, x, y)
 
 
 def MA(window, x='x'):

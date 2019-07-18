@@ -33,6 +33,7 @@ from PyFin.Analysis.TechnicalAnalysis import SecurityMovingPositiveDifferenceAve
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingNegativeDifferenceAverage
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingRSI
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingLogReturn
+from PyFin.Analysis.TechnicalAnalysis import SecurityMovingCorrelation
 
 
 class TestStatefulTechnicalAnalysis(unittest.TestCase):

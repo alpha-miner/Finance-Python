@@ -11,7 +11,7 @@ cimport numpy as np
 cimport cython
 from PyFin.Math.Accumulators.IAccumulators cimport Accumulator
 from PyFin.Analysis.SeriesValues cimport SeriesValues
-from PyFin.Analysis.SecurityValueHolders cimport SecurityValueHolder
+from PyFin.Analysis.SecurityValueHolders cimport SecuritySingleValueHolder
 from PyFin.Analysis.SecurityValueHolders cimport build_holder
 from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingAverage
 from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingDecay
@@ -34,24 +34,9 @@ from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingPositiveDifferen
 from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingNegativeDifferenceAverage
 from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingRSI
 from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingLogReturn
+from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingResidue
 from PyFin.Math.MathConstants cimport NAN
 
-
-cdef class SecuritySingleValueHolder(SecurityValueHolder):
-    def __init__(self, window, holderType, x):
-        super(SecuritySingleValueHolder, self).__init__()
-        self._compHolder = build_holder(x) if isinstance(x, SecurityValueHolder) else None
-        if self._compHolder:
-            self._dependency = self._compHolder.fields
-            self._window = window + self._compHolder.window
-            self._holderTemplate = holderType(window=window, x=str(self._compHolder))
-            self._innerHolders = {
-                name: copy.deepcopy(self._holderTemplate) for name in self._compHolder.symbolList
-                }
-        else:
-            self._dependency = [x]
-            self._window = window
-            self._holderTemplate = holderType(window=window, x=self._dependency)
 
 
 cdef class SecurityMovingAverage(SecuritySingleValueHolder):
@@ -201,20 +186,44 @@ cdef class SecurityMovingCountedPositive(SecuritySingleValueHolder):
     def __init__(self, window, x):
         super(SecurityMovingCountedPositive, self).__init__(window, MovingCountedPositive, x)
 
+    def __str__(self):
+        if self._compHolder:
+            return "\\mathrm{{MNPositive}}({0}, {1})".format(self._window - self._compHolder.window, str(self._compHolder))
+        else:
+            return str(self._holderTemplate)
+
 
 cdef class SecurityMovingPositiveAverage(SecuritySingleValueHolder):
     def __init__(self, window, x):
         super(SecurityMovingPositiveAverage, self).__init__(window, MovingPositiveAverage, x)
+
+    def __str__(self):
+        if self._compHolder:
+            return "\\mathrm{{MAPositive}}({0}, {1})".format(self._window - self._compHolder.window, str(self._compHolder))
+        else:
+            return str(self._holderTemplate)
 
 
 cdef class SecurityMovingCountedNegative(SecuritySingleValueHolder):
     def __init__(self, window, x):
         super(SecurityMovingCountedNegative, self).__init__(window, MovingCountedNegative, x)
 
+    def __str__(self):
+        if self._compHolder:
+            return "\\mathrm{{MNNegative}}({0}, {1})".format(self._window - self._compHolder.window, str(self._compHolder))
+        else:
+            return str(self._holderTemplate)
+
 
 cdef class SecurityMovingNegativeAverage(SecuritySingleValueHolder):
     def __init__(self, window, x):
         super(SecurityMovingNegativeAverage, self).__init__(window, MovingNegativeAverage, x)
+
+    def __str__(self):
+        if self._compHolder:
+            return "\\mathrm{{MANegative}}({0}, {1})".format(self._window - self._compHolder.window, str(self._compHolder))
+        else:
+            return str(self._holderTemplate)
 
 
 cdef class SecurityMovingPositiveDifferenceAverage(SecuritySingleValueHolder):
@@ -231,7 +240,66 @@ cdef class SecurityMovingRSI(SecuritySingleValueHolder):
     def __init__(self, window, x):
         super(SecurityMovingRSI, self).__init__(window, MovingRSI, x)
 
+    def __str__(self):
+        if self._compHolder:
+            return "\\mathrm{{MRSI}}({0}, {1})".format(self._window - self._compHolder.window, str(self._compHolder))
+        else:
+            return str(self._holderTemplate)
+
 
 cdef class SecurityMovingLogReturn(SecuritySingleValueHolder):
     def __init__(self, window, x):
         super(SecurityMovingLogReturn, self).__init__(window, MovingLogReturn, x)
+
+
+cdef class SecurityMovingResidue(SecuritySingleValueHolder):
+    def __init__(self, window, x):
+        super(SecurityMovingResidue, self).__init__(window, MovingResidue, x)
+
+    def __str__(self):
+        if self._compHolder:
+            return "\\mathrm{{MRes}({0}, {1})".format(self._window - self._compHolder.window, str(self._compHolder))
+        else:
+            return str(self._holderTemplate)
+
+
+# cdef class SecurityBinaryValueHolder(SecurityValueHolder):
+# 
+#     cdef public SecurityValueHolder _compHolder2
+# 
+#     def __init__(self, window, holderType, x, y):
+#         super(SecurityBinaryValueHolder, self).__init__()
+#         self._compHolder = build_holder(x) if isinstance(x, SecurityValueHolder) else None
+#         self._compHolder2 = build_holder(y) if isinstance(y, SecurityValueHolder) else None
+#         if self._compHolder:
+#             if self._compHolder2:
+#                 self._dependency = self._compHolder.fields
+#                 self._window = window + max(self._compHolder.window, self._compHolder2.window)
+#                 self._holderTemplate = holderType(window=window, x=str(self._compHolder), y=str(self._compHolder))
+#                 self._innerHolders = {
+#                     name: copy.deepcopy(self._holderTemplate) for name in self._compHolder.symbolList
+#                     }
+#             else:
+#                 self._dependency = self._compHolder.fields + [y]
+#                 self._window = window + self._compHolder.window
+#                 self._holderTemplate = holderType(window=window, x=str(self._compHolder), y=[y])
+#                 self._innerHolders = {
+#                     name: copy.deepcopy(self._holderTemplate) for name in self._compHolder.symbolList
+#                     }
+#         else:
+#             self._dependency = [x]
+#             self._window = window
+#             self._holderTemplate = holderType(window=window, x=self._dependency)
+# 
+# 
+# 
+# cdef class SecurityMovingCorrelation(SecuritySingleValueHolder):
+#     def __init__(self, window, x):
+#         super(SecurityMovingCorrelation, self).__init__(window, MovingCorrelation, x)
+# 
+#     def __str__(self):
+#         if self._compHolder:
+#             return "\\mathrm{{MCorr}({0}, {1})".format(self._window - self._compHolder.window, str(self._compHolder))
+#         else:
+#             return str(self._holderTemplate)
+

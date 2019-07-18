@@ -120,7 +120,7 @@ def MACD(short, long, x='x'):
     return SecurityMACDValueHolder(short, long, x)
 
 
-def RSI(window, x='x'):
+def MRSI(window, x='x'):
     return SecurityMovingRSI(window, x)
 
 

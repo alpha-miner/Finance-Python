@@ -90,4 +90,5 @@ __all__ = ['SecuritySignValueHolder',
            'SecurityMovingPositiveDifferenceAverage',
            'SecurityMovingNegativeDifferenceAverage',
            'SecurityMovingRSI',
-           'SecurityMovingLogReturn']
+           'SecurityMovingLogReturn',
+           'SecurityMovingCorrelation']

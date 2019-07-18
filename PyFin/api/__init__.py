@@ -22,7 +22,7 @@ from PyFin.Analysis.SeriesValues import SeriesValues
 from PyFin.api.Analysis import SIGN
 from PyFin.api.Analysis import EMA
 from PyFin.api.Analysis import MACD
-from PyFin.api.Analysis import RSI
+from PyFin.api.Analysis import MRSI
 from PyFin.api.Analysis import MA
 from PyFin.api.Analysis import MADecay
 from PyFin.api.Analysis import MMAX
@@ -97,7 +97,7 @@ __all__ = ["datesList",
            "SeriesValues",
            "EMA",
            "MACD",
-           "RSI",
+           "MRSI",
            "MA",
            "MADecay",
            "MMAX",

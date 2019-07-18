@@ -172,13 +172,11 @@ cdef class SecurityOrOperatorValueHolder(SecurityCombinedValueHolder):
     pass
 
 
-cdef class SecurityShiftedValueHolder(SecurityStatelessSingleValueHolder):
+cdef class SecurityShiftedValueHolder(SecuritySingleValueHolder):
     pass
 
-cdef class SecurityDeltaValueHolder(SecurityValueHolder):
-
-    cdef public SecurityValueHolder _compHolder
-    cpdef push(self, dict data)
+cdef class SecurityDeltaValueHolder(SecuritySingleValueHolder):
+    pass
 
 
 cdef class SecurityIIFValueHolder(SecurityValueHolder):

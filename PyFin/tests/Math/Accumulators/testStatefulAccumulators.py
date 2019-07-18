@@ -108,9 +108,9 @@ class TestStatefulAccumulators(unittest.TestCase):
         ma = MovingAverage(10, 'close')
 
         with self.assertRaises(ValueError):
-            _ = Shift(ma, N=0)
+            _ = Shift(0, ma)
 
-        test = Shift(ma, N=1)
+        test = Shift(1, ma)
 
         test.push(dict(close=2.0))
         ma.push(dict(close=2.0))
@@ -128,9 +128,9 @@ class TestStatefulAccumulators(unittest.TestCase):
         ma = MovingAverage(10, 'close')
 
         with self.assertRaises(ValueError):
-            _ = Delta(ma, N=0)
+            _ = Delta(window=0, x=ma)
 
-        test = Delta(ma, N=2)
+        test = Delta(2, ma)
 
         test.push(dict(close=2.0))
         ma.push(dict(close=2.0))
@@ -149,7 +149,7 @@ class TestStatefulAccumulators(unittest.TestCase):
 
     def testShiftValueHolderDeepcopy(self):
         ma = Latest('close')
-        test = Shift(ma, N=2)
+        test = Shift(2, ma)
 
         test.push(dict(close=2.0))
         test.push(dict(close=3.0))
@@ -160,7 +160,7 @@ class TestStatefulAccumulators(unittest.TestCase):
 
     def testShiftValueHolderPickle(self):
         ma = Latest('close')
-        test = Shift(ma, N=2)
+        test = Shift(2, ma)
 
         test.push(dict(close=2.0))
         test.push(dict(close=3.0))
@@ -1504,7 +1504,7 @@ class TestStatefulAccumulators(unittest.TestCase):
         os.unlink(f.name)
 
     def testShiftStr(self):
-        s = Shift(Latest('roe'), 2)
+        s = Shift(2, Latest('roe'))
         self.assertEqual("\mathrm{Shift}(''\\text{roe}'', 2)", str(s))
 
     def testMovingMaxStr(self):

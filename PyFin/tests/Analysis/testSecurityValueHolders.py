@@ -49,8 +49,7 @@ class TestSecurityValueHolders(unittest.TestCase):
     def testSecurityValueHolderWithGetItemUseInt(self):
 
         shift = 2
-
-        benchmark = SecurityShiftedValueHolder(SecurityLatestValueHolder(x='close'), shift)
+        benchmark = SecurityShiftedValueHolder(shift, SecurityLatestValueHolder(x='close'))
         testValueHolder = SecurityLatestValueHolder(x='close')[shift]
 
         for i in range(len(self.datas['aapl']['close'])):
@@ -809,7 +808,7 @@ class TestSecurityValueHolders(unittest.TestCase):
 
     def testDeltaSecurityValueHolder(self):
         mm = SecurityMovingAverage(2, 'close')
-        delta1 = SecurityDeltaValueHolder(mm, 2)
+        delta1 = SecurityDeltaValueHolder(2, mm)
 
         data1 = {'aapl': {'close': 1.0},
                  'ibm': {'close': 2.0},
@@ -856,7 +855,7 @@ class TestSecurityValueHolders(unittest.TestCase):
             _ = mm.shift(0)
 
     def testShiftedSecurityValueHolderDeepcopy(self):
-        tested = SecurityShiftedValueHolder(SecurityLatestValueHolder('close'), 2)
+        tested = SecurityShiftedValueHolder(2, SecurityLatestValueHolder('close'))
 
         data = dict(aapl=dict(close=1.0),
                     ibm=dict(close=2.0))
@@ -878,7 +877,7 @@ class TestSecurityValueHolders(unittest.TestCase):
             self.assertAlmostEqual(expected[name], calcualted[name])
 
     def testShiftedSecurityValueHolderPickle(self):
-        tested = SecurityShiftedValueHolder(SecurityLatestValueHolder('close'), 2)
+        tested = SecurityShiftedValueHolder(2, SecurityLatestValueHolder('close'))
 
         data = dict(aapl=dict(close=1.0),
                     ibm=dict(close=2.0))

@@ -265,11 +265,11 @@ def ROUND(x):
 
 
 def SHIFT(x, n):
-    return SecurityShiftedValueHolder(x, n)
+    return SecurityShiftedValueHolder(n, x)
 
 
 def DELTA(x, n):
-    return SecurityDeltaValueHolder(x, n)
+    return SecurityDeltaValueHolder(n, x)
 
 
 def IIF(flag, left, right):

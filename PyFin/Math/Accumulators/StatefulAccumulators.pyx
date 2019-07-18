@@ -49,11 +49,11 @@ cdef class StatefulValueHolder(Accumulator):
 
 cdef class Shift(StatefulValueHolder):
 
-    def __init__(self, x, N=1):
-        super(Shift, self).__init__(N)
-        pyFinAssert(N >= 1, ValueError, "shift value should not be less than 1")
+    def __init__(self, window, x):
+        super(Shift, self).__init__(window)
+        pyFinAssert(window >= 1, ValueError, "shift value should not be less than 1")
         self._x = build_holder(x)
-        self._window = self._x.window + N
+        self._window = self._x.window + window
         self._dependency = deepcopy(self._x.dependency)
         self._popout = NAN
 
@@ -74,11 +74,11 @@ cdef class Shift(StatefulValueHolder):
 
 cdef class Delta(StatefulValueHolder):
 
-    def __init__(self, x, N=1):
-        super(Delta, self).__init__(N)
-        pyFinAssert(N >= 1, ValueError, "Delta window value should not be less than 1")
+    def __init__(self, window, x):
+        super(Delta, self).__init__(window)
+        pyFinAssert(window >= 1, ValueError, "Delta window value should not be less than 1")
         self._x = build_holder(x)
-        self._window = self._x.window + N
+        self._window = self._x.window + window
         self._dependency = deepcopy(self._x.dependency)
         self._popout = NAN
         self._current = NAN
@@ -427,7 +427,7 @@ cdef class MovingPositiveDifferenceAverage(SingleValuedValueHolder):
 
     def __init__(self, window, x):
         super(MovingPositiveDifferenceAverage, self).__init__(window, x)
-        cdef Accumulator runningPositive = PositivePart(build_holder(x) - Shift(build_holder(x), 1))
+        cdef Accumulator runningPositive = PositivePart(build_holder(x) - Shift(1, build_holder(x)))
         self._runningAverage = MovingAverage(window, x=runningPositive)
 
     cpdef push(self, dict data):
@@ -445,7 +445,7 @@ cdef class MovingNegativeDifferenceAverage(SingleValuedValueHolder):
 
     def __init__(self, window, x):
         super(MovingNegativeDifferenceAverage, self).__init__(window, x)
-        cdef Accumulator runningNegative = NegativePart(build_holder(x) - Shift(build_holder(x), 1))
+        cdef Accumulator runningNegative = NegativePart(build_holder(x) - Shift(1, build_holder(x)))
         self._runningAverage = MovingAverage(window, x=runningNegative)
 
     cpdef push(self, dict data):

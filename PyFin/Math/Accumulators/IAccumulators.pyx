@@ -476,6 +476,8 @@ cpdef build_holder(name):
         return Identity(float(name))
     elif hasattr(name, '__iter__'):
         return build_holder(name[0])
+    else:
+        raise ValueError("({0}) is not recognized as a valid accumuator type".format(type(name)))
 
 
 cdef class CompoundedValueHolder(Accumulator):

@@ -447,15 +447,16 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
                 continue
 
             value = mc.value
-            for name in value.index():
-                xs = self.dataSet[name]['close'][start:(i + 1)]
-                ys = self.dataSet[name]['open'][start:(i + 1)]
-                expected = np.corrcoef(xs, ys)[0, 1]
-                calculated = value[name]
-                self.assertAlmostEqual(expected, calculated, 12, 'at index {0}\n'
-                                                                 'expected:   {1:.12f}\n'
-                                                                 'calculated: {2:.12f}'.format(i, expected, calculated))
-
+            for i, name in enumerate(value.index()):
+                if i >= window:
+                    xs = self.dataSet[name]['close'][start:(i + 1)]
+                    ys = self.dataSet[name]['open'][start:(i + 1)]
+                    zs = np.where(xs > ys, 1., 0.)
+                    expected = np.corrcoef(xs, zs)[0, 1]
+                    calculated = value[name]
+                    self.assertAlmostEqual(expected, calculated, 12, 'at index {0}\n'
+                                                                     'expected:   {1:.12f}\n'
+                                                                     'calculated: {2:.12f}'.format(i, expected, calculated))
 
     def testSecurityMovingQuantile(self):
         window = 10

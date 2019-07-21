@@ -93,8 +93,11 @@ cdef class SecurityValueHolder(object):
             n = len(names)
             res = np.zeros(n)
             for i, name in enumerate(names):
-                holder = self._innerHolders[name]
-                res[i] = holder.result()
+                try:
+                    holder = self._innerHolders[name]
+                    res[i] = holder.result()
+                except ArithmeticError:
+                    res[i] = NAN
             return SeriesValues(res, index=names)
 
     cpdef double value_by_name(self, name):
@@ -102,8 +105,11 @@ cdef class SecurityValueHolder(object):
         if self.updated:
             return self.cached[name]
         else:
-            holder = self._innerHolders[name]
-            return holder.result()
+            try:
+                holder = self._innerHolders[name]
+                return holder.result()
+            except ArithmeticError:
+                return NAN
 
     @property
     def holders(self):
@@ -288,7 +294,7 @@ cdef class SecurityBinaryValueHolder(SecurityValueHolder):
         self._compHolder1 = build_holder(x)
         self._compHolder2 = build_holder(y)
         self._dependency = list(set(self._compHolder1.fields + self._compHolder2.fields))
-        self._window = window + max(self._compHolder1.window, self._compHolder1.window)
+        self._window = window + max(self._compHolder1.window, self._compHolder2.window)
         self._holderTemplate = holderType(window=window, x=str(self._compHolder1), y=str(self._compHolder2))
         self._innerHolders = {
             name: copy.deepcopy(self._holderTemplate) for name in self._compHolder1.symbolList

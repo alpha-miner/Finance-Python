@@ -397,7 +397,9 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
 
     def testSecurityMovingCorrelation(self):
         window = 120
-        mc = SecurityMovingCorrelation(window, ['close'], ['open'])
+        x = SecurityLatestValueHolder('close')
+        y = SecurityLatestValueHolder('open')
+        mc = SecurityMovingCorrelation(window, x, y)
 
         for i in range(len(self.aapl['close'])):
             data = dict(aapl=dict(close=self.aapl['close'][i],

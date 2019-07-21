@@ -16,6 +16,7 @@ from scipy.stats import norm
 from PyFin.Analysis.SecurityValueHolders import SecurityLatestValueHolder
 from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import SecurityDiffValueHolder
 from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import SecuritySignValueHolder
+from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import SecurityAverageValueHolder
 from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import SecurityXAverageValueHolder
 from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import SecurityExpValueHolder
 from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import SecurityLogValueHolder
@@ -58,6 +59,25 @@ class TestStatelessTechnicalAnalysis(unittest.TestCase):
             value = sign.value
             for name in value.index():
                 expected[name] = np.sign(self.dataSet[name]['close'][i])
+                calculated = value[name]
+                self.assertAlmostEqual(expected[name], calculated, 12, 'at index {0}\n'
+                                                                       'expected:   {1:.12f}\n'
+                                                                       'calculated: {2:.12f}'
+                                       .format(i, expected[name], calculated))
+
+    def testSecurityAverageValueHolder(self):
+        av = SecurityAverageValueHolder('close')
+        expected = {}
+        for i in range(len(self.aapl['close'])):
+            data = dict(aapl=dict(close=self.aapl['close'][i],
+                                  open=self.aapl['open'][i]),
+                        ibm=dict(close=self.ibm['close'][i],
+                                 open=self.ibm['open'][i]))
+            av.push(data)
+
+            value = av.value
+            for name in value.index():
+                expected[name] = np.mean(self.dataSet[name]['close'][:i+1])
                 calculated = value[name]
                 self.assertAlmostEqual(expected[name], calculated, 12, 'at index {0}\n'
                                                                        'expected:   {1:.12f}\n'

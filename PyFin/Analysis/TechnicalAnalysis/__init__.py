@@ -6,6 +6,7 @@ Created on 2015-8-8
 """
 
 from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import SecuritySignValueHolder
+from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import SecurityAverageValueHolder
 from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import SecurityXAverageValueHolder
 from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import SecurityMACDValueHolder
 from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import SecurityExpValueHolder
@@ -51,6 +52,7 @@ from PyFin.Analysis.TechnicalAnalysis.StatefulTechnicalAnalysers import Security
 from PyFin.Analysis.TechnicalAnalysis.StatefulTechnicalAnalysers import SecurityMovingCorrelation
 
 __all__ = ['SecuritySignValueHolder',
+           'SecurityAverageValueHolder',
            'SecurityXAverageValueHolder',
            'SecurityMACDValueHolder',
            'SecurityExpValueHolder',

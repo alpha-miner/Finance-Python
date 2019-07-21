@@ -28,6 +28,7 @@ from PyFin.Analysis.TechnicalAnalysis import SecurityMovingPositiveAverage
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingRSI
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingCorrelation
 from PyFin.Analysis.TechnicalAnalysis import SecuritySignValueHolder
+from PyFin.Analysis.TechnicalAnalysis import SecurityAverageValueHolder
 from PyFin.Analysis.TechnicalAnalysis import SecurityXAverageValueHolder
 from PyFin.Analysis.TechnicalAnalysis import SecurityMACDValueHolder
 from PyFin.Analysis.TechnicalAnalysis import SecuritySqrtValueHolder
@@ -111,6 +112,10 @@ def CSRes(left, right):
 
 def SIGN(x='x'):
     return SecuritySignValueHolder(x)
+
+
+def AVG(x='x'):
+    return SecurityAverageValueHolder(x)
 
 
 def EMA(window, x='x'):

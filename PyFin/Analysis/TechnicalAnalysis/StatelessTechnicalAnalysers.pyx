@@ -11,6 +11,7 @@ from PyFin.Analysis.SecurityValueHolders cimport SecurityCombinedValueHolder
 from PyFin.Analysis.SecurityValueHolders cimport build_holder
 from PyFin.Math.Accumulators.IAccumulators cimport Sign
 from PyFin.Math.Accumulators.StatelessAccumulators cimport XAverage
+from PyFin.Math.Accumulators.StatelessAccumulators cimport Average
 from PyFin.Math.Accumulators.StatefulAccumulators cimport MACD
 from PyFin.Math.Accumulators.IAccumulators cimport Exp
 from PyFin.Math.Accumulators.IAccumulators cimport Log
@@ -30,6 +31,12 @@ from PyFin.Math.Accumulators.StatelessAccumulators cimport SimpleReturn
 from PyFin.Math.Accumulators.StatelessAccumulators cimport LogReturn
 from PyFin.Analysis.SeriesValues import s_maximum
 from PyFin.Analysis.SeriesValues import s_minimum
+
+
+cdef class SecurityAverageValueHolder(SecurityStatelessSingleValueHolder):
+    def __init__(self, x):
+        super(SecurityAverageValueHolder, self).__init__(holderType=Average,
+                                                         x=x)
 
 
 cdef class SecurityXAverageValueHolder(SecurityStatelessSingleValueHolder):

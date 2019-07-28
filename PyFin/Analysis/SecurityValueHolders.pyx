@@ -265,7 +265,6 @@ cdef class SecuritySingleValueHolder(SecurityValueHolder):
             }
 
     cpdef push(self, dict data):
-
         cdef SeriesValues sec_values
         cdef Accumulator holder
         cdef str dummy_name
@@ -429,6 +428,9 @@ cdef class FilteredSecurityValueHolder(SecurityValueHolder):
         self._filter.push(data)
         self.updated = 0
 
+    def __str__(self):
+        return "\\mathrm{Filter}({0}, {1})".format(str(self._filter), str(self._computer))
+
 
 cdef class IdentitySecurityValueHolder(SecurityValueHolder):
 
@@ -437,6 +439,8 @@ cdef class IdentitySecurityValueHolder(SecurityValueHolder):
         self._value = value
         self._dependency = []
         self._symbols = set()
+        self.updated = 0
+        self.cached = None
 
     def __str__(self):
         return str(self._value)
@@ -450,6 +454,7 @@ cdef class IdentitySecurityValueHolder(SecurityValueHolder):
 
     cpdef push(self, dict data):
         self._symbols = self._symbols.union(data.keys())
+        self.updated = 0
 
     cpdef SeriesValues value_all(self):
         return SeriesValues({n: self._value for n in self._symbols})
@@ -459,6 +464,9 @@ cdef class IdentitySecurityValueHolder(SecurityValueHolder):
 
     cpdef SeriesValues value_by_names(self, list names):
         return SeriesValues({n: self._value for n in names})
+
+    def __str__(self):
+        return "\\mathrm{Identity}({0})".format(str(self._value))
 
 
 cdef class SecurityConstArrayValueHolder(SecurityValueHolder):
@@ -740,7 +748,6 @@ cdef class SecurityCombinedValueHolder(SecurityValueHolder):
         super(SecurityCombinedValueHolder, self).__init__()
         self._left = build_holder(left)
         self._right = build_holder(right)
-
         self._window = max(self._left.window, self._right.window)
         self._dependency = list(set(self._left.fields + self._right.fields))
         self._op = op
@@ -823,19 +830,7 @@ cdef class SecurityMultipliedValueHolder(SecurityCombinedValueHolder):
             left, right, operator.mul)
 
     def __str__(self):
-
-        if isinstance(self._left, (SecurityAddedValueHolder, SecuritySubbedValueHolder)):
-            s1 = "({0})".format(str(self._left))
-        else:
-            s1 = "{0}".format(str(self._left))
-
-        if isinstance(self._right,  (SecurityAddedValueHolder, SecuritySubbedValueHolder)):
-            s2 = "({0})".format(str(self._right))
-        else:
-            s2 = "{0}".format(str(self._right))
-
-        return "{0} \\times {1}".format(s1, s2)
-
+        return "{0} * {1}".format(str(self._left), str(self._right))
 
 cdef class SecurityDividedValueHolder(SecurityCombinedValueHolder):
     def __init__(self, left, right):
@@ -924,7 +919,7 @@ cdef class SecurityShiftedValueHolder(SecuritySingleValueHolder):
         super(SecurityShiftedValueHolder, self).__init__(window, Shift, x)
 
     def __str__(self):
-        return "\\mathrm{{Shift}}({0}, {1})".format(str(self._compHolder), self._holderTemplate.lag())
+        return "\\mathrm{Shift}({0}, {1})".format(str(self._compHolder), self._holderTemplate.lag())
 
 
 cdef class SecurityDeltaValueHolder(SecuritySingleValueHolder):
@@ -966,6 +961,8 @@ cdef class SecurityIIFValueHolder(SecurityValueHolder):
     cpdef SeriesValues value_all(self):
 
         cdef SeriesValues flag_value
+        cdef np.ndarray[double, ndim=1] left_value
+        cdef np.ndarray[double, ndim=1] right_value
 
         if self.updated:
             return self.cached
@@ -994,11 +991,12 @@ cdef class SecurityIIFValueHolder(SecurityValueHolder):
     cpdef SeriesValues value_by_names(self, list names):
 
         cdef SeriesValues flag_value
+        cdef np.ndarray[double, ndim=1] left_value
+        cdef np.ndarray[double, ndim=1] right_value
 
         if self.updated:
             return self.cached[names]
         else:
-
             flag_value = self._flag.value_by_names(names)
 
             left_value = self._left.value_by_names(names).values
@@ -1008,3 +1006,6 @@ cdef class SecurityIIFValueHolder(SecurityValueHolder):
                                          left_value,
                                          right_value),
                                 flag_value.name_mapping)
+
+    def __str__(self):
+        return "\\mathrm{IIF}({0}, {1}, {2})".format(str(self._flag), str(self._left), str(self._right))

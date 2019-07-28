@@ -82,6 +82,9 @@ cdef class SimpleReturn(Accumulator):
         else:
             return NAN
 
+    def __str__(self):
+        return "\\mathrm{{SimpleReturn}}({0})".format(str(self._inner))
+
 
 cdef class LogReturn(Accumulator):
 
@@ -113,6 +116,9 @@ cdef class LogReturn(Accumulator):
         else:
             return NAN
 
+    def __str__(self):
+        return "\\mathrm{{LogReturn}}({0})".format(str(self._inner))
+
 
 cdef class PositivePart(Accumulator):
 
@@ -136,6 +142,9 @@ cdef class PositivePart(Accumulator):
 
     cpdef double result(self):
         return self._pos
+
+    def __str__(self):
+        return "\\mathrm{{PositivePart}}({0})".format(str(self._inner))
 
 
 cdef class NegativePart(Accumulator):
@@ -161,6 +170,9 @@ cdef class NegativePart(Accumulator):
     cpdef double result(self):
         return self._neg
 
+    def __str__(self):
+        return "\\mathrm{{NegativePart}}({0})".format(str(self._inner))
+
 
 cdef class Max(Accumulator):
 
@@ -185,6 +197,9 @@ cdef class Max(Accumulator):
     cpdef double result(self):
         return self._currentMax
 
+    def __str__(self):
+        return "\\mathrm{{Max}}({0})".format(str(self._inner))
+
 cdef class Maximum(Accumulator):
 
     def __init__(self, x, y):
@@ -205,6 +220,9 @@ cdef class Maximum(Accumulator):
 
     cpdef double result(self):
         return self._currentMax
+
+    def __str__(self):
+        return "\\mathrm{{Maximum}}({0}, {1})".format(str(self._x), str(self._y))
 
 
 cdef class Min(Accumulator):
@@ -229,6 +247,9 @@ cdef class Min(Accumulator):
     cpdef double result(self):
         return self._currentMin
 
+    def __str__(self):
+        return "\\mathrm{{Min}}({0})".format(str(self._inner))
+
 
 cdef class Minimum(Accumulator):
 
@@ -250,6 +271,9 @@ cdef class Minimum(Accumulator):
 
     cpdef double result(self):
         return self._currentMin
+
+    def __str__(self):
+        return "\\mathrm{{Minimum}}({0}, {1})".format(str(self._x), str(self._y))
 
 
 cdef class Sum(Accumulator):
@@ -273,6 +297,9 @@ cdef class Sum(Accumulator):
 
     cpdef double result(self):
         return self._currentSum
+
+    def __str__(self):
+        return "\\mathrm{{Sum}}({0})".format(str(self._inner))
 
 
 cdef class Average(Accumulator):
@@ -303,6 +330,9 @@ cdef class Average(Accumulator):
         else:
             return NAN
 
+    def __str__(self):
+        return "\\mathrm{{Average}}({0})".format(str(self._inner))
+
 
 cdef class XAverage(Accumulator):
 
@@ -328,6 +358,9 @@ cdef class XAverage(Accumulator):
         else:
             self._average += self._exp * (value - self._average)
         self._isFull = self._isFull or self._inner.isFull()
+
+    def __str__(self):
+        return "\\mathrm{{XAverage}}({0}, {1})".format(2.0 / self._exp - 1., str(self._inner))
 
     cpdef double result(self):
         return self._average
@@ -370,6 +403,9 @@ cdef class Variance(Accumulator):
         else:
             return NAN
 
+    def __str__(self):
+        return "\\mathrm{{Variance}}({0})".format(str(self._inner))
+
 
 cdef class Product(Accumulator):
 
@@ -392,3 +428,6 @@ cdef class Product(Accumulator):
 
     cpdef double result(self):
         return self._product
+
+    def __str__(self):
+        return "\\mathrm{{Product}}({0})".format(str(self._inner))

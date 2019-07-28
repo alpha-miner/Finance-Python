@@ -429,7 +429,7 @@ cdef class FilteredSecurityValueHolder(SecurityValueHolder):
         self.updated = 0
 
     def __str__(self):
-        return "\\mathrm{Filter}({0}, {1})".format(str(self._filter), str(self._computer))
+        return "\\mathrm{{Filter}}({0}, {1})".format(str(self._filter), str(self._computer))
 
 
 cdef class IdentitySecurityValueHolder(SecurityValueHolder):
@@ -466,7 +466,7 @@ cdef class IdentitySecurityValueHolder(SecurityValueHolder):
         return SeriesValues({n: self._value for n in names})
 
     def __str__(self):
-        return "\\mathrm{Identity}({0})".format(str(self._value))
+        return "\\mathrm{{Identity}}({0})".format(str(self._value))
 
 
 cdef class SecurityConstArrayValueHolder(SecurityValueHolder):
@@ -1008,4 +1008,4 @@ cdef class SecurityIIFValueHolder(SecurityValueHolder):
                                 flag_value.name_mapping)
 
     def __str__(self):
-        return "\\mathrm{IIF}({0}, {1}, {2})".format(str(self._flag), str(self._left), str(self._right))
+        return "\\mathrm{{IIF}}({0}, {1}, {2})".format(str(self._flag), str(self._left), str(self._right))

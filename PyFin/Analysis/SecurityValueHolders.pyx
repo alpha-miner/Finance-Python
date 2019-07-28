@@ -919,7 +919,7 @@ cdef class SecurityShiftedValueHolder(SecuritySingleValueHolder):
         super(SecurityShiftedValueHolder, self).__init__(window, Shift, x)
 
     def __str__(self):
-        return "\\mathrm{Shift}({0}, {1})".format(str(self._compHolder), self._holderTemplate.lag())
+        return "\\mathrm{{Shift}}({0}, {1})".format(str(self._compHolder), self._holderTemplate.lag())
 
 
 cdef class SecurityDeltaValueHolder(SecuritySingleValueHolder):

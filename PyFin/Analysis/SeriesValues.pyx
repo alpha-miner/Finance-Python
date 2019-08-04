@@ -70,12 +70,12 @@ cdef class SeriesValues(object):
     @cython.boundscheck(False)
     @cython.wraparound(False)
     cpdef SeriesValues mask(self, np.ndarray flags):
-        cdef np.ndarray bool_flags = flags.astype(bool)
+        cdef np.ndarray filtered_names
         if not self.name_array:
             self.name_array = np.array(sorted(self.name_mapping.keys()), dtype=str)
 
-        filtered_names = self.name_array[bool_flags]
-        return SeriesValues(self.values[bool_flags], dict(zip(filtered_names, range(len(filtered_names)))))
+        filtered_names = self.name_array[flags]
+        return SeriesValues(self.values[flags], dict(zip(filtered_names, range(len(filtered_names)))))
 
     def __invert__(self):
         return SeriesValues(~self.values, self.name_mapping)

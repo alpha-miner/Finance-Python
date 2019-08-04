@@ -388,13 +388,13 @@ cdef class FilteredSecurityValueHolder(SecurityValueHolder):
         return self._computer.holders
 
     cpdef value_all(self):
-        cdef SeriesValues filter_value
+        cdef np.ndarray[np.uint8_t, ndim=1, cast=True] filter_value
 
         if self.updated:
             return self.cached
         else:
-            filter_value = self._filter.value_all()
-            self.cached = self._computer.value_all().mask(filter_value.values)
+            filter_value = self._filter.value_all().values.astype(bool)
+            self.cached = self._computer.value_all().mask(filter_value)
             self.updated = 1
             return self.cached
 

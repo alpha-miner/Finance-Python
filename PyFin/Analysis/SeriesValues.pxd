@@ -13,7 +13,7 @@ cdef class SeriesValues(object):
     cdef public np.ndarray values
     cdef public np.ndarray name_array
 
-    cpdef SeriesValues mask(self, flags)
+    cpdef SeriesValues mask(self, np.ndarray flags)
     cpdef list index(self)
     cpdef SeriesValues rank(self, SeriesValues groups=*)
     cpdef SeriesValues top_n(self, int n, SeriesValues groups=*)

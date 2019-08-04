@@ -41,12 +41,9 @@ cdef class SeriesValues(object):
         if isinstance(data, dict):
             keys = sorted(data.keys())
             index = dict(zip(keys, range(len(data))))
-            data = np.array([data[k] for k in keys])
+            data = np.array([data[k] for k in keys], dtype=float)
 
-        if data.dtype == np.object:
-            self.values = data.astype(float)
-        else:
-            self.values = data
+        self.values = data.astype(float)
 
         if isinstance(index, dict):
             self.name_mapping = index
@@ -72,12 +69,13 @@ cdef class SeriesValues(object):
 
     @cython.boundscheck(False)
     @cython.wraparound(False)
-    cpdef SeriesValues mask(self, flags):
+    cpdef SeriesValues mask(self, np.ndarray flags):
+        cdef np.ndarray bool_flags = flags.astype(bool)
         if not self.name_array:
             self.name_array = np.array(sorted(self.name_mapping.keys()), dtype=str)
 
-        filtered_names = self.name_array[flags]
-        return SeriesValues(self.values[flags], dict(zip(filtered_names, range(len(filtered_names)))))
+        filtered_names = self.name_array[bool_flags]
+        return SeriesValues(self.values[bool_flags], dict(zip(filtered_names, range(len(filtered_names)))))
 
     def __invert__(self):
         return SeriesValues(~self.values, self.name_mapping)
@@ -151,20 +149,20 @@ cdef class SeriesValues(object):
     def __and__(self, right):
         if isinstance(right, SeriesValues):
             if isinstance(self, SeriesValues):
-                return SeriesValues(self.values & right.values, self.name_mapping)
+                return SeriesValues(self.values.astype(bool) & right.values.astype(bool), self.name_mapping)
             else:
-                return SeriesValues(self & right.values, right.name_mapping)
+                return SeriesValues(self & right.values.astype(bool), right.name_mapping)
         else:
-            return SeriesValues(self.values & right, self.name_mapping)
+            return SeriesValues(self.values.astype(bool) & right, self.name_mapping)
 
     def __or__(self, right):
         if isinstance(right, SeriesValues):
             if isinstance(self, SeriesValues):
-                return SeriesValues(self.values | right.values, self.name_mapping)
+                return SeriesValues(self.values.astype(bool) | right.values.astype(bool), self.name_mapping)
             else:
-                return SeriesValues(self | right.values, right.name_mapping)
+                return SeriesValues(self | right.values.astype(bool), right.name_mapping)
         else:
-            return SeriesValues(self.values | right, self.name_mapping)
+            return SeriesValues(self.values.astype(bool) | right, self.name_mapping)
 
     def __xor__(self, right):
         if isinstance(right, SeriesValues):

@@ -219,7 +219,10 @@ class TestSecurityValues(unittest.TestCase):
         self.assertEqual(calculated.name_mapping, expected.name_mapping)
 
         data1 = np.random.randn(100)
+        data1 = data1 - data1.mean()
         data2 = np.random.randn(100)
+        data2 = data2 - data2.mean()
+
         index = list(range(1, 101))
 
         test1 = SeriesValues(data1, index)

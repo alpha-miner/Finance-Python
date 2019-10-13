@@ -444,11 +444,11 @@ cdef set sse_holDays = {Date(2005, 1, 3),
                         Date(2019, 5, 3),
                         Date(2019, 6, 7),
                         Date(2019, 9, 13),
-                        Date(2019, 9, 30),
                         Date(2019, 10, 1),
                         Date(2019, 10, 2),
                         Date(2019, 10, 3),
-                        Date(2019, 10, 4)}
+                        Date(2019, 10, 4),
+                        Date(2019, 10, 7)}
 
 cdef class ChinaSseImpl(CalendarImpl):
     def __init__(self):

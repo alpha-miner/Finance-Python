@@ -120,7 +120,7 @@ class TestCalendar(unittest.TestCase):
                        Date(2019, 10, 6), Date(2019, 10, 7),
                        # China Shanghai Securities Exchange holiday list in the year 2020
                        Date(2020, 1, 1),
-                       Date(2020, 1, 24), Date(2020, 1, 25), Date(2020, 1, 26), Date(2020, 1, 27), Date(2020, 1, 28), Date(2020, 1, 29), Date(2020, 1, 30),
+                       Date(2020, 1, 24), Date(2020, 1, 25), Date(2020, 1, 26), Date(2020, 1, 27), Date(2020, 1, 28), Date(2020, 1, 29), Date(2020, 1, 30), Date(2020, 1, 31),
                        Date(2020, 4, 4), Date(2020, 4, 5), Date(2020, 4, 6),
                        Date(2020, 5, 1), Date(2020, 5, 2), Date(2020, 5, 3), Date(2020, 5, 4), Date(2020, 5, 5),
                        Date(2020, 6, 25), Date(2020, 6, 26), Date(2020, 6, 27),
@@ -177,7 +177,6 @@ class TestCalendar(unittest.TestCase):
                                   Date(2019, 10, 12),
                                   # China Inter Bank working weekend list in the year 2020
                                   Date(2020, 1, 19),
-                                  Date(2020, 2, 1),
                                   Date(2020, 4, 26),
                                   Date(2020, 5, 9),
                                   Date(2020, 6, 28),

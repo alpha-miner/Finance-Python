@@ -26,10 +26,7 @@ install:
   # Replace dep1 dep2 ... with your dependencies
   - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION
   - source activate test-environment
-  - if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then
-      conda install enum34;
-    fi
-  - conda install coverage
+  - conda install coverage=4.5.1
   - conda install numpy
   - conda install scipy
   - conda install pandas

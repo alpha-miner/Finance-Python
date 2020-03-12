@@ -255,8 +255,8 @@ cdef class SecurityMovingLogReturn(SecuritySingleValueHolder):
 
 
 cdef class SecurityMovingResidue(SecuritySingleValueHolder):
-    def __init__(self, window, x):
-        super(SecurityMovingResidue, self).__init__(window, MovingResidue, x)
+    def __init__(self, window, x, y):
+        super(SecurityMovingResidue, self).__init__(window, MovingResidue, x, y)
 
     def __str__(self):
         if self._compHolder:

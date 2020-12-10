@@ -159,7 +159,9 @@ else:
     n_cpu = 0
 
 ext_modules_settings = cythonize(generate_extensions(ext_modules, line_trace), 
-                                 compiler_directives={'embedsignature': True, 'linetrace': line_trace}, 
+                                 compiler_directives={"embedsignature": True,
+                                                      "linetrace": line_trace,
+                                                      "language_level": 3},
                                  nthreads=n_cpu)
 
 

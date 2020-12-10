@@ -125,6 +125,14 @@ class TestCalendar(unittest.TestCase):
                        Date(2020, 5, 1), Date(2020, 5, 2), Date(2020, 5, 3), Date(2020, 5, 4), Date(2020, 5, 5),
                        Date(2020, 6, 25), Date(2020, 6, 26), Date(2020, 6, 27),
                        Date(2020, 10, 1), Date(2020, 10, 2), Date(2020, 10, 3), Date(2020, 10, 4), Date(2020, 10, 5), Date(2020, 10, 6), Date(2020, 10, 7), Date(2020, 10, 8),
+                       # China Shanghai Securities Exchange holiday list in the year 2021
+                       Date(2021, 1, 1), Date(2021, 1, 2), Date(2021, 1, 3),
+                       Date(2021, 2, 11), Date(2021, 2, 12), Date(2021, 2, 13), Date(2021, 2, 14), Date(2021, 2, 15), Date(2021, 2, 16), Date(2021, 2, 17),
+                       Date(2021, 4, 3), Date(2021, 4, 4), Date(2021, 4, 5),
+                       Date(2021, 5, 1), Date(2021, 5, 2), Date(2021, 5, 3), Date(2021, 5, 4), Date(2021, 5, 5),
+                       Date(2021, 6, 12), Date(2021, 6, 13), Date(2021, 6, 14),
+                       Date(2021, 9, 19), Date(2021, 9, 20), Date(2021, 9, 21),
+                       Date(2021, 10, 1), Date(2021, 10, 2), Date(2021, 10, 3), Date(2021, 10, 4), Date(2021, 10, 5), Date(2021, 10, 6), Date(2021, 10, 7)
                        ]
 
         cal = Calendar('China.SSE')
@@ -181,7 +189,15 @@ class TestCalendar(unittest.TestCase):
                                   Date(2020, 5, 9),
                                   Date(2020, 6, 28),
                                   Date(2020, 9, 27),
-                                  Date(2020, 10, 10)]
+                                  Date(2020, 10, 10),
+                                  # China Inter Bank working weekend list in the year 2021
+                                  Date(2021, 2, 7),
+                                  Date(2021, 2, 20),
+                                  Date(2021, 4, 25),
+                                  Date(2021, 5, 8),
+                                  Date(2021, 9, 18),
+                                  Date(2021, 9, 26),
+                                  Date(2021, 10, 9)]
 
         cal = Calendar('China.IB')
 

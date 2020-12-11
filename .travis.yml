@@ -28,12 +28,12 @@ install:
   # Replace dep1 dep2 ... with your dependencies
   - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION
   - source activate test-environment
-  - conda install coverage
   - conda install numpy
   - conda install scipy
   - conda install pandas
   - conda install cython
   - pip install simpleutils
+  - pip install coverage==4.5.4
   - pip install coveralls
 # command to run tests
 script:

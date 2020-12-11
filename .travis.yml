@@ -28,7 +28,7 @@ install:
   # Replace dep1 dep2 ... with your dependencies
   - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION
   - source activate test-environment
-  - conda install coverage=4.5.1
+  - conda install coverage
   - conda install numpy
   - conda install scipy
   - conda install pandas

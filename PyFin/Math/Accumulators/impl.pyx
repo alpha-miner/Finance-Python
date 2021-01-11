@@ -45,9 +45,11 @@ cdef class Deque:
             self.is_full = self.count == self.window
             return default
 
-    cpdef void dumps(self, values):
+    cpdef list dumps(self, values):
+        cdef ret_values = []
         for v in values:
-            self.dump(v)
+            ret_values.append(self.dump(v))
+        return ret_values
 
     cdef inline size_t size(self):
         return self.count
@@ -120,3 +122,82 @@ cpdef object rebuild(bytes data, size_t window, bint is_full, size_t start, size
     c.start = start
     c.count = count
     return c
+
+
+cdef class DiffDeque:
+
+    def __cinit__(self,
+                  window):
+        self.window = window
+        self.con = []
+        self.stamps = []
+
+    @cython.cdivision(True)
+    @cython.boundscheck(False)
+    @cython.wraparound(False)
+    cpdef list dump(self, double value, int stamp, double default=NAN):
+        cdef list ret_values = []
+        while self.con and (stamp - self.stamps[0]) > self.window:
+            ret_values.append(self.con.pop(0))
+            self.stamps.pop(0)
+        self.con.append(value)
+        self.stamps.append(stamp)
+        return ret_values
+
+    cpdef list dumps(self, values, stamps):
+        cdef list ret_values = []
+        for v, s in zip(values, stamps):
+            ret_values.extend(self.dump(v, s))
+        return ret_values
+
+    cpdef size_t size(self):
+        return len(self.con)
+
+    cpdef bint isFull(self):
+        if self.con:
+            return True
+        else:
+            return False
+
+    @cython.cdivision(True)
+    @cython.boundscheck(False)
+    @cython.wraparound(False)
+    cpdef size_t idx(self, double value):
+        cdef size_t i
+        for i in range(len(self.con)):
+            if value == self.con[i]:
+                break
+        else:
+            i = -1
+        return i
+
+    @cython.wraparound(False)
+    @cython.boundscheck(False)
+    cpdef double sum(self):
+        cdef double x = 0.0
+        for v in self.con:
+            x += v
+        return x
+
+    @cython.cdivision(True)
+    @cython.boundscheck(False)
+    @cython.wraparound(False)
+    def __getitem__(self, size_t item):
+        return self.con[item]
+
+    def __richcmp__(Deque self, Deque other, int op):
+        cdef bint flag = False
+        cdef int i
+        if op == 2:
+            flag = self.window == other.window \
+                   and self.is_full == other.is_full
+            if flag:
+                for i, v in enumerate(self.con):
+                    if v != other.con[i]:
+                        return False
+                return True
+            else:
+                return False
+
+        elif op == 3:
+            return not self.__richcmp__(other, 2)

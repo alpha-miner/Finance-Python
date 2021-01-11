@@ -14,7 +14,7 @@ cdef class Deque:
     cdef public size_t count
 
     cdef double dump(self, double value, double default=*)
-    cpdef void dumps(self, values)
+    cpdef list dumps(self, values)
     cdef inline size_t size(self)
     cdef inline bint isFull(self)
     cpdef size_t idx(self, double value)
@@ -23,3 +23,17 @@ cdef class Deque:
 
 
 cpdef object rebuild(bytes data, size_t window, bint is_full, size_t start, size_t count)
+
+cdef class DiffDeque:
+
+    cdef double window
+    cdef public bint is_full
+    cdef list con
+    cdef list stamps
+
+    cpdef list dump(self, double value, int stamp, double default= *)
+    cpdef list dumps(self, values, stamps)
+    cpdef size_t size(self)
+    cpdef bint isFull(self)
+    cpdef size_t idx(self, double value)
+    cpdef double sum(self)

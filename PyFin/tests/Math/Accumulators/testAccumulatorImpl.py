@@ -12,7 +12,10 @@ import pickle
 import os
 from collections import deque
 import numpy as np
-from PyFin.Math.Accumulators.impl import Deque
+from PyFin.Math.Accumulators.impl import (
+    Deque,
+    DiffDeque
+)
 
 
 class TestAccumulatorImpl(unittest.TestCase):
@@ -55,5 +58,36 @@ class TestAccumulatorImpl(unittest.TestCase):
             caclulated_idx = deque2.idx(max_val)
             self.assertEqual(expected_idx, caclulated_idx)
 
+    def testDiffDequeDump(self):
+        deque = DiffDeque(10)
+        values = [1, 2, 3, 4, 5]
+        stamps = [1, 7, 9, 13, 26]
+
+        for i, (v, s) in enumerate(zip(values, stamps)):
+            ret_values = deque.dump(v, s)
+            if i in (0, 1, 2):
+                self.assertTrue(not ret_values)
+            elif i == 3:
+                self.assertEqual(ret_values, [1])
+            elif i == 4:
+                self.assertEqual(ret_values, [2, 3, 4])
+
+    def testDiffDequeSum(self):
+        deque = DiffDeque(10)
+        values = [1, 2, 3, 4, 5]
+        stamps = [1, 7, 9, 13, 26]
+
+        for i, (v, s) in enumerate(zip(values, stamps)):
+            deque.dump(v, s)
+            if i == 0:
+                self.assertTrue(deque.sum(), 1)
+            elif i == 1:
+                self.assertTrue(deque.sum(), 3)
+            elif i == 2:
+                self.assertTrue(deque.sum(), 6)
+            elif i == 3:
+                self.assertTrue(deque.sum(), 9)
+            elif i == 4:
+                self.assertTrue(deque.sum(), 5)
 
 

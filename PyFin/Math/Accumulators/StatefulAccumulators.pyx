@@ -299,7 +299,7 @@ cdef class TimeMovingCount(TimeSingleValuedValueHolder):
 
     cpdef push(self, dict data):
         cdef int added
-        cdef double popout
+        cdef list popouts
 
         self._x.push(data)
         cdef double value = self._x.result()
@@ -310,7 +310,7 @@ cdef class TimeMovingCount(TimeSingleValuedValueHolder):
         if value:
             added += 1
         popouts = self._deque.dump(value, data["stamp"], NAN)
-        if popout:
+        if popouts:
             added -= len(popouts)
 
         self._count += added
@@ -372,6 +372,7 @@ cdef class TimeMovingCountUnique(TimeSingleValuedValueHolder):
     cpdef push(self, dict data):
         cdef int added
         cdef double popout
+        cdef list popouts
 
         self._x.push(data)
         cdef double value = self._x.result()
@@ -384,7 +385,7 @@ cdef class TimeMovingCountUnique(TimeSingleValuedValueHolder):
             self._unique_values[value] = 1
         else:
             self._unique_values[value] += 1
-        popouts = self._deque.dump(value, NAN)
+        popouts = self._deque.dump(value, data["stamp"], NAN)
         if popouts:
             for popout in popouts:
                 self._unique_values[popout] -= 1

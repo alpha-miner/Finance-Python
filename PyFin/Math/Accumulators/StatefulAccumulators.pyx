@@ -26,6 +26,7 @@ from PyFin.Utilities.Asserts cimport pyFinAssert
 from PyFin.Utilities.Asserts cimport isClose
 from PyFin.Math.udfs cimport consecutive_int_sum
 from PyFin.Math.Accumulators.impl cimport Deque
+from PyFin.Math.Accumulators.impl cimport DiffDeque
 from PyFin.Math.MathConstants cimport NAN
 
 
@@ -45,6 +46,25 @@ cdef class StatefulValueHolder(Accumulator):
 
     cpdef bint isFull(self):
         return self._isFull
+
+
+cdef class TimeStatefulValueHolder(Accumulator):
+    def __init__(self, window):
+        super(TimeStatefulValueHolder, self).__init__()
+        if not isinstance(window, int):
+            raise ValueError("window parameter should be a positive int however {0} received"
+                             .format(window))
+        pyFinAssert(window > 0, ValueError, "window length should be greater than 0")
+        self._deque = DiffDeque(window)
+        self._isFull = False
+
+    cpdef size_t size(self):
+        return self._deque.size()
+
+    cpdef bint isFull(self):
+        return self._isFull
+
+
 
 
 cdef class Shift(StatefulValueHolder):
@@ -105,6 +125,14 @@ cdef class Delta(StatefulValueHolder):
 cdef class SingleValuedValueHolder(StatefulValueHolder):
     def __init__(self, window, x):
         super(SingleValuedValueHolder, self).__init__(window)
+        self._x = build_holder(x)
+        self._window = self._x.window + window
+        self._dependency = deepcopy(self._x.dependency)
+
+
+cdef class TimeSingleValuedValueHolder(TimeStatefulValueHolder):
+    def __init__(self, window, x):
+        super(TimeSingleValuedValueHolder, self).__init__(window)
         self._x = build_holder(x)
         self._window = self._x.window + window
         self._dependency = deepcopy(self._x.dependency)
@@ -249,8 +277,8 @@ cdef class MovingCount(SingleValuedValueHolder):
 
         if value:
             added += 1
-        popout = self._deque.dump(value, False)
-        if popout:
+        popout = self._deque.dump(value, NAN)
+        if not isnan(popout):
             added -= 1
 
         self._count += added
@@ -261,6 +289,38 @@ cdef class MovingCount(SingleValuedValueHolder):
 
     def __str__(self):
         return "\\mathrm{{MCount}}({0}, {1})".format(self._window, str(self._x))
+
+
+cdef class TimeMovingCount(TimeSingleValuedValueHolder):
+
+    def __init__(self, window, x):
+        super(TimeMovingCount, self).__init__(window, x)
+        self._count = 0
+
+    cpdef push(self, dict data):
+        cdef int added
+        cdef double popout
+
+        self._x.push(data)
+        cdef double value = self._x.result()
+        if isnan(value):
+            return NAN
+        added = 0
+
+        if value:
+            added += 1
+        popouts = self._deque.dump(value, data["stamp"], NAN)
+        if popout:
+            added -= len(popouts)
+
+        self._count += added
+        self._isFull = self._isFull or self._deque.isFull()
+
+    cpdef double result(self):
+        return self._count
+
+    def __str__(self):
+        return "\\mathrm{{TimeMCount}}({0}, {1})".format(self._window, str(self._x))
 
 
 cdef class MovingCountUnique(SingleValuedValueHolder):
@@ -300,6 +360,46 @@ cdef class MovingCountUnique(SingleValuedValueHolder):
 
     def __str__(self):
         return "\\mathrm{{MCountUnique}}({0}, {1})".format(self._window, str(self._x))
+
+
+cdef class TimeMovingCountUnique(TimeSingleValuedValueHolder):
+
+    def __init__(self, window, x):
+        super(TimeMovingCountUnique, self).__init__(window, x)
+        self._count = 0
+        self._unique_values = dict()
+
+    cpdef push(self, dict data):
+        cdef int added
+        cdef double popout
+
+        self._x.push(data)
+        cdef double value = self._x.result()
+        if isnan(value):
+            return NAN
+        added = 0
+
+        if value not in self._unique_values:
+            added += 1
+            self._unique_values[value] = 1
+        else:
+            self._unique_values[value] += 1
+        popouts = self._deque.dump(value, NAN)
+        if popouts:
+            for popout in popouts:
+                self._unique_values[popout] -= 1
+                if self._unique_values[popout] == 0:
+                    del self._unique_values[popout]
+                    added -= 1
+
+        self._count += added
+        self._isFull = self._isFull or self._deque.isFull()
+
+    cpdef double result(self):
+        return self._count
+
+    def __str__(self):
+        return "\\mathrm{{TimeMCountUnique}}({0}, {1})".format(self._window, str(self._x))
 
 
 cdef class MovingAllTrue(SingleValuedValueHolder):

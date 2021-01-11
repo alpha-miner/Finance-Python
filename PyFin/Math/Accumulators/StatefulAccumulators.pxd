@@ -7,12 +7,21 @@ Created on 2017-2-10
 
 cimport numpy as np
 from PyFin.Math.Accumulators.impl cimport Deque
+from PyFin.Math.Accumulators.impl cimport DiffDeque
 from PyFin.Math.Accumulators.IAccumulators cimport Accumulator
 
 
 cdef class StatefulValueHolder(Accumulator):
 
     cdef public Deque _deque
+
+    cpdef size_t size(self)
+    cpdef bint isFull(self)
+
+
+cdef class TimeStatefulValueHolder(Accumulator):
+
+    cdef public DiffDeque _deque
 
     cpdef size_t size(self)
     cpdef bint isFull(self)
@@ -40,6 +49,12 @@ cdef class Delta(StatefulValueHolder):
 
 
 cdef class SingleValuedValueHolder(StatefulValueHolder):
+
+    cdef public Accumulator _x
+
+
+
+cdef class TimeSingleValuedValueHolder(TimeStatefulValueHolder):
 
     cdef public Accumulator _x
 
@@ -88,7 +103,23 @@ cdef class MovingCount(SingleValuedValueHolder):
     cpdef double result(self)
 
 
+cdef class TimeMovingCount(TimeSingleValuedValueHolder):
+
+    cdef public size_t _count
+
+    cpdef push(self, dict data)
+    cpdef double result(self)
+
+
 cdef class MovingCountUnique(SingleValuedValueHolder):
+    cdef public size_t _count
+    cdef public dict _unique_values
+
+    cpdef push(self, dict data)
+    cpdef double result(self)
+
+
+cdef class TimeMovingCountUnique(TimeSingleValuedValueHolder):
     cdef public size_t _count
     cdef public dict _unique_values
 

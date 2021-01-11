@@ -80,6 +80,22 @@ cdef class MovingQuantile(SortedValueHolder):
     cpdef double result(self)
 
 
+cdef class MovingCount(SingleValuedValueHolder):
+
+    cdef public size_t _count
+
+    cpdef push(self, dict data)
+    cpdef double result(self)
+
+
+cdef class MovingCountUnique(SingleValuedValueHolder):
+    cdef public size_t _count
+    cdef public dict _unique_values
+
+    cpdef push(self, dict data)
+    cpdef double result(self)
+
+
 cdef class MovingAllTrue(SingleValuedValueHolder):
 
     cdef public size_t _countedTrue

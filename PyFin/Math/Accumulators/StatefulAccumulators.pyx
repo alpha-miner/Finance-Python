@@ -231,6 +231,76 @@ cdef class MovingQuantile(SortedValueHolder):
         return "\\mathrm{{MQuantile}}({0}, {1})".format(self._window, str(self._x))
 
 
+cdef class MovingCount(SingleValuedValueHolder):
+
+    def __init__(self, window, x):
+        super(MovingCount, self).__init__(window, x)
+        self._count = 0
+
+    cpdef push(self, dict data):
+        cdef int added
+        cdef double popout
+
+        self._x.push(data)
+        cdef double value = self._x.result()
+        if isnan(value):
+            return NAN
+        added = 0
+
+        if value:
+            added += 1
+        popout = self._deque.dump(value, False)
+        if popout:
+            added -= 1
+
+        self._count += added
+        self._isFull = self._isFull or self._deque.isFull()
+
+    cpdef double result(self):
+        return self._count
+
+    def __str__(self):
+        return "\\mathrm{{MCount}}({0}, {1})".format(self._window, str(self._x))
+
+
+cdef class MovingCountUnique(SingleValuedValueHolder):
+
+    def __init__(self, window, x):
+        super(MovingCountUnique, self).__init__(window, x)
+        self._count = 0
+        self._unique_values = dict()
+
+    cpdef push(self, dict data):
+        cdef int added
+        cdef double popout
+
+        self._x.push(data)
+        cdef double value = self._x.result()
+        if isnan(value):
+            return NAN
+        added = 0
+
+        if value and value not in self._unique_values:
+            added += 1
+            self._unique_values[value] = 1
+        else:
+            self._unique_values[value] += 1
+        popout = self._deque.dump(value, False)
+        if popout:
+            self._unique_values[popout] -= 1
+            if self._unique_values[popout] == 0:
+                added -= 1
+
+        self._count += added
+        self._isFull = self._isFull or self._deque.isFull()
+
+    cpdef double result(self):
+        return self._count
+
+    def __str__(self):
+        return "\\mathrm{{MCountUnique}}({0}, {1})".format(self._window, str(self._x))
+
+
 cdef class MovingAllTrue(SingleValuedValueHolder):
 
     def __init__(self, window, x):

@@ -26,7 +26,9 @@ from PyFin.Math.Accumulators import MovingArgMin
 from PyFin.Math.Accumulators import MovingRank
 from PyFin.Math.Accumulators import MovingQuantile
 from PyFin.Math.Accumulators import MovingCount
+from PyFin.Math.Accumulators import TimeMovingCount
 from PyFin.Math.Accumulators import MovingCountUnique
+from PyFin.Math.Accumulators import TimeMovingCountUnique
 from PyFin.Math.Accumulators import MovingAllTrue
 from PyFin.Math.Accumulators import MovingAnyTrue
 from PyFin.Math.Accumulators import MovingAverage
@@ -803,6 +805,21 @@ class TestStatefulAccumulators(unittest.TestCase):
                                                    "expected:   {1}\n"
                                                    "calculated: {2}".format(i, expected, calculated))
 
+    def testTimeMovingCount(self):
+        window = 60
+        mat = TimeMovingCount(window, Latest("x"))
+        values = np.random.randn(2500)
+        stamps = np.cumsum(np.random.randint(0, 10, 2500))
+        for i, (value, stamp) in enumerate(zip(values, stamps)):
+            mat.push(dict(x=value, stamp=stamp))
+
+            calculated = mat.result()
+            time_diff = (stamp - stamps) <= window
+            expected = np.sum(time_diff[:i+1])
+            self.assertEqual(calculated, expected, "at index {0}\n"
+                                                   "expected:   {1}\n"
+                                                   "calculated: {2}".format(i, expected, calculated))
+
     def testMovingCountUnique(self):
         window = 10
         mat = MovingCountUnique(window, Latest('x'))
@@ -815,6 +832,22 @@ class TestStatefulAccumulators(unittest.TestCase):
 
             calculated = mat.result()
             expected = len(np.unique(con))
+            self.assertEqual(calculated, expected, "at index {0}\n"
+                                                   "expected:   {1}\n"
+                                                   "calculated: {2}".format(i, expected, calculated))
+
+    def testTimeMovingCountUnique(self):
+        window = 60
+        mat = TimeMovingCountUnique(window, Latest("x"))
+        values = np.random.randint(0, 10, 2500)
+        stamps = np.cumsum(np.random.randint(0, 10, 2500))
+        for i, (value, stamp) in enumerate(zip(values, stamps)):
+            mat.push(dict(x=value, stamp=stamp))
+
+            calculated = mat.result()
+            time_diff = (stamp - stamps) <= window
+            time_diff[i+1:] = False
+            expected = len(np.unique(values[time_diff]))
             self.assertEqual(calculated, expected, "at index {0}\n"
                                                    "expected:   {1}\n"
                                                    "calculated: {2}".format(i, expected, calculated))

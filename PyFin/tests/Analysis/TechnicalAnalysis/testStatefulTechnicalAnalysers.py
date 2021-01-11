@@ -170,7 +170,6 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
                                   open=self.aapl['open'][i]),
                         ibm=dict(close=self.ibm['close'][i],
                                  open=self.ibm['open'][i]))
-
             ma.push(data)
 
             for name in data:

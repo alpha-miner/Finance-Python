@@ -64,7 +64,9 @@ from PyFin.Math.Accumulators.StatefulAccumulators import MovingArgMin
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingRank
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingQuantile
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingCount
+from PyFin.Math.Accumulators.StatefulAccumulators import TimeMovingCount
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingCountUnique
+from PyFin.Math.Accumulators.StatefulAccumulators import TimeMovingCountUnique
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingAllTrue
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingAnyTrue
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingProduct
@@ -130,7 +132,9 @@ __all__ = ["Exp",
            "MovingRank",
            "MovingQuantile",
            "MovingCount",
+           "TimeMovingCount",
            "MovingCountUnique",
+           "TimeMovingCountUnique",
            "MovingAllTrue",
            "MovingAnyTrue",
            "MovingVariance",

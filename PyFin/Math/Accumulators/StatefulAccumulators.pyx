@@ -280,15 +280,16 @@ cdef class MovingCountUnique(SingleValuedValueHolder):
             return NAN
         added = 0
 
-        if value and value not in self._unique_values:
+        if value not in self._unique_values:
             added += 1
             self._unique_values[value] = 1
         else:
             self._unique_values[value] += 1
-        popout = self._deque.dump(value, False)
-        if popout:
+        popout = self._deque.dump(value, NAN)
+        if not isnan(popout):
             self._unique_values[popout] -= 1
             if self._unique_values[popout] == 0:
+                del self._unique_values[popout]
                 added -= 1
 
         self._count += added

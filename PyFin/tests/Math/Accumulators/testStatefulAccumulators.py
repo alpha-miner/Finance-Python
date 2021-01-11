@@ -25,6 +25,8 @@ from PyFin.Math.Accumulators import MovingMin
 from PyFin.Math.Accumulators import MovingArgMin
 from PyFin.Math.Accumulators import MovingRank
 from PyFin.Math.Accumulators import MovingQuantile
+from PyFin.Math.Accumulators import MovingCount
+from PyFin.Math.Accumulators import MovingCountUnique
 from PyFin.Math.Accumulators import MovingAllTrue
 from PyFin.Math.Accumulators import MovingAnyTrue
 from PyFin.Math.Accumulators import MovingAverage
@@ -785,9 +787,40 @@ class TestStatefulAccumulators(unittest.TestCase):
             self.assertAlmostEqual(test.value, pickled.value)
         os.unlink(f.name)
 
+    def testMovingCount(self):
+        window = 10
+        mat = MovingCount(window, Latest('x'))
+        total = np.random.randn(2500)
+        con = deque(maxlen=window)
+        for i, value in enumerate(total):
+            value = float(value)
+            con.append(value)
+            mat.push(dict(x=value))
+
+            calculated = mat.result()
+            expected = len(con)
+            self.assertEqual(calculated, expected, "at index {0}\n"
+                                                   "expected:   {1}\n"
+                                                   "calculated: {2}".format(i, expected, calculated))
+
+    def testMovingCountUnique(self):
+        window = 10
+        mat = MovingCountUnique(window, Latest('x'))
+        total = np.random.randint(0, 10, 2500)
+        con = deque(maxlen=window)
+        for i, value in enumerate(total):
+            value = float(value)
+            con.append(value)
+            mat.push(dict(x=value))
+
+            calculated = mat.result()
+            expected = len(np.unique(con))
+            self.assertEqual(calculated, expected, "at index {0}\n"
+                                                   "expected:   {1}\n"
+                                                   "calculated: {2}".format(i, expected, calculated))
+
     def testMovingAllTrue(self):
         window = 3
-
         underlying = Latest('x') > 0.
 
         mat = MovingAllTrue(window, underlying)

@@ -30,6 +30,25 @@ from PyFin.Math.Accumulators.impl cimport DiffDeque
 from PyFin.Math.MathConstants cimport NAN
 
 
+def parse(window):
+    if isinstance(window, int) or isinstance(window, float):
+        pyFinAssert(window > 0, ValueError, "window length should be greater than 0")
+        return window
+    elif isinstance(window, str):
+        number = float(window[:-1])
+        pyFinAssert(number > 0, ValueError, "window length should be greater than 0")
+        if window[-1].upper() == "D":
+            return number * 24 * 3600.
+        elif window[-1].upper() == "H":
+            return number * 3600.
+        elif window[-1].upper() == "T":
+            return number * 60.
+        elif window[-1].upper() == "S":
+            return number
+        else:
+            raise ValueError("{0} can't be recognized as valid time window".format(window))
+
+
 cdef class StatefulValueHolder(Accumulator):
 
     def __init__(self, window):
@@ -51,11 +70,7 @@ cdef class StatefulValueHolder(Accumulator):
 cdef class TimeStatefulValueHolder(Accumulator):
     def __init__(self, window):
         super(TimeStatefulValueHolder, self).__init__()
-        if not isinstance(window, int):
-            raise ValueError("window parameter should be a positive int however {0} received"
-                             .format(window))
-        pyFinAssert(window > 0, ValueError, "window length should be greater than 0")
-        self._deque = DiffDeque(window)
+        self._deque = DiffDeque(parse(window))
         self._isFull = False
 
     cpdef size_t size(self):

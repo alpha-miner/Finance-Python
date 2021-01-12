@@ -43,3 +43,6 @@ print("Finance-Python using groupby (rolling count): {0}s".format(dt.datetime.no
 start = dt.datetime.now()
 res2 = df.groupby('c')['x'].rolling("7D").apply(lambda x: len(np.unique(x)), raw=True)
 print("Pandas (rolling count): {0}s".format(dt.datetime.now() - start))
+
+print(res1)
+print(res2.sort_index(level=[1, 0]).reset_index(0))

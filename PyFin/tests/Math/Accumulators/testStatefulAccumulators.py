@@ -833,7 +833,7 @@ class TestStatefulAccumulators(unittest.TestCase):
             mat.push(dict(x=value, stamp=stamp))
 
             calculated = mat.result()
-            time_diff = (stamp - stamps) <= window
+            time_diff = (stamp - stamps) < window
             expected = np.sum(time_diff[:i+1])
             self.assertEqual(calculated, expected, "at index {0}\n"
                                                    "expected:   {1}\n"
@@ -864,7 +864,7 @@ class TestStatefulAccumulators(unittest.TestCase):
             mat.push(dict(x=value, stamp=stamp))
 
             calculated = mat.result()
-            time_diff = (stamp - stamps) <= window
+            time_diff = (stamp - stamps) < window
             time_diff[i+1:] = False
             expected = len(np.unique(values[time_diff]))
             self.assertEqual(calculated, expected, "at index {0}\n"

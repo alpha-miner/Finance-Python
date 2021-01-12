@@ -551,7 +551,7 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
 
             value = mq.value
             for name in value.index():
-                time_diff = (getattr(self, name)["stamp"][i] - getattr(self, name)["stamp"]) <= window
+                time_diff = (getattr(self, name)["stamp"][i] - getattr(self, name)["stamp"]) < window
                 expected = np.sum(time_diff[:i+1])
                 calculated = value[name]
                 self.assertEqual(expected, calculated, 'at index {0}\n'
@@ -606,7 +606,7 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
 
             value = mq.value
             for name in value.index():
-                time_diff = (getattr(self, name)["stamp"][i] - getattr(self, name)["stamp"]) <= window
+                time_diff = (getattr(self, name)["stamp"][i] - getattr(self, name)["stamp"]) < window
                 time_diff[i + 1:] = False
                 expected = len(np.unique(getattr(self, name)["volume"][time_diff]))
                 calculated = value[name]

@@ -7,19 +7,18 @@ Created on 2016-12-27
 
 import datetime as dt
 import numpy as np
-import numpy.matlib as matlib
 import pandas as pd
 from PyFin.api import *
 from PyFin.Math.Accumulators import MovingAverage
 
-n = 300
-m = 300
+n = 300000
+m = 30
 
 index = pd.date_range(dt.datetime(1990, 1, 1), dt.datetime(1990, 1, 1) + dt.timedelta(days=m-1))
 index = np.repeat(index, n)
 
 df = pd.DataFrame(np.random.randn(n*m, 3), columns=['x', 'y', 'z'], index=index)
-df['c'] = matlib.repmat(np.linspace(0, n-1, n, dtype=int), 1, m)[0]
+df['c'] = np.concatenate([np.linspace(0, n-1, n, dtype=int)] * m)
 
 start = dt.datetime.now()
 t = MA(20, 'x') / MA(30, 'y')
@@ -52,7 +51,7 @@ index = np.repeat(index, n)
 
 df = pd.DataFrame(np.random.randn(n*m, 1), columns=['x'], index=index)
 ind = np.random.randint(0, int(n / 100), len(df))
-df['c'] = matlib.repmat(np.linspace(0, n-1, n, dtype=int), 1, m)[0]
+df['c'] = np.concatenate([np.linspace(0, n-1, n, dtype=int)] * m)
 df['ind'] = ind
 
 start = dt.datetime.now()

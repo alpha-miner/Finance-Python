@@ -140,7 +140,7 @@ cdef class DiffDeque:
     @cython.wraparound(False)
     cdef CList[double] dump(self, double value, int stamp, double default=NAN):
         cdef CList[double] ret_values = CList[double]()
-        while self.con.size() > 0 and (stamp - self.stamps.front()) > self.window:
+        while self.con.size() > 0 and (stamp - self.stamps.front()) >= self.window:
             ret_values.push_back(self.con.front())
             self.con.pop_front()
             self.stamps.pop_front()
@@ -150,8 +150,10 @@ cdef class DiffDeque:
 
     cpdef CList[double] dumps(self, values, stamps):
         cdef CList[double] ret_values = CList[double]()
+        cdef CList[double] tmp
         for v, s in zip(values, stamps):
-            ret_values.merge(self.dump(v, s))
+            tmp = self.dump(v, s)
+            ret_values.merge(tmp)
         return ret_values
 
     cpdef size_t size(self):

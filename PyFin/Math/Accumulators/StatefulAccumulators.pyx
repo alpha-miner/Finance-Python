@@ -288,8 +288,7 @@ cdef class MovingCount(SingleValuedValueHolder):
             return NAN
         added = 0
 
-        if value:
-            added += 1
+        added += 1
         popout = self._deque.dump(value, NAN)
         if not isnan(popout):
             added -= 1
@@ -320,8 +319,7 @@ cdef class TimeMovingCount(TimeSingleValuedValueHolder):
             return NAN
         added = 0
 
-        if value:
-            added += 1
+        added += 1
         popouts = self._deque.dump(value, data["stamp"], NAN)
         if popouts:
             added -= len(popouts)

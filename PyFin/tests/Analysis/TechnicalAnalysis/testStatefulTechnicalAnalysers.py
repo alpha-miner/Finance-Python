@@ -24,6 +24,8 @@ from PyFin.Analysis.TechnicalAnalysis import SecurityMovingMin
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingArgMin
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingRank
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingQuantile
+from PyFin.Analysis.TechnicalAnalysis import SecurityMovingCount
+from PyFin.Analysis.TechnicalAnalysis import SecurityMovingCountUnique
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingAllTrue
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingAnyTrue
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingSum
@@ -42,16 +44,17 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
         np.random.seed(0)
         aaplClose = np.random.randn(1000)
         aaplOpen = np.random.randn(1000)
-        self.aapl = {'close': aaplClose, 'open': aaplOpen}
+        aaplVolume = np.random.randint(0, 10, 1000)
+        self.aapl = {'close': aaplClose, 'open': aaplOpen, "volume": aaplVolume}
 
         ibmClose = np.random.randn(1000)
         ibmOpen = np.random.randn(1000)
-        self.ibm = {'close': ibmClose, 'open': ibmOpen}
+        ibmVolume = np.random.randint(0, 10, 1000)
+        self.ibm = {'close': ibmClose, 'open': ibmOpen, "volume": ibmVolume}
         self.dataSet = {'aapl': self.aapl, 'ibm': self.ibm}
 
     def template_test_deepcopy(self, class_type, **kwargs):
         ma = class_type(**kwargs)
-
         data = dict(aapl=dict(x=1.),
                     ibm=dict(x=2.))
         data2 = dict(aapl=dict(x=2.),
@@ -490,6 +493,63 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
 
     def testSecurityMovingQuantilePickle(self):
         self.template_test_pickle(SecurityMovingQuantile, window=10, x=['x'])
+
+    def testSecurityMovingCount(self):
+        window = 10
+
+        self.aapl['close'] = self.aapl['close'] > 0.
+        self.ibm['close'] = self.ibm['close'] > 0.
+
+        mq = SecurityMovingCount(window, ['close'])
+
+        for i in range(len(self.aapl['close'])):
+            data = dict(aapl=dict(close=self.aapl['close'][i],
+                                  open=self.aapl['open'][i]),
+                        ibm=dict(close=self.ibm['close'][i],
+                                 open=self.ibm['open'][i]))
+            mq.push(data)
+            if i < window:
+                start = 0
+            else:
+                start = i + 1 - window
+
+            if i < 1:
+                continue
+
+            value = mq.value
+            for name in value.index():
+                con = self.dataSet[name]['close'][start:(i + 1)]
+                expected = len(con)
+                calculated = value[name]
+                self.assertEqual(expected, calculated, 'at index {0}\n'
+                                                       'expected:   {1}\n'
+                                                       'calculated: {2}'.format(i, expected, calculated))
+
+    def testSecurityMovingCountUnique(self):
+        window = 10
+
+        mq = SecurityMovingCountUnique(window, ['volume'])
+
+        for i in range(len(self.aapl['volume'])):
+            data = dict(aapl=dict(volume=self.aapl['volume'][i]),
+                        ibm=dict(volume=self.ibm['volume'][i]))
+            mq.push(data)
+            if i < window:
+                start = 0
+            else:
+                start = i + 1 - window
+
+            if i < 1:
+                continue
+
+            value = mq.value
+            for name in value.index():
+                con = self.dataSet[name]['volume'][start:(i + 1)]
+                expected = len(np.unique(con))
+                calculated = value[name]
+                self.assertEqual(expected, calculated, 'at index {0}\n'
+                                                       'expected:   {1}\n'
+                                                       'calculated: {2}'.format(i, expected, calculated))
 
     def testSecurityMovingAllTrue(self):
         window = 3

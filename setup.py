@@ -16,10 +16,12 @@ Cython.Compiler.Options.annotate = True
 
 if "--line_trace" in sys.argv:
     line_trace = True
+    profile = True
     print("Build with line trace enabled ...")
     sys.argv.remove("--line_trace")
 else:
     line_trace = False
+    profile = False
 
 PACKAGE = "PyFin"
 NAME = "Finance-Python"
@@ -161,6 +163,7 @@ else:
 ext_modules_settings = cythonize(generate_extensions(ext_modules, line_trace), 
                                  compiler_directives={"embedsignature": True,
                                                       "linetrace": line_trace,
+                                                      "profile": profile,
                                                       "language_level": 3},
                                  nthreads=n_cpu)
 

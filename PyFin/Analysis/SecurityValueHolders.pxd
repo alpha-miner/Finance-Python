@@ -28,19 +28,22 @@ cdef class SecurityValueHolder(object):
 cdef class SecuritySingleValueHolder(SecurityValueHolder):
 
     cdef public SecurityValueHolder _compHolder
+    cdef public str _holderName
     cpdef push(self, dict data)
 
 
 cdef class SecurityBinaryValueHolder(SecurityValueHolder):
     cdef public SecurityValueHolder _compHolder1
+    cdef public str _holderName1
     cdef public SecurityValueHolder _compHolder2
+    cdef public str _holderName2
     cpdef push(self, dict data)
 
 
 cdef class SecurityStatelessSingleValueHolder(SecurityValueHolder):
 
     cdef public SecurityValueHolder _compHolder
-
+    cdef public str _holderName
     cpdef push(self, dict data)
 
 

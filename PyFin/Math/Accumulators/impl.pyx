@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# distutils: language = c++
 u"""
 Created on 2017-1-1
 
@@ -9,6 +10,8 @@ cimport cython
 from PyFin.Math.MathConstants cimport NAN
 from cpython.mem cimport PyMem_Malloc, PyMem_Free
 from libc.string cimport memcpy
+from libcpp.list cimport list as CList
+from cython.operator import dereference, preincrement
 
 
 cdef class Deque:
@@ -126,35 +129,36 @@ cpdef object rebuild(bytes data, size_t window, bint is_full, size_t start, size
 
 cdef class DiffDeque:
 
-    def __init__(self,
+    def __cinit__(self,
                   window):
         self.window = window
-        self.con = []
-        self.stamps = []
+        self.con = CList[double]()
+        self.stamps = CList[double]()
 
     @cython.cdivision(True)
     @cython.boundscheck(False)
     @cython.wraparound(False)
-    cpdef list dump(self, double value, int stamp, double default=NAN):
-        cdef list ret_values = []
-        while self.con and (stamp - self.stamps[0]) > self.window:
-            ret_values.append(self.con.pop(0))
-            self.stamps.pop(0)
-        self.con.append(value)
-        self.stamps.append(stamp)
+    cdef CList[double] dump(self, double value, int stamp, double default=NAN):
+        cdef CList[double] ret_values = CList[double]()
+        while self.con.size() > 0 and (stamp - self.stamps.front()) > self.window:
+            ret_values.push_back(self.con.front())
+            self.con.pop_front()
+            self.stamps.pop_front()
+        self.con.push_back(value)
+        self.stamps.push_back(stamp)
         return ret_values
 
-    cpdef list dumps(self, values, stamps):
-        cdef list ret_values = []
+    cpdef CList[double] dumps(self, values, stamps):
+        cdef CList[double] ret_values = CList[double]()
         for v, s in zip(values, stamps):
-            ret_values.extend(self.dump(v, s))
+            ret_values.merge(self.dump(v, s))
         return ret_values
 
     cpdef size_t size(self):
-        return len(self.con)
+        return self.size()
 
     cpdef bint isFull(self):
-        if self.con:
+        if self.con.size() > 0:
             return True
         else:
             return False
@@ -164,9 +168,13 @@ cdef class DiffDeque:
     @cython.wraparound(False)
     cpdef size_t idx(self, double value):
         cdef size_t i
-        for i in range(len(self.con)):
-            if value == self.con[i]:
+        cdef CList[double].iterator it
+        it = self.con.begin()
+        for i in range(self.con.size()):
+            if value == dereference(it):
                 break
+            else:
+                preincrement(it)
         else:
             i = -1
         return i
@@ -175,29 +183,43 @@ cdef class DiffDeque:
     @cython.boundscheck(False)
     cpdef double sum(self):
         cdef double x = 0.0
-        for v in self.con:
-            x += v
+        cdef size_t i
+        cdef CList[double].iterator it
+        it = self.con.begin()
+        for i in range(self.con.size()):
+            x += dereference(it)
+            preincrement(it)
         return x
 
     @cython.cdivision(True)
     @cython.boundscheck(False)
     @cython.wraparound(False)
     def __getitem__(self, size_t item):
-        return self.con[item]
+        cdef size_t i
+        cdef CList[double].iterator it
+        it = self.con.begin()
+        for i in range(self.con.size()):
+            if i == item:
+                return dereference(it)
+            preincrement(it)
 
-    def __richcmp__(Deque self, Deque other, int op):
+    def __richcmp__(Deque self, DiffDeque other, int op):
         cdef bint flag = False
         cdef int i
         if op == 2:
             flag = self.window == other.window \
                    and self.is_full == other.is_full
             if flag:
-                for i, v in enumerate(self.con):
-                    if v != other.con[i]:
-                        return False
                 return True
             else:
                 return False
 
         elif op == 3:
             return not self.__richcmp__(other, 2)
+
+    def __reduce__(self):
+        return rebuild2, (self.window,)
+
+cpdef object rebuild2(double window):
+    c = DiffDeque(window)
+    return c

@@ -30,7 +30,7 @@ from PyFin.Math.Accumulators.impl cimport DiffDeque
 from PyFin.Math.MathConstants cimport NAN
 
 
-def parse(window):
+def _parse(window):
     if isinstance(window, int) or isinstance(window, float):
         pyFinAssert(window > 0, ValueError, "window length should be greater than 0")
         return window
@@ -70,7 +70,7 @@ cdef class StatefulValueHolder(Accumulator):
 cdef class TimeStatefulValueHolder(Accumulator):
     def __init__(self, window):
         super(TimeStatefulValueHolder, self).__init__()
-        self._deque = DiffDeque(parse(window))
+        self._deque = DiffDeque(_parse(window))
         self._isFull = False
 
     cpdef size_t size(self):
@@ -78,8 +78,6 @@ cdef class TimeStatefulValueHolder(Accumulator):
 
     cpdef bint isFull(self):
         return self._isFull
-
-
 
 
 cdef class Shift(StatefulValueHolder):
@@ -149,7 +147,7 @@ cdef class TimeSingleValuedValueHolder(TimeStatefulValueHolder):
     def __init__(self, window, x):
         super(TimeSingleValuedValueHolder, self).__init__(window)
         self._x = build_holder(x)
-        self._window = self._x.window + window
+        self._window = self._x.window + _parse(window)
         self._dependency = deepcopy(self._x.dependency)
 
 

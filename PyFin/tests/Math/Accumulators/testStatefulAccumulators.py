@@ -56,6 +56,25 @@ class TestStatefulAccumulators(unittest.TestCase):
         np.random.seed(0)
         self.sample = np.random.randn(10000)
 
+    def testParse(self):
+        exp = TimeMovingCount(10, "x")
+        self.assertEqual(exp.window, 10)
+
+        exp = TimeMovingCount(12., "x")
+        self.assertEqual(exp.window, 12)
+
+        exp = TimeMovingCount("2D", "x")
+        self.assertEqual(exp.window, 2. * 24 * 3600)
+
+        exp = TimeMovingCount("3H", "x")
+        self.assertEqual(exp.window, 3. * 3600)
+
+        exp = TimeMovingCount("4T", "x")
+        self.assertEqual(exp.window, 4. * 60)
+
+        exp = TimeMovingCount("5S", "x")
+        self.assertEqual(exp.window, 5.)
+
     def testCurrentValueHolderWithOtherValueHolder(self):
         test1 = Exp(Current('x'))
         test1.push({'x': 2.0})

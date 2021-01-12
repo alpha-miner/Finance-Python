@@ -126,7 +126,7 @@ cpdef object rebuild(bytes data, size_t window, bint is_full, size_t start, size
 
 cdef class DiffDeque:
 
-    def __cinit__(self,
+    def __init__(self,
                   window):
         self.window = window
         self.con = []

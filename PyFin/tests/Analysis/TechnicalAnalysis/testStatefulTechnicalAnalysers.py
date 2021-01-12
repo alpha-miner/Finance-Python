@@ -25,7 +25,9 @@ from PyFin.Analysis.TechnicalAnalysis import SecurityMovingArgMin
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingRank
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingQuantile
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingCount
+from PyFin.Analysis.TechnicalAnalysis import SecurityTimeMovingCount
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingCountUnique
+from PyFin.Analysis.TechnicalAnalysis import SecurityTimeMovingCountUnique
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingAllTrue
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingAnyTrue
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingSum
@@ -45,12 +47,14 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
         aaplClose = np.random.randn(1000)
         aaplOpen = np.random.randn(1000)
         aaplVolume = np.random.randint(0, 10, 1000)
-        self.aapl = {'close': aaplClose, 'open': aaplOpen, "volume": aaplVolume}
+        applStamps = stamps = np.cumsum(np.random.randint(0, 10, 1000))
+        self.aapl = {'close': aaplClose, 'open': aaplOpen, "volume": aaplVolume, "stamp": applStamps}
 
         ibmClose = np.random.randn(1000)
         ibmOpen = np.random.randn(1000)
         ibmVolume = np.random.randint(0, 10, 1000)
-        self.ibm = {'close': ibmClose, 'open': ibmOpen, "volume": ibmVolume}
+        ibmStamps = stamps = np.cumsum(np.random.randint(0, 10, 1000))
+        self.ibm = {'close': ibmClose, 'open': ibmOpen, "volume": ibmVolume, "stamp": ibmStamps}
         self.dataSet = {'aapl': self.aapl, 'ibm': self.ibm}
 
     def template_test_deepcopy(self, class_type, **kwargs):
@@ -525,6 +529,35 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
                                                        'expected:   {1}\n'
                                                        'calculated: {2}'.format(i, expected, calculated))
 
+    def testSecurityTimeMovingCount(self):
+        window = 60
+
+        self.aapl['close'] = self.aapl['close'] > 0.
+        self.ibm['close'] = self.ibm['close'] > 0.
+
+        mq = SecurityTimeMovingCount(window, ['close'])
+
+        for i in range(len(self.aapl['close'])):
+            data = dict(aapl=dict(close=self.aapl['close'][i],
+                                  open=self.aapl['open'][i],
+                                  stamp=self.aapl["stamp"][i]),
+                        ibm=dict(close=self.ibm['close'][i],
+                                 open=self.ibm['open'][i],
+                                 stamp=self.ibm["stamp"][i]))
+            mq.push(data)
+
+            if i < 1:
+                continue
+
+            value = mq.value
+            for name in value.index():
+                time_diff = (getattr(self, name)["stamp"][i] - getattr(self, name)["stamp"]) <= window
+                expected = np.sum(time_diff[:i+1])
+                calculated = value[name]
+                self.assertEqual(expected, calculated, 'at index {0}\n'
+                                                       'expected:   {1}\n'
+                                                       'calculated: {2}'.format(i, expected, calculated))
+
     def testSecurityMovingCountUnique(self):
         window = 10
 
@@ -546,6 +579,36 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
             for name in value.index():
                 con = self.dataSet[name]['volume'][start:(i + 1)]
                 expected = len(np.unique(con))
+                calculated = value[name]
+                self.assertEqual(expected, calculated, 'at index {0}\n'
+                                                       'expected:   {1}\n'
+                                                       'calculated: {2}'.format(i, expected, calculated))
+
+    def testSecurityTimeMovingCountUnique(self):
+        window = 60
+
+        self.aapl['close'] = self.aapl['close'] > 0.
+        self.ibm['close'] = self.ibm['close'] > 0.
+
+        mq = SecurityTimeMovingCountUnique(window, ['volume'])
+
+        for i in range(len(self.aapl['close'])):
+            data = dict(aapl=dict(volume=self.aapl['volume'][i],
+                                  open=self.aapl['open'][i],
+                                  stamp=self.aapl["stamp"][i]),
+                        ibm=dict(volume=self.ibm['volume'][i],
+                                 open=self.ibm['open'][i],
+                                 stamp=self.ibm["stamp"][i]))
+            mq.push(data)
+
+            if i < 1:
+                continue
+
+            value = mq.value
+            for name in value.index():
+                time_diff = (getattr(self, name)["stamp"][i] - getattr(self, name)["stamp"]) <= window
+                time_diff[i + 1:] = False
+                expected = len(np.unique(getattr(self, name)["volume"][time_diff]))
                 calculated = value[name]
                 self.assertEqual(expected, calculated, 'at index {0}\n'
                                                        'expected:   {1}\n'

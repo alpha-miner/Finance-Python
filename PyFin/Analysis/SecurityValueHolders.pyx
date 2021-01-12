@@ -275,12 +275,13 @@ cdef class SecuritySingleValueHolder(SecurityValueHolder):
         sec_values = self._compHolder.value_all()
 
         for name in sec_values.index():
+            data[name][dummy_name] = sec_values[name]
             try:
                 holder = self._innerHolders[name]
-                holder.push({dummy_name: sec_values[name]})
+                holder.push(data[name])
             except KeyError:
                 holder = copy.deepcopy(self._holderTemplate)
-                holder.push({dummy_name:  sec_values[name]})
+                holder.push(data[name])
                 self._innerHolders[name] = holder
 
     def __str__(self):
@@ -316,12 +317,14 @@ cdef class SecurityBinaryValueHolder(SecurityValueHolder):
         sec_values2 = self._compHolder2.value_all()
 
         for name in sec_values1.index():
+            data[name][dummy_name1] = sec_values1[name]
+            data[name][dummy_name2] = sec_values2[name]
             try:
                 holder = self._innerHolders[name]
-                holder.push({dummy_name1: sec_values1[name], dummy_name2: sec_values2[name]})
+                holder.push(data[name])
             except KeyError:
                 holder = copy.deepcopy(self._holderTemplate)
-                holder.push({dummy_name1: sec_values1[name], dummy_name2: sec_values2[name]})
+                holder.push(data[name])
                 self._innerHolders[name] = holder
 
     def __str__(self):
@@ -349,12 +352,13 @@ cdef class SecurityStatelessSingleValueHolder(SecurityValueHolder):
         sec_values = self._compHolder.value_all()
 
         for name in sec_values.index():
+            data[name][dummy_name] = sec_values[name]
             try:
                 holder = self._innerHolders[name]
-                holder.push({dummy_name: sec_values[name]})
+                holder.push(data[name])
             except KeyError:
                 holder = copy.deepcopy(self._holderTemplate)
-                holder.push({dummy_name:  sec_values[name]})
+                holder.push(data[name])
                 self._innerHolders[name] = holder
 
     def __str__(self):

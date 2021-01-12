@@ -149,6 +149,7 @@ cdef class TimeSingleValuedValueHolder(TimeStatefulValueHolder):
         self._x = build_holder(x)
         self._window = self._x.window + _parse(window)
         self._dependency = deepcopy(self._x.dependency)
+        self._dependency = list(set(self._x.dependency + ["stamp"]))
 
 
 cdef class SortedValueHolder(SingleValuedValueHolder):

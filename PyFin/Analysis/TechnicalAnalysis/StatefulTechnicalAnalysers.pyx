@@ -23,7 +23,9 @@ from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingArgMin
 from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingRank
 from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingQuantile
 from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingCount
+from PyFin.Math.Accumulators.StatefulAccumulators cimport TimeMovingCount
 from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingCountUnique
+from PyFin.Math.Accumulators.StatefulAccumulators cimport TimeMovingCountUnique
 from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingAllTrue
 from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingAnyTrue
 from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingSum
@@ -141,6 +143,17 @@ cdef class SecurityMovingCount(SecuritySingleValueHolder):
             return str(self._holderTemplate)
 
 
+cdef class SecurityTimeMovingCount(SecuritySingleValueHolder):
+    def __init__(self, window, x):
+        super(SecurityTimeMovingCount, self).__init__(window, TimeMovingCount, x)
+
+    def __str__(self):
+        if self._compHolder:
+            return "\\mathrm{{TimeMCount}}({0}, {1})".format(self._window - self._compHolder.window, str(self._compHolder))
+        else:
+            return str(self._holderTemplate)
+
+
 cdef class SecurityMovingCountUnique(SecuritySingleValueHolder):
     def __init__(self, window, x):
         super(SecurityMovingCountUnique, self).__init__(window, MovingCountUnique, x)
@@ -148,6 +161,17 @@ cdef class SecurityMovingCountUnique(SecuritySingleValueHolder):
     def __str__(self):
         if self._compHolder:
             return "\\mathrm{{MCountUnique}}({0}, {1})".format(self._window - self._compHolder.window, str(self._compHolder))
+        else:
+            return str(self._holderTemplate)
+
+
+cdef class SecurityTimeMovingCountUnique(SecuritySingleValueHolder):
+    def __init__(self, window, x):
+        super(SecurityTimeMovingCountUnique, self).__init__(window, TimeMovingCountUnique, x)
+
+    def __str__(self):
+        if self._compHolder:
+            return "\\mathrm{{TimeMCountUnique}}({0}, {1})".format(self._window - self._compHolder.window, str(self._compHolder))
         else:
             return str(self._holderTemplate)
 

@@ -22,6 +22,8 @@ from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingMin
 from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingArgMin
 from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingRank
 from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingQuantile
+from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingCount
+from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingCountUnique
 from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingAllTrue
 from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingAnyTrue
 from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingSum
@@ -125,6 +127,27 @@ cdef class SecurityMovingQuantile(SecuritySingleValueHolder):
     def __str__(self):
         if self._compHolder:
             return "\\mathrm{{MQuantile}}({0}, {1})".format(self._window - self._compHolder.window, str(self._compHolder))
+        else:
+            return str(self._holderTemplate)
+
+cdef class SecurityMovingCount(SecuritySingleValueHolder):
+    def __init__(self, window, x):
+        super(SecurityMovingCount, self).__init__(window, MovingCount, x)
+
+    def __str__(self):
+        if self._compHolder:
+            return "\\mathrm{{MCount}}({0}, {1})".format(self._window - self._compHolder.window, str(self._compHolder))
+        else:
+            return str(self._holderTemplate)
+
+
+cdef class SecurityMovingCountUnique(SecuritySingleValueHolder):
+    def __init__(self, window, x):
+        super(SecurityMovingCountUnique, self).__init__(window, MovingCountUnique, x)
+
+    def __str__(self):
+        if self._compHolder:
+            return "\\mathrm{{MCountUnique}}({0}, {1})".format(self._window - self._compHolder.window, str(self._compHolder))
         else:
             return str(self._holderTemplate)
 

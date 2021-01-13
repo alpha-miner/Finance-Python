@@ -29,8 +29,8 @@ df["stamp"] = pd.DatetimeIndex(df.index).astype(np.int64) / 1e9
 print(f"df.shape: {df.shape}")
 
 start = dt.datetime.now()
-exp = SecurityTimeMovingCountUnique("7D", "x")
-res1 = exp.transform(df, category_field="c")
+exp = SecurityTimeMovingCountUnique("7D", "x") / SecurityTimeMovingCount("7D", "x")
+res1 = exp.transform(df, "factor", category_field="c")
 print("Finance-Python (rolling count): {0}s".format(dt.datetime.now() - start))
 
 start = dt.datetime.now()
@@ -41,8 +41,9 @@ for n, g in grouped:
 print("Finance-Python using groupby (rolling count): {0}s".format(dt.datetime.now() - start))
 
 start = dt.datetime.now()
-res2 = df.groupby('c')['x'].rolling("7D").apply(lambda x: len(np.unique(x)), raw=True)
+res2 = df.groupby('c')['x'].rolling("7D").apply(lambda x: len(np.unique(x)), raw=True) \
+       / df.groupby('c')['x'].rolling("7D").apply(lambda x: len(x), raw=True)
 print("Pandas (rolling count): {0}s".format(dt.datetime.now() - start))
 
-print(res1)
-print(res2.sort_index(level=[1, 0]).reset_index(0))
+res2 = res2.sort_index(level=[1, 0]).reset_index()
+np.testing.assert_array_almost_equal(res1["factor"].values, res2["x"].values)

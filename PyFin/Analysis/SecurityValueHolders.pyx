@@ -271,21 +271,22 @@ cdef class SecuritySingleValueHolder(SecurityValueHolder):
         cdef SeriesValues sec_values
         cdef Accumulator holder
         cdef dict sample
+        cdef list names
         self.updated = 0
         self._compHolder.push(data)
-        sec_values = self._compHolder.value_all()
+        names = list(data.keys())
+        sec_values = self._compHolder.value_by_names(names)
 
         for name in sec_values.index():
-            if name in data:
-                sample = data[name]
-                sample[self._holderName] = sec_values[name]
-                try:
-                    holder = self._innerHolders[name]
-                    holder.push(sample)
-                except KeyError:
-                    holder = copy.deepcopy(self._holderTemplate)
-                    holder.push(sample)
-                    self._innerHolders[name] = holder
+            sample = data[name]
+            sample[self._holderName] = sec_values[name]
+            try:
+                holder = self._innerHolders[name]
+                holder.push(sample)
+            except KeyError:
+                holder = copy.deepcopy(self._holderTemplate)
+                holder.push(sample)
+                self._innerHolders[name] = holder
 
     def __str__(self):
         return str(self._holderTemplate)
@@ -311,24 +312,26 @@ cdef class SecurityBinaryValueHolder(SecurityValueHolder):
         cdef SeriesValues sec_values2
         cdef Accumulator holder
         cdef dict sample
+        cdef list names
         self.updated = 0
         self._compHolder1.push(data)
         self._compHolder2.push(data)
-        sec_values1 = self._compHolder1.value_all()
-        sec_values2 = self._compHolder2.value_all()
+
+        names = list(data.keys())
+        sec_values1 = self._compHolder1.value_by_names(names)
+        sec_values2 = self._compHolder2.value_by_names(names)
 
         for name in sec_values1.index():
-            if name in data:
-                sample = data[name]
-                sample[self._holderName1] = sec_values1[name]
-                sample[self._holderName2] = sec_values2[name]
-                try:
-                    holder = self._innerHolders[name]
-                    holder.push(sample)
-                except KeyError:
-                    holder = copy.deepcopy(self._holderTemplate)
-                    holder.push(sample)
-                    self._innerHolders[name] = holder
+            sample = data[name]
+            sample[self._holderName1] = sec_values1[name]
+            sample[self._holderName2] = sec_values2[name]
+            try:
+                holder = self._innerHolders[name]
+                holder.push(sample)
+            except KeyError:
+                holder = copy.deepcopy(self._holderTemplate)
+                holder.push(sample)
+                self._innerHolders[name] = holder
 
     def __str__(self):
         return str(self._holderTemplate)
@@ -348,21 +351,22 @@ cdef class SecurityStatelessSingleValueHolder(SecurityValueHolder):
         cdef SeriesValues sec_values
         cdef Accumulator holder
         cdef dict sample
+        cdef list names
         self.updated = 0
         self._compHolder.push(data)
-        sec_values = self._compHolder.value_all()
+        names = list(data.keys())
+        sec_values = self._compHolder.value_by_names(names)
 
         for name in sec_values.index():
-            if name in data:
-                sample = data[name]
-                sample[self._holderName] = sec_values[name]
-                try:
-                    holder = self._innerHolders[name]
-                    holder.push(sample)
-                except KeyError:
-                    holder = copy.deepcopy(self._holderTemplate)
-                    holder.push(sample)
-                    self._innerHolders[name] = holder
+            sample = data[name]
+            sample[self._holderName] = sec_values[name]
+            try:
+                holder = self._innerHolders[name]
+                holder.push(sample)
+            except KeyError:
+                holder = copy.deepcopy(self._holderTemplate)
+                holder.push(sample)
+                self._innerHolders[name] = holder
 
     def __str__(self):
         return str(self._holderTemplate)
@@ -608,7 +612,7 @@ cdef class SecurityCurrentValueHolder(SecurityValueHolder):
         cdef int i
 
         if self.updated:
-            return SeriesValues(self.cached.values, self.cached.name_mapping)
+            return self.cached
         else:
             keys = sorted(self._symbol_values.keys())
             n = len(keys)
@@ -690,7 +694,7 @@ cdef class SecurityLatestValueHolder(SecurityValueHolder):
         cdef int i
 
         if self.updated:
-            return SeriesValues(self.cached.values, self.cached.name_mapping)
+            return self.cached
         else:
             keys = sorted(self._symbol_values.keys())
             n = len(keys)

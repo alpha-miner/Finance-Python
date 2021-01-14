@@ -38,7 +38,9 @@ cpdef to_dict(total_index, list total_category, double[:, :] matrix_values, list
 
         pyFinAssert(len(current_dict) == len(splited_category[i]),
                     ValueError,
-                    "There is duplicated category value in the snapshot ({0})".format(total_index[start]))
+                    "There is duplicated category value in the snapshot ({0}, {1}, {2})".format(total_index[start],
+                                                                                               len(current_dict),
+                                                                                               len(splited_category[i])))
 
     splited_category[index_diff_length] = total_category[start:]
     current_dict = {}

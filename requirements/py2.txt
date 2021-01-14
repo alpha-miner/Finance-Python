@@ -1,7 +1,0 @@
-cython>=0.26.0
-enum34>=1.0.4
-numpy>=1.10.1
-pandas>=0.18.0
-scipy>=0.18.0
-simpleutils>=0.1.0
-six>=1.10.0

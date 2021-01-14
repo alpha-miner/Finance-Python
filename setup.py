@@ -95,10 +95,8 @@ class version_build(Command):
         file_handle.writelines(newFiles)
         file_handle.close()
 
-if sys.version_info > (3, 0, 0):
-    requirements = "requirements/py3.txt"
-else:
-    requirements = "requirements/py2.txt"
+
+requirements = "requirements.txt"
 
 
 ext_modules = [

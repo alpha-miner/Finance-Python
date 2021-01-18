@@ -148,7 +148,7 @@ cdef class DiffDeque:
         pyFinAssert(closed in ("left", "right", "both", "neither"),
                     ValueError,
                     "closed parameter is <{0}> which is not in the recognized formats".format(closed))
-        self.closed = closed.lower().encode("UTF-8")
+        self.closed = closed.encode("UTF-8")
         self.last = NAN
         self.last_stamp = NAN
 
@@ -250,8 +250,8 @@ cdef class DiffDeque:
             return not self.__richcmp__(other, 2)
 
     def __reduce__(self):
-        return rebuild2, (self.window,)
+        return rebuild2, (self.window, self.closed.decode("UTF-8"))
 
-cpdef object rebuild2(double window):
-    c = DiffDeque(window)
+cpdef object rebuild2(double window, str closed):
+    c = DiffDeque(window, closed)
     return c

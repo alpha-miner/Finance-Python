@@ -64,6 +64,35 @@ class TestAccumulatorImpl(unittest.TestCase):
         stamps = [1, 7, 9, 13, 26]
 
         deque.dumps(values, stamps)
-        self.assertTrue(deque.sum(), 5)
+        self.assertEqual(deque.sum(), 5)
+
+    def testDiffDequeWithLeftClosed(self):
+        deque = DiffDeque(10, closed="left")
+
+        values = [1, 2, 3, 4, 5]
+        stamps = [1, 7, 9, 16, 26]
+
+        deque.dumps(values, stamps)
+        self.assertEqual(deque.sum(), 4)
+
+    def testDiffDequeWithBothClosed(self):
+        deque = DiffDeque(10, closed="both")
+
+        values = [1, 2, 3, 4, 5]
+        stamps = [1, 7, 9, 16, 26]
+
+        deque.dumps(values, stamps)
+        self.assertEqual(deque.sum(), 9)
+
+    def testDiffDequeWithNeitherClosed(self):
+        deque = DiffDeque(10, closed="neither")
+
+        values = [1, 2, 3, 4, 5]
+        stamps = [1, 7, 9, 16, 26]
+
+        deque.dumps(values, stamps)
+        self.assertEqual(deque.sum(), 0)
+
+
 
 

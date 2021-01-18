@@ -172,8 +172,10 @@ cdef class DiffDeque:
             self.stamps.push_back(stamp)
         else:
             if not isnan(self.last):
-                self.con.push_back(self.last)
-                self.stamps.push_back(self.last_stamp)
+                if (self.closed == _NEITHER and (stamp - self.last_stamp) < self.window) \
+                    or (self.closed == _LEFT and (stamp - self.last_stamp) <= self.window):
+                    self.con.push_back(self.last)
+                    self.stamps.push_back(self.last_stamp)
         self.last = value
         self.last_stamp = stamp
         return ret_values

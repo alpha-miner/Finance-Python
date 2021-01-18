@@ -14,7 +14,8 @@ from collections import deque
 import numpy as np
 from PyFin.Math.Accumulators.impl import (
     Deque,
-    DiffDeque
+    DiffDeque,
+    UniqueDiffDeque
 )
 
 
@@ -71,7 +72,7 @@ class TestAccumulatorImpl(unittest.TestCase):
         deque.dumps(values, stamps)
         self.assertEqual(deque.sum(), 5)
 
-    def testDiffDequeWithLeftClosed(self):
+    def testDiffDequeWithLeftClosedSum(self):
         deque = DiffDeque(10, closed="left")
 
         values = [1, 2, 3, 4, 5]
@@ -80,7 +81,7 @@ class TestAccumulatorImpl(unittest.TestCase):
         deque.dumps(values, stamps)
         self.assertEqual(deque.sum(), 4)
 
-    def testDiffDequeWithBothClosed(self):
+    def testDiffDequeWithBothClosedSum(self):
         deque = DiffDeque(10, closed="both")
 
         values = [1, 2, 3, 4, 5]
@@ -89,7 +90,7 @@ class TestAccumulatorImpl(unittest.TestCase):
         deque.dumps(values, stamps)
         self.assertEqual(deque.sum(), 9)
 
-    def testDiffDequeWithNeitherClosed(self):
+    def testDiffDequeWithNeitherClosedSum(self):
         deque = DiffDeque(10, closed="neither")
 
         values = [1, 2, 3, 4, 5]
@@ -97,6 +98,46 @@ class TestAccumulatorImpl(unittest.TestCase):
 
         deque.dumps(values, stamps)
         self.assertEqual(deque.sum(), 0)
+
+    def testUniqueDiffDequeDeepCopy(self):
+        benchmark_deque = UniqueDiffDeque(5, closed="left")
+        copied_deque = copy.deepcopy(benchmark_deque)
+        self.assertEqual(copied_deque, benchmark_deque)
+
+    def testUniqueDiffDequeSum(self):
+        deque = UniqueDiffDeque(10)
+        values = [2, 2, 3, 5, 5]
+        stamps = [1, 7, 20, 22, 26]
+
+        deque.dumps(values, stamps)
+        self.assertEqual(deque.sum(), 8)
+
+    def testUniqueDiffDequeWithLeftClosedSum(self):
+        deque = UniqueDiffDeque(10, closed="left")
+
+        values = [2, 2, 5, 5, 5]
+        stamps = [1, 16, 20, 22, 26]
+
+        deque.dumps(values, stamps)
+        self.assertEqual(deque.sum(), 7)
+
+    def testUniqueDiffDequeWithBothClosedSum(self):
+        deque = UniqueDiffDeque(10, closed="both")
+
+        values = [2, 2, 5, 5, 7]
+        stamps = [1, 16, 20, 22, 26]
+
+        deque.dumps(values, stamps)
+        self.assertEqual(deque.sum(), 14)
+
+    def testUniqueDiffDequeWithNeitherClosedSum(self):
+        deque = UniqueDiffDeque(10, closed="neither")
+
+        values = [2, 2, 5, 5, 7]
+        stamps = [1, 16, 20, 22, 26]
+
+        deque.dumps(values, stamps)
+        self.assertEqual(deque.sum(), 5)
 
 
 

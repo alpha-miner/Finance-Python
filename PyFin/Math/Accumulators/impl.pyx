@@ -118,10 +118,10 @@ cdef class Deque:
 
     def __reduce__(self):
         cdef bytes data = <bytes>(<char *>self.con)[:sizeof(double)*self.window]
-        return rebuild, (data, self.window, self.is_full, self.start, self.count)
+        return rebuild_deque, (data, self.window, self.is_full, self.start, self.count)
 
 
-cpdef object rebuild(bytes data, size_t window, bint is_full, size_t start, size_t count):
+cpdef object rebuild_deque(bytes data, size_t window, bint is_full, size_t start, size_t count):
     c = Deque(window)
     c.set_data(data)
     c.is_full = is_full
@@ -256,8 +256,147 @@ cdef class DiffDeque:
             return not self.__richcmp__(other, 2)
 
     def __reduce__(self):
-        return rebuild2, (self.window, self.closed.decode("UTF-8"))
+        return rebuild_diff_deque, (self.window, self.closed.decode("UTF-8"))
 
-cpdef object rebuild2(double window, str closed):
+cpdef object rebuild_diff_deque(double window, str closed):
     c = DiffDeque(window, closed)
+    return c
+
+
+cdef class UniqueDiffDeque:
+
+    def __cinit__(self,
+                  window,
+                  closed="right"):
+        self.window = window
+        self.con = CList[double]()
+        self.stamps = CList[double]()
+        cdef str closed_str = closed.lower()
+        pyFinAssert(closed_str in ("left", "right", "both", "neither"),
+                    ValueError,
+                    "closed parameter is <{0}> which is not in the recognized formats".format(closed))
+        self.closed = closed_str.encode("UTF-8")
+        self.last = NAN
+        self.last_stamp = NAN
+        self.unique_values = dict()
+
+    @cython.cdivision(True)
+    @cython.boundscheck(False)
+    @cython.wraparound(False)
+    cdef CList[double] dump(self, double value, int stamp, double default=NAN):
+        cdef CList[double] ret_values = CList[double]()
+        cdef double out_value
+        if self.closed == _BOTH or self.closed == _LEFT:
+            while self.con.size() > 0 and (stamp - self.stamps.front()) > self.window:
+                out_value = self.con.front()
+                self.unique_values[out_value] -= 1
+                if self.unique_values[out_value] == 0:
+                    del self.unique_values[out_value]
+                    ret_values.push_back(out_value)
+                self.con.pop_front()
+                self.stamps.pop_front()
+        else:
+            while self.con.size() > 0 and (stamp - self.stamps.front()) >= self.window:
+                out_value = self.con.front()
+                self.unique_values[out_value] -= 1
+                if self.unique_values[out_value] == 0:
+                    del self.unique_values[out_value]
+                    ret_values.push_back(out_value)
+                self.con.pop_front()
+                self.stamps.pop_front()
+
+        if self.closed == _RIGHT or self.closed == _BOTH:
+            self.con.push_back(value)
+            self.stamps.push_back(stamp)
+            if value not in self.unique_values:
+                self.unique_values[value] = 1
+            else:
+                self.unique_values[value] += 1
+        else:
+            if not isnan(self.last):
+                if (self.closed == _NEITHER and (stamp - self.last_stamp) < self.window) \
+                        or (self.closed == _LEFT and (stamp - self.last_stamp) <= self.window):
+                    self.con.push_back(self.last)
+                    self.stamps.push_back(self.last_stamp)
+                    if self.last not in self.unique_values:
+                        self.unique_values[self.last] = 1
+                    else:
+                        self.unique_values[self.last] += 1
+        self.last = value
+        self.last_stamp = stamp
+        return ret_values
+
+    cpdef CList[double] dumps(self, values, stamps):
+        cdef CList[double] ret_values = CList[double]()
+        cdef CList[double] tmp
+        for v, s in zip(values, stamps):
+            tmp = self.dump(v, s)
+            ret_values.merge(tmp)
+        return ret_values
+
+    cpdef size_t size(self):
+        return self.unique_values.__len__()
+
+    cpdef bint isFull(self):
+        if self.con.size() > 0:
+            return True
+        else:
+            return False
+
+    @cython.cdivision(True)
+    @cython.boundscheck(False)
+    @cython.wraparound(False)
+    cpdef size_t idx(self, double value):
+        cdef size_t i
+        cdef double k
+        for i, k in enumerate(self.unique_values.keys()):
+            if k == value:
+                break
+        else:
+            i = -1
+        return i
+
+    @cython.wraparound(False)
+    @cython.boundscheck(False)
+    cpdef double sum(self):
+        cdef double x = 0.0
+        cdef double k
+        for k in self.unique_values.keys():
+            x += k
+        return x
+
+    cpdef CString close(self):
+        return self.closed
+
+    @cython.cdivision(True)
+    @cython.boundscheck(False)
+    @cython.wraparound(False)
+    def __getitem__(self, size_t item):
+        cdef size_t i
+        cdef double k
+        for i, k in enumerate(self.unique_values.keys()):
+            if i == item:
+               return k
+
+    def __richcmp__(Deque self, UniqueDiffDeque other, int op):
+        cdef bint flag = False
+        cdef int i
+        if op == 2:
+            flag = self.window == other.window \
+                   and self.is_full == other.is_full \
+                   and self.closed == other.closed
+            if flag:
+                return True
+            else:
+                return False
+
+        elif op == 3:
+            return not self.__richcmp__(other, 2)
+
+    def __reduce__(self):
+        return rebuild_unique_diff_deque, (self.window, self.closed.decode("UTF-8"))
+
+
+cpdef object rebuild_unique_diff_deque(double window, str closed):
+    c = UniqueDiffDeque(window, closed)
     return c

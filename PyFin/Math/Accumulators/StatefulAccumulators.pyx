@@ -288,7 +288,7 @@ cdef class MovingCount(SingleValuedValueHolder):
         cdef double value = self._x.result()
         if isnan(value):
             return NAN
-        previous_size = self._deque().size()
+        previous_size = self._deque.size()
         popout = self._deque.dump(value, NAN)
         added = self._deque.size() - previous_size
 

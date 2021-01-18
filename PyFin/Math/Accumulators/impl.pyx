@@ -245,7 +245,8 @@ cdef class DiffDeque:
         cdef int i
         if op == 2:
             flag = self.window == other.window \
-                   and self.is_full == other.is_full
+                   and self.is_full == other.is_full \
+                   and self.closed == other.closed
             if flag:
                 return True
             else:

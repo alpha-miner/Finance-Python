@@ -58,6 +58,11 @@ class TestAccumulatorImpl(unittest.TestCase):
             caclulated_idx = deque2.idx(max_val)
             self.assertEqual(expected_idx, caclulated_idx)
 
+    def testDiffDequeDeepCopy(self):
+        benchmark_deque = DiffDeque(5, closed="left")
+        copied_deque = copy.deepcopy(benchmark_deque)
+        self.assertEqual(copied_deque, benchmark_deque)
+
     def testDiffDequeSum(self):
         deque = DiffDeque(10)
         values = [1, 2, 3, 4, 5]

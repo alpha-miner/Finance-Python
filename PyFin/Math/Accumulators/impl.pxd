@@ -44,4 +44,4 @@ cdef class DiffDeque:
     cpdef size_t idx(self, double value)
     cpdef double sum(self)
 
-cpdef object rebuild2(double window)
+cpdef object rebuild2(double window, str closed)

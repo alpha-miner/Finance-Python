@@ -282,17 +282,15 @@ cdef class MovingCount(SingleValuedValueHolder):
     cpdef push(self, dict data):
         cdef int added
         cdef double popout
+        cdef size_t previous_size
 
         self._x.push(data)
         cdef double value = self._x.result()
         if isnan(value):
             return NAN
-        added = 0
-
-        added += 1
+        previous_size = self._deque().size()
         popout = self._deque.dump(value, NAN)
-        if not isnan(popout):
-            added -= 1
+        added = self._deque.size() - previous_size
 
         self._count += added
         self._isFull = self._isFull or self._deque.isFull()
@@ -313,17 +311,15 @@ cdef class TimeMovingCount(TimeSingleValuedValueHolder):
     cpdef push(self, dict data):
         cdef int added
         cdef list popouts
+        cdef size_t previous_size
 
         self._x.push(data)
         cdef double value = self._x.result()
         if isnan(value):
             return NAN
-        added = 0
-
-        added += 1
+        previous_size = self._deque.size()
         popouts = self._deque.dump(value, data["stamp"], NAN)
-        if popouts:
-            added -= len(popouts)
+        added = self._deque.size() - previous_size
 
         self._count += added
         self._isFull = self._isFull or self._deque.isFull()

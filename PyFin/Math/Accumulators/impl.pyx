@@ -189,7 +189,7 @@ cdef class DiffDeque:
         return ret_values
 
     cpdef size_t size(self):
-        return self.size()
+        return self.con.size()
 
     cpdef bint isFull(self):
         if self.con.size() > 0:

@@ -68,9 +68,9 @@ cdef class StatefulValueHolder(Accumulator):
 
 
 cdef class TimeStatefulValueHolder(Accumulator):
-    def __init__(self, window):
+    def __init__(self, window, closed):
         super(TimeStatefulValueHolder, self).__init__()
-        self._deque = DiffDeque(_parse(window))
+        self._deque = DiffDeque(_parse(window), closed)
         self._isFull = False
 
     cpdef size_t size(self):
@@ -144,8 +144,8 @@ cdef class SingleValuedValueHolder(StatefulValueHolder):
 
 
 cdef class TimeSingleValuedValueHolder(TimeStatefulValueHolder):
-    def __init__(self, window, x):
-        super(TimeSingleValuedValueHolder, self).__init__(window)
+    def __init__(self, window, x, closed):
+        super(TimeSingleValuedValueHolder, self).__init__(window, closed)
         self._x = build_holder(x)
         self._window = self._x.window + _parse(window)
         self._dependency = deepcopy(self._x.dependency)
@@ -306,8 +306,8 @@ cdef class MovingCount(SingleValuedValueHolder):
 
 cdef class TimeMovingCount(TimeSingleValuedValueHolder):
 
-    def __init__(self, window, x):
-        super(TimeMovingCount, self).__init__(window, x)
+    def __init__(self, window, x, closed="right"):
+        super(TimeMovingCount, self).__init__(window, x, closed)
         self._count = 0
 
     cpdef push(self, dict data):
@@ -376,8 +376,8 @@ cdef class MovingCountUnique(SingleValuedValueHolder):
 
 cdef class TimeMovingCountUnique(TimeSingleValuedValueHolder):
 
-    def __init__(self, window, x):
-        super(TimeMovingCountUnique, self).__init__(window, x)
+    def __init__(self, window, x, closed="right"):
+        super(TimeMovingCountUnique, self).__init__(window, x, closed)
         self._count = 0
         self._unique_values = dict()
 

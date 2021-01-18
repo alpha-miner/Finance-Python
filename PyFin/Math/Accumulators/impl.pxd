@@ -43,5 +43,6 @@ cdef class DiffDeque:
     cpdef bint isFull(self)
     cpdef size_t idx(self, double value)
     cpdef double sum(self)
+    cpdef CString close(self)
 
 cpdef object rebuild2(double window, str closed)

@@ -1613,6 +1613,34 @@ class TestStatefulAccumulators(unittest.TestCase):
         s = MovingQuantile(10, Latest('roe') + Latest('y'))
         self.assertEqual("\mathrm{MQuantile}(10, ''\\text{roe}'' + ''\\text{y}'')", str(s))
 
+    def testMovingCountStr(self):
+        s = MovingCount(10, 'roe')
+        self.assertEqual("\mathrm{MCount}(10, ''\\text{roe}'')", str(s))
+
+        s = MovingCount(10, Latest('roe') + Latest('y'))
+        self.assertEqual("\mathrm{MCount}(10, ''\\text{roe}'' + ''\\text{y}'')", str(s))
+
+    def testTimeMovingCountStr(self):
+        s = TimeMovingCount(10, 'roe')
+        self.assertEqual("\mathrm{TimeMCount}(10, ''\\text{roe}'', b'right')", str(s))
+
+        s = TimeMovingCount(10, Latest('roe') + Latest('y'))
+        self.assertEqual("\mathrm{TimeMCount}(10, ''\\text{roe}'' + ''\\text{y}'', b'right')", str(s))
+
+    def testMovingCountUniqueStr(self):
+        s = MovingCountUnique(10, 'roe')
+        self.assertEqual("\mathrm{MCountUnique}(10, ''\\text{roe}'')", str(s))
+
+        s = MovingCountUnique(10, Latest('roe') + Latest('y'))
+        self.assertEqual("\mathrm{MCountUnique}(10, ''\\text{roe}'' + ''\\text{y}'')", str(s))
+
+    def testTimeMovingCountUniqueStr(self):
+        s = TimeMovingCountUnique(10, 'roe')
+        self.assertEqual("\mathrm{TimeMCountUnique}(10, ''\\text{roe}'', b'right')", str(s))
+
+        s = TimeMovingCountUnique(10, Latest('roe') + Latest('y'))
+        self.assertEqual("\mathrm{TimeMCountUnique}(10, ''\\text{roe}'' + ''\\text{y}'', b'right')", str(s))
+
     def testMovingAllTrueStr(self):
         s = MovingAllTrue(10, 'roe')
         self.assertEqual("\mathrm{MAllTrue}(10, ''\\text{roe}'')", str(s))

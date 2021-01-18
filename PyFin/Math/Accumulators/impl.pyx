@@ -225,6 +225,9 @@ cdef class DiffDeque:
             preincrement(it)
         return x
 
+    cpdef CString close(self):
+        return self.closed
+
     @cython.cdivision(True)
     @cython.boundscheck(False)
     @cython.wraparound(False)

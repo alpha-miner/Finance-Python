@@ -332,7 +332,7 @@ cdef class TimeMovingCount(TimeSingleValuedValueHolder):
         return self._count
 
     def __str__(self):
-        return "\\mathrm{{TimeMCount}}({0}, {1})".format(self._window, str(self._x))
+        return "\\mathrm{{TimeMCount}}({0}, {1}, {2})".format(self._window, str(self._x), self._deque.close())
 
 
 cdef class MovingCountUnique(SingleValuedValueHolder):
@@ -412,7 +412,7 @@ cdef class TimeMovingCountUnique(TimeSingleValuedValueHolder):
         return self._count
 
     def __str__(self):
-        return "\\mathrm{{TimeMCountUnique}}({0}, {1})".format(self._window, str(self._x))
+        return "\\mathrm{{TimeMCountUnique}}({0}, {1}, {2})".format(self._window, str(self._x), self._deque.close())
 
 
 cdef class MovingAllTrue(SingleValuedValueHolder):

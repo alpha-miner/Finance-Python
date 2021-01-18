@@ -7,6 +7,7 @@ Created on 2017-2-8
 """
 
 from libcpp.list cimport list as CList
+from libcpp.string cimport string as CString
 
 cdef class Deque:
 
@@ -30,8 +31,11 @@ cdef class DiffDeque:
 
     cdef double window
     cdef public bint is_full
+    cdef double last
+    cdef double last_stamp
     cdef CList[double] con
     cdef CList[double] stamps
+    cdef CString closed
 
     cdef CList[double] dump(self, double value, int stamp, double default= *)
     cpdef CList[double] dumps(self, values, stamps)

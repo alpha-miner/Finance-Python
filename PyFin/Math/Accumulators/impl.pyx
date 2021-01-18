@@ -9,9 +9,12 @@ Created on 2017-1-1
 cimport cython
 from PyFin.Math.MathConstants cimport NAN
 from cpython.mem cimport PyMem_Malloc, PyMem_Free
+from libc.math cimport isnan
 from libc.string cimport memcpy
 from libcpp.list cimport list as CList
+from libcpp.string cimport string as CString
 from cython.operator import dereference, preincrement
+from PyFin.Utilities.Asserts cimport pyFinAssert
 
 
 cdef class Deque:
@@ -127,25 +130,52 @@ cpdef object rebuild(bytes data, size_t window, bint is_full, size_t start, size
     return c
 
 
+cdef CString _RIGHT = "right".encode("UTF-8")
+cdef CString _LEFT = "left".encode("UTF-8")
+cdef CString _BOTH = "both".encode("UTF-8")
+cdef CString _NEITHER = "neither".encode("UTF-8")
+
+
 cdef class DiffDeque:
 
     def __cinit__(self,
-                  window):
+                  window,
+                  closed="right"):
         self.window = window
         self.con = CList[double]()
         self.stamps = CList[double]()
+        cdef str closed = closed.lower()
+        pyFinAssert(closed in ("left", "right", "both", "neither"),
+                    ValueError,
+                    "closed parameter is <{0}> which is not in the recognized formats".format(closed))
+        self.closed = closed.lower().encode("UTF-8")
+        self.last = NAN
+        self.last_stamp = NAN
 
     @cython.cdivision(True)
     @cython.boundscheck(False)
     @cython.wraparound(False)
     cdef CList[double] dump(self, double value, int stamp, double default=NAN):
         cdef CList[double] ret_values = CList[double]()
-        while self.con.size() > 0 and (stamp - self.stamps.front()) >= self.window:
-            ret_values.push_back(self.con.front())
-            self.con.pop_front()
-            self.stamps.pop_front()
-        self.con.push_back(value)
-        self.stamps.push_back(stamp)
+        if self.closed == _BOTH or self.closed == _LEFT:
+            while self.con.size() > 0 and (stamp - self.stamps.front()) > self.window:
+                ret_values.push_back(self.con.front())
+                self.con.pop_front()
+                self.stamps.pop_front()
+        else:
+            while self.con.size() > 0 and (stamp - self.stamps.front()) >= self.window:
+                ret_values.push_back(self.con.front())
+                self.con.pop_front()
+                self.stamps.pop_front()
+        if self.closed == _RIGHT or self.closed == _BOTH:
+            self.con.push_back(value)
+            self.stamps.push_back(stamp)
+        else:
+            if not isnan(self.last):
+                self.con.push_back(self.last)
+                self.stamps.push_back(self.last_stamp)
+        self.last = value
+        self.last_stamp = stamp
         return ret_values
 
     cpdef CList[double] dumps(self, values, stamps):

@@ -17,14 +17,12 @@ from PyFin.Analysis.TechnicalAnalysis import (
     SecurityTimeMovingCountUnique
 )
 
-n = 100
-m = 100
+m = 14
 
-index = pd.date_range(dt.datetime(2021, 1, 1), dt.datetime(2021, 1, 1) + dt.timedelta(days=m-1), freq="D")
-index_total = np.repeat(index, n)
+index = pd.date_range(dt.datetime(2021, 1, 1), dt.datetime(2021, 1, 1) + dt.timedelta(days=m-1), freq="s")
 
-df = pd.DataFrame(np.random.randint(0, 10, (len(index_total), 3)), columns=['x', 'y', 'z'], index=index_total)
-df["c"] = np.concatenate([np.linspace(0, n-1, n, dtype=int)] * len(index))
+df = pd.DataFrame(np.random.randint(0, 10, (len(index), 3)), columns=['x', 'y', 'z'], index=index)
+df["c"] = np.random.randint(0, int(len(index) / 14), len(index))
 df["stamp"] = pd.DatetimeIndex(df.index).astype(np.int64) / 1e9
 print(f"df.shape: {df.shape}")
 

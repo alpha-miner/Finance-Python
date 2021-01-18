@@ -27,6 +27,7 @@ from PyFin.Utilities.Asserts cimport isClose
 from PyFin.Math.udfs cimport consecutive_int_sum
 from PyFin.Math.Accumulators.impl cimport Deque
 from PyFin.Math.Accumulators.impl cimport DiffDeque
+from PyFin.Math.Accumulators.impl cimport UniqueDiffDeque
 from PyFin.Math.MathConstants cimport NAN
 
 
@@ -71,6 +72,19 @@ cdef class TimeStatefulValueHolder(Accumulator):
     def __init__(self, window, closed):
         super(TimeStatefulValueHolder, self).__init__()
         self._deque = DiffDeque(_parse(window), closed)
+        self._isFull = False
+
+    cpdef size_t size(self):
+        return self._deque.size()
+
+    cpdef bint isFull(self):
+        return self._isFull
+
+
+cdef class TimeStatefulUniqueValueHolder(Accumulator):
+    def __init__(self, window, closed):
+        super(TimeStatefulUniqueValueHolder, self).__init__()
+        self._deque = UniqueDiffDeque(_parse(window), closed)
         self._isFull = False
 
     cpdef size_t size(self):
@@ -146,6 +160,15 @@ cdef class SingleValuedValueHolder(StatefulValueHolder):
 cdef class TimeSingleValuedValueHolder(TimeStatefulValueHolder):
     def __init__(self, window, x, closed):
         super(TimeSingleValuedValueHolder, self).__init__(window, closed)
+        self._x = build_holder(x)
+        self._window = self._x.window + _parse(window)
+        self._dependency = deepcopy(self._x.dependency)
+        self._dependency = list(set(self._x.dependency + ["stamp"]))
+
+
+cdef class TimeSingleValuedUniqueValueHolder(TimeStatefulUniqueValueHolder):
+    def __init__(self, window, x, closed):
+        super(TimeSingleValuedUniqueValueHolder, self).__init__(window, closed)
         self._x = build_holder(x)
         self._window = self._x.window + _parse(window)
         self._dependency = deepcopy(self._x.dependency)
@@ -370,36 +393,25 @@ cdef class MovingCountUnique(SingleValuedValueHolder):
         return "\\mathrm{{MCountUnique}}({0}, {1})".format(self._window, str(self._x))
 
 
-cdef class TimeMovingCountUnique(TimeSingleValuedValueHolder):
+cdef class TimeMovingCountUnique(TimeSingleValuedUniqueValueHolder):
 
     def __init__(self, window, x, closed="right"):
         super(TimeMovingCountUnique, self).__init__(window, x, closed)
         self._count = 0
-        self._unique_values = dict()
 
     cpdef push(self, dict data):
         cdef int added
-        cdef double popout
+        cdef size_t previous_size
         cdef list popouts
 
         self._x.push(data)
         cdef double value = self._x.result()
         if isnan(value):
             return NAN
-        added = 0
 
-        if value not in self._unique_values:
-            added += 1
-            self._unique_values[value] = 1
-        else:
-            self._unique_values[value] += 1
+        previous_size = self._deque.size()
         popouts = self._deque.dump(value, data["stamp"], NAN)
-        if popouts:
-            for popout in popouts:
-                self._unique_values[popout] -= 1
-                if self._unique_values[popout] == 0:
-                    del self._unique_values[popout]
-                    added -= 1
+        added = self._deque.size() - previous_size
 
         self._count += added
         self._isFull = self._isFull or self._deque.isFull()

@@ -8,6 +8,7 @@ Created on 2017-2-10
 cimport numpy as np
 from PyFin.Math.Accumulators.impl cimport Deque
 from PyFin.Math.Accumulators.impl cimport DiffDeque
+from PyFin.Math.Accumulators.impl cimport UniqueDiffDeque
 from PyFin.Math.Accumulators.IAccumulators cimport Accumulator
 
 
@@ -22,6 +23,14 @@ cdef class StatefulValueHolder(Accumulator):
 cdef class TimeStatefulValueHolder(Accumulator):
 
     cdef public DiffDeque _deque
+
+    cpdef size_t size(self)
+    cpdef bint isFull(self)
+
+
+cdef class TimeStatefulUniqueValueHolder(Accumulator):
+
+    cdef public UniqueDiffDeque _deque
 
     cpdef size_t size(self)
     cpdef bint isFull(self)
@@ -55,6 +64,11 @@ cdef class SingleValuedValueHolder(StatefulValueHolder):
 
 
 cdef class TimeSingleValuedValueHolder(TimeStatefulValueHolder):
+
+    cdef public Accumulator _x
+
+
+cdef class TimeSingleValuedUniqueValueHolder(TimeStatefulUniqueValueHolder):
 
     cdef public Accumulator _x
 
@@ -119,9 +133,8 @@ cdef class MovingCountUnique(SingleValuedValueHolder):
     cpdef double result(self)
 
 
-cdef class TimeMovingCountUnique(TimeSingleValuedValueHolder):
+cdef class TimeMovingCountUnique(TimeSingleValuedUniqueValueHolder):
     cdef public size_t _count
-    cdef public dict _unique_values
 
     cpdef push(self, dict data)
     cpdef double result(self)

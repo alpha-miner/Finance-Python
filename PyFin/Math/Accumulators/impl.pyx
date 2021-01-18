@@ -144,11 +144,11 @@ cdef class DiffDeque:
         self.window = window
         self.con = CList[double]()
         self.stamps = CList[double]()
-        cdef str closed = closed.lower()
-        pyFinAssert(closed in ("left", "right", "both", "neither"),
+        cdef str closed_str = closed.lower()
+        pyFinAssert(closed_str in ("left", "right", "both", "neither"),
                     ValueError,
                     "closed parameter is <{0}> which is not in the recognized formats".format(closed))
-        self.closed = closed.encode("UTF-8")
+        self.closed = closed_str.encode("UTF-8")
         self.last = NAN
         self.last_stamp = NAN
 

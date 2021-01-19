@@ -18,6 +18,10 @@ from PyFin.Analysis.TechnicalAnalysis import SecurityMovingRank
 from PyFin.Analysis.TechnicalAnalysis import SecurityMaximumValueHolder
 from PyFin.Analysis.TechnicalAnalysis import SecurityMinimumValueHolder
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingQuantile
+from PyFin.Analysis.TechnicalAnalysis import SecurityMovingCount
+from PyFin.Analysis.TechnicalAnalysis import SecurityMovingCountUnique
+from PyFin.Analysis.TechnicalAnalysis import SecurityTimeMovingCount
+from PyFin.Analysis.TechnicalAnalysis import SecurityTimeMovingCountUnique
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingAllTrue
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingAnyTrue
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingSum
@@ -172,6 +176,24 @@ def MINIMUM(x='x', y='y'):
 
 def MQUANTILE(window, x='x'):
     return SecurityMovingQuantile(window, x)
+
+
+def MCOUNT(window, x="x", closed="right"):
+    if isinstance(window, int):
+        return SecurityMovingCount(window, x)
+    elif isinstance(window, str):
+        return SecurityTimeMovingCount(window, x, closed)
+    else:
+        raise ValueError("wrong window format <{0}>".format(window))
+
+
+def MUCOUNT(window, x="x", closed="right"):
+    if isinstance(window, int):
+        return SecurityMovingCountUnique(window, x)
+    elif isinstance(window, str):
+        return SecurityTimeMovingCountUnique(window, x, closed)
+    else:
+        raise ValueError("wrong window format <{0}>".format(window))
 
 
 def MALLTRUE(window, x='x'):

@@ -35,6 +35,8 @@ from PyFin.api.Analysis import MRANK
 from PyFin.api.Analysis import MAXIMUM
 from PyFin.api.Analysis import MINIMUM
 from PyFin.api.Analysis import MQUANTILE
+from PyFin.api.Analysis import MCOUNT
+from PyFin.api.Analysis import MUCOUNT
 from PyFin.api.Analysis import MALLTRUE
 from PyFin.api.Analysis import MANYTRUE
 from PyFin.api.Analysis import MSUM
@@ -112,6 +114,8 @@ __all__ = ["datesList",
            "MAXIMUM",
            "MINIMUM",
            "MQUANTILE",
+           "MCOUNT",
+           "MUCOUNT",
            "MALLTRUE",
            "MANYTRUE",
            "MSUM",

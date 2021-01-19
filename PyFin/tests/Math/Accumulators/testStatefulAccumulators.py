@@ -904,7 +904,7 @@ class TestStatefulAccumulators(unittest.TestCase):
         window = 60
         mat = TimeMovingCountUnique(window, Latest("x"), "right")
         values = np.random.randint(0, 10, 2500)
-        stamps = np.cumsum(np.random.randint(0, 10, 2500))
+        stamps = np.cumsum(np.random.randint(1, 10, 2500))
         for i, (value, stamp) in enumerate(zip(values, stamps)):
             mat.push(dict(x=value, stamp=stamp))
 
@@ -920,13 +920,45 @@ class TestStatefulAccumulators(unittest.TestCase):
         window = 60
         mat = TimeMovingCountUnique(window, Latest("x"), "both")
         values = np.random.randint(0, 10, 2500)
-        stamps = np.cumsum(np.random.randint(0, 5, 2500))
+        stamps = np.cumsum(np.random.randint(1, 5, 2500))
         for i, (value, stamp) in enumerate(zip(values, stamps)):
             mat.push(dict(x=value, stamp=stamp))
 
             calculated = mat.result()
             time_diff = (stamp - stamps) <= window
             time_diff[i+1:] = False
+            expected = len(np.unique(values[time_diff]))
+            self.assertEqual(calculated, expected, "at index {0}\n"
+                                                   "expected:   {1}\n"
+                                                   "calculated: {2}".format(i, expected, calculated))
+
+    def testTimeMovingCountUniqueLeft(self):
+        window = 60
+        mat = TimeMovingCountUnique(window, Latest("x"), "left")
+        values = np.random.randint(0, 10, 2500)
+        stamps = np.cumsum(np.random.randint(1, 5, 2500))
+        for i, (value, stamp) in enumerate(zip(values, stamps)):
+            mat.push(dict(x=value, stamp=stamp))
+
+            calculated = mat.result()
+            time_diff = (stamp - stamps) <= window
+            time_diff[i:] = False
+            expected = len(np.unique(values[time_diff]))
+            self.assertEqual(calculated, expected, "at index {0}\n"
+                                                   "expected:   {1}\n"
+                                                   "calculated: {2}".format(i, expected, calculated))
+
+    def testTimeMovingCountUniqueNeither(self):
+        window = 60
+        mat = TimeMovingCountUnique(window, Latest("x"), "neither")
+        values = np.random.randint(0, 10, 2500)
+        stamps = np.cumsum(np.random.randint(1, 5, 2500))
+        for i, (value, stamp) in enumerate(zip(values, stamps)):
+            mat.push(dict(x=value, stamp=stamp))
+
+            calculated = mat.result()
+            time_diff = (stamp - stamps) < window
+            time_diff[i:] = False
             expected = len(np.unique(values[time_diff]))
             self.assertEqual(calculated, expected, "at index {0}\n"
                                                    "expected:   {1}\n"

@@ -31,16 +31,16 @@ exp = SecurityTimeMovingCountUnique("7D", "x")
 res1 = exp.transform(df, "factor", category_field="c")
 print("Finance-Python (rolling count): {0}s".format(dt.datetime.now() - start))
 
-# start = dt.datetime.now()
-# grouped = df.groupby('c')
-# for n, g in grouped:
-#     exp = TimeMovingCountUnique("7D", "x")
-#     exp.transform(g)
-# print("Finance-Python using groupby (rolling count): {0}s".format(dt.datetime.now() - start))
-#
-# start = dt.datetime.now()
-# res2 = df.groupby('c')['x'].rolling("7D").apply(lambda x: len(np.unique(x)), raw=True)
-# print("Pandas (rolling count): {0}s".format(dt.datetime.now() - start))
-#
-# res2 = res2.sort_index(level=[1, 0]).reset_index()
-# np.testing.assert_array_almost_equal(res1["factor"].values, res2["x"].values)
+start = dt.datetime.now()
+grouped = df.groupby('c')
+for n, g in grouped:
+    exp = TimeMovingCountUnique("7D", "x")
+    exp.transform(g)
+print("Finance-Python using groupby (rolling count): {0}s".format(dt.datetime.now() - start))
+
+start = dt.datetime.now()
+res2 = df.groupby('c')['x'].rolling("7D").apply(lambda x: len(np.unique(x)), raw=True)
+print("Pandas (rolling count): {0}s".format(dt.datetime.now() - start))
+
+res2 = res2.sort_index(level=[1, 0]).reset_index()
+np.testing.assert_array_almost_equal(res1["factor"].values, res2["x"].values)

@@ -13,6 +13,8 @@ from libc.math cimport isnan
 from libc.string cimport memcpy
 from libcpp.list cimport list as CList
 from libcpp.string cimport string as CString
+from libcpp.map cimport map as CMap
+from libcpp.pair cimport pair as CPair
 from cython.operator import dereference, preincrement
 from PyFin.Utilities.Asserts cimport pyFinAssert
 
@@ -269,8 +271,6 @@ cdef class UniqueDiffDeque:
                   window,
                   closed="right"):
         self.window = window
-        self.con = CList[double]()
-        self.stamps = CList[double]()
         cdef str closed_str = closed.lower()
         pyFinAssert(closed_str in ("left", "right", "both", "neither"),
                     ValueError,
@@ -278,7 +278,8 @@ cdef class UniqueDiffDeque:
         self.closed = closed_str.encode("UTF-8")
         self.last = NAN
         self.last_stamp = NAN
-        self.unique_values = dict()
+        self.values_map = CMap[double, double]()
+        self.stamps_map = CMap[double, double]()
 
     @cython.cdivision(True)
     @cython.boundscheck(False)
@@ -286,42 +287,52 @@ cdef class UniqueDiffDeque:
     cdef CList[double] dump(self, double value, int stamp, double default=NAN):
         cdef CList[double] ret_values = CList[double]()
         cdef double out_value
+        cdef double previous_stamp
+        cdef size_t debug_int
+        cdef CMap[double, double].iterator it
+        cdef CPair[double, double] pair_value
+
+        it = self.stamps_map.begin()
         if self.closed == _BOTH or self.closed == _LEFT:
-            while self.con.size() > 0 and (stamp - self.stamps.front()) > self.window:
-                out_value = self.con.front()
-                self.unique_values[out_value] -= 1
-                if self.unique_values[out_value] == 0:
-                    del self.unique_values[out_value]
-                    ret_values.push_back(out_value)
-                self.con.pop_front()
-                self.stamps.pop_front()
+            while it != self.stamps_map.end() and (stamp - dereference(it).first) > self.window:
+                out_value =  dereference(it).second
+                ret_values.push_back(out_value)
+                self.stamps_map.erase(it)
+                debug_int = self.values_map.erase(out_value)
+                it = self.stamps_map.begin()
         else:
-            while self.con.size() > 0 and (stamp - self.stamps.front()) >= self.window:
-                out_value = self.con.front()
-                self.unique_values[out_value] -= 1
-                if self.unique_values[out_value] == 0:
-                    del self.unique_values[out_value]
-                    ret_values.push_back(out_value)
-                self.con.pop_front()
-                self.stamps.pop_front()
+            while it != self.stamps_map.end() and (stamp - dereference(it).first) >= self.window:
+                out_value = dereference(it).second
+                ret_values.push_back(out_value)
+                self.stamps_map.erase(it)
+                debug_int = self.values_map.erase(out_value)
+                it = self.stamps_map.begin()
 
         if self.closed == _RIGHT or self.closed == _BOTH:
-            self.con.push_back(value)
-            self.stamps.push_back(stamp)
-            if value not in self.unique_values:
-                self.unique_values[value] = 1
+            it = self.values_map.find(value)
+            if it != self.values_map.end():
+                previous_stamp = dereference(it).second
+                self.stamps_map.erase(previous_stamp)
+                self.values_map[value] = stamp
             else:
-                self.unique_values[value] += 1
+                pair_value = (value, stamp)
+                self.values_map.insert(pair_value)
+            pair_value = (stamp, value)
+            self.stamps_map.insert(pair_value)
         else:
             if not isnan(self.last):
                 if (self.closed == _NEITHER and (stamp - self.last_stamp) < self.window) \
                         or (self.closed == _LEFT and (stamp - self.last_stamp) <= self.window):
-                    self.con.push_back(self.last)
-                    self.stamps.push_back(self.last_stamp)
-                    if self.last not in self.unique_values:
-                        self.unique_values[self.last] = 1
+                    it = self.values_map.find(self.last)
+                    if it != self.values_map.end():
+                        previous_stamp = dereference(it).second
+                        self.stamps_map.erase(previous_stamp)
+                        self.values_map[self.last] = self.last_stamp
                     else:
-                        self.unique_values[self.last] += 1
+                        pair_value = (self.last, self.last_stamp)
+                        self.values_map.insert(pair_value)
+                    pair_value = (self.last_stamp, self.last)
+                    self.stamps_map.insert(pair_value)
         self.last = value
         self.last_stamp = stamp
         return ret_values
@@ -335,10 +346,10 @@ cdef class UniqueDiffDeque:
         return ret_values
 
     cpdef size_t size(self):
-        return self.unique_values.__len__()
+        return self.values_map.size()
 
     cpdef bint isFull(self):
-        if self.con.size() > 0:
+        if not self.values_map.empty():
             return True
         else:
             return False
@@ -349,20 +360,27 @@ cdef class UniqueDiffDeque:
     cpdef size_t idx(self, double value):
         cdef size_t i
         cdef double k
-        for i, k in enumerate(self.unique_values.keys()):
-            if k == value:
-                break
-        else:
-            i = -1
-        return i
+        cdef CMap[double, double].iterator it
+
+        i = 0
+        it = self.stamps_map.begin()
+        while it != self.stamps_map.end():
+            if dereference(it).second == value:
+                return i
+            i += 1
+            preincrement(it)
 
     @cython.wraparound(False)
     @cython.boundscheck(False)
     cpdef double sum(self):
         cdef double x = 0.0
         cdef double k
-        for k in self.unique_values.keys():
-            x += k
+        cdef CMap[double, double].iterator it
+
+        it = self.stamps_map.begin()
+        while it != self.stamps_map.end():
+            x += dereference(it).second
+            preincrement(it)
         return x
 
     cpdef CString close(self):
@@ -374,9 +392,15 @@ cdef class UniqueDiffDeque:
     def __getitem__(self, size_t item):
         cdef size_t i
         cdef double k
-        for i, k in enumerate(self.unique_values.keys()):
+        cdef CMap[double, double].iterator it
+
+        i = 0
+        it = self.stamps_map.begin()
+        while it != self.stamps_map.end():
             if i == item:
-               return k
+                return dereference(it).second
+            i += 1
+            preincrement(it)
 
     def __richcmp__(Deque self, UniqueDiffDeque other, int op):
         cdef bint flag = False

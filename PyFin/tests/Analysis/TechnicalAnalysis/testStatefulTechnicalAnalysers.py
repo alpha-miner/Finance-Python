@@ -47,13 +47,13 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
         aaplClose = np.random.randn(1000)
         aaplOpen = np.random.randn(1000)
         aaplVolume = np.random.randint(0, 10, 1000)
-        applStamps = stamps = np.cumsum(np.random.randint(0, 10, 1000))
+        applStamps = stamps = np.cumsum(np.random.randint(1, 10, 1000))
         self.aapl = {'close': aaplClose, 'open': aaplOpen, "volume": aaplVolume, "stamp": applStamps}
 
         ibmClose = np.random.randn(1000)
         ibmOpen = np.random.randn(1000)
         ibmVolume = np.random.randint(0, 10, 1000)
-        ibmStamps = stamps = np.cumsum(np.random.randint(0, 10, 1000))
+        ibmStamps = stamps = np.cumsum(np.random.randint(1, 10, 1000))
         self.ibm = {'close': ibmClose, 'open': ibmOpen, "volume": ibmVolume, "stamp": ibmStamps}
         self.dataSet = {'aapl': self.aapl, 'ibm': self.ibm}
 

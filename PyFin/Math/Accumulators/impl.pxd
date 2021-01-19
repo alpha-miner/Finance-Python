@@ -8,6 +8,7 @@ Created on 2017-2-8
 
 from libcpp.list cimport list as CList
 from libcpp.string cimport string as CString
+from libcpp.map cimport map as CMap
 
 cdef class Deque:
 
@@ -54,10 +55,9 @@ cdef class UniqueDiffDeque:
     cdef public bint is_full
     cdef double last
     cdef double last_stamp
-    cdef CList[double] con
-    cdef CList[double] stamps
     cdef CString closed
-    cdef dict unique_values
+    cdef CMap[double, double] values_map
+    cdef CMap[double, double] stamps_map
 
     cdef CList[double] dump(self, double value, int stamp, double default= *)
     cpdef CList[double] dumps(self, values, stamps)

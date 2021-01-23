@@ -1,7 +1,7 @@
 include MANIFEST.in
 include .coveragerc
 include *.md
-recursive-include requirements *.txt
+include requirements.txt
 recursive-include PyFin *.csv
 recursive-include PyFin *.pyx
 recursive-include PyFin *.pxd

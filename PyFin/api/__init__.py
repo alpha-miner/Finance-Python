@@ -82,7 +82,7 @@ from PyFin.api.Analysis import CSZScore
 from PyFin.api.Analysis import CSFillNA
 from PyFin.api.Analysis import CSRes
 
-from PyFin.Utilities.Asserts import pyFinAssert
+from PyFin.Utilities.Asserts import require
 
 
 __all__ = ["datesList",
@@ -159,4 +159,4 @@ __all__ = ["datesList",
            "CSZScore",
            "CSFillNA",
            "CSRes",
-           "pyFinAssert"]
+           "require"]

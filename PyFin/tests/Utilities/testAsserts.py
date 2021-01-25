@@ -7,8 +7,8 @@ Created on 2017-1-13
 
 import unittest
 import warnings
-from PyFin.Utilities import pyFinAssert
-from PyFin.Utilities import pyFinWarning
+from PyFin.Utilities import require
+from PyFin.Utilities import warning
 from PyFin.Utilities import isClose
 
 
@@ -17,12 +17,12 @@ class TestAsserts(unittest.TestCase):
     def testPyFinAssert(self):
 
         with self.assertRaises(ValueError):
-            pyFinAssert(1 == 2, ValueError)
+            require(1 == 2, ValueError)
 
     def testPyFinWarning(self):
         with warnings.catch_warnings(record=True) as warning_list:
             warnings.simplefilter("always")
-            pyFinWarning(1 == 2, DeprecationWarning)
+            warning(1 == 2, DeprecationWarning)
             self.assertTrue(any(item.category == DeprecationWarning for item in warning_list))
 
     def testIsClose(self):

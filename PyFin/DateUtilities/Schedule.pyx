@@ -12,7 +12,7 @@ from PyFin.DateUtilities.Date cimport Date
 from PyFin.DateUtilities.Period cimport Period
 from PyFin.DateUtilities.Calendar cimport Calendar
 from PyFin.Env import Settings
-from PyFin.Utilities.Asserts cimport pyFinAssert
+from PyFin.Utilities.Asserts cimport require
 
 cdef class Schedule(object):
 
@@ -68,7 +68,7 @@ cdef class Schedule(object):
         # really necessary. In these cases a decent placeholder is enough
         if not effectiveDate and not firstDate and dateGenerationRule == DateGeneration.Backward:
             evalDate = Settings.evaluationDate
-            pyFinAssert(evalDate < terminationDate, ValueError, "null effective date")
+            require(evalDate < terminationDate, ValueError, "null effective date")
             if nextToLastDate:
                 y = int((nextToLastDate - evalDate) / 366) + 1
                 effectiveDate = nextToLastDate - Period(length=y, units=TimeUnits.Years)
@@ -76,20 +76,20 @@ cdef class Schedule(object):
                 y = int((terminationDate - evalDate) / 366) + 1
                 effectiveDate = terminationDate - Period(length=y, units=TimeUnits.Years)
         else:
-            pyFinAssert(effectiveDate, ValueError, "null effective date")
+            require(effectiveDate, ValueError, "null effective date")
 
-        pyFinAssert(effectiveDate < terminationDate, ValueError, "effective date ({0}) "
+        require(effectiveDate < terminationDate, ValueError, "effective date ({0}) "
                                                                  "later than or equal to termination date ({1}"
         .format(effectiveDate, terminationDate))
 
         if tenor.length() == 0:
             self._rule = DateGeneration.Zero
         else:
-            pyFinAssert(tenor.length() > 0, ValueError, "non positive tenor ({0:d}) not allowed".format(tenor.length()))
+            require(tenor.length() > 0, ValueError, "non positive tenor ({0:d}) not allowed".format(tenor.length()))
 
         if self._firstDate:
             if self._rule == DateGeneration.Backward or self._rule == DateGeneration.Forward:
-                pyFinAssert(effectiveDate < self._firstDate < terminationDate, ValueError,
+                require(effectiveDate < self._firstDate < terminationDate, ValueError,
                             "first date ({0}) out of effective-termination date range [{1}, {2})"
                             .format(self._firstDate, effectiveDate, terminationDate))
                 # we should ensure that the above condition is still
@@ -101,7 +101,7 @@ cdef class Schedule(object):
 
         if self._nextToLastDate:
             if self._rule == DateGeneration.Backward or self._rule == DateGeneration.Forward:
-                pyFinAssert(effectiveDate < self._nextToLastDate < terminationDate, ValueError,
+                require(effectiveDate < self._nextToLastDate < terminationDate, ValueError,
                             "next to last date ({0}) out of effective-termination date range [{1}, {2})"
                             .format(self._nextToLastDate, effectiveDate, terminationDate))
                 # we should ensure that the above condition is still
@@ -249,7 +249,7 @@ cdef class Schedule(object):
             self._dates = self._dates[1:]
             self._isRegular = self._isRegular[1:]
 
-        pyFinAssert(len(self._dates) >= 1, ValueError, "degenerate single date ({0}) schedule\n"
+        require(len(self._dates) >= 1, ValueError, "degenerate single date ({0}) schedule\n"
                                                        "seed date: {1}\n"
                                                        "exit date: {2}\n"
                                                        "effective date: {3}\n"

@@ -8,7 +8,7 @@ Created on 2017-1-22
 cimport cython
 import numpy as np
 cimport numpy as np
-from PyFin.Utilities.Asserts cimport pyFinAssert
+from PyFin.Utilities.Asserts cimport require
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
@@ -36,7 +36,7 @@ cpdef to_dict(total_index, list total_category, double[:, :] matrix_values, list
         splited_values[i] = current_dict
         start = end + 1
 
-        pyFinAssert(len(current_dict) == len(splited_category[i]),
+        require(len(current_dict) == len(splited_category[i]),
                     ValueError,
                     "There is duplicated category value in the snapshot ({0}, {1}, {2})".format(total_index[start],
                                                                                                len(current_dict),

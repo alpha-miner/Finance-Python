@@ -6,7 +6,7 @@ Created on 2015-8-14
 """
 
 from PyFin.DateUtilities import Date
-from PyFin.Utilities import pyFinAssert
+from PyFin.Utilities import require
 
 
 class SettingsFactory(object):
@@ -22,7 +22,7 @@ class SettingsFactory(object):
 
     @evaluationDate.setter
     def evaluationDate(self, value):
-        pyFinAssert(isinstance(value, Date), ValueError, "{0} is not a valid PyFin date object".format(value))
+        require(isinstance(value, Date), ValueError, "{0} is not a valid PyFin date object".format(value))
         self._evaluationDate = value
 
     @property

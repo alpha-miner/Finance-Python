@@ -7,7 +7,7 @@ Created on 2017-6-8
 
 from PyFin.Env.Settings import Settings
 from PyFin.Math.udfs import sign
-from PyFin.Utilities.Asserts import pyFinAssert
+from PyFin.Utilities.Asserts import require
 
 
 class IrrFinder(object):
@@ -55,8 +55,8 @@ class IrrFinder(object):
                 if this_sign != 0:
                     last_sign = this_sign
 
-        pyFinAssert(sign_changes == 0,
-                    ValueError,
+        require(sign_changes == 0,
+                ValueError,
                     'given cash flows cannot result in the given market due to sign change')
 
 

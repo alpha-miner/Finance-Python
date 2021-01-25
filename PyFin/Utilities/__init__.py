@@ -6,13 +6,14 @@ Created on 2015-8-17
 """
 
 import time
-import numpy as np
-from PyFin.Utilities.Asserts import pyFinAssert
-from PyFin.Utilities.Asserts import pyFinWarning
+from PyFin.Utilities.Asserts import require
+from PyFin.Utilities.Asserts import ensureRaise
+from PyFin.Utilities.Asserts import warning
 from PyFin.Utilities.Asserts import isClose
 
-__all__ = ['pyFinAssert',
-           'pyFinWarning',
+__all__ = ['require',
+           'ensureRaise',
+           'warning',
            'isClose']
 
 

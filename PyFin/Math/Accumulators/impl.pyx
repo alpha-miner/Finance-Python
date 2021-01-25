@@ -16,7 +16,7 @@ from libcpp.string cimport string as CString
 from libcpp.map cimport map as CMap
 from libcpp.pair cimport pair as CPair
 from cython.operator import dereference, preincrement
-from PyFin.Utilities.Asserts cimport pyFinAssert
+from PyFin.Utilities.Asserts cimport require
 
 
 cdef class Deque:
@@ -147,7 +147,7 @@ cdef class DiffDeque:
         self.con = CList[double]()
         self.stamps = CList[double]()
         cdef str closed_str = closed.lower()
-        pyFinAssert(closed_str in ("left", "right", "both", "neither"),
+        require(closed_str in ("left", "right", "both", "neither"),
                     ValueError,
                     "closed parameter is <{0}> which is not in the recognized formats".format(closed))
         self.closed = closed_str.encode("UTF-8")
@@ -272,7 +272,7 @@ cdef class UniqueDiffDeque:
                   closed="right"):
         self.window = window
         cdef str closed_str = closed.lower()
-        pyFinAssert(closed_str in ("left", "right", "both", "neither"),
+        require(closed_str in ("left", "right", "both", "neither"),
                     ValueError,
                     "closed parameter is <{0}> which is not in the recognized formats".format(closed))
         self.closed = closed_str.encode("UTF-8")

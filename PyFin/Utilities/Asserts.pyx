@@ -10,17 +10,17 @@ from libc.math cimport fabs
 from libc.math cimport fmax
 
 
-cpdef int pyFinAssert(condition, exception, str msg="") except -1:
+cpdef int require(condition, exception, str msg="") except -1:
     if not condition:
         raise exception(msg)
     return 0
 
 
-cpdef int pyEnsureRaise(exception, str msg="") except -1:
+cpdef int ensureRaise(exception, str msg="") except -1:
     raise exception(msg)
 
 
-cpdef int pyFinWarning(condition, warn_type, str msg=""):
+cpdef int warning(condition, warn_type, str msg=""):
     if not condition:
         warnings.warn(msg, warn_type)
     return 0

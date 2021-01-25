@@ -9,8 +9,8 @@ import re
 cimport cython
 from libc.math cimport floor
 from PyFin.Enums._TimeUnits cimport TimeUnits
-from PyFin.Utilities.Asserts cimport pyFinAssert
-from PyFin.Utilities.Asserts cimport pyEnsureRaise
+from PyFin.Utilities.Asserts cimport require
+from PyFin.Utilities.Asserts cimport ensureRaise
 
 
 _unitPattern = re.compile('[BbDdMmWwYy]{1}')
@@ -64,7 +64,7 @@ cdef class Period(object):
                     units = TimeUnits.Weeks
                 return Period(length=length, units=units)
             else:
-                pyEnsureRaise(TypeError, "wrong period units type {0}".format(units))
+                ensureRaise(TypeError, "wrong period units type {0}".format(units))
 
     def __div__(self, int n):
 
@@ -81,7 +81,7 @@ cdef class Period(object):
                 reslength *= 7
                 resunits = TimeUnits.Days
 
-            pyFinAssert(reslength % n == 0, ValueError, "{0} cannot be divided by {1:d}".format(self, n))
+            require(reslength % n == 0, ValueError, "{0} cannot be divided by {1:d}".format(self, n))
 
             reslength //= n
 
@@ -104,8 +104,7 @@ cdef class Period(object):
                 reslength *= 7
                 resunits = TimeUnits.Days
 
-            pyFinAssert(reslength % n == 0, ValueError, "{0} cannot be divided by {1:d}".format(self, n))
-
+            require(reslength % n == 0, ValueError, "{0} cannot be divided by {1:d}".format(self, n))
             reslength //= n
 
         return Period(length=reslength, units=resunits)
@@ -128,7 +127,7 @@ cdef class Period(object):
                     resunits = TimeUnits.Months
                     reslength = reslength * 12 + p2length
                 elif p2units == TimeUnits.Weeks or p2units == TimeUnits.Days or p2units == TimeUnits.BDays:
-                    pyFinAssert(p2length == 0, ValueError, "impossible addition between {0} and {1}".format(self, p2))
+                    require(p2length == 0, ValueError, "impossible addition between {0} and {1}".format(self, p2))
                 else:
                     raise ValueError("unknown time unit ({0:d})".format(p2units))
                 return Period(length=reslength, units=resunits)
@@ -136,7 +135,7 @@ cdef class Period(object):
                 if p2units == TimeUnits.Years:
                     reslength += 12 * p2length
                 elif p2units == TimeUnits.Weeks or p2units == TimeUnits.Days or p2units == TimeUnits.BDays:
-                    pyFinAssert(p2length == 0, ValueError, "impossible addition between {0} and {1}".format(self, p2))
+                    require(p2length == 0, ValueError, "impossible addition between {0} and {1}".format(self, p2))
                 else:
                     raise ValueError("unknown time unit ({0:d})".format(p2units))
                 return Period(length=reslength, units=resunits)
@@ -145,7 +144,7 @@ cdef class Period(object):
                     resunits = TimeUnits.Days
                     reslength = reslength * 7 + p2length
                 elif p2units == TimeUnits.Years or p2units == TimeUnits.Months or p2units == TimeUnits.BDays:
-                    pyFinAssert(p2length == 0, ValueError, "impossible addition between {0} and {1}".format(self, p2))
+                    require(p2length == 0, ValueError, "impossible addition between {0} and {1}".format(self, p2))
                 else:
                     raise ValueError("unknown time unit ({0:d})".format(p2units))
                 return Period(length=reslength, units=resunits)
@@ -153,13 +152,13 @@ cdef class Period(object):
                 if p2units == TimeUnits.Weeks:
                     reslength += 7 * p2length
                 elif p2units == TimeUnits.Years or p2units == TimeUnits.Months or p2units == TimeUnits.BDays:
-                    pyFinAssert(p2length == 0, ValueError, "impossible addition between {0} and {1}".format(self, p2))
+                    require(p2length == 0, ValueError, "impossible addition between {0} and {1}".format(self, p2))
                 else:
                     raise ValueError("unknown time unit ({0:d})".format(p2units))
                 return Period(length=reslength, units=resunits)
             elif resunits == TimeUnits.BDays:
                 if p2units == TimeUnits.Years or p2units == TimeUnits.Months or p2units == TimeUnits.Weeks or p2units == TimeUnits.Days:
-                    pyFinAssert(p2length == 0, ValueError, "impossible addition between {0} and {1}".format(self, p2))
+                    require(p2length == 0, ValueError, "impossible addition between {0} and {1}".format(self, p2))
                 else:
                     raise ValueError("unknown time unit ({0:d})".format(p2units))
                 return Period(length=reslength, units=resunits)
@@ -269,7 +268,7 @@ cdef bint _lt_cmp(Period p1, Period p2) except -1:
     elif p1lim[0] >= p2lim[1]:
         return False
     else:
-        pyEnsureRaise(ValueError, "undecidable comparison between {0} and {1}".format(p1, p2))
+        ensureRaise(ValueError, "undecidable comparison between {0} and {1}".format(p1, p2))
 
 
 cdef tuple _daysMinMax(Period p):
@@ -286,4 +285,4 @@ cdef tuple _daysMinMax(Period p):
     elif units == TimeUnits.Years:
         return 365 * length, 366 * length
     elif units == TimeUnits.BDays:
-        pyEnsureRaise(ValueError, "Business days unit has not min max days")
+        ensureRaise(ValueError, "Business days unit has not min max days")

@@ -22,7 +22,7 @@ from PyFin.Math.Accumulators.StatelessAccumulators cimport PositivePart
 from PyFin.Math.Accumulators.StatelessAccumulators cimport NegativePart
 from PyFin.Math.Accumulators.StatelessAccumulators cimport XAverage
 from PyFin.Math.Accumulators.IAccumulators cimport Pow
-from PyFin.Utilities.Asserts cimport pyFinAssert
+from PyFin.Utilities.Asserts cimport require
 from PyFin.Utilities.Asserts cimport isClose
 from PyFin.Math.udfs cimport consecutive_int_sum
 from PyFin.Math.Accumulators.impl cimport Deque
@@ -33,11 +33,11 @@ from PyFin.Math.MathConstants cimport NAN
 
 def _parse(window):
     if isinstance(window, int) or isinstance(window, float):
-        pyFinAssert(window > 0, ValueError, "window length should be greater than 0")
+        require(window > 0, ValueError, "window length should be greater than 0")
         return window
     elif isinstance(window, str):
         number = float(window[:-1])
-        pyFinAssert(number > 0, ValueError, "window length should be greater than 0")
+        require(number > 0, ValueError, "window length should be greater than 0")
         if window[-1].upper() == "D":
             return number * 24 * 3600.
         elif window[-1].upper() == "H":
@@ -57,7 +57,7 @@ cdef class StatefulValueHolder(Accumulator):
         if not isinstance(window, int):
             raise ValueError("window parameter should be a positive int however {0} received"
                              .format(window))
-        pyFinAssert(window > 0, ValueError, "window length should be greater than 0")
+        require(window > 0, ValueError, "window length should be greater than 0")
         self._deque = Deque(window)
         self._isFull = False
 
@@ -98,7 +98,7 @@ cdef class Shift(StatefulValueHolder):
 
     def __init__(self, window, x):
         super(Shift, self).__init__(window)
-        pyFinAssert(window >= 1, ValueError, "shift value should not be less than 1")
+        require(window >= 1, ValueError, "shift value should not be less than 1")
         self._x = build_holder(x)
         self._window = self._x.window + window
         self._dependency = deepcopy(self._x.dependency)
@@ -123,7 +123,7 @@ cdef class Delta(StatefulValueHolder):
 
     def __init__(self, window, x):
         super(Delta, self).__init__(window)
-        pyFinAssert(window >= 1, ValueError, "Delta window value should not be less than 1")
+        require(window >= 1, ValueError, "Delta window value should not be less than 1")
         self._x = build_holder(x)
         self._window = self._x.window + window
         self._dependency = deepcopy(self._x.dependency)
@@ -720,7 +720,7 @@ cdef class MovingVariance(SingleValuedValueHolder):
         self._runningSumSquare = 0.0
         self._isPop = isPopulation
         if not self._isPop:
-            pyFinAssert(window >= 2, ValueError, "sampling variance can't be calculated with window size < 2")
+            require(window >= 2, ValueError, "sampling variance can't be calculated with window size < 2")
 
     cpdef push(self, dict data):
         cdef double popout
@@ -764,7 +764,7 @@ cdef class MovingStandardDeviation(SingleValuedValueHolder):
         self._runningSumSquare = 0.0
         self._isPop = isPopulation
         if not self._isPop:
-            pyFinAssert(window >= 2, ValueError, "sampling standard deviation can't be calculated with window size < 2")
+            require(window >= 2, ValueError, "sampling standard deviation can't be calculated with window size < 2")
 
     cpdef push(self, dict data):
         cdef double popout
@@ -810,7 +810,7 @@ cdef class MovingNegativeVariance(SingleValuedValueHolder):
         self._runningNegativeCount = 0
         self._isPop = isPopulation
         if not self._isPop:
-            pyFinAssert(window >= 2, ValueError, "sampling standard deviation can't be calculated with window size < 2")
+            require(window >= 2, ValueError, "sampling standard deviation can't be calculated with window size < 2")
 
     cpdef push(self, dict data):
         cdef double popout

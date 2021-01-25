@@ -24,7 +24,7 @@ cimport cython
 import numpy as np
 cimport numpy as np
 import pandas as pd
-from PyFin.Utilities.Asserts cimport pyFinAssert
+from PyFin.Utilities.Asserts cimport require
 from PyFin.Math.MathConstants cimport NAN
 from PyFin.Math.udfs cimport sign
 from PyFin.Math.Distributions.NormalDistribution cimport InverseCumulativeNormal as InvNormImpl

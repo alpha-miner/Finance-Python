@@ -6,12 +6,12 @@ Created on 2015-7-21
 """
 
 from collections import OrderedDict
-from PyFin.Utilities import pyFinAssert
+from PyFin.Utilities import require
 
 
 class Timeseries(object):
     def __init__(self, dates, values):
-        pyFinAssert(len(dates) == len(values), ValueError, "dates and values should have same length")
+        require(len(dates) == len(values), ValueError, "dates and values should have same length")
         self._values = OrderedDict()
 
         for date, value in zip(dates, values):

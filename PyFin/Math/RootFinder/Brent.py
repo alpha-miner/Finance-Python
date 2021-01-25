@@ -8,7 +8,7 @@ Created on 2017-6-7
 from math import exp
 from math import fabs
 from numpy import inf
-from PyFin.Utilities.Asserts import pyFinAssert
+from PyFin.Utilities.Asserts import require
 from PyFin.Math.RootFinder.RootFinderBase import RootFinder
 
 
@@ -29,7 +29,7 @@ class BracketedBrent(RootFinder):
         self.a = low
         self.b = high
 
-        pyFinAssert(self.a[1] * self.b[1] <= 0., ValueError, 'root is not bracketed')
+        require(self.a[1] * self.b[1] <= 0., ValueError, 'root is not bracketed')
 
         if fabs(self.a[1]) < fabs(self.b[1]):
             self.a, self.b = self.b, self.a

@@ -9,7 +9,7 @@ from math import exp
 from math import log
 from PyFin.Enums.Compoundings import Compounding
 from PyFin.Enums.Frequencies import Frequency
-from PyFin.Utilities.Asserts import pyFinAssert
+from PyFin.Utilities.Asserts import require
 
 
 class InterestRate(object):
@@ -24,8 +24,8 @@ class InterestRate(object):
                 or self.comp_ == Compounding.SimpleThenCompounded \
                 or self.comp_ == Compounding.CompoundedThenSimple:
             self.freqMakesSense_ = True
-            pyFinAssert(freq != Frequency.Once and freq != Frequency.OtherFrequency,
-                        ValueError,
+            require(freq != Frequency.Once and freq != Frequency.OtherFrequency,
+                    ValueError,
                         "frequency not allowed for this interest rate")
             self.freq_ = float(freq)
 

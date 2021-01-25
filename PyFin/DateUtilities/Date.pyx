@@ -10,7 +10,7 @@ import six
 cimport cython
 from libc.math cimport floor
 from PyFin.Enums._TimeUnits cimport TimeUnits
-from PyFin.Utilities.Asserts cimport pyFinAssert
+from PyFin.Utilities.Asserts cimport require
 from PyFin.DateUtilities.Period cimport Period
 
 
@@ -53,7 +53,7 @@ cdef Date _advance(Date date, int n, int units):
         y += addedYear
         leapFlag = Date.isLeap(y)
 
-        pyFinAssert(1900 < y < 2200, ValueError, 'year {0:d} is out of bound. It must be in [1901, 2199]'.format(y))
+        require(1900 < y < 2200, ValueError, 'year {0:d} is out of bound. It must be in [1901, 2199]'.format(y))
 
         length = _MonthLeapLength[monthLeft - 1] if leapFlag else _MonthLength[monthLeft - 1]
         if d > length:
@@ -97,7 +97,7 @@ cdef class Date(object):
             while d <= _monthOffset(m, leap):
                 m -= 1
 
-            pyFinAssert(1900 < y < 2200, ValueError, 'year {0:d} is out of bound. It must be in [1901, 2199]'.format(y))
+            require(1900 < y < 2200, ValueError, 'year {0:d} is out of bound. It must be in [1901, 2199]'.format(y))
             self._year = y
             self._month = m
             self._day = d - _monthOffset(m, leap)
@@ -219,8 +219,8 @@ cdef class Date(object):
 
     @staticmethod
     def nthWeekday(int nth, int dayOfWeek, int m, int y):
-        pyFinAssert(nth > 0, ValueError, "zeroth day of week in a given (month, year) is undefined")
-        pyFinAssert(nth < 6, ValueError, "no more than 5 weekday in a given (month, year)")
+        require(nth > 0, ValueError, "zeroth day of week in a given (month, year) is undefined")
+        require(nth < 6, ValueError, "no more than 5 weekday in a given (month, year)")
 
         cdef int skip
         cdef int first

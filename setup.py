@@ -25,8 +25,8 @@ else:
 
 PACKAGE = "PyFin"
 NAME = "Finance-Python"
-VERSION = "0.9.4"
-DESCRIPTION = "PyFin " + VERSION
+__version__ = "0.9.5" + "-ac2c07e759"
+DESCRIPTION = "PyFin " + __version__
 AUTHOR = "cheng li"
 AUTHOR_EMAIL = "wegamekinglc@hotmail.com"
 URL = 'https://github.com/ChinaQuants/Finance-Python'
@@ -36,7 +36,7 @@ def git_version():
     from subprocess import Popen, PIPE
     gitproc = Popen(['git', 'rev-parse', 'HEAD'], stdout=PIPE)
     (stdout, _) = gitproc.communicate()
-    return stdout.strip()
+    return stdout.strip().decode("utf8")
 
 
 class test(Command):
@@ -79,21 +79,22 @@ class version_build(Command):
 
     def run(self):
         git_ver = git_version()[:10]
-        configFile = 'PyFin/__init__.py'
+        configFiles = ['PyFin/__init__.py', 'setup.py']
 
-        file_handle = open(configFile, 'r')
-        lines = file_handle.readlines()
-        newFiles = []
-        for line in lines:
-            if line.startswith('__version__'):
-                line = line.split('+')[0].rstrip()
-                line = line + " + \"-" + git_ver + "\"\n"
-            newFiles.append(line)
-        file_handle.close()
-        os.remove(configFile)
-        file_handle = open(configFile, 'w')
-        file_handle.writelines(newFiles)
-        file_handle.close()
+        for configFile in configFiles:
+            file_handle = open(configFile, 'r')
+            lines = file_handle.readlines()
+            newFiles = []
+            for line in lines:
+                if line.startswith('__version__'):
+                    line = line.split('+')[0].rstrip()
+                    line = line + " + \"-" + git_ver + "\"\n"
+                newFiles.append(line)
+            file_handle.close()
+            os.remove(configFile)
+            file_handle = open(configFile, 'w')
+            file_handle.writelines(newFiles)
+            file_handle.close()
 
 
 requirements = "requirements.txt"
@@ -168,7 +169,7 @@ ext_modules_settings = cythonize(generate_extensions(ext_modules, line_trace),
 
 setup(
     name=NAME,
-    version=VERSION,
+    version=__version__,
     description=DESCRIPTION,
     author=AUTHOR,
     author_email=AUTHOR_EMAIL,

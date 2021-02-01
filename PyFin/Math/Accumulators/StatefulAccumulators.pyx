@@ -548,7 +548,6 @@ cdef class TimeMovingAverage(TimeSingleValuedValueHolder):
         self._runningSum = 0.0
 
     cpdef push(self, dict data):
-        cdef int added
         cdef list popouts
 
         self._x.push(data)
@@ -832,6 +831,54 @@ cdef class MovingStandardDeviation(SingleValuedValueHolder):
 
     def __str__(self):
         return "\\mathrm{{mstd}}({0}, {1}, {2})".format(self._window, str(self._x), self._isPop)
+
+
+cdef class TimeMovingStandardDeviation(TimeSingleValuedValueHolder):
+
+    def __init__(self, window, x, isPopulation=False, closed="right"):
+        super(TimeMovingStandardDeviation, self).__init__(window, x, closed)
+        self._runningSum = 0.0
+        self._runningSumSquare = 0.0
+        self._isPop = isPopulation
+        if not self._isPop:
+            require(window >= 2, ValueError, "sampling standard deviation can't be calculated with window size < 2")
+
+    cpdef push(self, dict data):
+        cdef list popouts
+
+        self._x.push(data)
+        cdef double value = self._x.result()
+        if isnan(value):
+            return NAN
+        popouts = self._deque.dump(value, data["stamp"], 0.)
+
+        self._runningSum += value
+        self._runningSumSquare += value * value
+        for p in popouts:
+            self._runningSum -= p
+            self._runningSumSquare -= p * p
+        self._isFull = self._isFull or self._deque.isFull()
+
+    @cython.cdivision(True)
+    cpdef double result(self):
+        cdef size_t length = self._deque.size()
+        cdef double tmp
+
+        if length == 0:
+            return NAN
+
+        tmp = self._runningSumSquare - self._runningSum * self._runningSum / length
+
+        if self._isPop:
+            return sqrt(tmp / length)
+        else:
+            if length >= 2:
+                return sqrt(tmp / (length - 1))
+            else:
+                return NAN
+
+    def __str__(self):
+        return "\\mathrm{{Timemstd}}({0}, {1}, {2})".format(self._window, str(self._x), self._deque.close())
 
 
 cdef class MovingNegativeVariance(SingleValuedValueHolder):

@@ -250,6 +250,16 @@ cdef class MovingStandardDeviation(SingleValuedValueHolder):
     cpdef double result(self)
 
 
+cdef class TimeMovingStandardDeviation(TimeSingleValuedValueHolder):
+
+    cdef public double _runningSum
+    cdef public double _runningSumSquare
+    cdef public int _isPop
+
+    cpdef push(self, dict data)
+    cpdef double result(self)
+
+
 cdef class MovingNegativeVariance(SingleValuedValueHolder):
 
     cdef public double _runningNegativeSum

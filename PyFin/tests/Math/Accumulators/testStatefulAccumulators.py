@@ -44,6 +44,7 @@ from PyFin.Math.Accumulators import MovingCountedPositive
 from PyFin.Math.Accumulators import MovingCountedNegative
 from PyFin.Math.Accumulators import MovingVariance
 from PyFin.Math.Accumulators import MovingStandardDeviation
+from PyFin.Math.Accumulators import TimeMovingStandardDeviation
 from PyFin.Math.Accumulators import MovingNegativeVariance
 from PyFin.Math.Accumulators import MovingCorrelation
 from PyFin.Math.Accumulators import MovingProduct
@@ -228,9 +229,7 @@ class TestStatefulAccumulators(unittest.TestCase):
         mv = TimeMovingAverage(window, 'z')
         values = np.random.randn(2500)
         stamps = np.cumsum(np.random.randint(1, 10, 2500))
-        con = []
         for i, (value, stamp) in enumerate(zip(values, stamps)):
-            con.append(value)
             mv.push(dict(z=value, stamp=stamp))
 
             calculated = mv.result()
@@ -1348,6 +1347,41 @@ class TestStatefulAccumulators(unittest.TestCase):
                                                                  "Var expected:   {1:f}\n"
                                                                  "Var calculated: {2:f}".format(i, expected,
                                                                                                 calculated))
+
+    def testTimeMovingStandardDeviation(self):
+        window = 60
+
+        mv = TimeMovingStandardDeviation(window, 'z', isPopulation=True)
+        values = np.random.randn(2500)
+        stamps = np.cumsum(np.random.randint(1, 10, 2500))
+        for i, (value, stamp) in enumerate(zip(values, stamps)):
+            mv.push(dict(z=value, stamp=stamp))
+
+            calculated = mv.result()
+            time_diff = (stamp - stamps) < window
+            time_diff[i+1:] = False
+            expected = np.std(values[time_diff])
+
+            if i >= window - 1:
+                self.assertAlmostEqual(calculated, expected, 12,
+                                       "at index {0}\n"
+                                       "expected:   {1}\n"
+                                       "calculated: {2}".format(i, expected, calculated))
+
+        mv = TimeMovingStandardDeviation(window, 'z', isPopulation=False)
+        for i, (value, stamp) in enumerate(zip(values, stamps)):
+            mv.push(dict(z=value, stamp=stamp))
+
+            calculated = mv.result()
+            time_diff = (stamp - stamps) < window
+            time_diff[i + 1:] = False
+            expected = np.std(values[time_diff], ddof=1)
+
+            if i >= window - 1:
+                self.assertAlmostEqual(calculated, expected, 12,
+                                       "at index {0}\n"
+                                       "expected:   {1}\n"
+                                       "calculated: {2}".format(i, expected, calculated))
 
     def testMovingStandardDeviationDeepcopy(self):
         window = 20

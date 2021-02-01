@@ -83,7 +83,6 @@ cdef class MovingMax(SortedValueHolder):
 
     cpdef double result(self)
 
-
 cdef class MovingArgMax(SortedValueHolder):
 
     cpdef double result(self)
@@ -166,6 +165,13 @@ cdef class MovingSum(SingleValuedValueHolder):
 
 cdef class MovingAverage(SingleValuedValueHolder):
 
+    cdef public double _runningSum
+
+    cpdef push(self, dict data)
+    cpdef double result(self)
+
+
+cdef class TimeMovingAverage(TimeSingleValuedValueHolder):
     cdef public double _runningSum
 
     cpdef push(self, dict data)

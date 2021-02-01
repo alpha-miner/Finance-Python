@@ -541,6 +541,39 @@ cdef class MovingAverage(SingleValuedValueHolder):
         return "\\mathrm{{MA}}({0}, {1})".format(self._window, str(self._x))
 
 
+cdef class TimeMovingAverage(TimeSingleValuedValueHolder):
+
+    def __init__(self, window, x, closed="right"):
+        super(TimeMovingAverage, self).__init__(window, x, closed)
+        self._runningSum = 0.0
+
+    cpdef push(self, dict data):
+        cdef int added
+        cdef list popouts
+
+        self._x.push(data)
+        cdef double value = self._x.result()
+        if isnan(value):
+            return NAN
+        popouts = self._deque.dump(value, data["stamp"], 0.)
+
+        self._runningSum += value
+        for p in popouts:
+            self._runningSum -= p
+        self._isFull = self._isFull or self._deque.isFull()
+
+    @cython.cdivision(True)
+    cpdef double result(self):
+        cdef size_t size = self.size()
+        if size:
+            return self._runningSum / size
+        else:
+            return NAN
+
+    def __str__(self):
+        return "\\mathrm{{TimeMA}}({0}, {1}, {2})".format(self._window, str(self._x), self._deque.close())
+
+
 cdef class MovingDecay(SingleValuedValueHolder):
 
     def __init__(self, window, x):

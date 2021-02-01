@@ -32,6 +32,7 @@ from PyFin.Math.Accumulators import TimeMovingCountUnique
 from PyFin.Math.Accumulators import MovingAllTrue
 from PyFin.Math.Accumulators import MovingAnyTrue
 from PyFin.Math.Accumulators import MovingAverage
+from PyFin.Math.Accumulators import TimeMovingAverage
 from PyFin.Math.Accumulators import MovingDecay
 from PyFin.Math.Accumulators import MovingPositiveAverage
 from PyFin.Math.Accumulators import MovingNegativeAverage
@@ -220,6 +221,27 @@ class TestStatefulAccumulators(unittest.TestCase):
                                                                  "Average expected:   {1:f}\n"
                                                                  "Average calculated: {2:f}".format(i, expected,
                                                                                                     calculated))
+
+    def testTimeMovingAverager(self):
+        window = 60
+
+        mv = TimeMovingAverage(window, 'z')
+        values = np.random.randn(2500)
+        stamps = np.cumsum(np.random.randint(1, 10, 2500))
+        con = []
+        for i, (value, stamp) in enumerate(zip(values, stamps)):
+            con.append(value)
+            mv.push(dict(z=value, stamp=stamp))
+
+            calculated = mv.result()
+            time_diff = (stamp - stamps) < window
+            time_diff[i+1:] = False
+            expected = np.mean(values[time_diff])
+
+            self.assertAlmostEqual(calculated, expected, 12,
+                                   "at index {0}\n"
+                                   "expected:   {1}\n"
+                                   "calculated: {2}".format(i, expected, calculated))
 
     def testMovingDecay(self):
         window = 80
@@ -828,7 +850,7 @@ class TestStatefulAccumulators(unittest.TestCase):
         window = 60
         mat = TimeMovingCount(window, Latest("x"))
         values = np.random.randn(2500)
-        stamps = np.cumsum(np.random.randint(0, 10, 2500))
+        stamps = np.cumsum(np.random.randint(1, 10, 2500))
         for i, (value, stamp) in enumerate(zip(values, stamps)):
             mat.push(dict(x=value, stamp=stamp))
 

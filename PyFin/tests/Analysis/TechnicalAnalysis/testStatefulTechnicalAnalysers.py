@@ -15,9 +15,11 @@ import os
 from collections import deque
 from PyFin.Analysis.SecurityValueHolders import SecurityLatestValueHolder
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingAverage
+from PyFin.Analysis.TechnicalAnalysis import SecurityTimeMovingAverage
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingDecay
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingVariance
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingStandardDeviation
+from PyFin.Analysis.TechnicalAnalysis import SecurityTimeMovingStandardDeviation
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingMax
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingArgMax
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingMin
@@ -128,6 +130,28 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
             value = ma1.value
             for name in value.index():
                 expected = np.mean(self.dataSet[name]['close'][start:(i + 1)])
+                calculated = value[name]
+                self.assertAlmostEqual(expected, calculated, 12, 'at index {0}\n'
+                                                                 'expected:   {1:.12f}\n'
+                                                                 'calculated: {2:.12f}'.format(i, expected, calculated))
+
+    def testSecurityTimeMovingAverage(self):
+        window = 10
+        ma1 = SecurityTimeMovingAverage(window, ['close'])
+
+        for i in range(len(self.aapl['close'])):
+            data = dict(aapl=dict(close=self.aapl['close'][i],
+                                  open=self.aapl['open'][i],
+                                  stamp=self.aapl["stamp"][i]),
+                        ibm=dict(close=self.ibm['close'][i],
+                                 open=self.ibm['open'][i],
+                                 stamp=self.ibm["stamp"][i]))
+            ma1.push(data)
+            value = ma1.value
+            for name in value.index():
+                time_diff = (getattr(self, name)["stamp"][i] - getattr(self, name)["stamp"]) < window
+                time_diff[i+1:] = False
+                expected = np.mean(self.dataSet[name]['close'][time_diff])
                 calculated = value[name]
                 self.assertAlmostEqual(expected, calculated, 12, 'at index {0}\n'
                                                                  'expected:   {1:.12f}\n'
@@ -262,6 +286,32 @@ class TestStatefulTechnicalAnalysis(unittest.TestCase):
                                                                  'expected:   {1:.12f}\n'
                                                                  'calculated: {2:.12f}'.format(i, expected,
                                                                                                calculated))
+
+    def testSecurityTimeMovingAverage(self):
+        window = 60
+        ma1 = SecurityTimeMovingStandardDeviation(window, ['close'])
+
+        for i in range(len(self.aapl['close'])):
+            data = dict(aapl=dict(close=self.aapl['close'][i],
+                                  open=self.aapl['open'][i],
+                                  stamp=self.aapl["stamp"][i]),
+                        ibm=dict(close=self.ibm['close'][i],
+                                 open=self.ibm['open'][i],
+                                 stamp=self.ibm["stamp"][i]))
+            ma1.push(data)
+            value = ma1.value
+
+            if i <= 1:
+                continue
+
+            for name in value.index():
+                time_diff = (getattr(self, name)["stamp"][i] - getattr(self, name)["stamp"]) < window
+                time_diff[i + 1:] = False
+                expected = np.std(self.dataSet[name]['close'][time_diff], ddof=1)
+                calculated = value[name]
+                self.assertAlmostEqual(expected, calculated, 12, 'at index {0}\n'
+                                                                 'expected:   {1:.12f}\n'
+                                                                 'calculated: {2:.12f}'.format(i, expected, calculated))
 
     def testSecurityMovingStandardDeviationDeepcopy(self):
         self.template_test_deepcopy(SecurityMovingStandardDeviation, window=10, x=['x'])

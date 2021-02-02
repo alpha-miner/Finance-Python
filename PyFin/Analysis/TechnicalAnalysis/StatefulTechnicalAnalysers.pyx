@@ -15,6 +15,7 @@ from PyFin.Analysis.SecurityValueHolders cimport SecuritySingleValueHolder
 from PyFin.Analysis.SecurityValueHolders cimport SecurityBinaryValueHolder
 from PyFin.Analysis.SecurityValueHolders cimport build_holder
 from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingAverage
+from PyFin.Math.Accumulators.StatefulAccumulators cimport TimeMovingAverage
 from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingDecay
 from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingMax
 from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingArgMax
@@ -31,6 +32,7 @@ from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingAnyTrue
 from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingSum
 from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingVariance
 from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingStandardDeviation
+from PyFin.Math.Accumulators.StatefulAccumulators cimport TimeMovingStandardDeviation
 from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingCountedPositive
 from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingPositiveAverage
 from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingCountedNegative
@@ -52,6 +54,17 @@ cdef class SecurityMovingAverage(SecuritySingleValueHolder):
     def __str__(self):
         if self._compHolder:
             return "\\mathrm{{MA}}({0}, {1})".format(self._window - self._compHolder.window, str(self._compHolder))
+        else:
+            return str(self._holderTemplate)
+
+
+cdef class SecurityTimeMovingAverage(SecuritySingleValueHolder):
+    def __init__(self, window, x):
+        super(SecurityTimeMovingAverage, self).__init__(window, TimeMovingAverage, x)
+
+    def __str__(self):
+        if self._compHolder:
+            return "\\mathrm{{TimeMA}}({0}, {1})".format(self._window - self._compHolder.window, str(self._compHolder))
         else:
             return str(self._holderTemplate)
 
@@ -227,6 +240,17 @@ cdef class SecurityMovingStandardDeviation(SecuritySingleValueHolder):
     def __str__(self):
         if self._compHolder:
             return "\\mathrm{{MStd}}({0}, {1})".format(self._window - self._compHolder.window, str(self._compHolder))
+        else:
+            return str(self._holderTemplate)
+
+
+cdef class SecurityTimeMovingStandardDeviation(SecuritySingleValueHolder):
+    def __init__(self, window, x):
+        super(SecurityTimeMovingStandardDeviation, self).__init__(window, TimeMovingStandardDeviation, x)
+
+    def __str__(self):
+        if self._compHolder:
+            return "\\mathrm{{TimeMStd}}({0}, {1})".format(self._window - self._compHolder.window, str(self._compHolder))
         else:
             return str(self._holderTemplate)
 

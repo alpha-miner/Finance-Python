@@ -9,6 +9,7 @@ Created on 2015-9-23
 import functools
 
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingAverage
+from PyFin.Analysis.TechnicalAnalysis import SecurityTimeMovingAverage
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingDecay
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingMax
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingArgMax
@@ -27,6 +28,7 @@ from PyFin.Analysis.TechnicalAnalysis import SecurityMovingAnyTrue
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingSum
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingVariance
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingStandardDeviation
+from PyFin.Analysis.TechnicalAnalysis import SecurityTimeMovingStandardDeviation
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingCountedPositive
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingPositiveAverage
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingRSI
@@ -138,8 +140,13 @@ def MCORR(window, x='x', y='y'):
     return SecurityMovingCorrelation(window, x, y)
 
 
-def MA(window, x='x'):
-    return SecurityMovingAverage(window, x)
+def MA(window, x='x', closed="right"):
+    if isinstance(window, int):
+        return SecurityMovingAverage(window, x)
+    elif isinstance(window, str):
+        return SecurityTimeMovingAverage(window, x, closed)
+    else:
+        raise ValueError("wrong window format <{0}>".format(window))
 
 
 def MADecay(window, x='x'):
@@ -212,8 +219,13 @@ def MVARIANCE(window, x='x'):
     return SecurityMovingVariance(window, x)
 
 
-def MSTD(window, x='x'):
-    return SecurityMovingStandardDeviation(window, x)
+def MSTD(window, x='x', closed="right"):
+    if isinstance(window, int):
+        return SecurityMovingStandardDeviation(window, x)
+    elif isinstance(window, str):
+        return SecurityTimeMovingStandardDeviation(window, x, closed)
+    else:
+        raise ValueError("wrong window format <{0}>".format(window))
 
 
 def MNPOSITIVE(window, x='x'):

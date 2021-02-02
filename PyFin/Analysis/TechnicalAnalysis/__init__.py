@@ -29,6 +29,7 @@ from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import Securit
 from PyFin.Analysis.TechnicalAnalysis.StatelessTechnicalAnalysers import SecurityMinimumValueHolder
 
 from PyFin.Analysis.TechnicalAnalysis.StatefulTechnicalAnalysers import SecurityMovingAverage
+from PyFin.Analysis.TechnicalAnalysis.StatefulTechnicalAnalysers import SecurityTimeMovingAverage
 from PyFin.Analysis.TechnicalAnalysis.StatefulTechnicalAnalysers import SecurityMovingDecay
 from PyFin.Analysis.TechnicalAnalysis.StatefulTechnicalAnalysers import SecurityMovingMax
 from PyFin.Analysis.TechnicalAnalysis.StatefulTechnicalAnalysers import SecurityMovingArgMax
@@ -45,6 +46,7 @@ from PyFin.Analysis.TechnicalAnalysis.StatefulTechnicalAnalysers import Security
 from PyFin.Analysis.TechnicalAnalysis.StatefulTechnicalAnalysers import SecurityMovingSum
 from PyFin.Analysis.TechnicalAnalysis.StatefulTechnicalAnalysers import SecurityMovingVariance
 from PyFin.Analysis.TechnicalAnalysis.StatefulTechnicalAnalysers import SecurityMovingStandardDeviation
+from PyFin.Analysis.TechnicalAnalysis.StatefulTechnicalAnalysers import SecurityTimeMovingStandardDeviation
 from PyFin.Analysis.TechnicalAnalysis.StatefulTechnicalAnalysers import SecurityMovingCountedPositive
 from PyFin.Analysis.TechnicalAnalysis.StatefulTechnicalAnalysers import SecurityMovingPositiveAverage
 from PyFin.Analysis.TechnicalAnalysis.StatefulTechnicalAnalysers import SecurityMovingCountedNegative
@@ -78,6 +80,7 @@ __all__ = ['SecuritySignValueHolder',
            'SecurityMaximumValueHolder',
            'SecurityMinimumValueHolder',
            'SecurityMovingAverage',
+           'SecurityTimeMovingAverage',
            'SecurityMovingDecay',
            'SecurityMovingMax',
            'SecurityMovingArgMax',
@@ -94,6 +97,7 @@ __all__ = ['SecuritySignValueHolder',
            'SecurityMovingSum',
            'SecurityMovingVariance',
            'SecurityMovingStandardDeviation',
+           'SecurityTimeMovingStandardDeviation',
            'SecurityMovingCountedPositive',
            'SecurityMovingPositiveAverage',
            'SecurityMovingCountedNegative',

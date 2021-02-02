@@ -89,6 +89,3 @@ class InterestRate(object):
         t1 = self.dayCounter_.yearFraction(d1, d2, refStart, refEnd)
         t2 = resultDC.yearFraction(d1, d2, refStart, refEnd)
         return self.impliedRate(self.compoundFactorImpl(t1), resultDC, comp, freq, t2)
-
-
-

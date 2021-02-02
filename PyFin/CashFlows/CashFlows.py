@@ -57,7 +57,7 @@ class IrrFinder(object):
 
         require(sign_changes == 0,
                 ValueError,
-                    'given cash flows cannot result in the given market due to sign change')
+                'given cash flows cannot result in the given market due to sign change')
 
 
 class CashFlows(object):

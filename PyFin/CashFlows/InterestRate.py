@@ -26,7 +26,7 @@ class InterestRate(object):
             self.freqMakesSense_ = True
             require(freq != Frequency.Once and freq != Frequency.OtherFrequency,
                     ValueError,
-                        "frequency not allowed for this interest rate")
+                    "frequency not allowed for this interest rate")
             self.freq_ = float(freq)
 
     def compoundFactorImpl(self, t):

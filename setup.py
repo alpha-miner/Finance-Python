@@ -25,7 +25,7 @@ else:
 
 PACKAGE = "PyFin"
 NAME = "Finance-Python"
-__version__ = "0.9.5" + "-ac2c07e759"
+__version__ = "0.9.6"
 DESCRIPTION = "PyFin " + __version__
 AUTHOR = "cheng li"
 AUTHOR_EMAIL = "wegamekinglc@hotmail.com"

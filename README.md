@@ -37,12 +37,6 @@
     
 以及相关的c/c++编译器（例如Linux下的gcc，windows下的visual studio）
 
-* 可选依赖
-
-如果您在Windows上工作，并且想使用相关的Excel功能（请见根目录下``excel``文件夹），则需以下工具：
-
-    xlwings
-
 ### 安装
 
 1. 从最新源代码安装

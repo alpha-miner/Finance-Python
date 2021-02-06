@@ -23,7 +23,7 @@
 ### TODO list
 
 - [x] 增加基于事件长度的窗口函数（Count以及CountUnique）
-- [ ] 增加更多的基于时间窗口长度的函数
+- [x] 增加更多的基于时间窗口长度的函数
 
 ### 依赖
 
@@ -51,60 +51,27 @@
     
         git clone https://github.com/ChinaQuants/Finance-Python.git (如果你是从github获取)
         cd finance-Python
-        
-    * *Linux*
-    
+       
     只需运行如下命令：
     
         python setpy.py install
-    
-    * *Windows*
-        
-    需要修改项目根目录下``setup.cfg``文件，添加如下两行：
-    
-        [build]
-        compiler=msvc
-    
-    然后再运行：``python setup.py install``
     
     安装之后，可以直先接运行测试：
     
         python PyFin/tests/testSuite.py
         
 2. 从``pypi``安装
-
-    * *Linux*
     
     只需运行如下命令：
     
         pip install Finance-Python
-        
-    * *Windows*
-    
-    从编译完成的``.whl``文件安装：
-    
-        pip insall --use-wheel Finance-Python
-        
-    现阶段支持python 2.7, 3.5以及3.6版本，并且只有64位版本。如果在首次运行时遇到dll文件无法找到的问题，请确保您的电脑上有visual studio 2015的运行时环境，
-    下载地址：[Visual C++ Redistributable for Visual Studio 2015](https://www.microsoft.com/en-us/download/details.aspx?id=48145)
     
     
 ### 开发环境
 
-* *Linux*
-
 在代码目录下，需要运行如下指令：
 
     python setup.py build_ext --inplace
-    
-* *Windows*
-    
-需要显式的指定编译器，例如选用Visual Studio的c/c++编译器：
-
-    python setup.py build_ext --inplace --compiler=msvc
-    
-或者修改``setup.cfg``文件。
-
 
 ### 主要功能
 

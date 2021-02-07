@@ -40,6 +40,7 @@ from PyFin.Math.Accumulators import MovingPositiveDifferenceAverage
 from PyFin.Math.Accumulators import MovingNegativeDifferenceAverage
 from PyFin.Math.Accumulators import MovingRSI
 from PyFin.Math.Accumulators import MovingSum
+from PyFin.Math.Accumulators import TimeMovingSum
 from PyFin.Math.Accumulators import MovingCountedPositive
 from PyFin.Math.Accumulators import MovingCountedNegative
 from PyFin.Math.Accumulators import MovingVariance
@@ -613,6 +614,26 @@ class TestStatefulAccumulators(unittest.TestCase):
                                                                  "Sum expected:   {1:f}\n"
                                                                  "Sum calculated: {2:f}".format(i, expected,
                                                                                                 calculated))
+
+    def testTimeMovingSum(self):
+        window = 60
+
+        mv = TimeMovingSum(window, 'z')
+        values = np.random.randn(2500)
+        stamps = np.cumsum(np.random.randint(1, 10, 2500))
+        for i, (value, stamp) in enumerate(zip(values, stamps)):
+            mv.push(dict(z=value, stamp=stamp))
+
+            calculated = mv.result()
+            time_diff = (stamp - stamps) < window
+            time_diff[i+1:] = False
+            expected = np.sum(values[time_diff])
+
+            self.assertAlmostEqual(calculated, expected, 12,
+                                   "at index {0}\n"
+                                   "expected:   {1}\n"
+                                   "calculated: {2}".format(i, expected, calculated))
+
 
     def testMovingSumDeepcopy(self):
         ms = MovingSum(3, 'x')

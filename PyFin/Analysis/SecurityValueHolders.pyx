@@ -256,16 +256,16 @@ cdef class SecurityValueHolder(object):
 
 
 cdef class SecuritySingleValueHolder(SecurityValueHolder):
-    def __init__(self, window, holderType, x):
+    def __init__(self, window, holderType, x, **kwargs):
         super(SecuritySingleValueHolder, self).__init__()
         self._compHolder = build_holder(x)
         self._holderName = str(self._compHolder)
         self._dependency = self._compHolder.fields
         self._window = _parse(window)+ self._compHolder.window
-        self._holderTemplate = holderType(window=window, x=str(self._compHolder))
+        self._holderTemplate = holderType(window=window, x=str(self._compHolder), **kwargs)
         self._innerHolders = {
             name: copy.deepcopy(self._holderTemplate) for name in self._compHolder.symbolList
-            }
+        }
 
     cpdef push(self, dict data):
         cdef SeriesValues sec_values

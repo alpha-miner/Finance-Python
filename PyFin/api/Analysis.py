@@ -26,6 +26,7 @@ from PyFin.Analysis.TechnicalAnalysis import SecurityTimeMovingCountUnique
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingAllTrue
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingAnyTrue
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingSum
+from PyFin.Analysis.TechnicalAnalysis import SecurityTimeMovingSum
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingVariance
 from PyFin.Analysis.TechnicalAnalysis import SecurityMovingStandardDeviation
 from PyFin.Analysis.TechnicalAnalysis import SecurityTimeMovingStandardDeviation
@@ -211,8 +212,13 @@ def MANYTRUE(window, x='x'):
     return SecurityMovingAnyTrue(window, x)
 
 
-def MSUM(window, x='x'):
-    return SecurityMovingSum(window, x)
+def MSUM(window, x='x', closed="right"):
+    if isinstance(window, int):
+        return SecurityMovingSum(window, x)
+    elif isinstance(window, str):
+        return SecurityTimeMovingSum(window, x, closed)
+    else:
+        raise ValueError("wrong window format <{0}>".format(window))
 
 
 def MVARIANCE(window, x='x'):

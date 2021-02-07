@@ -30,6 +30,7 @@ from PyFin.Math.Accumulators.StatefulAccumulators cimport TimeMovingCountUnique
 from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingAllTrue
 from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingAnyTrue
 from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingSum
+from PyFin.Math.Accumulators.StatefulAccumulators cimport TimeMovingSum
 from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingVariance
 from PyFin.Math.Accumulators.StatefulAccumulators cimport MovingStandardDeviation
 from PyFin.Math.Accumulators.StatefulAccumulators cimport TimeMovingStandardDeviation
@@ -59,12 +60,14 @@ cdef class SecurityMovingAverage(SecuritySingleValueHolder):
 
 
 cdef class SecurityTimeMovingAverage(SecuritySingleValueHolder):
-    def __init__(self, window, x):
-        super(SecurityTimeMovingAverage, self).__init__(window, TimeMovingAverage, x)
+    def __init__(self, window, x, closed="right"):
+        super(SecurityTimeMovingAverage, self).__init__(window, TimeMovingAverage, x, closed=closed)
 
     def __str__(self):
         if self._compHolder:
-            return "\\mathrm{{TimeMA}}({0}, {1})".format(self._window - self._compHolder.window, str(self._compHolder))
+            return "\\mathrm{{TimeMA}}({0}, {1}, {2})".format(self._window - self._compHolder.window,
+                                                              str(self._compHolder),
+                                                              self._holderTemplate)
         else:
             return str(self._holderTemplate)
 
@@ -157,8 +160,8 @@ cdef class SecurityMovingCount(SecuritySingleValueHolder):
 
 
 cdef class SecurityTimeMovingCount(SecuritySingleValueHolder):
-    def __init__(self, window, x):
-        super(SecurityTimeMovingCount, self).__init__(window, TimeMovingCount, x)
+    def __init__(self, window, x, closed="right"):
+        super(SecurityTimeMovingCount, self).__init__(window, TimeMovingCount, x, closed=closed)
 
     def __str__(self):
         if self._compHolder:
@@ -218,6 +221,17 @@ cdef class SecurityMovingSum(SecuritySingleValueHolder):
     def __str__(self):
         if self._compHolder:
             return "\\mathrm{{MSum}}({0}, {1})".format(self._window - self._compHolder.window, str(self._compHolder))
+        else:
+            return str(self._holderTemplate)
+
+
+cdef class SecurityTimeMovingSum(SecuritySingleValueHolder):
+    def __init__(self, window, x, closed="right"):
+        super(SecurityTimeMovingSum, self).__init__(window, TimeMovingSum, x, closed=closed)
+
+    def __str__(self):
+        if self._compHolder:
+            return "\\mathrm{{TimeMSum}}({0}, {1})".format(self._window - self._compHolder.window, str(self._compHolder))
         else:
             return str(self._holderTemplate)
 

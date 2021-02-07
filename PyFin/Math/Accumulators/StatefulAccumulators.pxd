@@ -163,6 +163,14 @@ cdef class MovingSum(SingleValuedValueHolder):
     cpdef double result(self)
 
 
+cdef class TimeMovingSum(TimeSingleValuedValueHolder):
+
+    cdef public double _runningSum
+
+    cpdef push(self, dict data)
+    cpdef double result(self)
+
+
 cdef class MovingAverage(SingleValuedValueHolder):
 
     cdef public double _runningSum

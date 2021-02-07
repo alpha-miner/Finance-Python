@@ -52,6 +52,7 @@ from PyFin.Math.Accumulators.StatefulAccumulators import MovingPositiveDifferenc
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingNegativeDifferenceAverage
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingRSI
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingSum
+from PyFin.Math.Accumulators.StatefulAccumulators import TimeMovingSum
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingCountedPositive
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingCountedNegative
 from PyFin.Math.Accumulators.StatefulAccumulators import MovingVariance
@@ -124,6 +125,7 @@ __all__ = ["Exp",
            "MovingNegativeDifferenceAverage",
            "MovingRSI",
            "MovingSum",
+           "TimeMovingSum",
            "MovingCountedPositive",
            "MovingCountedNegative",
            "MovingNegativeVariance",

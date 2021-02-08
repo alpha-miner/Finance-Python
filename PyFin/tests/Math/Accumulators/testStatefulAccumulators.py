@@ -615,7 +615,7 @@ class TestStatefulAccumulators(unittest.TestCase):
                                                                  "Sum calculated: {2:f}".format(i, expected,
                                                                                                 calculated))
 
-    def testTimeMovingSum(self):
+    def testTimeMovingSumRight(self):
         window = 60
 
         mv = TimeMovingSum(window, 'z')
@@ -634,6 +634,65 @@ class TestStatefulAccumulators(unittest.TestCase):
                                    "expected:   {1}\n"
                                    "calculated: {2}".format(i, expected, calculated))
 
+    def testTimeMovingSumLeft(self):
+        window = 60
+
+        mv = TimeMovingSum(window, 'z', closed="left")
+        values = np.random.randn(2500)
+        stamps = np.cumsum(np.random.randint(1, 10, 2500))
+        for i, (value, stamp) in enumerate(zip(values, stamps)):
+            mv.push(dict(z=value, stamp=stamp))
+
+            calculated = mv.result()
+            time_diff = (stamp - stamps) <= window
+            time_diff[i:] = False
+            expected = np.sum(values[time_diff])
+
+            if i > 0:
+                self.assertAlmostEqual(calculated, expected, 12,
+                                       "at index {0}\n"
+                                       "expected:   {1}\n"
+                                       "calculated: {2}".format(i, expected, calculated))
+
+    def testTimeMovingSumBoth(self):
+        window = 60
+
+        mv = TimeMovingSum(window, 'z', closed="both")
+        values = np.random.randn(2500)
+        stamps = np.cumsum(np.random.randint(1, 10, 2500))
+        for i, (value, stamp) in enumerate(zip(values, stamps)):
+            mv.push(dict(z=value, stamp=stamp))
+
+            calculated = mv.result()
+            time_diff = (stamp - stamps) <= window
+            time_diff[i+1:] = False
+            expected = np.sum(values[time_diff])
+
+            if i > 0:
+                self.assertAlmostEqual(calculated, expected, 12,
+                                       "at index {0}\n"
+                                       "expected:   {1}\n"
+                                       "calculated: {2}".format(i, expected, calculated))
+
+    def testTimeMovingSumNeither(self):
+        window = 60
+
+        mv = TimeMovingSum(window, 'z', closed="neither")
+        values = np.random.randn(2500)
+        stamps = np.cumsum(np.random.randint(1, 10, 2500))
+        for i, (value, stamp) in enumerate(zip(values, stamps)):
+            mv.push(dict(z=value, stamp=stamp))
+
+            calculated = mv.result()
+            time_diff = (stamp - stamps) < window
+            time_diff[i:] = False
+            expected = np.sum(values[time_diff])
+
+            if i > 0:
+                self.assertAlmostEqual(calculated, expected, 12,
+                                       "at index {0}\n"
+                                       "expected:   {1}\n"
+                                       "calculated: {2}".format(i, expected, calculated))
 
     def testMovingSumDeepcopy(self):
         ms = MovingSum(3, 'x')

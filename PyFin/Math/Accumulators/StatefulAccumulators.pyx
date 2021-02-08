@@ -382,7 +382,6 @@ cdef class MovingCountUnique(SingleValuedValueHolder):
             if self._unique_values[popout] == 0:
                 del self._unique_values[popout]
                 added -= 1
-
         self._count += added
         self._isFull = self._isFull or self._deque.isFull()
 
@@ -525,13 +524,12 @@ cdef class TimeMovingSum(TimeSingleValuedValueHolder):
         if isnan(value):
             return NAN
         popouts = self._deque.dump(value, data["stamp"], 0.)
-
-        self._runningSum += value
+        if self._deque.is_new_added:
+            self._runningSum += self._deque.back()
         for p in popouts:
             self._runningSum -= p
         self._isFull = self._isFull or self._deque.isFull()
 
-    @cython.cdivision(True)
     cpdef double result(self):
         return self._runningSum
 

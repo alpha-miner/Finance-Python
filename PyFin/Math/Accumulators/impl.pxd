@@ -32,6 +32,7 @@ cdef class DiffDeque:
 
     cdef double window
     cdef public bint is_full
+    cdef public bint is_new_added
     cdef double last
     cdef double last_stamp
     cdef CList[double] con
@@ -45,6 +46,7 @@ cdef class DiffDeque:
     cpdef size_t idx(self, double value)
     cpdef double sum(self)
     cpdef CString close(self)
+    cpdef double back(self)
 
 cpdef object rebuild_diff_deque(double window, str closed)
 

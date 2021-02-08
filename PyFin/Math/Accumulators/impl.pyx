@@ -153,6 +153,7 @@ cdef class DiffDeque:
         self.closed = closed_str.encode("UTF-8")
         self.last = NAN
         self.last_stamp = NAN
+        self.is_new_added = False
 
     @cython.cdivision(True)
     @cython.boundscheck(False)
@@ -172,15 +173,22 @@ cdef class DiffDeque:
         if self.closed == _RIGHT or self.closed == _BOTH:
             self.con.push_back(value)
             self.stamps.push_back(stamp)
+            self.is_new_added = True
         else:
             if not isnan(self.last):
                 if (self.closed == _NEITHER and (stamp - self.last_stamp) < self.window) \
                     or (self.closed == _LEFT and (stamp - self.last_stamp) <= self.window):
                     self.con.push_back(self.last)
                     self.stamps.push_back(self.last_stamp)
+                    self.is_new_added = True
+                else:
+                    self.is_new_added = False
         self.last = value
         self.last_stamp = stamp
         return ret_values
+
+    cpdef double back(self):
+        return self.con.back()
 
     cpdef CList[double] dumps(self, values, stamps):
         cdef CList[double] ret_values = CList[double]()

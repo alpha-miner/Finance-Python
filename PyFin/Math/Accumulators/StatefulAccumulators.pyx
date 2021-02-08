@@ -583,7 +583,8 @@ cdef class TimeMovingAverage(TimeSingleValuedValueHolder):
             return NAN
         popouts = self._deque.dump(value, data["stamp"], 0.)
 
-        self._runningSum += value
+        if self._deque.is_new_added:
+            self._runningSum += self._deque.back()
         for p in popouts:
             self._runningSum -= p
         self._isFull = self._isFull or self._deque.isFull()
@@ -872,15 +873,17 @@ cdef class TimeMovingStandardDeviation(TimeSingleValuedValueHolder):
 
     cpdef push(self, dict data):
         cdef list popouts
+        cdef double last_value
 
         self._x.push(data)
         cdef double value = self._x.result()
         if isnan(value):
             return NAN
         popouts = self._deque.dump(value, data["stamp"], 0.)
-
-        self._runningSum += value
-        self._runningSumSquare += value * value
+        if self._deque.is_new_added:
+            last_value = self._deque.back()
+            self._runningSum += last_value
+            self._runningSumSquare += last_value * last_value
         for p in popouts:
             self._runningSum -= p
             self._runningSumSquare -= p * p

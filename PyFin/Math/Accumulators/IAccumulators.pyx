@@ -96,7 +96,7 @@ cdef class Accumulator(IAccumulator):
         cdef int k
         cdef double[:, :] matrix_values
         cdef size_t n = len(data)
-        cdef double[:] output_values = np.zeros(n)
+        cdef np.ndarray[double, ndim=1] output_values = np.zeros(n)
         cdef list columns
         cdef size_t column_length
         cdef dict data_dict

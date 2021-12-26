@@ -691,7 +691,25 @@ cdef set sse_holDays = {
     Date(2021, 10, 4),
     Date(2021, 10, 5),
     Date(2021, 10, 6),
-    Date(2021, 10, 7)
+    Date(2021, 10, 7),
+    Date(2022, 1, 3),
+    Date(2022, 1, 31),
+    Date(2022, 2, 1),
+    Date(2022, 2, 2),
+    Date(2022, 2, 3),
+    Date(2022, 2, 4),
+    Date(2022, 4, 4),
+    Date(2022, 4, 5),
+    Date(2022, 5, 2),
+    Date(2022, 5, 3),
+    Date(2022, 5, 4),
+    Date(2022, 6, 3),
+    Date(2022, 9, 12),
+    Date(2022, 10, 3),
+    Date(2022, 10, 4),
+    Date(2022, 10, 5),
+    Date(2022, 10, 6),
+    Date(2022, 10, 7)
 }
 
 
@@ -847,7 +865,15 @@ cdef set ib_working_weekends = {
     Date(2021, 5, 8),
     Date(2021, 9, 18),
     Date(2021, 9, 26),
-    Date(2021, 10, 9)
+    Date(2021, 10, 9),
+    # 2022
+    Date(2022, 1, 29),
+    Date(2022, 1, 30),
+    Date(2022, 4, 2),
+    Date(2022, 4, 24),
+    Date(2022, 5, 7),
+    Date(2022, 10, 8),
+    Date(2022, 10, 9)
 }
 
 cdef ChinaSseImpl _sseImpl = ChinaSseImpl()

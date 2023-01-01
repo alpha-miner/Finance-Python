@@ -223,8 +223,8 @@ class TestCalendar(unittest.TestCase):
                                   Date(2022, 10, 8),
                                   Date(2022, 10, 9),
                                   # China Inter Bank working weekend list in the year 2023
-                                  Date(2023, 1, 27),
                                   Date(2023, 1, 28),
+                                  Date(2023, 1, 29),
                                   Date(2023, 4, 23),
                                   Date(2023, 5, 6),
                                   Date(2023, 6, 25),

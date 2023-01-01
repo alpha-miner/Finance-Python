@@ -140,7 +140,15 @@ class TestCalendar(unittest.TestCase):
                        Date(2022, 5, 2), Date(2022, 5, 3), Date(2022, 5, 4),
                        Date(2022, 6, 3),
                        Date(2022, 9, 12),
-                       Date(2022, 10, 3), Date(2022, 10, 4), Date(2022, 10, 5), Date(2022, 10, 6), Date(2022, 10, 7)
+                       Date(2022, 10, 3), Date(2022, 10, 4), Date(2022, 10, 5), Date(2022, 10, 6), Date(2022, 10, 7),
+                       # China Shanghai Securities Exchange holiday list in the year 2023
+                       Date(2023, 1, 1), Date(2023, 1, 2),
+                       Date(2023, 1, 21), Date(2023, 1, 22), Date(2023, 1, 23), Date(2023, 1, 24), Date(2023, 1, 25), Date(2023, 1, 26), Date(2023, 1, 27),
+                       Date(2023, 4, 5), Date(2023, 4, 29), Date(2023, 4, 30),
+                       Date(2023, 5, 1), Date(2023, 5, 2), Date(2023, 5, 3),
+                       Date(2023, 6, 22), Date(2023, 6, 23), Date(2023, 6, 24),
+                       Date(2023, 9, 29), Date(2023, 9, 30),
+                       Date(2023, 10, 1), Date(2023, 10, 2), Date(2023, 10, 3), Date(2023, 10, 4), Date(2023, 10, 5), Date(2023, 10, 6)
                        ]
 
         cal = Calendar('China.SSE')
@@ -213,7 +221,16 @@ class TestCalendar(unittest.TestCase):
                                   Date(2022, 4, 24),
                                   Date(2022, 5, 7),
                                   Date(2022, 10, 8),
-                                  Date(2022, 10, 9)]
+                                  Date(2022, 10, 9),
+                                  # China Inter Bank working weekend list in the year 2023
+                                  Date(2023, 1, 27),
+                                  Date(2023, 1, 28),
+                                  Date(2023, 4, 23),
+                                  Date(2023, 5, 6),
+                                  Date(2023, 6, 25),
+                                  Date(2023, 10, 7),
+                                  Date(2023, 10, 8)
+                                  ]
 
         cal = Calendar('China.IB')
 

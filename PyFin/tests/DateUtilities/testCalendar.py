@@ -148,7 +148,15 @@ class TestCalendar(unittest.TestCase):
                        Date(2023, 5, 1), Date(2023, 5, 2), Date(2023, 5, 3),
                        Date(2023, 6, 22), Date(2023, 6, 23), Date(2023, 6, 24),
                        Date(2023, 9, 29), Date(2023, 9, 30),
-                       Date(2023, 10, 1), Date(2023, 10, 2), Date(2023, 10, 3), Date(2023, 10, 4), Date(2023, 10, 5), Date(2023, 10, 6)
+                       Date(2023, 10, 1), Date(2023, 10, 2), Date(2023, 10, 3), Date(2023, 10, 4), Date(2023, 10, 5), Date(2023, 10, 6),
+                       # China Shanghai Securities Exchange holiday list in the year 2024
+                       Date(2024, 1, 1),
+                       Date(2024, 2, 10), Date(2024, 2, 11), Date(2024, 2, 12), Date(2024, 2, 13), Date(2024, 2, 14), Date(2024, 2, 15), Date(2024, 2, 16), Date(2024, 2, 17),
+                       Date(2024, 4, 5), Date(2024, 4, 6), Date(2024, 4, 7),
+                       Date(2024, 5, 1), Date(2024, 5, 2), Date(2024, 5, 3), Date(2024, 5, 4), Date(2024, 5, 5),
+                       Date(2024, 6, 10),
+                       Date(2024, 9, 15), Date(2024, 9, 16), Date(2024, 9, 17),
+                       Date(2024, 10, 1), Date(2024, 10, 2), Date(2024, 10, 3), Date(2024, 10, 4), Date(2024, 10, 5), Date(2024, 10, 6), Date(2024, 10, 7),
                        ]
 
         cal = Calendar('China.SSE')
@@ -229,7 +237,17 @@ class TestCalendar(unittest.TestCase):
                                   Date(2023, 5, 6),
                                   Date(2023, 6, 25),
                                   Date(2023, 10, 7),
-                                  Date(2023, 10, 8)
+                                  Date(2023, 10, 8),
+                                  # China Inter Bank working weekend list in the year 2024
+                                  Date(2024, 2, 4),
+                                  Date(2024, 2, 9),
+                                  Date(2024, 2, 18),
+                                  Date(2024, 4, 7),
+                                  Date(2024, 4, 28),
+                                  Date(2024, 5, 11),
+                                  Date(2024, 9, 14),
+                                  Date(2024, 9, 29),
+                                  Date(2024, 10, 12)
                                   ]
 
         cal = Calendar('China.IB')

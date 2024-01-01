@@ -36,18 +36,33 @@ cdef class IAccumulator(object):
     def __add__(self, right):
         return AddedValueHolder(self, right)
 
+    def __radd__(self, left):
+        return AddedValueHolder(left, self)
+
     def __sub__(self, right):
         return MinusedValueHolder(self, right)
+
+    def __rsub__(self, left):
+        return MinusedValueHolder(left, self)
 
     def __mul__(self, right):
         return MultipliedValueHolder(self, right)
 
+    def __rmul__(self, left):
+        return MultipliedValueHolder(left, self)
+
     def __div__(self, right):
         return DividedValueHolder(self, right)
+
+    def __rdiv__(self, left):
+        return DividedValueHolder(left, self)
 
     # only work for python 3
     def __truediv__(self, right):
         return DividedValueHolder(self, right)
+
+    def __rtruediv__(self, left):
+        return DividedValueHolder(left, self)
 
     def __richcmp__(self, right, int op):
         if op == 0:

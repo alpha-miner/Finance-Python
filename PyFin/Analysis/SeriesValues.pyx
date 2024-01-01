@@ -92,6 +92,15 @@ cdef class SeriesValues(object):
         else:
             return SeriesValues(self.values + right, self.name_mapping)
 
+    def __radd__(self, left):
+        if isinstance(left, SeriesValues):
+            if isinstance(self, SeriesValues):
+                return SeriesValues(left.values + self.values, self.name_mapping)
+            else:
+                return SeriesValues(left.values + self, left.name_mapping)
+        else:
+            return SeriesValues(left + self.values, self.name_mapping)
+
     def __sub__(self, right):
         if isinstance(right, SeriesValues):
             if isinstance(self, SeriesValues):
@@ -101,6 +110,15 @@ cdef class SeriesValues(object):
         else:
             return SeriesValues(self.values - right, self.name_mapping)
 
+    def __rsub__(self, left):
+        if isinstance(left, SeriesValues):
+            if isinstance(self, SeriesValues):
+                return SeriesValues(left.values - self.values, self.name_mapping)
+            else:
+                return SeriesValues(left.values - self, left.name_mapping)
+        else:
+            return SeriesValues(left - self.values, self.name_mapping)
+
     def __mul__(self, right):
         if isinstance(right, SeriesValues):
             if isinstance(self, SeriesValues):
@@ -109,6 +127,15 @@ cdef class SeriesValues(object):
                 return SeriesValues(self * right.values, right.name_mapping)
         else:
             return SeriesValues(self.values * right, self.name_mapping)
+
+    def __rmul__(self, left):
+        if isinstance(left, SeriesValues):
+            if isinstance(self, SeriesValues):
+                return SeriesValues(left.values * self.values, self.name_mapping)
+            else:
+                return SeriesValues(left.values * self, left.name_mapping)
+        else:
+            return SeriesValues(left * self.values, self.name_mapping)
 
     @cython.cdivision(True)
     def __truediv__(self, right):
@@ -123,6 +150,24 @@ cdef class SeriesValues(object):
                 name_mapping = right.name_mapping
         else:
             values = self.values / right
+            name_mapping = self.name_mapping
+
+        values[~np.isfinite(values)] = NAN
+        return SeriesValues(values, name_mapping)
+
+    @cython.cdivision(True)
+    def __rtruediv__(self, left):
+        cdef np.ndarray[double, ndim=1] values
+        cdef dict name_mapping
+        if isinstance(left, SeriesValues):
+            if isinstance(self, SeriesValues):
+                values = left.values / self.values
+                name_mapping = self.name_mapping
+            else:
+                values = left.values / self
+                name_mapping = left.name_mapping
+        else:
+            values = left / self.values
             name_mapping = self.name_mapping
 
         values[~np.isfinite(values)] = NAN
@@ -146,6 +191,24 @@ cdef class SeriesValues(object):
         values[~np.isfinite(values)] = NAN
         return SeriesValues(values, name_mapping)
 
+    @cython.cdivision(True)
+    def __rdiv__(self, left):
+        cdef np.ndarray[double, ndim=1] values
+        cdef dict name_mapping
+        if isinstance(left, SeriesValues):
+            if isinstance(self, SeriesValues):
+                values = left.values / self.values
+                name_mapping = self.name_mapping
+            else:
+                values = left.values / self
+                name_mapping = left.name_mapping
+        else:
+            values = left / self.values
+            name_mapping = self.name_mapping
+
+        values[~np.isfinite(values)] = NAN
+        return SeriesValues(values, name_mapping)
+
     def __and__(self, right):
         if isinstance(right, SeriesValues):
             if isinstance(self, SeriesValues):
@@ -155,6 +218,15 @@ cdef class SeriesValues(object):
         else:
             return SeriesValues(self.values.astype(bool) & right, self.name_mapping)
 
+    def __rand__(self, left):
+        if isinstance(left, SeriesValues):
+            if isinstance(self, SeriesValues):
+                return SeriesValues(left.values.astype(bool) & self.values.astype(bool), self.name_mapping)
+            else:
+                return SeriesValues(left.values.astype(bool) & self, left.name_mapping)
+        else:
+            return SeriesValues(left & self.values.astype(bool), self.name_mapping)
+
     def __or__(self, right):
         if isinstance(right, SeriesValues):
             if isinstance(self, SeriesValues):
@@ -163,6 +235,15 @@ cdef class SeriesValues(object):
                 return SeriesValues(self | right.values.astype(bool), right.name_mapping)
         else:
             return SeriesValues(self.values.astype(bool) | right, self.name_mapping)
+
+    def __ror__(self, left):
+        if isinstance(left, SeriesValues):
+            if isinstance(self, SeriesValues):
+                return SeriesValues(left.values.astype(bool) | self.values.astype(bool), self.name_mapping)
+            else:
+                return SeriesValues(left.values.astype(bool) | self, left.name_mapping)
+        else:
+            return SeriesValues(left | self.values.astype(bool), self.name_mapping)
 
     def __xor__(self, right):
         if isinstance(right, SeriesValues):
@@ -231,7 +312,7 @@ cdef class SeriesValues(object):
                 start = diff_loc + 1
             data[isnan(self.values)] = NAN
         else:
-            data = rankdata(self.values).astype(float)
+            data = rankdata(self.values, nan_policy="omit").astype(float)
             data[isnan(self.values)] = NAN
         return SeriesValues(data, self.name_mapping)
 

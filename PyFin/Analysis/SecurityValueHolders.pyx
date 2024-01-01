@@ -138,17 +138,33 @@ cdef class SecurityValueHolder(object):
     def __add__(self, right):
         return SecurityAddedValueHolder(self, right)
 
+    def __radd__(self, left):
+        return SecurityAddedValueHolder(left, self)
+
     def __sub__(self, right):
         return SecuritySubbedValueHolder(self, right)
+
+    def __rsub__(self, left):
+        return SecuritySubbedValueHolder(left, self)
 
     def __mul__(self, right):
         return SecurityMultipliedValueHolder(self, right)
 
+    def __rmul__(self, left):
+        return SecurityMultipliedValueHolder(left, self)
+
+
     def __div__(self, right):
         return SecurityDividedValueHolder(self, right)
 
+    def __rdiv__(self, left):
+        return SecurityDividedValueHolder(left, self)
+
     def __truediv__(self, right):
         return SecurityDividedValueHolder(self, right)
+
+    def __rtruediv__(self, left):
+        return SecurityDividedValueHolder(left, self)
 
     def __richcmp__(self, right, int op):
 
